@@ -45,33 +45,52 @@ function buildBigCondition(i,condition)
   var inlineconditions = buildConditionsCode(condition.conditions);
   var code = "";
   if(condition.f === "count" )
-  code = "value.f" + i + "=(" + inlineconditions+ ")?1:0;";
+    code = "value.f" + i + "=(" + inlineconditions+ ")?1:0;";
   else if(condition.f === "sum" || condition.f === "avg")
-  code = "value.f" + i + "=(" + inlineconditions+")?this." + condition.field +":0;";
-  //else if(condition.f === "avg"){
-  //  code += "if("+inlineconditions+"){value.f" + i +"_1=1;";
-  //  code+="value.f" + i + "_2=this." + condition.field +";}";
-  //  code+= "else{value.f"+i+"_1=value.f"+i+"_2=0};";
-  //}
+  code = "value.f" + i + "=(" + inlineconditions+")?this." + condition.field + ":0;";
+  else throw "wrong operator";
   return code;
 }
 
 function buildMapChunk(ind, condition){
-    var code="if(this.actiontype==='"+condition.actiontype+"'){";
-    var i = 0;
-    var conditions = condition.conditions;
-    var n = conditions.length;
-    while (i < n) {
-      code += buildBigCondition(ind + "_" + (i/2) ,conditions[i]);
-      i+=2;
+  var usedis = [] //used indices
+  var code="if(this.actiontype==='"+condition.actiontype+"'){";
+  var i = 0;
+  var conditions = condition.conditions;
+  var n = conditions.length;
+  while (i < n) {
+    var temp = buildBigCondition(ind + "_" + (i/2) ,conditions[i]);
+    if(temp !== "")
+    {
+      usedis.push(ind + "_" + (i/2));
+      code+=temp;
     }
-    code+="}";
-    return {code;
+
+    i+=2;
+  }
+  code+="}else{";
+  var defval = {};
+  for(var i in usedis)
+    code+="value['f"+usedis[i] +"'']=0;";
+  code+= "}";
+
+  return code;
 }
 
 function buildMapFunction(query){
-  var code="function(){var value={}";
+  var code="function(){var value={};";
+  var i = 0;
+  var n = query.length
+
+  while (i < n) {
+    code += buildMapChunk(i/2, query[i]);
+    i+=2;
+  }
+  code += "}";
+  return code;
 }
+
+
 
 function toMapReduce( queryobject, result)
 {
