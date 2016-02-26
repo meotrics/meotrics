@@ -1,6 +1,6 @@
 var MongoClient = require('mongodb').MongoClient,
     url = 'mongodb://localhost:1234/test',
-    n = 200000,
+    n = 50000,
     collection = 'actions',
     users = null,
     numberUsers = 0,
@@ -45,16 +45,25 @@ function generatePageView(){
 	}
 }
 
+function generatePurchase(){
+    var user = users[generateNumber(0, numberUsers-1)];
+    var pid = generateNumber(1, 1000);
+    return {
+        appid: user.appid,
+        actiontype: 'purchase',
+        ctime: new Date(new Date().getTime() + generateNumber(-1, 1)*3600000),
+        user: user,
+        cid: pid%10,
+        pid: pid,
+        amount: generateNumber(1, 10),
+        price: generateNumber(10, 200)
+    }
+}
+
 function generateNumber(min, max){
     var range = max - min;
-    var temp = range.toString();
-    var str = "1";
-    for(var i=0;i<temp.length;i++){
-        str += '0';
-    }
-    temp = parseInt(str);
 
-    var number = Math.floor((Math.random()*temp)/(temp/(range+1)))+min;
+    var number = Math.floor(Math.random()*(range+1))+min;
     return number;
 }
 

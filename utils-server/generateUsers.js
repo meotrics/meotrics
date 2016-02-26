@@ -53,14 +53,8 @@ function generateUsers(){
 
 function generateNumber(min, max){
 	var range = max - min;
-	var temp = range.toString();
-	var str = "1";
-	for(var i=0;i<temp.length;i++){
-		str += '0';
-	}
-	temp = parseInt(str);
 
-	var number = Math.floor((Math.random()*temp)/(temp/(range+1)))+min;
+	var number = Math.floor(Math.random()*(range+1))+min;
 	return number;
 }
 
