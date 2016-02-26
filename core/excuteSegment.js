@@ -14,7 +14,7 @@ var testJson = [{
   actiontype: "pageview",
   conditions: [{
     f: "count",  field: "pid",  operator: ">",  value: 5,
-    conditions: ["amount", ">", 5, "and", "price", "=", "dd"],
+    conditions: ["amount", ">", 5, "and", "price", "=", "30"],
   }]
 }];
 
@@ -25,64 +25,75 @@ if(f== "avg"), addFiled("eifi_1, eifi_2")
 buildCondition
 this. + field + opera  && condition: 1 : 0
 
-//test: buildConditionsCode("amount", ">", 5, "and", "price", "=", "dd"])
+
+//purpose: build javascript code based on json condition
+//example: buildConditionsCode(["amount", ">", 5, "and", "price", "=", "30"])
+//return: string contains compiled javascript code
+//param: array of conditions, [field, operator, value, joinoperator, field, operator, value, ...]
 function buildConditionsCode(conditions){
-  var i =0;
-  var n = conditions.length
+  var i = 0;
   var code = "";
 
-  while (i < n) {
-    var nextop = i+3 < n ? conditions[i+3] : "" ;
+  while (i < conditions.length) {
+    //get the next operator (if exist)
+    var nextop = i + 3 < n ? conditions[i+3] : "";
+
+    //append new compiled js code
     code += "(this." + conditions[i] + conditions[i+1] + JSON.stringify(conditions[i+2]) +")" + nextop;
     i+=4;
   }
   return code;
 }
 
-//test buildBigCondition({  f: "count",  field: "pid",  operator: ">",  value: 5,conditions: ["amount", ">", 5, "and", "price", "=", "dd"],})
-function buildBigCondition(i,condition)
+//purpose: build big condition to javascript code
+//example: buildBigCondition({  f: "count",  field: "pid",  operator: ">", value: 5,conditions: ["amount", ">", 5, "and", "price", "=", "dd"],})
+//return: string contains compiled javascript code
+//param: i=index of condition, for iteration purpose, condition=see example
+function buildBigCondition(i, condition)
 {
+  //get the condition code
   var inlineconditions = buildConditionsCode(condition.conditions);
+
   var code = "";
+  //if the query is to count then just map 1, but if the query is to sum
+  // and calculate average then have to map field's value
   if(condition.f === "count" )
-    code = "value.f" + i + "=(" + inlineconditions+ ")?1:0;";
+    code = "value.f" + i + "=(" + inlineconditions + ")?1:0;";
   else if(condition.f === "sum" || condition.f === "avg")
-  code = "value.f" + i + "=(" + inlineconditions+")?this." + condition.field + ":0;";
+    code = "value.f" + i + "=(" + inlineconditions + ")?this." + condition.field + ":0;";
   else throw "wrong operator";
+
   return code;
 }
 
+//purpose: build a piece of map function
+//example: buildMapChunk({actiontype: "pageview", conditions: [{f: "count", field: "pid", operator: ">", value: 5, conditions: ["amount", ">", 5, "and", "price", "=", "dd"]})
+//return: string contains compiled javascript code
+//param: i=index of condition, for iteration purpose, condition=see example
 function buildMapChunk(ind, condition){
-  var usedis = [] //used indices
-  var code="if(this.actiontype==='"+condition.actiontype+"'){";
+  var code="if(this.actiontype==='" + condition.actiontype + "'){";
   var i = 0;
   var conditions = condition.conditions;
-  var n = conditions.length;
-  while (i < n) {
-    var temp = buildBigCondition(ind + "_" + (i/2) ,conditions[i]);
-    if(temp !== "")
-    {
-      usedis.push(ind + "_" + (i/2));
-      code+=temp;
-    }
+  var defvalcode = "";
 
+  //just join small chunk into a big one
+  while (i < conditions.length) {
+    code += buildBigCondition( ind + "_" + (i/2) ,conditions[i]);
+    defvalcode += "value['f"+ ind + "_" + (i/2) +"'']=0;";
     i+=2;
   }
-  code+="}else{";
-  var defval = {};
-  for(var i in usedis)
-    code+="value['f"+usedis[i] +"'']=0;";
-  code+= "}";
-
+  code += "}else{" + defvalcode + "}";
   return code;
 }
 
+//purpose: build a javascript map functino from a json query
+//example: buildMapFunction(testJson)
+//return: string contains compiled javascript code
+//param: query=see testJson
 function buildMapFunction(query){
   var code="function(){var value={};";
   var i = 0;
-  var n = query.length
-
-  while (i < n) {
+  while (i < query.length) {
     code += buildMapChunk(i/2, query[i]);
     i+=2;
   }
@@ -90,27 +101,6 @@ function buildMapFunction(query){
   return code;
 }
 
-
-
-function toMapReduce( queryobject, result)
-{
-  if(queryobject.length !== 1)
-  {
-    toMapReduce(queryobject.slice(0,-2), result);
-  }
-
-  var operator = queryobject[queryobject.length - 2];
-  var query = queryobject[queryobject.length - 1];
-
-  json =
-
-
-}
-function toMapReduce(queryobject)
-{
-  var N = queryobject.length;
-  var ei = 0;
-  while (ei < N) {
-
-  }
+function main(){
+  console.log(buildMapFunction(testJson));
 }
