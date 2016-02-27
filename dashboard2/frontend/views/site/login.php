@@ -35,5 +35,7 @@ Html::addCssClass($this->params['bodyOptions'], 'login-page');
         </div>
 
         <?php ActiveForm::end(); ?>
+        <hr>
+        <p style="color:#999;margin:1em 0"> If you don't have accout, please <?= Html::a('register',['site/signup']) ?></p>
     </div>
 </div>
