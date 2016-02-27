@@ -13,10 +13,12 @@ Analytics software
 [mac: ]
 trỏ danh sách tên miền sau
 
-meotrics.dev            -> 127.0.0.1
-backend.meotrics.dev    -> 127.0.0.1
-meotrics.run            -> 198.98.102.113
-backend.meotrics.run    -> 198.98.102.113
+| Tên miền              | Địa chỉ           |
+|-----------------------|-------------------|
+|meotrics.dev           | 127.0.0.1         |
+|backend.meotrics.dev   | 127.0.0.1         |
+|meotrics.run           | 198.98.102.113    |
+|backend.meotrics.run   | 198.98.102.113    |
 
 2. Danh sách port chuẩn
 process		port
@@ -39,7 +41,8 @@ gõ
 `$ php init`
 chọn môi trường là development, gõ tiếp
 `composer self-update
-composer install`
+composer global require "fxp/composer-asset-plugin:^1.0"
+composer update -o`
 3. Cấu hình Web Server
 3.1 Cấu hình apache
 `<VirtualHost *:80>
@@ -85,31 +88,29 @@ composer install`
 `
 3.2 Cấu hình nginx
 `server {
-       charset utf-8;
-       client_max_body_size 128M;
+  charset utf-8;
+  client_max_body_size 128M;
+  listen 80; ## listen for ipv4
+  #listen [::]:80 default_server ipv6only=on; ## listen for ipv6
 
-       listen 80; ## listen for ipv4
-       #listen [::]:80 default_server ipv6only=on; ## listen for ipv6
+  server_name meotrics.run;
+  root        /home/thanhpk/space/meotrics/dashboard2/frontend/web/;
+  index       index.php;
 
-       server_name meotrics.run;
-       root        /home/thanhpk/space/meotrics/dashboard2/frontend/web/;
-       index       index.php;
+  access_log  /home/thanhpk/tmp/frontend-access.log;
+  error_log   /home/thanhpk/tmp/frontend-error.log;
 
-       access_log  /home/thanhpk/tmp/frontend-access.log;
-       error_log   /home/thanhpk/tmp/frontend-error.log;
-
-       location / {
-           # Redirect everything that isn't a real file to index.php
-           try_files $uri $uri/ /index.php?$args;
-       }
-
-       # uncomment to avoid processing of calls to non-existing static files by Yii
-       #location ~ \.(js|css|png|jpg|gif|swf|ico|pdf|mov|fla|zip|rar)$ {
+  location / {
+    # Redirect everything that isn't a real file to index.php
+    try_files $uri $uri/ /index.php?$args;
+  }
+  # uncomment to avoid processing of calls to non-existing static files by Yii
+  #location ~ \.(js|css|png|jpg|gif|swf|ico|pdf|mov|fla|zip|rar)$ {
        #    try_files $uri =404;
        #}
        #error_page 404 /404.html;
 
-       location ~ \.php$ {
+      location ~ \.php$ {
            include fastcgi_params;
            fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
            fastcgi_pass   unix:/var/run/php5-fpm-meotrics.sock;
@@ -120,8 +121,7 @@ composer install`
            deny all;
        }
    }
-
-   server {
+server {
        charset utf-8;
        client_max_body_size 128M;
 
@@ -155,8 +155,8 @@ composer install`
 
        location ~ /\.(ht|svn|git) {
            deny all;
-       }
-   }`
+         }
+}`
 4. Đường dẫn chuẩn
 ..* Dashboard:
 ....* Frontend: meotrics.dev | meotrics.run
