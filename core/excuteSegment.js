@@ -18,14 +18,6 @@ var testJson = [{
   }]
 }];
 
-if(f == "count"), addField("eifi")
-if(f == "sum"), addField("eifi")
-if(f== "avg"), addFiled("eifi_1, eifi_2")
-
-buildCondition
-this. + field + opera  && condition: 1 : 0
-
-
 //purpose: build javascript code based on json condition
 //example: buildConditionsCode(["amount", ">", 5, "and", "price", "=", "30"])
 //return: string contains compiled javascript code
@@ -36,7 +28,7 @@ function buildConditionsCode(conditions){
 
   while (i < conditions.length) {
     //get the next operator (if exist)
-    var nextop = i + 3 < n ? conditions[i+3] : "";
+    var nextop = i + 3 < conditions.length ? conditions[i+3] : "";
 
     //append new compiled js code
     code += "(this." + conditions[i] + conditions[i+1] + JSON.stringify(conditions[i+2]) +")" + nextop;
@@ -79,7 +71,7 @@ function buildMapChunk(ind, condition){
   //just join small chunk into a big one
   while (i < conditions.length) {
     code += buildBigCondition( ind + "_" + (i/2) ,conditions[i]);
-    defvalcode += "value['f"+ ind + "_" + (i/2) +"'']=0;";
+    defvalcode += "value['f"+ ind + "_" + (i/2) +"']=0;";
     i+=2;
   }
   code += "}else{" + defvalcode + "}";
@@ -103,4 +95,11 @@ function buildMapFunction(query){
 
 function main(){
   console.log(buildMapFunction(testJson));
+}
+
+
+function(){
+   Array.sum(f1,f2,..fn);
+   for(i in condition)
+   buildCondition()
 }
