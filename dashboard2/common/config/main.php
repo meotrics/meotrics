@@ -7,9 +7,9 @@ return [
         ],
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=localhost;dbname=linhtinh',
-            'username' => 'root',
-            'password' => '',
+            'dsn' => 'mysql:host=localhost;dbname=meotrics_dashboard',
+            'username' => 'meotrics',
+            'password' => 'meotrics!@#',
             'charset' => 'utf8',
         ],
         'mailer' => [
