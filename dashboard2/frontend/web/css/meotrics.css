@@ -1,0 +1,19 @@
+.main-header{
+    position: fixed;
+    width: 100%;
+    top: 0;
+}
+
+.main-sidebar{
+    height: 100%;
+    position: fixed;
+    overflow: auto;
+}
+
+.content-wrapper{
+    margin-top: 50px;
+}
+
+.logo{
+    background-color: #1A2226!important;
+}
