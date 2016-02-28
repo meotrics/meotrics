@@ -1,5 +1,5 @@
 <?php
-
+echo "<head></head>";
 use yii\helpers\Html;
 use frontend\widgets\Menu;
 use yii\widgets\Breadcrumbs;

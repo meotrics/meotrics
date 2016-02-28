@@ -26,6 +26,8 @@ Html::addCssClass($this->params['bodyOptions'], ['hold-transition', AdminLTEAsse
 <head>
     <meta charset="<?= Yii::$app->charset ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--[if IE]><link rel="shortcut icon" href="/favicon.ico"><![endif]-->
+    <link rel="icon" href="/favicon.ico?v=2">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
