@@ -57,6 +57,13 @@ trỏ danh sách tên miền sau
 	composer global require "fxp/composer-asset-plugin:^1.0"
 	composer update -o```
 
+3. Cài đặt nodejs
+	
+	Chuyển vào thư mục core (`meotrics/core`), gõ
+	```
+	npm install```
+	
+
 3. Cấu hình Web Server
 
 	1.  Cấu hình apache
