@@ -1,6 +1,6 @@
 <?php
 return [
     'adminEmail' => 'admin@example.com',
-    'logoMini' => '<b>LT</b>',
-    'logoLg' => '<b>LINH</b> TINH',
+    'logoMini' => "<img src='/images/logo.png' width = '30px' >",
+    'logoLg' => "<img src='/images/logo.png' width = '30px' ></img> meotrics",
 ];
