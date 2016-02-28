@@ -70,11 +70,11 @@ if (!isset($this->params['pageTitle'])) {
                 <?= Menu::widget() ?>
             </section>
             <section class="logo" style="position: absolute; bottom: 0;">
-                <ul class="media-list" style="margin-left: 10px; margin-top: 10px; margin-right:10px">
+                <ul class="media-list" style="margin-left: 10px; margin-top: 10px;">
                     <li class="media">
                     <div class="media-left">
                     <a href="#">
-                        <?php echo Html::img('@web/images/user.png', ['class' => 'meida-object', 'width' => '45px'] ) ?>
+                        <?php echo Html::img('@web/images/user.png', ['class' => 'media-object'] ) ?>
                     </a>
                 </div>
                 <div class="media-body">

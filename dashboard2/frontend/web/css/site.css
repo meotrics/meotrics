@@ -103,3 +103,23 @@ a.desc:after {
 .nav > li > form > button:hover {
     text-decoration: none;
 }
+
+.sidebar-mini img.media-object
+{
+    width: 45px;
+}
+
+.sidebar-mini.sidebar-collapse img.media-object
+{
+    width: 30px;
+}
+
+.sidebar-collapse .media-body
+{
+    display: none;
+}
+
+.sidebar-collapse .media-list
+{
+    margin-right:0px;
+}
