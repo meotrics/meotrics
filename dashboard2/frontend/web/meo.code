@@ -1,0 +1,18 @@
+//define meotrics for queue
+
+var Meotrics = Meotrics || {};
+var requestQueue= requesQueue || [];
+if(Meotrics.record === undefined) {
+	Meotrics.record = function(){
+		requestQueue.push()
+	}
+}
+
+var script = document.createElement("script");
+script.type = "text/javascript";
+script.src = "meotrics.dev/mt.js";
+script.onreadystatechange = function(){
+
+};
+//script.onload = callback;
+document.body.appendChild(js);
