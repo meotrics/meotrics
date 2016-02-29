@@ -1,18 +1,21 @@
 //define meotrics for queue
-
 var Meotrics = Meotrics || {};
-var requestQueue= requesQueue || [];
 
+Meotrics.appid = "1234";
+
+Meotrics.__requestQueue= Meotrics.__requesQueue || [];
+
+//TODO: problem when clone callback function, we dont want clone callback function.
 //2 level deep clone object
-function clone(obj)
+Meotrics.__clone = function (obj)
 {
 	if (null == obj || "object" != typeof obj) return obj;
 	var copy = obj.constructor();
-    for (var attr in obj) if (obj.hasOwnProperty(attr)) copy[attr] = shallowclone(obj[attr]);
+    for (var attr in obj) if (obj.hasOwnProperty(attr)) copy[attr] = Meotrics.__shallowclone(obj[attr]);
     return copy;
 }
 
-function shallowclone(obj) {
+Meotrics.__shallowclone = function (obj) {
 	if (null == obj || "object" != typeof obj) return obj;
 	var copy = obj.constructor();
     for (var attr in obj) if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
@@ -24,9 +27,14 @@ if(Meotrics.record === undefined) {
 		//clone arguments
 		var newarguments = [];
 		for(var i in arguments)
-			newarguments.push(clone(arguments[i]));
-		requestQueue.push({arguments: newarguments, time: new Date()});
+			newarguments.push(Meotrics.__clone (arguments[i]));
+		Meotrics.__requestQueue.push({arguments: newarguments, time: new Date()});
 	}
+}
+
+Meotrics.__callbackQueue = Meotrics.__callbackQueue || [];
+Meotrics.getMtId  = function(callback){
+	Meotrics.__callbackQueue.push(callback);
 }
 
 var script = document.createElement("script");

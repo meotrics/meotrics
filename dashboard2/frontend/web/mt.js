@@ -5,11 +5,19 @@ function getCookie(name) {
 	var value = "; " + document.cookie;
 	var parts = value.split("; " + name + "=");
 	if (parts.length == 2) return parts.pop().split(";").shift();
+	return undefined;
 }
 
 Meotrics.__visitorid = getCookie("meovisitorid");
-Meotrics.getVisitorId = function () {
-	return Meotrics.__visitorid;
+Meotrics.getMtId = function (callback) {
+	if(Meotrics.__visitorid !== undefined) callback(Meotrics.__visitorid);
+	else{
+		//set up new user cookie
+		$.post(host + '/s',function(){
+			//the cookie must be setted now
+			callback(Meotrics.__visitorid);
+		});
+	}
 };
 
 Meotrics.EVIEWPAGE = 1
@@ -193,3 +201,22 @@ Meotrics.getOsId = function () {
 
 	return osid;
 };
+
+//finish the queue
+
+Meotrics.__callbackQueue = Meotrics.__callbackQueue || [];
+
+for(var i in Meotrics.__callbackQueue)
+{
+	Meotrics.getMtId(Meotrics.__callbackQueue[i]);
+}
+//release memory
+delete Meotrics.__callbackQueue;
+
+
+for(var i in Meotrics.__requestQueue)
+{
+	Meotrics.record(Meotrics.__requestQueue[i]);
+}
+//release memory
+delete Meotrics.__requestQueue;
