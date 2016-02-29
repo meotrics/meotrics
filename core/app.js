@@ -55,6 +55,7 @@ app.get('/trend', function(req,res){
 
 
 
+
 //CLIENT------------------------------------------------------------------------
 //record and event
 app.post('/r', function recordAnEvent(req, res)
