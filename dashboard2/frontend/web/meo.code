@@ -2,17 +2,36 @@
 
 var Meotrics = Meotrics || {};
 var requestQueue= requesQueue || [];
+
+//2 level deep clone object
+function clone(obj)
+{
+	if (null == obj || "object" != typeof obj) return obj;
+	var copy = obj.constructor();
+    for (var attr in obj) if (obj.hasOwnProperty(attr)) copy[attr] = shallowclone(obj[attr]);
+    return copy;
+}
+
+function shallowclone(obj) {
+	if (null == obj || "object" != typeof obj) return obj;
+	var copy = obj.constructor();
+    for (var attr in obj) if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    return copy;
+}
+
 if(Meotrics.record === undefined) {
 	Meotrics.record = function(){
-		requestQueue.push()
+		//clone arguments
+		var newarguments = [];
+		for(var i in arguments)
+			newarguments.push(clone(arguments[i]));
+		requestQueue.push({arguments: newarguments, time: new Date()});
 	}
 }
 
 var script = document.createElement("script");
 script.type = "text/javascript";
 script.src = "meotrics.dev/mt.js";
-script.onreadystatechange = function(){
-
-};
+//script.onreadystatechange = callbacl;
 //script.onload = callback;
 document.body.appendChild(js);
