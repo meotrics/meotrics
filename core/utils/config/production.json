@@ -1,0 +1,8 @@
+{
+	"port": 1111,
+	"mongod": {
+		"host": "127.0.0.1",
+		"username": "admin",
+		"password": ""
+	}
+}
