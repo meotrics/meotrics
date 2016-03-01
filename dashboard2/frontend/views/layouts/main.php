@@ -39,7 +39,8 @@ if (!isset($model)) {
                 <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
                     <span class="sr-only">Toggle navigation</span>
                 </a>
-                <form class="navbar-form navbar-left" role="search">
+
+                <form class="navbar-form navbar-right" role="search" style="margin-right: 20px;">
                     <div class="form-group">
                         <?php
                         use kartik\daterange\DateRangePicker;
@@ -56,15 +57,17 @@ if (!isset($model)) {
                                         <span class="pull-left">
                                             <span class="range-value">{value}</span>
                                         </span>
-                                        <b class="caret"></b>
+                                        <b class="fa fa-caret-down"></b>
                                         {input}
                                     </span>',
                             'pluginOptions'=>[
-                                'timePicker'=>true,
+                                'timePicker'=>false,
                                 'timePickerIncrement'=>30,
                                 'locale'=>[
                                     'format'=>'Y-m-d h:i A'
                                 ],
+                                'opens'=>'left',
+                                'separator'=> ' - ',
                             ]
                         ]);
                         ?>
