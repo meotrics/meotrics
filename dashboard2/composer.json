@@ -19,7 +19,8 @@
         "yiisoft/yii2-bootstrap": "*",
         "yiisoft/yii2-swiftmailer": "*",
         "almasaeed2010/adminlte": "~2.0",
-        "rmrevin/yii2-fontawesome": "~2.12"
+        "rmrevin/yii2-fontawesome": "~2.12",
+        "kartik-v/yii2-date-range": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-codeception": "*",

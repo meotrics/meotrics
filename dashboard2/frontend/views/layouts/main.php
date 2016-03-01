@@ -74,7 +74,7 @@ if (!isset($this->params['pageTitle'])) {
                     <li class="media">
                     <div class="media-left">
                     <a href="#">
-                        <?php echo Html::img('@web/images/user.png', ['class' => 'media-object'] ) ?>
+                        <?= Html::img('@web/images/user.png', ['class' => 'media-object'] ) ?>
                     </a>
                 </div>
                 <div class="media-body">
