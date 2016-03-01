@@ -1,24 +1,21 @@
-
 var cluster = require('cluster');
 
-if(cluster.isMaster){
+if (cluster.isMaster) {
 	var config = require('config');
 	var numWebservers = config.get("numWebservers");
-
 	console.log('Master cluster setting up ' + numWebservers + ' webservers...');
-	for(let i = 0; i < numWebservers; i++) {
+	for (let i = 0; i < numWebservers; i++) {
 		cluster.fork();
 	}
-}else{
+} else {
 	var config = require('config');
 	var MongoClient = require('mongodb').MongoClient;
 	var uuid = require('node-uuid');
 
-	function buildconnstr()
-	{
+	function buildconnstr() {
 		var host = config.get("mongo.host") || "127.0.0.1";
-		var port= config.get("mongo.port") || 27017;
-		var database= config.get("mongo.database") || "test";
+		var port = config.get("mongo.port") || 27017;
+		var database = config.get("mongo.database") || "test";
 		return "mongodb://" + host + ":" + port + "/" + database;
 	}
 
@@ -28,13 +25,11 @@ if(cluster.isMaster){
 		});
 
 		var config = require('config');
-		var MongoClient = require('mongodb').MongoClient;
 
-		function buildconnstr()
-		{
+		function buildconnstr() {
 			var host = config.get("mongod.host");
-			var port= config.get("mongod.port");
-			var database= config.get("mongod.database");
+			var port = config.get("mongod.port");
+			var database = config.get("mongod.database");
 			return "mongodb://" + host + ":" + port + "/" + database;
 		}
 
@@ -100,7 +95,7 @@ if(cluster.isMaster){
 		app.post('/s', function (req, res) {
 			//NOTE: use array instead of json for faster network throughput
 			// appid
-			res.json({uid: uuid.v4()});
+			res.json({ uid: uuid.v4() });
 		});
 
 
@@ -108,7 +103,7 @@ if(cluster.isMaster){
 		//SEGMENTATION--------------------------------------------------------------
 
 		app.post('segment', function (req, res) {
-			segmgr.create(req.params, function(){
+			segmgr.create(req.params, function () {
 				res.send(200);
 			});
 		})
@@ -118,7 +113,7 @@ if(cluster.isMaster){
 	//Using connection pool. Initialize mongodb once
 	MongoClient.connect(buildconnstr(), function (err, db) {
 		if (err) throw err;
-		
+
 		var SegmentMgr = require('segment').SegmentMgr;
 		var express = require('express');
 		
@@ -127,7 +122,7 @@ if(cluster.isMaster){
 		
 		//set up new express application
 		var app = express();
-		route(app, db,segmgr);
+		route(app, db, segmgr);
 		
 		//run the app
 		var port = config.get("port") || 2108;
@@ -136,31 +131,10 @@ if(cluster.isMaster){
 		});
 
 		app.get('/segment', function (req, res) {
-			segmgr.create(req.params, function(responsetext){
+			segmgr.create(req.params, function (responsetext) {
 				res.send(responsetext);
 				res.end()
 			});
 		})
-	}
-
-//THE ENTRY POINT
-//Using connection pool. Initialize mongodb once
-MongoClient.connect(buildconnstr(), function (err, db) {
-	if (err) throw err;
-	
-	var SegmentMgr = require('./segmentmgr.js').SegmentMgr;
-	var express = require('express');
-	
-	//create component
-	var segmgr = new SegmentMgr(db);
-	
-	//set up new express application
-	var app = express();
-	route(app, db,segmgr);
-	
-	//run the app
-	var port = config.get("port") || 2108;
-	app.listen(port, function () {
-		console.log('Meotrics core listening on port ' + port + '!');
 	});
 }
