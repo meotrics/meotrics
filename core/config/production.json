@@ -3,6 +3,8 @@
 	"mongod": {
 		"host": "127.0.0.1",
 		"username": "admin",
-		"password": ""
+		"password": "",
+		"database": "local",
+		"port" : 27017
 	}
 }
