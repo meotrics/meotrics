@@ -3,9 +3,9 @@ var MongoClient = require('mongodb').MongoClient;
 
 function buildconnstr()
 {
-	var host = config.get("mongo.host") || "127.0.0.1";
-	var port= config.get("mongo.port") || 27017;
-	var database= config.get("mongo.database") || "test";
+	var host = config.get("mongod.host");
+	var port= config.get("mongod.port");
+	var database= config.get("mongod.database");
 	return "mongodb://" + host + ":" + port + "/" + database;
 }
 
@@ -73,9 +73,10 @@ function route(app, db, segmgr) {
 
 	//SEGMENTATION--------------------------------------------------------------
 
-	app.post('segment', function (req, res) {
-		segmgr.create(req.params, function(){
-			res.send(200);
+	app.get('/segment', function (req, res) {
+		segmgr.create(req.params, function(responsetext){
+			res.send(responsetext);
+			res.end()
 		});
 	})
 }
@@ -85,7 +86,7 @@ function route(app, db, segmgr) {
 MongoClient.connect(buildconnstr(), function (err, db) {
 	if (err) throw err;
 	
-	var SegmentMgr = require('segment').SegmentMgr;
+	var SegmentMgr = require('./segmentmgr.js').SegmentMgr;
 	var express = require('express');
 	
 	//create component
