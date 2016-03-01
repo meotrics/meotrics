@@ -13,6 +13,11 @@ if (!isset($this->params['pageTitle'])) {
     $this->params['pageTitle'] = $this->title;
 }
 
+if (!isset($model)) {
+    $model = new \yii\base\DynamicModel(['daterange']);
+    $model->addRule(['daterange'],'date');
+}
+
 ?>
 <?php $this->beginContent('@frontend/views/layouts/blank.php'); ?>
 
@@ -34,6 +39,38 @@ if (!isset($this->params['pageTitle'])) {
                 <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
                     <span class="sr-only">Toggle navigation</span>
                 </a>
+                <form class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <?php
+                        use kartik\daterange\DateRangePicker;
+                        echo DateRangePicker::widget([
+                            'model'=>$model,
+                            'attribute'=>'daterange',
+                            'convertFormat'=>true,
+                            'presetDropdown' => true,
+                            'hideInput'=>true,
+                            'containerTemplate' => '<span class="input-group-addon">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </span>
+                                    <span class="form-control text-right">
+                                        <span class="pull-left">
+                                            <span class="range-value">{value}</span>
+                                        </span>
+                                        <b class="caret"></b>
+                                        {input}
+                                    </span>',
+                            'pluginOptions'=>[
+                                'timePicker'=>true,
+                                'timePickerIncrement'=>30,
+                                'locale'=>[
+                                    'format'=>'Y-m-d h:i A'
+                                ],
+                            ]
+                        ]);
+                        ?>
+                    </div>
+                </form>
+
                 <!-- Navbar Right Menu -->
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
