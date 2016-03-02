@@ -132,7 +132,7 @@ if (cluster.isMaster) {
 			Tham số:
 			{
 				appid: number,
-				auid: number, //auid của anonymous user
+				aumtid: number, //auid của anonymous user
 				userid, name, email, age, birth, gender, ...
 			}
 			
