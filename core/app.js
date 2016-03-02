@@ -1,3 +1,5 @@
+"use strict";
+
 var cluster = require('cluster');
 
 if (cluster.isMaster) {
@@ -11,27 +13,25 @@ if (cluster.isMaster) {
 	var config = require('config');
 	var MongoClient = require('mongodb').MongoClient;
 	var uuid = require('node-uuid');
+	var bodyParser = require('body-parser');
 
 	function buildconnstr() {
-		var host = config.get("mongo.host") || "127.0.0.1";
-		var port = config.get("mongo.port") || 27017;
-		var database = config.get("mongo.database") || "test";
+		var host = config.get("mongod.host") || "127.0.0.1";
+		var port = config.get("mongod.port") || 27017;
+		var database = config.get("mongod.database") || "test";
 		return "mongodb://" + host + ":" + port + "/" + database;
 	}
 
 	function route(app, db, segmgr) {
+		// parse application/x-www-form-urlencoded
+		app.use(bodyParser.urlencoded({ extended: false }))
+
+		// parse application/json
+		app.use(bodyParser.json())	
+
 		app.get('/', function (req, res) {
 			res.send('Hello World!');
 		});
-
-		var config = require('config');
-
-		function buildconnstr() {
-			var host = config.get("mongod.host");
-			var port = config.get("mongod.port");
-			var database = config.get("mongod.database");
-			return "mongodb://" + host + ":" + port + "/" + database;
-		}
 
 
 		//APP------------------------------------------------------------------------
@@ -44,7 +44,7 @@ if (cluster.isMaster) {
 		//update or create an action type
 		app.post('/actiontype', function (req, res) {
 			var sampleActionType = {
-				name: "purchase",
+				name: "purchase"
 
 			}
 		});
@@ -52,7 +52,7 @@ if (cluster.isMaster) {
 		//get actiontype by id or list
 		app.get('/actiontype', function (req, res) {
 			var sampleActionType = {
-				name: "purchase",
+				name: "purchase"
 
 			}
 		});
@@ -115,7 +115,15 @@ if (cluster.isMaster) {
 		}
 		*/
 		app.post('/r', function (req, res) {
-			
+			var data = req.body;
+			var collection = "meotrics_"+data.appid;
+			delete data.appid;
+			db.collection(collection).insertOne(data)
+				.then(function(r){
+
+				}).catch(function(e){
+
+				});
 		});
 
 		/* Phương thức này dùng để báo cho hệ thống biết một anonymous user thực ra là
@@ -124,7 +132,7 @@ if (cluster.isMaster) {
 			Tham số:
 			{
 				appid: number,
-				mtid: number, //mtid của anonymous user
+				auid: number, //auid của anonymous user
 				userid, name, email, age, birth, gender, ...
 			}
 			
@@ -136,7 +144,57 @@ if (cluster.isMaster) {
 			2. Toàn bộ thông tin về user được cập nhật mới.
 			*/
 		app.post('/i', function (req, res) {
+			res.json({success: true});
+			var data = req.body;
+			var collection = "meotrics_"+data.appid;
+			var uid = data.user.uid;
 
+			async.waterfall([
+				function(callback){
+					delete data.user.uid;
+					db.collection(collection).findOneAndUpdate({type: "user", uid: uid}, {$set: data.user})
+						.then(function(r){
+							if(r.value != null){ 
+								if(r.lastErrorObject.n == 1){
+									callback(null, true);
+								}else{
+									callback('Error');
+								}
+							}else{	
+								callback(null, false);
+							}
+						}).catch(function(e){
+							console.log(e);
+							
+						});
+				}, function(isCreated, callback){
+					if(isCreated){
+						callback(null);
+					}else{
+						data.user.uid = uid;
+						data.user.type = "user";
+						db.collection(collection).insertOne(data.user)
+							.then(function(r){
+								if(results.insertedCount == 1){
+									callback(null);
+								}else{
+									callback('Error');
+								}
+							}).catch(function(e){
+								callback('Error');
+							});
+					}
+				}, function(callback){
+					db.collection(collection).updateMany({type: "action", uid: data.auid}, {$set: {uid: uid}})
+						.then(function(r){
+							// If success delete 
+						}).catch(function(e){
+
+						});
+				}
+			], function(err){
+				// We need to do that again and again util it success
+			});
 		});
 
 		/* Thiết lập cookie mới cho người dùng mới
@@ -148,8 +206,20 @@ if (cluster.isMaster) {
 		Đầu ra:
 		mtid vừa được tạo
 		*/
+
 		app.post('/s', function (req, res) {
-			res.json({ uid: uuid.v4() });
+			var auid = uuid.v4();
+			var collection = 'meotrics_'+req.body.appid;
+			db.collection(collection).insertOne({uid: auid, type:'user'})
+				.then(function(results){
+					if(results.insertedCount == 1){
+						res.json({success: true, auid: auid});
+					}else{
+						res.json({success: false});
+					}
+				}).catch(function(err){
+					res.json({success: false});
+				});
 		});
 
 		//SEGMENTATION-------------------------------------------------------------
@@ -174,11 +244,11 @@ if (cluster.isMaster) {
 		})
 		
 		//update or create a segment
-		app.post('segment', function (req, res) {
-			segmgr.create(req.params, function () {
-				res.send(200);
-			});
-		})
+		// app.post('segment', function (req, res) {
+		// 	segmgr.create(req.params, function () {
+		// 		res.send(200);
+		// 	});
+		// })
 	}
 
 	//THE ENTRY POINT
@@ -186,15 +256,16 @@ if (cluster.isMaster) {
 	MongoClient.connect(buildconnstr(), function (err, db) {
 		if (err) throw err;
 
-		var SegmentMgr = require('segment').SegmentMgr;
+		// var SegmentMgr = require('segment').SegmentMgr;
 		var express = require('express');
 		
 		//create component
-		var segmgr = new SegmentMgr(db);
+		// var segmgr = new SegmentMgr(db);
 		
 		//set up new express application
 		var app = express();
-		route(app, db, segmgr);
+		// route(app, db, segmgr);
+		route(app, db, null);
 		
 		//run the app
 		var port = config.get("port") || 2108;
@@ -202,11 +273,11 @@ if (cluster.isMaster) {
 			console.log('Meotrics core listening on port ' + port + '!');
 		});
 
-		app.get('/segment', function (req, res) {
-			segmgr.create(req.params, function (responsetext) {
-				res.send(responsetext);
-				res.end()
-			});
-		})
+		// app.get('/segment', function (req, res) {
+		// 	segmgr.create(req.params, function (responsetext) {
+		// 		res.send(responsetext);
+		// 		res.end()
+		// 	});
+		// })
 	});
 }
