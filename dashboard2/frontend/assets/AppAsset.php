@@ -30,6 +30,5 @@ class AppAsset extends AssetBundle
 //    ];
     public $depends = [
         'common\assets\AdminLTEAsset',
-//        'common\assets\SocketIOAsset',
     ];
 }

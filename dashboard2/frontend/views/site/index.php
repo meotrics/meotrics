@@ -1,7 +1,5 @@
 <?php
-
 /* @var $this yii\web\View */
-
 $this->title = 'My Yii Application';
 ?>
 <div class="site-index">
@@ -9,9 +7,9 @@ $this->title = 'My Yii Application';
     <div class="jumbotron">
         <h1>Congratulations!</h1>
 
-        <p class="lead">You have successfully created your Linh Tinh application.</p>
+        <p class="lead">You have successfully joined your Meotrics application.</p>
 
-        <p><a class="btn btn-lg btn-success" href="http://www.yiiframework.com">Get started with Linhtinh</a></p>
+        <p><a class="btn btn-lg btn-success" href="#">Get started with Meotrics</a></p>
     </div>
 
     <div class="body-content">

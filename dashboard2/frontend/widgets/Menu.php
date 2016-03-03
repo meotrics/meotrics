@@ -24,32 +24,21 @@ class Menu extends \yii\widgets\Menu
             self::createHeader('CÔNG CỤ'),
             [
                 'label' => 'Trend',
-                'url' => ['#'],
+                'url' => ['/trend/default/index'],
                 'icon' => 'fa fa-exchange',
             ],
             [
                 'label' => 'Segmentation',
-                'url' => ['#'],
+                'url' =>  ['/segmentation/default/index'],
                 'icon' => 'fa fa-bolt',
             ],
 
             self::createHeader('HƯỚNG DẪN'),
             [
                 'label' => 'Cấu hình',
-                'url' => 'http://docs.meotrics.com/',
+                'url' => ['/site/document'],//'http://docs.meotrics.com/',
                 'icon' => 'fa fa-book',
             ],
-//            self::createHeader('Users'),
-//            [
-//                'label' => 'Trend',
-//                'url' => ['/site/'],
-//                'icon' => 'fa fa-exchange',
-//            ],
-//            [
-//                'label' => 'Segmentation',
-//                'url' => ['/site/'],
-//                'icon' => 'fa fa-bolt',
-//            ],
         ];
     }
 

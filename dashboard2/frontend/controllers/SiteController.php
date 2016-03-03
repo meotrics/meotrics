@@ -217,4 +217,10 @@ class SiteController extends Controller
             'model' => $model,
         ]);
     }
+
+    public function actionDocument(){
+        return $this->render('document',[
+            'doc' => "http://docs.meotrics.com/",
+        ]);
+    }
 }
