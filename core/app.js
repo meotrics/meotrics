@@ -11,9 +11,12 @@ if (cluster.isMaster) {
 	}
 } else {
 	var config = require('config');
-	var MongoClient = require('mongodb').MongoClient;
-	var uuid = require('node-uuid');
+	var mongodb = require('mongodb');
+	var MongoClient = mongodb.MongoClient;
 	var bodyParser = require('body-parser');
+	var async = require('async');
+
+	var prefix = config.get("prefix") || "meotrics_";
 
 	function buildconnstr() {
 		var host = config.get("mongod.host") || "127.0.0.1";
@@ -95,16 +98,16 @@ if (cluster.isMaster) {
 		/* Ghi nhận một action mới
 		Tham số: {
 			appid : number, 
-			userid: number, 
-			mtid : number, 
-			typeid: number // type of action, eg: "purchase", "pageview"
+			userid: number, ( Em tuong cai nay phu thuoc vao thang khach hang) 
+			mtid : number, ( Em tuong? lay _id cua mongodb?????)
+			typeid: number // type of action, eg: "purchase", "pageview", ( Them cai typeid cua "user" nua a nhe, luu chung ma)
 			osid: number // os information, eg: "window", "linux", 
 			browserid : number // eg, "chrome", "firefox", "opera", 
 			locationid : number // location code, eg: Hanoi, Vietnam 
 			referer: string
 			campaignid : number
 			deviceid : number
-			ctime: date // created time
+			ctime: date // created time (Cai nay co van de ae minh lay time cua ae minh hay cua thang user, em nghi sai so k qua nhieu lay cua minh di)
 			ip: string // public ip address
 			screenres: string // screen resolution of the device
 			totalsec: number // total number of sec to finish the action
@@ -113,16 +116,22 @@ if (cluster.isMaster) {
 			osversion : number
 			field1, field2, field3, field4
 		}
+
+		NOTEEE: Quy dinh ma~ code som' di a con` cho vao code luon
 		*/
 		app.post('/r', function (req, res) {
 			var data = req.body;
-			var collection = "meotrics_"+data.appid;
+			var collection = prefix+data.appid;
 			delete data.appid;
 			db.collection(collection).insertOne(data)
 				.then(function(r){
-
+					if(r.insertedCount == 1){
+						// OK
+					}else{
+						// ST WRONG
+					}
 				}).catch(function(e){
-
+					// [ERROR]
 				});
 		});
 
@@ -132,7 +141,7 @@ if (cluster.isMaster) {
 			Tham số:
 			{
 				appid: number,
-				aumtid: number, //auid của anonymous user
+				mtid: number, //auid của anonymous user
 				userid, name, email, age, birth, gender, ...
 			}
 			
@@ -144,56 +153,71 @@ if (cluster.isMaster) {
 			2. Toàn bộ thông tin về user được cập nhật mới.
 			*/
 		app.post('/i', function (req, res) {
-			res.json({success: true});
 			var data = req.body;
-			var collection = "meotrics_"+data.appid;
+			var collection = prefix+data.appid;
 			var uid = data.user.uid;
 
 			async.waterfall([
 				function(callback){
 					delete data.user.uid;
-					db.collection(collection).findOneAndUpdate({type: "user", uid: uid}, {$set: data.user})
+					db.collection(collection).findOneAndUpdate({type: "user", uid: uid}, {$set: data.user}, {projection:{_id: 1}})
 						.then(function(r){
+							console.log(r);
 							if(r.value != null){ 
+								var mtid = r.value._id;
+								res.json({success: true, mtid: mtid});
 								if(r.lastErrorObject.n == 1){
-									callback(null, true);
+									// Update thanh cong
 								}else{
-									callback('Error');
+									// Update khong thanh cong
+									// [ERROR]
 								}
+								callback(null, true, mtid);
 							}else{	
+								res.json({success: true, mtid: data.mtid});
 								callback(null, false);
 							}
 						}).catch(function(e){
-							console.log(e);
-							
+							// [ERROR]
+							callback('Error');
+							res.json({success: false});
 						});
-				}, function(isCreated, callback){
+				}, function(isCreated, mtid, callback){]
 					if(isCreated){
-						callback(null);
+						callback(null, true, mtid);
 					}else{
 						data.user.uid = uid;
 						data.user.type = "user";
-						db.collection(collection).insertOne(data.user)
+
+						db.collection(collection).updateOne({_id: new mongodb.ObjectID(data.mtid)}, data.user)
 							.then(function(r){
-								if(results.insertedCount == 1){
-									callback(null);
-								}else{
-									callback('Error');
-								}
+								// check update thanh cong
+								callback(null, false);
 							}).catch(function(e){
-								callback('Error');
+								// [ERROR]
+								callback(null, false);
 							});
 					}
-				}, function(callback){
-					db.collection(collection).updateMany({type: "action", uid: data.auid}, {$set: {uid: uid}})
-						.then(function(r){
-							// If success delete 
-						}).catch(function(e){
+				}, function(needUpdate, mtid, callback){
+					if(needUpdate){
+						console.log('haha');
+						console.log(data.mtid+" "+mtid);
+						db.collection(collection).updateMany({type: "action", uid: new mongodb.ObjectID(data.mtid)}, {$set: {uid: new mongodb.ObjectID(mtid)}})
+							.then(function(r){
+								// If success delete 
 
-						});
+							}).catch(function(e){
+								// [ERROR]
+								callback('Error');
+							});
+					}else{
+						callback(null);
+					}
 				}
 			], function(err){
-				// We need to do that again and again util it success
+				if(err){
+					// We need to do that again and again util it success
+				}
 			});
 		});
 
@@ -208,16 +232,18 @@ if (cluster.isMaster) {
 		*/
 
 		app.post('/s', function (req, res) {
-			var auid = uuid.v4();
-			var collection = 'meotrics_'+req.body.appid;
-			db.collection(collection).insertOne({uid: auid, type:'user'})
+			var data = req.body;
+			var collection = prefix + data.appid;
+			db.collection(collection).insertOne({type:'user'})
 				.then(function(results){
 					if(results.insertedCount == 1){
-						res.json({success: true, auid: auid});
+						var mtid = results.insertedId;
+						res.json({success: true, mtid: mtid});
 					}else{
 						res.json({success: false});
 					}
 				}).catch(function(err){
+					// [ERROR]
 					res.json({success: false});
 				});
 		});
@@ -280,4 +306,5 @@ if (cluster.isMaster) {
 		// 	});
 		// })
 	});
+
 }
