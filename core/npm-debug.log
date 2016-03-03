@@ -1,0 +1,185 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'D:\\Program Files\\nodejs\\\\node.exe',
+1 verbose cli   'D:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'install',
+1 verbose cli   'cityhash' ]
+2 info using npm@2.10.1
+3 info using node@v0.12.4
+4 verbose install initial load of E:\workspace\nodemeotrics\meotrics\core\package.json
+5 verbose installManyTop reading scoped package data from E:\workspace\nodemeotrics\meotrics\core\node_modules\README.md\package.json
+6 verbose installManyTop reading scoped package data from E:\workspace\nodemeotrics\meotrics\core\node_modules\config\package.json
+7 verbose installManyTop reading scoped package data from E:\workspace\nodemeotrics\meotrics\core\node_modules\express\package.json
+8 verbose installManyTop reading scoped package data from E:\workspace\nodemeotrics\meotrics\core\node_modules\mongodb\package.json
+9 verbose installManyTop reading scoped package data from E:\workspace\nodemeotrics\meotrics\core\node_modules\murmurhash3\package.json
+10 verbose readDependencies loading dependencies from E:\workspace\nodemeotrics\meotrics\core\package.json
+11 silly cache add args [ 'cityhash', null ]
+12 verbose cache add spec cityhash
+13 silly cache add parsed spec { raw: 'cityhash',
+13 silly cache add   scope: null,
+13 silly cache add   name: 'cityhash',
+13 silly cache add   rawSpec: '',
+13 silly cache add   spec: '*',
+13 silly cache add   type: 'range' }
+14 silly addNamed cityhash@*
+15 verbose addNamed "*" is a valid semver range for cityhash
+16 silly addNameRange { name: 'cityhash', range: '*', hasData: false }
+17 silly mapToRegistry name cityhash
+18 silly mapToRegistry using default registry
+19 silly mapToRegistry registry https://registry.npmjs.org/
+20 silly mapToRegistry uri https://registry.npmjs.org/cityhash
+21 verbose addNameRange registry:https://registry.npmjs.org/cityhash not in flight; fetching
+22 verbose request uri https://registry.npmjs.org/cityhash
+23 verbose request no auth needed
+24 info attempt registry request try #1 at 12:36:34 AM
+25 verbose request id ff237807e93ee2c1
+26 http request GET https://registry.npmjs.org/cityhash
+27 http 200 https://registry.npmjs.org/cityhash
+28 silly get cb [ 200,
+28 silly get   { server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+28 silly get     etag: '"56GJQ3MBOHNCWQZH4Y9MFXVNE"',
+28 silly get     'content-type': 'application/json',
+28 silly get     'cache-control': 'max-age=300',
+28 silly get     'content-length': '38100',
+28 silly get     'accept-ranges': 'bytes',
+28 silly get     date: 'Wed, 02 Mar 2016 17:36:39 GMT',
+28 silly get     via: '1.1 varnish',
+28 silly get     age: '0',
+28 silly get     connection: 'keep-alive',
+28 silly get     'x-served-by': 'cache-fra1222-FRA',
+28 silly get     'x-cache': 'MISS',
+28 silly get     'x-cache-hits': '0',
+28 silly get     'x-timer': 'S1456940199.574543,VS0,VE196',
+28 silly get     vary: 'Accept' } ]
+29 verbose get saving cityhash to D:\Users\Thanh\AppData\Roaming\npm-cache\registry.npmjs.org\cityhash\.cache.json
+30 silly addNameRange number 2 { name: 'cityhash', range: '*', hasData: true }
+31 silly addNameRange versions [ 'cityhash', [ '0.0.2', '0.0.3', '0.0.4', '0.0.5' ] ]
+32 silly addNamed cityhash@0.0.5
+33 verbose addNamed "0.0.5" is a plain semver version for cityhash
+34 silly mapToRegistry name cityhash
+35 silly mapToRegistry using default registry
+36 silly mapToRegistry registry https://registry.npmjs.org/
+37 silly mapToRegistry uri https://registry.npmjs.org/cityhash
+38 verbose addRemoteTarball https://registry.npmjs.org/cityhash/-/cityhash-0.0.5.tgz not in flight; adding
+39 verbose addRemoteTarball [ 'https://registry.npmjs.org/cityhash/-/cityhash-0.0.5.tgz',
+39 verbose addRemoteTarball   'f163d8699400146165c11da432c2674da789c8f5' ]
+40 info retry fetch attempt 1 at 12:36:36 AM
+41 info attempt registry request try #1 at 12:36:36 AM
+42 http fetch GET https://registry.npmjs.org/cityhash/-/cityhash-0.0.5.tgz
+43 http fetch 200 https://registry.npmjs.org/cityhash/-/cityhash-0.0.5.tgz
+44 silly fetchAndShaCheck shasum f163d8699400146165c11da432c2674da789c8f5
+45 verbose addTmpTarball D:\Users\Thanh\AppData\Local\Temp\npm-5556-6cacdc8c\registry.npmjs.org\cityhash\-\cityhash-0.0.5.tgz not in flight; adding
+46 verbose addTmpTarball already have metadata; skipping unpack for cityhash@0.0.5
+47 silly cache afterAdd cityhash@0.0.5
+48 verbose afterAdd D:\Users\Thanh\AppData\Roaming\npm-cache\cityhash\0.0.5\package\package.json not in flight; writing
+49 verbose afterAdd D:\Users\Thanh\AppData\Roaming\npm-cache\cityhash\0.0.5\package\package.json written
+50 silly install resolved [ { name: 'cityhash',
+50 silly install resolved     version: '0.0.5',
+50 silly install resolved     main: './build/Release/cityhash',
+50 silly install resolved     description: 'NodeJS binding for Google CityHash.',
+50 silly install resolved     dependencies: {},
+50 silly install resolved     scripts: { test: 'node test.js', install: 'node-gyp rebuild' },
+50 silly install resolved     repositories: [ [Object] ],
+50 silly install resolved     homepage: 'http://github.com/fbzhong/node-cityhash',
+50 silly install resolved     bugs: 'http://github.com/fbzhong/node-cityhash/issues',
+50 silly install resolved     maintainers: [ [Object] ],
+50 silly install resolved     contributors: [ [Object] ],
+50 silly install resolved     licenses: [ [Object] ],
+50 silly install resolved     gypfile: true,
+50 silly install resolved     readme: '# node-cityhash #\n\nA NodeJS binding for [Google CityHash](http://code.google.com/p/cityhash/).\n\n### Install ###\n\n```\nnpm install cityhash\n```\n\n### Functions ###\n\n    64-bit hash object:\n    {\n        low:    {unsigned long}, eg 1727229466.\n        high:   {unsigned long}, eg 1535838579.\n        uint64: {boolean} true if hash object is uint64. Otherwise undefined.\n        value:  {string}, eg "6596376470467341850".\n    }\n\n    128-bit hash object:\n    {\n        low:     {64-bit hash object}.\n        high:    {64-bit hash object}.\n        uint128: {boolean} true if hash object is uint128. Otherwise undefined.\n        value:   {string}, "low64,high64", eg "9138004313465017137,12242971252332641544".\n    }\n\n    /**\n     * convert string or number to hash object.\n     * @param {unsigned long long | string} the string or number to be convered to hash object.\n     * @return {hash} 64-bit hash object or 128-bit hash object.\n    **/\n    function objectify(obj);\n\n    /**\n     * stringify the hash object.\n     * @param {hash} 64-bit hash object or 128-bit hash object.\n     * @return {string} the hash string value, eg "6596376470467341850" or "9138004313465017137,12242971252332641544".\n    **/\n    function stringify(obj);\n\n    /**\n     * Compute hash for str by CityHash64().\n     * @param {string} str The string to compute hash.\n     * @param {unsigned long long | string | 64-bit hash object} [seed0] The hash seed.\n     * @param {unsigned long long | string | 64-bit hash object} [seed1] The hash seed.\n     * @return {hash} 64-bit hash value.\n    **/\n    function hash64(str, [seed0], [seed1]);\n\n    /**\n     * Compute hash for str by CityHash128().\n     * @param {string} str The string to compute hash.\n     * @param {string | 128-bit hash object} [seed0] The hash seed.\n     * @return {hash} 128-bit hash value.\n    **/\n    function hash128(str, [seed0]);\n\n    /**\n     * Compute hash crc for str by CityHashCrc128().\n     * @param {string} str The string to compute hash.\n     * @param {string | 128-bit hash object} [seed0] The hash seed.\n     * @return {hash} 128-bit hash value.\n    **/\n    function crc128(str, [seed0]);\n\n    /**\n     * Compute hash crc for str by CityHashCrc256().\n     * @param {string} str The string to compute hash.\n     * @return {array} 4 64-bit hash object in an array, eg [hash1, hash2, hash3, hash4].\n    **/\n    function crc256(str);\n\n### Usage ###\n\n    var cityhash = require(\'node-cityhash\');\n    var hash;\n\n    hash = cityhash.stringify({low:1727229466, high:1535838579});\n    // hash = \'6596376470467341850\'\n\n    hash = cityhash.objectify(\'6596376470467341850\');\n    // hash = {low: 1727229466, high: 1535838579, uint64: true}\n\n    hash = cityhash.hash64(\'Hello\');\n    // hash = {\n    //    low: 1727229466,\n    //    high: 1535838579,\n    //    uint64: true,\n    //    value:\'6596376470467341850\'\n    //    }\n\n    hash = cityhash.hash64(\'Hello\', 87392039);\n    // hash = {\n    //        low: 2569634289,\n    //        high: 3664379964,\n    //        uint64: true,\n    //        value: \'15738392108067291633\'\n    //    }\n\n    hash = cityhash.hash64(\'Hello\', cityhash.objectify(87392039));\n    // hash = {\n    //        low: 2569634289,\n    //        high: 3664379964,\n    //        uint64: true,\n    //        value: \'15738392108067291633\'\n    //    }\n\n    hash = cityhash.hash64(\'Hello\', 87392039, 1230234);\n    // hash = {\n    //        low: 2389520903,\n    //        high: 3787608545,\n    //        value: \'16267654833214665223\',\n    //        uint64: true,\n    //    }\n\n    hash = cityhash.hash128(\'Hello\');\n    // hash = {\n    //        "low": {\n    //            "low": 68277041,\n    //            "high": 2127607426,\n    //            "value": "9138004313465017137",\n    //            "uint64": true\n    //        },\n    //        "high": {\n    //            "low": 3936042248,\n    //            "high": 2850538876,\n    //            "value": "12242971252332641544",\n    //            "uint64": true\n    //        },\n    //        "value": "9138004313465017137,12242971252332641544",\n    //        "uint128": true\n    //    }\n\n    hash = cityhash.hash128(\'Hello\', \'12343,30293\');\n    // hash = {\n    //        "low": {\n    //            "low": 3184066266,\n    //            "high": 3674042232,\n    //            "value": "15779891233746910938",\n    //            "uint64": true\n    //        },\n    //        "high": {\n    //            "low": 4196783977,\n    //            "high": 3519958761,\n    //            "value": "15118107765960464233",\n    //            "uint64": true\n    //        },\n    //        "value": "15779891233746910938,15118107765960464233",\n    //        "uint128": true\n    //    }\n\n    hash = cityhash.hash128(\'Hello\', cityhash.objectify(\'12343,30293\'));\n    // hash = {\n    //        "low": {\n    //            "low": 3184066266,\n    //            "high": 3674042232,\n    //            "value": "15779891233746910938",\n    //            "uint64": true\n    //        },\n    //        "high": {\n    //            "low": 4196783977,\n    //            "high": 3519958761,\n    //            "value": "15118107765960464233",\n    //            "uint64": true\n    //        },\n    //        "value": "15779891233746910938,15118107765960464233",\n    //        "uint128": true\n    //    }\n\n    hash = cityhash.crc128(\'Hello\');\n    // hash = {\n    //        "low": {\n    //            "low": 68277041,\n    //            "high": 2127607426,\n    //            "value": "9138004313465017137",\n    //            "uint64": true\n    //        },\n    //        "high": {\n    //            "low": 3936042248,\n    //            "high": 2850538876,\n    //            "value": "12242971252332641544",\n    //            "uint64": true\n    //        },\n    //        "value": "9138004313465017137,12242971252332641544",\n    //        "uint128": true\n    //    }\n\n    hash = cityhash.crc128(\'Hello\', \'12343,30293\');\n    // hash = {\n    //        "low": {\n    //            "low": 3184066266,\n    //            "high": 3674042232,\n    //            "value": "15779891233746910938",\n    //            "uint64": true\n    //        },\n    //        "high": {\n    //            "low": 4196783977,\n    //            "high": 3519958761,\n    //            "value": "15118107765960464233",\n    //            "uint64": true\n    //        },\n    //        "value": "15779891233746910938,15118107765960464233",\n    //        "uint128": true\n    //    }\n\n### Benchmark ###\n\ntodo\n',
+50 silly install resolved     readmeFilename: 'README.markdown',
+50 silly install resolved     _id: 'cityhash@0.0.5',
+50 silly install resolved     dist:
+50 silly install resolved      { shasum: 'f163d8699400146165c11da432c2674da789c8f5',
+50 silly install resolved        tarball: 'http://registry.npmjs.org/cityhash/-/cityhash-0.0.5.tgz' },
+50 silly install resolved     _from: 'cityhash@*',
+50 silly install resolved     _npmVersion: '1.2.14',
+50 silly install resolved     _npmUser: { name: 'yyfrankyy', email: 'yyfrankyy@gmail.com' },
+50 silly install resolved     directories: {},
+50 silly install resolved     _shasum: 'f163d8699400146165c11da432c2674da789c8f5',
+50 silly install resolved     _resolved: 'https://registry.npmjs.org/cityhash/-/cityhash-0.0.5.tgz' } ]
+51 info install cityhash@0.0.5 into E:\workspace\nodemeotrics\meotrics\core
+52 info installOne cityhash@0.0.5
+53 verbose installOne of cityhash to E:\workspace\nodemeotrics\meotrics\core not in flight; installing
+54 verbose lock using D:\Users\Thanh\AppData\Roaming\npm-cache\_locks\cityhash-f61f4dec4b54227b.lock for E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash
+55 silly install write writing cityhash 0.0.5 to E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash
+56 verbose unbuild node_modules\cityhash
+57 silly gentlyRm E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash is being purged from base E:\workspace\nodemeotrics\meotrics\core
+58 verbose gentlyRm don't care about contents; nuking E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash
+59 verbose tar unpack D:\Users\Thanh\AppData\Roaming\npm-cache\cityhash\0.0.5\package.tgz
+60 verbose tar unpacking to E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash
+61 silly gentlyRm E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash is being purged
+62 verbose gentlyRm don't care about contents; nuking E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash
+63 silly gunzTarPerm modes [ '777', '666' ]
+64 silly gunzTarPerm extractEntry package.json
+65 silly gunzTarPerm modified mode [ 'package.json', 420, 438 ]
+66 silly gunzTarPerm extractEntry .npmignore
+67 silly gunzTarPerm modified mode [ '.npmignore', 420, 438 ]
+68 silly gunzTarPerm extractEntry LICENSE
+69 silly gunzTarPerm modified mode [ 'LICENSE', 420, 438 ]
+70 silly gunzTarPerm extractEntry test.js
+71 silly gunzTarPerm modified mode [ 'test.js', 420, 438 ]
+72 silly gunzTarPerm extractEntry .gitmodules
+73 silly gunzTarPerm modified mode [ '.gitmodules', 420, 438 ]
+74 silly gunzTarPerm extractEntry binding.cc
+75 silly gunzTarPerm modified mode [ 'binding.cc', 420, 438 ]
+76 silly gunzTarPerm extractEntry binding.gyp
+77 silly gunzTarPerm modified mode [ 'binding.gyp', 420, 438 ]
+78 silly gunzTarPerm extractEntry cityhash/city.cc
+79 silly gunzTarPerm modified mode [ 'cityhash/city.cc', 420, 438 ]
+80 silly gunzTarPerm extractEntry cityhash/city.h
+81 silly gunzTarPerm modified mode [ 'cityhash/city.h', 420, 438 ]
+82 silly gunzTarPerm extractEntry cityhash/citycrc.h
+83 silly gunzTarPerm modified mode [ 'cityhash/citycrc.h', 420, 438 ]
+84 silly gunzTarPerm extractEntry README.markdown
+85 silly gunzTarPerm modified mode [ 'README.markdown', 420, 438 ]
+86 verbose write writing to E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash\package.json
+87 info preinstall cityhash@0.0.5
+88 verbose readDependencies loading dependencies from E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash\package.json
+89 verbose readDependencies loading dependencies from E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash\package.json
+90 silly install resolved []
+91 verbose about to build E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash
+92 info build E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash
+93 info linkStuff cityhash@0.0.5
+94 silly linkStuff cityhash@0.0.5 has E:\workspace\nodemeotrics\meotrics\core\node_modules as its parent node_modules
+95 verbose linkBins cityhash@0.0.5
+96 verbose linkMans cityhash@0.0.5
+97 verbose rebuildBundles cityhash@0.0.5
+98 info install cityhash@0.0.5
+99 verbose unsafe-perm in lifecycle true
+100 info cityhash@0.0.5 Failed to exec install script
+101 verbose unlock done using D:\Users\Thanh\AppData\Roaming\npm-cache\_locks\cityhash-f61f4dec4b54227b.lock for E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash
+102 verbose stack Error: cityhash@0.0.5 install: `node-gyp rebuild`
+102 verbose stack Exit status 1
+102 verbose stack     at EventEmitter.<anonymous> (D:\Program Files\nodejs\node_modules\npm\lib\utils\lifecycle.js:213:16)
+102 verbose stack     at EventEmitter.emit (events.js:110:17)
+102 verbose stack     at ChildProcess.<anonymous> (D:\Program Files\nodejs\node_modules\npm\lib\utils\spawn.js:24:14)
+102 verbose stack     at ChildProcess.emit (events.js:110:17)
+102 verbose stack     at maybeClose (child_process.js:1015:16)
+102 verbose stack     at Process.ChildProcess._handle.onexit (child_process.js:1087:5)
+103 verbose pkgid cityhash@0.0.5
+104 verbose cwd E:\workspace\nodemeotrics\meotrics\core
+105 error Windows_NT 6.1.7601
+106 error argv "D:\\Program Files\\nodejs\\\\node.exe" "D:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install" "cityhash"
+107 error node v0.12.4
+108 error npm  v2.10.1
+109 error code ELIFECYCLE
+110 error cityhash@0.0.5 install: `node-gyp rebuild`
+110 error Exit status 1
+111 error Failed at the cityhash@0.0.5 install script 'node-gyp rebuild'.
+111 error This is most likely a problem with the cityhash package,
+111 error not with npm itself.
+111 error Tell the author that this fails on your system:
+111 error     node-gyp rebuild
+111 error You can get their info via:
+111 error     npm owner ls cityhash
+111 error There is likely additional logging output above.
+112 verbose exit [ 1, true ]
+113 verbose unbuild node_modules\cityhash
+114 info preuninstall cityhash@0.0.5
+115 info uninstall cityhash@0.0.5
+116 verbose unbuild rmStuff cityhash@0.0.5 from E:\workspace\nodemeotrics\meotrics\core\node_modules
+117 info postuninstall cityhash@0.0.5
+118 silly gentlyRm E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash is being purged from base E:\workspace\nodemeotrics\meotrics\core
+119 verbose gentlyRm don't care about contents; nuking E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash
+120 silly vacuum-fs purging E:\workspace\nodemeotrics\meotrics\core\node_modules\cityhash
+121 silly vacuum-fs quitting because other entries in E:\workspace\nodemeotrics\meotrics\core\node_modules
