@@ -8,6 +8,8 @@
     "url": "git@github.com:meotrics/meotrics.git"
   },
   "dependencies": {
+    "async": "^1.5.2",
+    "body-parser": "^1.15.0",
     "config": "^1.19.0",
     "express": "^4.13.4",
     "mongodb": "^2.1.0",

@@ -6,5 +6,7 @@
 		"password": "",
 		"database": "local",
 		"port" : 27017
-	}
+	},
+	"numWebservers": 4,
+	"prefix": "meotrics_"
 }
