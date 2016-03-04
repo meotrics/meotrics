@@ -13,10 +13,9 @@ if (cluster.isMaster) {
 	var config = require('config');
 	var mongodb = require('mongodb');
 	var MongoClient = mongodb.MongoClient;
-	var bodyParser = require('body-parser');
-	var async = require('async');
+	
 
-	var prefix = config.get("prefix") || "meotrics_";
+	
 
 	function buildconnstr() {
 		var host = config.get("mongod.host") || "127.0.0.1";
@@ -25,7 +24,10 @@ if (cluster.isMaster) {
 		return "mongodb://" + host + ":" + port + "/" + database;
 	}
 
-	function route(app, db, segmgr) {
+	function route(app, db, segmgr, prefix) {
+		var bodyParser = require('body-parser');
+		var async = require('async');
+	
 		// parse application/x-www-form-urlencoded
 		// app.use(bodyParser.urlencoded({ extended: false }))
 
@@ -353,7 +355,9 @@ if (cluster.isMaster) {
 		//set up new express application
 		var app = express();
 		// route(app, db, segmgr);
-		route(app, db, null);
+		var prefix = config.get("prefix") || "meotrics_";
+		
+		route(app, db, null, prefix);
 		
 		//run the app
 		var port = config.get("port") || 2108;
