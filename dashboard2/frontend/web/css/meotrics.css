@@ -17,3 +17,26 @@
 .logo{
     background-color: #1A2226!important;
 }
+
+.save-query {
+    margin-top: -15px;
+}
+
+.box-square{
+    border-radius: 0;
+    border-top: 0;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered {
+    margin-top: 0;
+}
+
+#bookmark:hover i,
+#bookmark:focus i,
+.bookmarked{
+    color: #ffcc00;
+}
+
+#save-submit{
+    margin-top: 100px;
+}
