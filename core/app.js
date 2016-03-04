@@ -27,10 +27,10 @@ if (cluster.isMaster) {
 
 	function route(app, db, segmgr) {
 		// parse application/x-www-form-urlencoded
-		app.use(bodyParser.urlencoded({ extended: false }))
+		// app.use(bodyParser.urlencoded({ extended: false }))
 
 		// parse application/json
-		app.use(bodyParser.json())	
+		app.use(bodyParser.json());
 
 		//APP------------------------------------------------------------------------
 		//set up an new app
@@ -40,28 +40,28 @@ if (cluster.isMaster) {
 
 		//ACTION TYPE-----------------------------------------------------------------
 		// create an action type
-		app.post('/actiontype', function (req, res) {
+		app.post('/actiontype/:appid', function (req, res) {
 			var data = req.body;
 			var collection = config.get('prefix')+"actiontype";
-			db.collection(collection).insertOne(data)
-				.then(function(r){
-					res.json({success: true, id: r.insertedId})
+			db.collection(collection).insertOne(data) // add options: w, j, timeout ...
+				.then(function(r){ 
+					res.json({s: true, _id: r.insertedId});
 				}).catch(function(err){
 					// [ERROR]
+					res.json({s: false});
 				});
 		});
 
-
-
 		//get all actiontype
 		app.get('/actiontype/:appid', function (req, res) {
-			var appid = req.params.appid;
+			var appid = Number(req.params.appid);
 			var collection = config.get('prefix')+"actiontype";
 			db.collection(collection).find({appid: appid}, {appid: 0}).toArray()
 				.then(function(results){
-					res.json({success: true, results})
+					res.json({s: true, results})
 				}).catch(function(e){
 					// [ERROR]
+					res.json({s: false});
 				});
 		});
 
@@ -71,9 +71,10 @@ if (cluster.isMaster) {
 			var collection = config.get('prefix')+"actiontype";
 			db.collection(collection).find({_id: new mongodb.ObjectID(atid) }, {appid: 0}).toArray()
 				.then(function(results){
-					res.json({success: true, results})
+					res.json({s: true, results})
 				}).catch(function(e){
 					// [ERROR]
+					res.json({s: false});
 				});
 		});
 
@@ -82,11 +83,25 @@ if (cluster.isMaster) {
 			// var appid = req.params.appid;
 			var atid = req.params.id;
 			var collection = config.get('prefix')+"actiontype";
-			db.collection(collection).remove({_id: new mongodb.ObjectID(atid)})
+			db.collection(collection).deleteOne({_id: new mongodb.ObjectID(atid)})
 				.then(function(results){
-					res.json({success: true})
+					res.json({s: true});
 				}).catch(function(e){
 					// [ERROR]
+					res.json({s: false});
+				});
+		});
+
+		//delete all actiontypes in an app
+		app.delete('/actiontype/:appid', function (req, res) {
+			var appid = Number(req.params.appid);
+			var collection = config.get('prefix')+"actiontype";
+			db.collection(collection).deleteMany({appid: appid})
+				.then(function(results){
+					res.json({s: true})
+				}).catch(function(e){
+					// [ERROR]
+					res.json({s: false});
 				});
 		});
 
@@ -98,35 +113,43 @@ if (cluster.isMaster) {
 			var collection = config.get('prefix')+"actiontype";
 			db.collection(collection).updateOne({_id: new mongodb.ObjectID(atid)}, {$set: data})
 				.then(function(results){
-					res.json({success: true});
+					res.json({s: true});
 				}).catch(function(e){
 					// [ERROR]
+					res.json({s: false});
 				});
 		});
 
 
 		//TREND-------------------------------------------------------------------------
 
-		//get a trend
-		app.get('/trend', function (req, res) {
+		//get all trends in a app
+		app.get('/trend/:appid', function (req, res) {
 
 		});
-	
-		//create or update a trend
-		app.post('/trend', function(req, res){
-			
+
+		//list a trend from a app
+		app.get('/trend/:appid/:id', function(req,res){
+
 		});
 
-		//list trend
-		app.get('/trends', function(req,res)
-		{});
-		
-		app.delete('/trend', function(req,res)
+		//create a trend
+		app.post('/trend/:appid', function(req, res){
+				
+		});
+		// Update a trend
+		app.put('/trend/:appid/:id', function(req,res)
 		{
 			
 		});
 
-		
+		app.delete('/trend/:appid/:id', function(req,res)
+		{
+			
+		});
+
+
+		// Get data trend ....
 		app.post('/trend/draf', function(req, res)
 		{
 			
