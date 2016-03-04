@@ -26,7 +26,7 @@ if (!isset($model)) {
         <header class="main-header">
 
             <!-- Logo -->
-            <a href="#" class="logo">
+            <a href="<?= \yii\helpers\Url::to(Yii::$app->homeUrl) ?>" class="logo">
                 <!-- mini logo for sidebar mini 50x50 pixels -->
                 <span class="logo-mini"><?= Yii::$app->params['logoMini'] ?></span>
                 <!-- logo for regular state and mobile devices -->
@@ -40,13 +40,14 @@ if (!isset($model)) {
                     <span class="sr-only">Toggle navigation</span>
                 </a>
 
-                <form class="navbar-form navbar-right" role="search" style="margin-right: 20px;">
+                <div class="col-md-3 pull-right">
                     <div class="form-group">
                         <?php
                         use kartik\daterange\DateRangePicker;
-                        echo DateRangePicker::widget([
-                            'model'=>$model,
-                            'attribute'=>'daterange',
+                        use yii\widgets\ActiveForm;
+                        $form = ActiveForm::begin();
+
+                        echo $form->field($model,'daterange')->widget(DateRangePicker::className(),[
                             'convertFormat'=>true,
                             'presetDropdown' => true,
                             'hideInput'=>true,
@@ -61,23 +62,43 @@ if (!isset($model)) {
                                         {input}
                                     </span>',
                             'pluginOptions'=>[
-                                'timePicker'=>false,
-                                'timePickerIncrement'=>30,
-                                'locale'=>[
-                                    'format'=>'Y-m-d h:i A'
-                                ],
-                                'opens'=>'left',
+                                'opens'=>'right',
                                 'separator'=> ' - ',
+                                'locale'=>[
+                                    'format'=>'d/m/Y'
+                                ],
                             ]
-                        ]);
+                        ])->label(false);
+
+                        ActiveForm::end();
+                        //                        echo DateRangePicker::widget([
+                        //                            'model'=>$model,
+                        //                            'attribute'=>'daterange',
+                        //                            'convertFormat'=>true,
+                        //                            'presetDropdown' => true,
+                        //                            'hideInput'=>true,
+                        //                            'containerTemplate' => '<span class="input-group-addon">
+                        //                                        <i class="glyphicon glyphicon-calendar"></i>
+                        //                                    </span>
+                        //                                    <span class="form-control text-right">
+                        //                                        <span class="pull-left">
+                        //                                            <span class="range-value">{value}</span>
+                        //                                        </span>
+                        //                                        <b class="fa fa-caret-down"></b>
+                        //                                        {input}
+                        //                                    </span>',
+                        //                            'pluginOptions'=>[
+                        //                                'timePicker'=>false,
+                        //                                'timePickerIncrement'=>30,
+                        //                                'locale'=>[
+                        //                                    'format'=>'Y-m-d h:i A'
+                        //                                ],
+                        //                                'opens'=>'left',
+                        //                                'separator'=> ' - ',
+                        //                            ]
+                        //                        ]);
                         ?>
                     </div>
-                </form>
-
-                <!-- Navbar Right Menu -->
-                <div class="navbar-custom-menu">
-                    <ul class="nav navbar-nav">
-                    </ul>
                 </div>
 
             </nav>
@@ -133,18 +154,8 @@ if (!isset($model)) {
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
-            <section class="content-header">
-                <h1>
-                    <?= $this->title ?>
-                </h1>
-                <?= Breadcrumbs::widget([
-                    'homeLink' => [
-                        'label' => 'Quản trị',
-                        'url' => Yii::$app->homeUrl,
-                    ],
-                    'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
-                ]) ?>
-            </section>
+<!--            <section class="content-header">-->
+<!--            </section>-->
 
             <section class="content">
                 <?= $content ?>
@@ -156,7 +167,7 @@ if (!isset($model)) {
             <div class="pull-right hidden-xs">
                 <b>Version</b> 1.0.1
             </div>
-            <strong>Copyright &copy; <?= date('Y') ?> <a href="#">Linhtinh</a>.</strong> All
+            <strong>Copyright &copy; <?= date('Y') ?> <a href="http://meotrics.com/">Meotrics</a>.</strong> All
             rights
             reserved.
         </footer>

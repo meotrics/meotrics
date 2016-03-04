@@ -32,11 +32,6 @@ if (cluster.isMaster) {
 		// parse application/json
 		app.use(bodyParser.json())	
 
-		app.get('/', function (req, res) {
-			res.send('Hello World!');
-		});
-
-
 		//APP------------------------------------------------------------------------
 		//set up an new app
 		app.post('/app', function (req, res) {
@@ -44,25 +39,69 @@ if (cluster.isMaster) {
 		});
 
 		//ACTION TYPE-----------------------------------------------------------------
-		//update or create an action type
+		// create an action type
 		app.post('/actiontype', function (req, res) {
-			var sampleActionType = {
-				name: "purchase"
-
-			}
+			var data = req.body;
+			var collection = config.get('prefix')+"actiontype";
+			db.collection(collection).insertOne(data)
+				.then(function(r){
+					res.json({success: true, id: r.insertedId})
+				}).catch(function(err){
+					// [ERROR]
+				});
 		});
 
-		//get actiontype by id or list
-		app.get('/actiontype', function (req, res) {
-			var sampleActionType = {
-				name: "purchase"
 
-			}
+
+		//get all actiontype
+		app.get('/actiontype/:appid', function (req, res) {
+			var appid = req.params.appid;
+			var collection = config.get('prefix')+"actiontype";
+			db.collection(collection).find({appid: appid}, {appid: 0}).toArray()
+				.then(function(results){
+					res.json({success: true, results})
+				}).catch(function(e){
+					// [ERROR]
+				});
+		});
+
+		app.get('/actiontype/:appid/:id', function (req, res){
+			// var appid = req.params.appid;
+			var atid = req.params.id;
+			var collection = config.get('prefix')+"actiontype";
+			db.collection(collection).find({_id: new mongodb.ObjectID(atid) }, {appid: 0}).toArray()
+				.then(function(results){
+					res.json({success: true, results})
+				}).catch(function(e){
+					// [ERROR]
+				});
 		});
 
 		//delete an actiontype
-		app.delete('/actiontype', function (req, res) {
+		app.delete('/actiontype/:appid/:id', function (req, res) {
+			// var appid = req.params.appid;
+			var atid = req.params.id;
+			var collection = config.get('prefix')+"actiontype";
+			db.collection(collection).remove({_id: new mongodb.ObjectID(atid)})
+				.then(function(results){
+					res.json({success: true})
+				}).catch(function(e){
+					// [ERROR]
+				});
+		});
 
+		// update actiontype
+		app.put('/actiontype/:appid/:id', function (req, res){
+			var data = req.body;
+			// var appid = req.params.appid;
+			var atid = req.params.id;
+			var collection = config.get('prefix')+"actiontype";
+			db.collection(collection).updateOne({_id: new mongodb.ObjectID(atid)}, {$set: data})
+				.then(function(results){
+					res.json({success: true});
+				}).catch(function(e){
+					// [ERROR]
+				});
 		});
 
 
@@ -114,22 +153,22 @@ if (cluster.isMaster) {
 			url: string
 			browserversion : number
 			osversion : number
-			field1, field2, field3, field4
+			field1, field2, field3, field4 
 		}
 
 		NOTEEE: Quy dinh ma~ code som' di a con` cho vao code luon
 		*/
+		var bufferSpace = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+
 		app.post('/r', function (req, res) {
 			var data = req.body;
 			var collection = prefix+data.appid;
+			data.buffer_space = bufferSpace;
 			delete data.appid;
 			db.collection(collection).insertOne(data)
 				.then(function(r){
-					if(r.insertedCount == 1){
-						// OK
-					}else{
-						// ST WRONG
-					}
+					var _id = r.insertedId;
+					db.collection(collection).updateOne({_id: new mongodb.ObjectID(_id)}, {$unset: {buffer_space: ""}});	
 				}).catch(function(e){
 					// [ERROR]
 				});
@@ -182,7 +221,7 @@ if (cluster.isMaster) {
 							callback('Error');
 							res.json({success: false});
 						});
-				}, function(isCreated, mtid, callback){]
+				}, function(isCreated, mtid, callback){	
 					if(isCreated){
 						callback(null, true, mtid);
 					}else{
