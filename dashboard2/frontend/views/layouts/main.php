@@ -47,28 +47,16 @@ if (!isset($model)) {
                         use yii\widgets\ActiveForm;
                         $form = ActiveForm::begin();
 
-                        echo $form->field($model,'daterange')->widget(DateRangePicker::className(),[
-                            'convertFormat'=>true,
-                            'presetDropdown' => true,
-                            'hideInput'=>true,
-                            'containerTemplate' => '<span class="input-group-addon">
-                                        <i class="glyphicon glyphicon-calendar"></i>
-                                    </span>
-                                    <span class="form-control text-right">
-                                        <span class="pull-left">
-                                            <span class="range-value">{value}</span>
-                                        </span>
-                                        <b class="fa fa-caret-down"></b>
-                                        {input}
-                                    </span>',
-                            'pluginOptions'=>[
-                                'opens'=>'right',
-                                'separator'=> ' - ',
-                                'locale'=>[
-                                    'format'=>'d/m/Y'
-                                ],
-                            ]
-                        ])->label(false);
+                       echo DateRangePicker::widget([
+    											'name'=>'date_range_3',
+   												'value'=>'2015-10-19 AM  2015-11-03',
+  												'convertFormat'=>true,
+    											'pluginOptions'=>[
+        										'opens'=>'left',
+        										'locale'=>['format'=>'m-d-y',
+														'separator' => 'to']
+													]
+												]);
 
                         ActiveForm::end();
                         //                        echo DateRangePicker::widget([
@@ -162,15 +150,6 @@ if (!isset($model)) {
             </section>
         </div>
         <!-- /.content-wrapper -->
-
-        <footer class="main-footer">
-            <div class="pull-right hidden-xs">
-                <b>Version</b> 1.0.1
-            </div>
-            <strong>Copyright &copy; <?= date('Y') ?> <a href="http://meotrics.com/">Meotrics</a>.</strong> All
-            rights
-            reserved.
-        </footer>
 
     </div>
     <!-- ./wrapper -->
