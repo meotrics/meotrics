@@ -21,7 +21,7 @@ if (cluster.isMaster) {
 		return "mongodb://" + host + ":" + port + "/" + database;
 	}
 
-	function route(app, db, segmgr, prefix) {
+	function route(app, db, segmgr, prefix, mongodb) {
 		var bodyParser = require('body-parser');
 		var async = require('async');
 	
@@ -140,7 +140,7 @@ if (cluster.isMaster) {
 			// var appid = req.params.appid;
 			var trid = req.params.id;
 			var collection = prefix+"trend";
-			db.collection(collection).find({_id: new mongodb.ObjectID(trid) }, {appid: 0}).toArray()
+			db.collection(collection).find({_id: new mongodb.ObjectID(trid) }, {_id: 0, appid: 0}).toArray()
 				.then(function(results){
 					res.json({s: true, results});
 				}).catch(function(err){
@@ -203,11 +203,53 @@ if (cluster.isMaster) {
 		});
 
 
-		// Get data trend ....
-		app.post('/trend/draf', function(req, res)
-		{
-			
+		// load trend ....
+		app.get('/trend/process/:apid/:id', function(req, res){
+			var appid = req.params.appid;
+			var trid = req.params.id;
+			var collection = prefix+"trend";
+			db.collection(collection).find({_id: new mongodb.ObjectID(trid) }, {_id: 0, appid: 0}).toArray()
+				.then(function(results){
+					var trendData = results[0];
+					collection = prefix + appid;
+					return db.collection(collection).aggregate(getQueryTrending(trendData)).toArray();		
+				}).then(function(results){
+					res.json({s: true, results});
+				}).catch(function(err){
+					// [ERROR]
+					throw {err: err, res: res};
+				});	
 		});
+
+		function getQueryTrending(object){
+			var query = [];
+			query.push({$match: {typeid: object.event}});
+			if(object.segment != undefined){
+				var field = "segment_"+object.segment;
+				query[0].$match[field] = true;
+			}
+			if(object.operation == 'count'){
+				query.push({$group: {
+					_id: '$'+object.object,
+					count: {'$sum': 1}
+				}});
+				query.push({$sort: {count: object.order}});
+			}else if(object.operation == 'avg'){
+				query.push({$group: {
+					_id: '$'+object.object,
+					result: {$avg: '$'+object.param}
+				}});
+				query.push({$sort: {result: object.order}});
+			}else if(object.operation == 'sum'){
+				query.push({$group: {
+					_id: '$'+object.object,
+					result: {$sum: '$'+object.param}
+				}});
+				query.push({$sort: {result: object.order}});
+			}
+			query.push({$limit: object.limit});
+			return query;
+		}
 		
 		//CLIENT------------------------------------------------------------------------
 		
@@ -392,7 +434,7 @@ if (cluster.isMaster) {
 		// route(app, db, segmgr);
 		var prefix = config.get("prefix") || "meotrics_";
 		
-		route(app, db, null, prefix);
+		route(app, db, null, prefix, mongodb);
 		
 		//run the app
 		var port = config.get("port") || 2108;
