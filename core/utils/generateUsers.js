@@ -1,7 +1,7 @@
 var MongoClient = require('mongodb').MongoClient,
-	url = 'mongodb://localhost:1234/test',
+	url = 'mongodb://localhost:1234/local',
 	n = 20000,
-	collection = 'users';
+	collection = 'meotrics_1';
 
 function generateDB(){
 	MongoClient.connect(url)
@@ -42,7 +42,7 @@ function generateDB(){
 
 function generateUsers(){
 	return {
-		appid: generateNumber(1, 4),
+		isUser: true,
 		name: generateName(),
 		height: generateNumber(150, 180),
 		iq: generateNumber(30, 40),
