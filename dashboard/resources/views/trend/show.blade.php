@@ -1,4 +1,4 @@
-@extends('../layout/master')
+@extends('../layout/master', ['sidebarselect' => 'trend'])
 @section('title', 'Trend')
 
 @section('script')
@@ -8,7 +8,7 @@
 
 $('.id_querytrend').click(function(){
 
-  $.post('/trend/query', {
+  $.get('queryTrend', {
     typeid: $('#actionselect').val(),
     operation: $('#opertorselect').val(),
     object : $('#fieldselect').val(),
@@ -67,7 +67,7 @@ $('.id_querytrend').click(function(){
               </select></label>
             </div>
 
-            <input type="button" value="Query" class="id_querytrend btn btn-default col-sm-2"/> 
+            <input type="button" value="Query" class="id_querytrend btn btn-default col-sm-2"/>
           </form>
           <div class="row">
 

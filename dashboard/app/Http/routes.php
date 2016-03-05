@@ -17,6 +17,9 @@ Route::get('home', 'HomeController@index');
 
 Route::resource('trend', 'TrendController');
 
+Route::resource('segment', 'SegmentController');
+
+Route::get('queryTrend', 'TrendController@query');
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',

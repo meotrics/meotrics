@@ -38,20 +38,20 @@
       </div>
 
       <ul class="nav">
-        <li class="active">
-          <a href="dashboard.html">
+        <li class="{{ !isset($sidebarselect) ||  $sidebarselect == 'home' ? 'active' : '' }}">
+          <a href="/home">
             <i class="pe-7s-graph"></i>
             <p>Dashboard</p>
           </a>
         </li>
-        <li>
-          <a href="user.html">
+        <li class="{{isset($sidebarselect) && $sidebarselect == 'trend' ? 'active' : '' }}">
+          <a href="/trend">
             <i class="pe-7s-user"></i>
             <p>Trend</p>
           </a>
         </li>
-        <li>
-          <a href="user.html">
+        <li class="{{isset($sidebarselect) && $sidebarselect == 'segment' ? 'active' : '' }}">
+          <a href="/segment">
             <i class="pe-7s-user"></i>
             <p>Segmentation</p>
           </a>
@@ -178,7 +178,7 @@
     }
   }
   $('#date-range').dateRangePicker(config);
-  
+
 
 
   </script>

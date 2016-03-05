@@ -2,8 +2,20 @@
 
 @section('script')
 <script>
-$('#id_addprop').click(function(){
 
+function addProp(prop)
+{
+  var $newprop = $('.id_proptem').child.clone();
+  $newprop.find('.id_remprop').click(function(){
+    $newprop.addClass('hidden');
+  });
+  $newprop.find('.id_name').val(prop.name);
+  $newprop.find('.id_remprop')
+
+  $(".id_proplist").append($newprop);
+}
+$('.id_addprop').click(function(){
+  addProp({code: "", name: ""})
 })
 
 </script>
@@ -30,7 +42,7 @@ $('#id_addprop').click(function(){
   <h3>Properties</h3>
   <a class="id_addprop" href="#">+ Add Properties</a>
 
-  <div></div>
+  <div class="id_proplist"></div>
 
   <button type="submit" class="btn btn-default">Submit</button>
 </form>
@@ -41,4 +53,5 @@ $('#id_addprop').click(function(){
   <input type="text" class="form-control" name="codename" placeholder="Code">
   <label >Properties name</label>
   <input type="text" class="form-control" name="codename" placeholder="Name">
+  <button class="id_remprop">Remove</button>
 </div></div>
