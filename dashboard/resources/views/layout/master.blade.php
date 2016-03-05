@@ -88,7 +88,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-        
+
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav navbar-left">
@@ -178,14 +178,7 @@
     }
   }
   $('#date-range').dateRangePicker(config);
-  $.notify({
-    icon: 'pe-7s-gift',
-    message: "Welcome to <b>Meotrics Dashboard</b> - a beautiful dashboard for every marketer."
-
-  },{
-    type: 'info',
-    timer: 4000
-  });
+  
 
 
   </script>
