@@ -208,7 +208,7 @@ if (cluster.isMaster) {
 
 
 		// load trend ....
-		app.get('/trend/process/:apid/:id', function(req, res){
+		app.get('/trend/query/:appid/:id', function(req, res){
 			var appid = req.params.appid;
 			var trid = req.params.id;
 			var collection = prefix+"trend";
@@ -216,6 +216,9 @@ if (cluster.isMaster) {
 				.then(function(results){
 					var trendData = results[0];
 					collection = prefix + appid;
+					console.log(collection);
+					console.log(trendData);
+					console.log(getQueryTrending(trendData));
 					return db.collection(collection).aggregate(getQueryTrending(trendData)).toArray();
 				}).then(function(results){
 					res.json({s: true, results});
@@ -227,7 +230,7 @@ if (cluster.isMaster) {
 
 		function getQueryTrending(object){
 			var query = [];
-			query.push({$match: {typeid: object.event}});
+			query.push({$match: {typeid: new mongodb.ObjectID(object.event)}});
 			if(object.segment != undefined){
 				var field = "segment_"+object.segment;
 				query[0].$match[field] = true;
@@ -247,7 +250,7 @@ if (cluster.isMaster) {
 			}else if(object.operation == 'sum'){
 				query.push({$group: {
 					_id: '$'+object.object,
-					result: {$sum: '$'+object.param}
+					result: {'$sum': '$'+object.param}
 				}});
 				query.push({$sort: {result: object.order}});
 			}
