@@ -1,10 +1,12 @@
 var MongoClient = require('mongodb').MongoClient,
-    url = 'mongodb://localhost:1234/test',
-    n = 50000,
-    collection = 'actions',
+    url = 'mongodb://localhost:1234/local',
+    n = 100000,
+    collection = 'meotrics_1',
     users = null,
     numberUsers = 0,
     db = null;
+
+    var mongodb = require('mongodb');
 
 function getUsers(){
     MongoClient.connect(url)
@@ -23,7 +25,7 @@ function getUsers(){
             db.on('close', function(err){
               console.log('[MongoDB] disconnected');
             });
-            return db.collection('users').find().toArray();
+            return db.collection('meotrics_1').find({isUser: true}).toArray();
         }).then(function(results){
             users = results;
             numberUsers = users.length;
@@ -37,11 +39,10 @@ function getUsers(){
 function generatePageView(){
 	var user = users[generateNumber(0, numberUsers-1)];
 	return {
-		appid: user.appid,
-		actiontype: 'pageview',
+		typeid: new mongodb.ObjectID("56dab10544aee0d1bd499a27"),
 		url: 'http://' + generateNumber(1, 1000) + '.com',
-		ctime: new Date(new Date().getTime() + generateNumber(-1, 1)*3600000),
-		user: user
+		ctime: Math.floor(new Date().getTime()/1000),
+		mtid: user._id
 	}
 }
 
@@ -49,10 +50,9 @@ function generatePurchase(){
     var user = users[generateNumber(0, numberUsers-1)];
     var pid = generateNumber(1, 1000);
     return {
-        appid: user.appid,
-        actiontype: 'purchase',
-        ctime: new Date(new Date().getTime() + generateNumber(-1, 1)*3600000),
-        user: user,
+        typeid: new mongodb.ObjectID("56dab10c44aee0d1bd499a29"),
+        ctime: Math.floor(new Date().getTime()/1000),
+        mtid: user._id,
         cid: pid%10,
         pid: pid,
         amount: generateNumber(1, 10),
@@ -70,7 +70,7 @@ function generateNumber(min, max){
 function generateDB(){
     var count = 0;
     for(var i=0;i<n;i++){
-        db.collection(collection).insertOne(generatePageView())
+        db.collection(collection).insertOne(generatePurchase())
             .then(function(results){
                 count++;
                 console.log(count + ' records');
