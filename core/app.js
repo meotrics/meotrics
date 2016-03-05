@@ -41,6 +41,7 @@ if (cluster.isMaster) {
 		// create an action type
 		app.post('/actiontype/:appid', function (req, res) {
 			var data = req.body;
+			data.appid = Number(req.params.appid);
 			var collection = prefix+"actiontype";
 			db.collection(collection).insertOne(data) // add options: w, j, timeout ...
 				.then(function(r){ 
@@ -121,6 +122,20 @@ if (cluster.isMaster) {
 
 
 		//TREND-------------------------------------------------------------------------
+		//create a trend
+		app.post('/trend/:appid', function(req, res){
+			var data = req.body;
+			data.appid = Number(req.params.appid);
+
+			var collection = prefix+"trend";
+			db.collection(collection).insertOne(data) // add options: w, j, timeout ...
+				.then(function(r){ 
+					res.json({s: true, _id: r.insertedId});
+				}).catch(function(err){
+					// [ERROR]
+					throw {err: err, res: res};
+				});	
+		});
 
 		//get all trends in a app
 		app.get('/trend/:appid', function (req, res) {
@@ -149,18 +164,7 @@ if (cluster.isMaster) {
 				});
 		});
 
-		//create a trend
-		app.post('/trend/:appid', function(req, res){
-			var data = req.body;
-			var collection = prefix+"trend";
-			db.collection(collection).insertOne(data) // add options: w, j, timeout ...
-				.then(function(r){ 
-					res.json({s: true, _id: r.insertedId});
-				}).catch(function(err){
-					// [ERROR]
-					throw {err: err, res: res};
-				});	
-		});
+		
 		// Update a trend
 		app.put('/trend/:appid/:id', function(req,res){
 			var data = req.body;
@@ -189,7 +193,7 @@ if (cluster.isMaster) {
 				});
 		});
 
-		//delete all actiontypes in an app
+		//delete all trends in an app
 		app.delete('/trend/:appid', function (req, res) {
 			var appid = Number(req.params.appid);
 			var collection = prefix+"trend";
@@ -212,7 +216,7 @@ if (cluster.isMaster) {
 				.then(function(results){
 					var trendData = results[0];
 					collection = prefix + appid;
-					return db.collection(collection).aggregate(getQueryTrending(trendData)).toArray();		
+					return db.collection(collection).aggregate(getQueryTrending(trendData)).toArray();
 				}).then(function(results){
 					res.json({s: true, results});
 				}).catch(function(err){
@@ -255,7 +259,6 @@ if (cluster.isMaster) {
 		
 		/* Ghi nhận một action mới
 		Tham số: {
-			appid : number, 
 			mtid : number, ( Em tuong? lay _id cua mongodb?????)
 			typeid: number // type of action, eg: "purchase", "pageview", ( Them cai typeid cua "user" nua a nhe, luu chung ma)
 			osid: number // os information, eg: "window", "linux", 
@@ -271,23 +274,30 @@ if (cluster.isMaster) {
 			url: string
 			browserversion : number
 			osversion : number
-			field1, field2, field3, field4 
+			userfields = {field1:10, field2: 345};
 		}
 
 		NOTEEE: Quy dinh ma~ code som' di a con` cho vao code luon
 		*/
-		var bufferSpace = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
 
-		app.post('/r', function (req, res) {
+		app.post('/r/:appid', function (req, res) {
 			var data = req.body;
-			var collection = prefix+data.appid;
-			data.buffer_space = bufferSpace;
+			var collection = prefix+req.params.appid;
+			// Convert string to ObjectID in mongodb
+			data.mtid = new mongodb.ObjectID(data.mtid);
+			data.typeid = new mongodb.ObjectID(data.typeid);
+			// This is for add prefix to userfields
+			var userfields = data.userfields;
+			delete data.userfields;
+			var keys = Object.keys(userfields);
+			for(var i=0; i < keys.length; i++){
+				data["f_"+keys[i]] = userfields[keys[i]];
+			}
+			// Add created time 
 			data.ctime = Math.round(new Date() / 1000);
-			delete data.appid;
 			db.collection(collection).insertOne(data)
 				.then(function(r){
-					var _id = r.insertedId;
-					db.collection(collection).updateOne({_id: new mongodb.ObjectID(_id)}, {$unset: {buffer_space: ""}});	
+					res.json({s: true});	
 				}).catch(function(e){
 					// [ERROR]
 					throw {err: err, res: res};
@@ -300,8 +310,8 @@ if (cluster.isMaster) {
 			Tham số:
 			{
 				appid: number,
-				mtid: number, //auid của anonymous user
-				userid, name, email, age, birth, gender, ...
+				cookie: string, //mtid của anonymous user
+				user: {userid, name, email, age, birth, gender, ...}
 			}
 			
 			Điều kiện: 
@@ -311,22 +321,22 @@ if (cluster.isMaster) {
 					user thành userid ở tham số.
 			2. Toàn bộ thông tin về user được cập nhật mới.
 			*/
-		app.post('/i', function (req, res) {
+		app.post('/i/:appid', function (req, res) {
 			var data = req.body;
-			var collection = prefix+data.appid;
+			var collection = prefix+req.params.appid;
 			var uid = data.user.uid;
 
 			async.waterfall([
 				function(callback){
 					delete data.user.uid;
-					db.collection(collection).findOneAndUpdate({type: "user", uid: uid}, {$set: data.user}, {projection:{_id: 1}})
+					db.collection(collection).findOneAndUpdate({isUser: true, uid: uid}, {$set: data.user}, {projection:{_id: 1}})
 						.then(function(r){
 							if(r.value != null){ 
 								var mtid = r.value._id;
 								res.json({s: true, mtid: mtid});
 								callback(null, true, mtid);
 							}else{	
-								res.json({s: true, mtid: data.mtid});
+								res.json({s: true, mtid: data.cookie});
 								callback(null, false);
 							}
 						}).catch(function(err){
@@ -338,18 +348,18 @@ if (cluster.isMaster) {
 						callback(null, true, mtid);
 					}else{
 						data.user.uid = uid;
-						data.user.type = "user";
+						data.user.isUser = true;
 
-						db.collection(collection).updateOne({_id: new mongodb.ObjectID(data.mtid)}, data.user, function(err, result){
+						db.collection(collection).updateOne({_id: new mongodb.ObjectID(data.cookie)}, data.user, function(err, result){
 							if(err) callback(err, null);
-							callback(null, false);
+							else callback(null, false);
 						});
 					}
 				}, function(needUpdate, mtid, callback){
 					if(needUpdate){
-						db.collection(collection).updateMany({type: "action", uid: new mongodb.ObjectID(data.mtid)}, {$set: {uid: new mongodb.ObjectID(mtid)}})
+						db.collection(collection).updateMany({mtid: new mongodb.ObjectID(data.cookie)}, {$set: {mtid: new mongodb.ObjectID(mtid)}})
 							.then(function(r){
-								db.collection(collection).deleteOne({_id: new mongodb.ObjectID(mtid)}, {}, function(err, result){
+								db.collection(collection).deleteOne({_id: new mongodb.ObjectID(data.cookie)}, {}, function(err, result){
 									callback(err, null);
 								});
 							}).catch(function(err){
@@ -376,10 +386,9 @@ if (cluster.isMaster) {
 		mtid vừa được tạo
 		*/
 
-		app.post('/s', function (req, res) {
-			var data = req.body;
-			var collection = prefix + data.appid;
-			db.collection(collection).insertOne({type:'user'})
+		app.get('/s/:appid', function (req, res) {
+			var collection = prefix + req.params.appid;
+			db.collection(collection).insertOne({})
 				.then(function(results){
 					var mtid = results.insertedId;
 					res.json({s: true, mtid: mtid});
@@ -391,24 +400,89 @@ if (cluster.isMaster) {
 
 		//SEGMENTATION-------------------------------------------------------------
 		
-		//make a segment query
-		app.get('segment', function(req, res)
-		{
-			
+		//create a segment
+		app.post('/segment/:appid', function(req, res){
+			var data = req.body;
+			data.appid = Number(req.params.appid);
+
+			var collection = prefix+"segment";
+			db.collection(collection).insertOne(data) // add options: w, j, timeout ...
+				.then(function(r){ 
+					res.json({s: true, _id: r.insertedId});
+				}).catch(function(err){
+					// [ERROR]
+					throw {err: err, res: res};
+				});	
 		});
+
+		//get all segments in a app
+		app.get('/segment/:appid', function (req, res) {
+			var appid = Number(req.params.appid);
+			var collection = prefix+"segment";
+			db.collection(collection).find({appid: appid}, {appid: 0}).toArray()
+				.then(function(results){
+					res.json({s: true, results});
+				}).catch(function(err){
+					// [ERROR]
+					throw {err: err, res: res};
+				});
+		});
+
+		//list a segment from a app
+		app.get('/segment/:appid/:id', function(req,res){
+			// var appid = req.params.appid;
+			var trid = req.params.id;
+			var collection = prefix+"segment";
+			db.collection(collection).find({_id: new mongodb.ObjectID(trid) }, {_id: 0, appid: 0}).toArray()
+				.then(function(results){
+					res.json({s: true, results});
+				}).catch(function(err){
+					// [ERROR]
+					throw {err: err, res: res};
+				});
+		});
+
 		
-		//list segment
-		app.get('segments', function(req,res)
-		{});
-		
-		app.post('segment/draf', function(req, res)
-		{});
-		
-		//delete a segment
-		app.delete('segment', function(req, res)
-		{
-			
-		})
+		// Update a segment
+		app.put('/segment/:appid/:id', function(req,res){
+			var data = req.body;
+			// var appid = req.params.appid;
+			var trid = req.params.id;
+			var collection = prefix+"segment";
+			db.collection(collection).updateOne({_id: new mongodb.ObjectID(trid)}, {$set: data})
+				.then(function(results){
+					res.json({s: true});
+				}).catch(function(err){
+					// [ERROR]
+					throw {err: err, res: res};
+				});
+		});
+
+		app.delete('/segment/:appid/:id', function(req,res){
+			// var appid = req.params.appid;
+			var trid = req.params.id;
+			var collection = prefix+"segment";
+			db.collection(collection).deleteOne({_id: new mongodb.ObjectID(trid)})
+				.then(function(results){
+					res.json({s: true});
+				}).catch(function(err){
+					// [ERROR]
+					throw {err: err, res: res};
+				});
+		});
+
+		//delete all segments in an app
+		app.delete('/segment/:appid', function (req, res) {
+			var appid = Number(req.params.appid);
+			var collection = prefix+"segment";
+			db.collection(collection).deleteMany({appid: appid})
+				.then(function(results){
+					res.json({s: true});
+				}).catch(function(err){
+					// [ERROR]
+					throw {err: err, res: res};
+				});
+		});
 		
 		//update or create a segment
 		// app.post('segment', function (req, res) {
