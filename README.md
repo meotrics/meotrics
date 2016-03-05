@@ -37,9 +37,9 @@ trỏ danh sách tên miền sau
 1. Cài đặt Composer
 	1. Môi trường window
 
-		Download tại: [Get Composer](https://getcomposer.org/Composer-Setup.exe)
+		Download tại [đây](https://getcomposer.org/Composer-Setup.exe)
 
-		*Chú ý* enable module openssl (tìm file php.ini, bỏ comment tất cả các dòng chứa `extension=php_openssl.dll`)
+		**Chú ý** enable module openssl (tìm file php.ini, bỏ comment tất cả các dòng chứa `extension=php_openssl.dll`)
 	1. Môi trường linux (ubuntu)
 
 		`curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer`
@@ -49,14 +49,16 @@ trỏ danh sách tên miền sau
 	Chuyển vào thư mục dashboard (`meotrics/dashboard`), gõ
 
 	```
-	composer require "laravel/installer"```
+	composer require "laravel/installer"
+	```
 	
+	**Tạo một file .env có nội dung giống với .env.example, sửa config csdl ở đây**
 3. Cài đặt nodejs
 	
 	Chuyển vào thư mục core (`meotrics/core`), gõ
 	```
-	npm install```
-	
+	npm install
+	```
 
 3. Cấu hình Web Server
 
