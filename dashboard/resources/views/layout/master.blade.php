@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width" />
 
   <!-- Bootstrap core CSS     -->
-  <link href="/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
   <link href="/css/animate.min.css" rel="stylesheet"/>
   <link href="/css/light-bootstrap-dashboard.css" rel="stylesheet"/>
 
@@ -18,7 +18,9 @@
   <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
   <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
   <link href="/css/pe-icon-7-stroke.css" rel="stylesheet" />
-  <link href="/css/app.css" rel="stylesheet" />
+  <link href="{{asset('css/app.css')}}" rel="stylesheet" />
+  <link rel="stylesheet" href="{{asset('css/daterangepicker.css')}}"/>
+  @yield('style')
 </head>
 <body>
 
@@ -90,24 +92,10 @@
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav navbar-left">
+
             <li>
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <i class="fa fa-dashboard"></i>
-              </a>
-            </li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <i class="fa fa-globe"></i>
-                <b class="caret"></b>
-                <span class="notification">5</span>
-              </a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Notification 1</a></li>
-                <li><a href="#">Notification 2</a></li>
-                <li><a href="#">Notification 3</a></li>
-                <li><a href="#">Notification 4</a></li>
-                <li><a href="#">Another notification</a></li>
-              </ul>
+
+
             </li>
             <li>
               <a href="">
@@ -118,30 +106,14 @@
 
           <ul class="nav navbar-nav navbar-right">
             <li>
-              <a href="">
-                Account
+              <a style="padding: 0px">
+                <div class="input-group" style="width: 480px;">
+                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                  <input type="text" id="date-range" class="form-control">
+                </div>
               </a>
             </li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                Dropdown
-                <b class="caret"></b>
-              </a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something</a></li>
-                <li class="divider"></li>
-                <li><a href="#">Separated link</a></li>
-              </ul>
-            </li>
-            <li>
-              <a href="#">
-                Log out
-              </a>
-            </li>
+
           </ul>
         </div>
       </div>
@@ -185,9 +157,9 @@
 
   </div>
 
+  <script src="//code.jquery.com/jquery-1.12.1.min.js" type="text/javascript"></script>
 
-  <script src="/js/jquery-1.10.2.js" type="text/javascript"></script>
-  <script src="/js/bootstrap.min.js" type="text/javascript"></script>
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" type="text/javascript"></script>
 
   <!--  Checkbox, Radio & Switch Plugins -->
   <script src="/js/bootstrap-checkbox-radio-switch.js"></script>
@@ -197,19 +169,33 @@
   <script src="/js/bootstrap-notify.js"></script>
   <script src="/js/light-bootstrap-dashboard.js"></script>
 
-  <script type="text/javascript">
-  $(document).ready(function(){
+  <script src="{{asset('js/moment.js')}}"></script>
+  <script src="{{asset('js/jquery.daterangepicker.js')}}"> </script>
 
-    $.notify({
-      icon: 'pe-7s-gift',
-      message: "Welcome to <b>Meotrics Dashboard</b> - a beautiful dashboard for every marketer."
+  @yield('script')
+  <script>
 
-    },{
-      type: 'info',
-      timer: 4000
-    });
+  var config = {
+    customOpenAnimation: function(cb)
+    {
+      $(this).fadeIn(300, cb);
+    },
+    customCloseAnimation: function(cb)
+    {
+      $(this).fadeOut(300, cb);
+    }
+  }
+  $('#date-range').dateRangePicker(config);
+  $.notify({
+    icon: 'pe-7s-gift',
+    message: "Welcome to <b>Meotrics Dashboard</b> - a beautiful dashboard for every marketer."
 
+  },{
+    type: 'info',
+    timer: 4000
   });
+
+
   </script>
 </body>
 </html>

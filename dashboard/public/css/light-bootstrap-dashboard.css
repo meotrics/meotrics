@@ -243,7 +243,7 @@ input:focus {
 }
 .sidebar .logo {
   padding: 10px 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  /* border-bottom: 1px solid rgba(255, 255, 255, 0.2); */
 }
 .sidebar .logo p {
   float: left;
@@ -314,7 +314,7 @@ input:focus {
 body > .navbar-collapse .logo {
   text-align: center;
   padding: 10px 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  /* border-bottom: 1px solid rgba(255, 255, 255, 0.2); */
 }
 .sidebar .logo p,
 body > .navbar-collapse .logo p {
