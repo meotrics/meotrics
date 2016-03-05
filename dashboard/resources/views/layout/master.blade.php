@@ -18,6 +18,7 @@
   <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
   <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
   <link href="/css/pe-icon-7-stroke.css" rel="stylesheet" />
+  <link href="/css/app.css" rel="stylesheet" />
 
 </head>
 <body>
@@ -31,9 +32,8 @@
 
     <div class="sidebar-wrapper">
       <div class="logo">
-        <a href="http://www.creative-tim.com" class="simple-text">
-          Creative Tim
-        </a>
+        <a href="/"> <img src="{{asset('img/logo.png')}}" width="30px"/></a>
+        <span class="logo-text">meotrics</span>
       </div>
 
       <ul class="nav">
