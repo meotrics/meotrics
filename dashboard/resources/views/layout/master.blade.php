@@ -19,7 +19,6 @@
   <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
   <link href="/css/pe-icon-7-stroke.css" rel="stylesheet" />
   <link href="/css/app.css" rel="stylesheet" />
-
 </head>
 <body>
 
@@ -55,12 +54,23 @@
             <p>Segmentation</p>
           </a>
         </li>
+        <li class="user-area">
+          <ul class="media-list" style="margin-left: 10px; margin-top: 10px;">
+            <li class="media">
+              <div class="media-left">
+                <a href="#">
+                  <img class="media-object" width="40px" src="/img/user.png" alt="">
+                </a>
+              </div>
+              <div class="media-body">
+                <h5 style="color:white;" class="media-heading">thanhpk</h5>
+                <a class="small" href="/auth/default/view?id=4">profile</a>
+                &nbsp; &nbsp;
+                <a class="small" href="/auth/logout" data-method="post">logout</a>
+              </div>
+            </li>
+          </ul>
 
-        <li class="active-pro">
-          <a href="upgrade.html">
-            <i class="pe-7s-rocket"></i>
-            <p>Upgrade to PRO</p>
-          </a>
         </li>
       </ul>
     </div>

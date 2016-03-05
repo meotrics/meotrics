@@ -4,3 +4,8 @@
   font-weight: 400;
   /* padding-top: 21px; */
 }
+.nav>li.user-area
+{
+  position: absolute;;
+  bottom: 20px;
+}
