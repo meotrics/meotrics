@@ -21,16 +21,14 @@ function mtthrow(err)
 
 function getQueryTrending(object) {
 	var query = [];
-
+	console.log(object);
 	query.push({ $match: { typeid: new mongodb.ObjectID(object.event) } });
-	console.log(11);
+
 	if (object.segment != undefined) {
 		var field = "segment_" + object.segment;
 		query[0].$match[field] = true;
-		console.log(21);
 	}
 
-	console.log(query);
 	if(object.operation == 'count') {
 		query.push({$group: {
 							_id: '$'+object.object,
@@ -48,8 +46,10 @@ function getQueryTrending(object) {
 							_id: '$'+object.object,
 							result: {'$sum': '$'+object.param}
 						}});
+						if(object.order === undefined) object.order = 1;
 						query.push({$sort: {result: object.order}});
 					}
+					if(object.limit === undefined) object.limit = 10;
 					query.push({$limit: object.limit});
 					
 	return query;
