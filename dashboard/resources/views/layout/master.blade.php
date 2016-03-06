@@ -40,13 +40,13 @@
       <ul class="nav">
         <li class="{{ !isset($sidebarselect) ||  $sidebarselect == 'home' ? 'active' : '' }}">
           <a href="/home">
-            <i class="pe-7s-graph"></i>
+            <i class="pe-7s-display2"></i>
             <p>Dashboard</p>
           </a>
         </li>
         <li class="{{isset($sidebarselect) && $sidebarselect == 'trend' ? 'active' : '' }}">
           <a href="/trend">
-            <i class="pe-7s-user"></i>
+            <i class="pe-7s-cup"></i>
             <p>Trend</p>
           </a>
         </li>
@@ -93,18 +93,19 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav navbar-left">
             @include('segment/select')
-
-          </ul>
-
-          <ul class="nav navbar-nav navbar-right">
             <li>
               <a style="padding: 0px">
-                <div class="input-group" style="width: 480px;">
-                  <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                  <input type="text" id="date-range" class="form-control">
+                <div class="input-group" style="width: 250px;">
+                    <span class="input-group-addon" ><i class="pe-7s-date" style="font-size:26px"></i></span>
+                  <input type="text" class="form-control" id="date-range">
+
                 </div>
               </a>
             </li>
+          </ul>
+
+          <ul class="nav navbar-nav navbar-right">
+
 
           </ul>
         </div>
@@ -112,40 +113,41 @@
     </nav>
 
     <div class="content">
-      @yield('content')
+      <div class="container-fluid">@yield('content')</div>
+      <footer class="footer">
+        <div class="container-fluid">
+          <nav class="pull-left">
+            <ul>
+              <li>
+                <a href="#">
+                  Home
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  Company
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  Portfolio
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  Blog
+                </a>
+              </li>
+            </ul>
+          </nav>
+          <p class="copyright pull-right">
+            &copy; 2016 <a href="http://meotrics.com">Meotrics</a>, made with love for a better insight
+          </p>
+        </div>
+      </footer>
     </div>
 
-    <footer class="footer">
-      <div class="container-fluid">
-        <nav class="pull-left">
-          <ul>
-            <li>
-              <a href="#">
-                Home
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                Company
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                Portfolio
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                Blog
-              </a>
-            </li>
-          </ul>
-        </nav>
-        <p class="copyright pull-right">
-          &copy; 2016 <a href="http://meotrics.com">Meotrics</a>, made with love for a better insight
-        </p>
-      </div>
-    </footer>
+
 
   </div>
 

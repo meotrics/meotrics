@@ -9,3 +9,7 @@
   position: absolute;;
   bottom: 20px;
 }
+
+th {
+    font-weight: normal;
+}

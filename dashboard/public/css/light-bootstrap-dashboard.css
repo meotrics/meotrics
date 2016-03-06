@@ -456,7 +456,7 @@ body > .navbar-collapse[data-color="purple"]:after {
 }
 
 .main-panel {
-  background: rgba(203, 203, 210, 0.15);
+  background: rgb(249, 249, 249);
   position: relative;
   z-index: 2;
   float: right;
@@ -1379,7 +1379,7 @@ body > .navbar-collapse[data-color="purple"]:after {
   font-size: 20px;
 }
 .navbar .navbar-nav > li > a {
-  padding: 10px 15px;
+  padding: 3px 5px;
   margin: 10px 3px;
   position: relative;
 }

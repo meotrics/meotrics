@@ -1,7 +1,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-    <i class="fa fa-database" style=""></i>
-    <span class="segment-label">All traffic </span>
+    <i class="pe-7s-user" style="vertical-align: middle; font-size: 34px"></i>
+    <span class="segment-label" style="vertical-align: middle">All traffic </span>
     <b class="caret"></b>
   </a>
   <ul class="dropdown-menu">
