@@ -14,6 +14,7 @@ function buildconnstr() {
 
 function mtthrow(err)
 {
+	console.log(err);
 	setTimeout(function(){
 		throw err;
 	});
@@ -28,30 +29,19 @@ function getQueryTrending(object) {
 		var field = "segment_" + object.segment;
 		query[0].$match[field] = true;
 	}
-
+	if(object.order === undefined) object.order = 1;
 	if(object.operation == 'count') {
-		query.push({$group: {
-							_id: '$'+object.object,
-							count: {'$sum': 1}
-						}});
-						query.push({$sort: {count: object.order}});
+		query.push({$group: {_id: '$'+object.object, count: {'$sum': 1}}});
+		query.push({$sort: {count: object.order}});
 	}else if(object.operation == 'avg'){
-						query.push({$group: {
-							_id: '$'+object.object,
-							result: {$avg: '$'+object.param}
-						}});
-						query.push({$sort: {result: object.order}});
-	}else if(object.operation == 'sum'){
-						query.push({$group: {
-							_id: '$'+object.object,
-							result: {'$sum': '$'+object.param}
-						}});
-						if(object.order === undefined) object.order = 1;
-						query.push({$sort: {result: object.order}});
-					}
-					if(object.limit === undefined) object.limit = 10;
-					query.push({$limit: object.limit});
-					
+		query.push({$group: {_id: '$'+object.object,result: {$avg: '$'+object.param}}});
+		query.push({$sort: {result: object.order}});
+	} else if(object.operation == 'sum'){
+		query.push({$group: {_id: '$'+object.object,result: {'$sum': '$'+object.param}}});				
+		query.push({$sort: {result: object.order}});
+	}
+	if(object.limit === undefined) object.limit = 10;
+	query.push({$limit: object.limit});
 	return query;
 }
 
@@ -162,26 +152,23 @@ function route(app, db, segmgr, prefix, mongodb) {
 		data.appid = Number(req.params.appid);
 		var collection = prefix + "trend";
 
-		db.collection(collection).insertOne(data) // add options: w, j, timeout ...
-						.then(function (r) {
-				res.json({ s: true, _id: r.insertedId });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		db.collection(collection)
+			.insertOne(data)
+			.then(function (r) {
+				res.json({ _id: r.insertedId });
+			})
+			.catch(mtthrow);
 	});
 
 	//get all trends in a app
 	app.get('/trend/:appid', function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "trend";
-		db.collection(collection).find({ appid: appid }, { appid: 0 }).toArray()
-						.then(function (results) {
-				res.json({ s: true, results });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		db.collection(collection)
+			.find({ appid: appid }, { appid: 0 })
+			.toArray()
+			.then(res.json)
+			.catch(mtthrow);
 	});
 
 	//list a trend from a app
@@ -250,15 +237,11 @@ function route(app, db, segmgr, prefix, mongodb) {
 			.then(function (results) {
 				var trendData = results[0];
 				collection = prefix + appid;
-				console.log(trendData)
 				console.log(getQueryTrending(trendData));
 				return db.collection(collection).aggregate(getQueryTrending(trendData)).toArray();
-						}).then(function (results) {
-				res.json({ s: true, results });
-			}).catch(mtthrow);
+			}).then(function(results){res.json(results)})
+			.catch(mtthrow);
 	});
-
-
 
 	//CLIENT------------------------------------------------------------------------
 				

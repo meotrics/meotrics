@@ -10,13 +10,13 @@
   <meta name="viewport" content="width=device-width" />
 
   <!-- Bootstrap core CSS     -->
-  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="{{asset('css/bootstrap.min.css')}}" rel="stylesheet" />
   <link href="/css/animate.min.css" rel="stylesheet"/>
   <link href="/css/light-bootstrap-dashboard.css" rel="stylesheet"/>
 
   <!--     Fonts and icons     -->
-  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
+  <link href="{{asset('css/font-awesome.min.css')}}" rel="stylesheet">
+  <link href="{{asset('css/gf-roboto.css')}}" rel='stylesheet' type='text/css'>
   <link href="/css/pe-icon-7-stroke.css" rel="stylesheet" />
   <link href="{{asset('css/app.css')}}" rel="stylesheet" />
   <link rel="stylesheet" href="{{asset('css/daterangepicker.css')}}"/>
@@ -25,7 +25,7 @@
 <body>
 
   <div class="wrapper">
-    <div class="sidebar" data-color="black" data-image="/img/sidebar-4.jpg">
+    <div class="sidebar" data-color="green" data-image="/img/sidebar-4.jpg">
       <!--
       Tip 1: you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple"
       Tip 2: you can also add an image using data-image tag
@@ -93,7 +93,7 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav navbar-left">
             @include('segment/select')
-            <li>
+            <li >
               <a style="padding: 0px">
                 <div class="input-group" style="width: 250px;">
                     <span class="input-group-addon" ><i class="pe-7s-date" style="font-size:26px"></i></span>
@@ -150,10 +150,10 @@
 
 
   </div>
+  <script src="{{asset('js/he.js')}}" type="text/javascript"></script>
+  <script src="{{asset('js/jquery-1.12.1.min.js')}}" type="text/javascript"></script>
 
-  <script src="//code.jquery.com/jquery-1.12.1.min.js" type="text/javascript"></script>
-
-  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" type="text/javascript"></script>
+  <script src="{{asset('js/bootstrap.min.js')}}" type="text/javascript"></script>
 
   <!--  Checkbox, Radio & Switch Plugins -->
   <script src="/js/bootstrap-checkbox-radio-switch.js"></script>
