@@ -336,11 +336,11 @@
 }
 
 .date-picker-wrapper .first-date-selected {
-    background-color: #585858 !important;
+    background-color: #185BA0 !important;
     color: white !important;
 }
 .date-picker-wrapper .last-date-selected {
-    background-color: #585858 !important;
+    background-color: #185BA0 !important;
     color: white !important;
 }
 .date-picker-wrapper .date-range-length-tip {/* Safari */

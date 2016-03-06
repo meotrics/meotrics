@@ -25,7 +25,7 @@
 <body>
 
   <div class="wrapper">
-    <div class="sidebar" data-color="black" data-image="/img/sidebar-4.jpg">
+    <div class="sidebar" data-color="green" data-image="/img/sidebar-4.jpg">
       <!--
       Tip 1: you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple"
       Tip 2: you can also add an image using data-image tag
@@ -93,7 +93,7 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav navbar-left">
             @include('segment/select')
-            <li>
+            <li >
               <a style="padding: 0px">
                 <div class="input-group" style="width: 250px;">
                     <span class="input-group-addon" ><i class="pe-7s-date" style="font-size:26px"></i></span>
@@ -150,7 +150,7 @@
 
 
   </div>
-
+  <script src="{{asset('js/he.js')}}" type="text/javascript"></script>
   <script src="//code.jquery.com/jquery-1.12.1.min.js" type="text/javascript"></script>
 
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" type="text/javascript"></script>

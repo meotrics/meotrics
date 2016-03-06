@@ -12,7 +12,7 @@ class TrendController extends Controller {
 
 	public function index()
 	{
-		return view('trend/show');
+		return view('trend/index');
 	}
 
 	public function query(Request $request)

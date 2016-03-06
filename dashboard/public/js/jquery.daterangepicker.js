@@ -1884,7 +1884,29 @@
 			if ( opt.customTopBar) html += ' custom-topbar ';
 			html += '">';
 
-			if (opt.showTopbar)
+			
+
+			var _colspan = opt.showWeekNumbers ? 6 : 5;
+			html += '<div class="month-wrapper">'
+				+'<table class="month1" cellspacing="0" border="0" cellpadding="0"><thead><tr class="caption"><th style="width:27px;"><span class="prev"><i class="pe-7s-angle-left" style="font-size:24px; vertical-align: middle;"></i></span></th><th colspan="'+_colspan+'" class="month-name"></th><th style="width:27px;">' + (opt.singleDate || !opt.stickyMonths ? '<span class="next"><i class="pe-7s-angle-right" style="font-size:24px; vertical-align: middle;"></i></span>': '') + '</th></tr><tr class="week-name">'+getWeekHead()+'</thead><tbody></tbody></table>';
+
+			if ( hasMonth2() )
+			{
+				html += '<div class="gap">'+getGapHTML()+'</div>'
+					+'<table class="month2" cellspacing="0" border="0" cellpadding="0"><thead><tr class="caption"><th style="width:27px;">' + (!opt.stickyMonths ? '<span class="prev"><i class="pe-7s-angle-left" style="font-size:24px; vertical-align: middle;"></span>': '') + '</th><th colspan="'+_colspan+'" class="month-name"></th><th style="width:27px;"><span class="next"><i class="pe-7s-angle-right" style="font-size:24px; vertical-align: middle;"></i></span></th></tr><tr class="week-name">'+getWeekHead()+'</thead><tbody></tbody></table>'
+			}
+				//+'</div>'
+			html +=	'<div style="clear:both;height:0;font-size:0;"></div>'
+				+'<div class="time">'
+				+'<div class="time1"></div>'
+			if ( ! opt.singleDate ) {
+				html += '<div class="time2"></div>'
+			}
+			html += '</div>'
+				+'<div style="clear:both;height:0;font-size:0;"></div>'
+				+'</div>';
+
+				if (opt.showTopbar)
 			{
 				html += '<div class="drp_top-bar">';
 
@@ -1908,27 +1930,7 @@
 				html += '<input type="button" class="apply-btn btn disabled'+ getApplyBtnClass() +'" value="'+lang('apply')+'" />';
 				html += '</div>'
 			}
-
-			var _colspan = opt.showWeekNumbers ? 6 : 5;
-			html += '<div class="month-wrapper">'
-				+'<table class="month1" cellspacing="0" border="0" cellpadding="0"><thead><tr class="caption"><th style="width:27px;"><span class="prev"><i class="pe-7s-angle-left" style="font-size:24px; vertical-align: middle;"></i></span></th><th colspan="'+_colspan+'" class="month-name"></th><th style="width:27px;">' + (opt.singleDate || !opt.stickyMonths ? '<span class="next"><i class="pe-7s-angle-right" style="font-size:24px; vertical-align: middle;"></i></span>': '') + '</th></tr><tr class="week-name">'+getWeekHead()+'</thead><tbody></tbody></table>';
-
-			if ( hasMonth2() )
-			{
-				html += '<div class="gap">'+getGapHTML()+'</div>'
-					+'<table class="month2" cellspacing="0" border="0" cellpadding="0"><thead><tr class="caption"><th style="width:27px;">' + (!opt.stickyMonths ? '<span class="prev"><i class="pe-7s-angle-left" style="font-size:24px; vertical-align: middle;"></span>': '') + '</th><th colspan="'+_colspan+'" class="month-name"></th><th style="width:27px;"><span class="next"><i class="pe-7s-angle-right" style="font-size:24px; vertical-align: middle;"></i></span></th></tr><tr class="week-name">'+getWeekHead()+'</thead><tbody></tbody></table>'
-			}
-				//+'</div>'
-			html +=	'<div style="clear:both;height:0;font-size:0;"></div>'
-				+'<div class="time">'
-				+'<div class="time1"></div>'
-			if ( ! opt.singleDate ) {
-				html += '<div class="time2"></div>'
-			}
-			html += '</div>'
-				+'<div style="clear:both;height:0;font-size:0;"></div>'
-				+'</div>';
-
+			
 			html += '<div class="footer">';
 			if (opt.showShortcuts)
 			{
@@ -1983,7 +1985,8 @@
 						html+='</span>';
 					}
 				}
-
+				
+				
 				if (opt.customShortcuts)
 				{
 					for(var i=0;i<opt.customShortcuts.length; i++)
@@ -1995,6 +1998,7 @@
 				html += '</div>';
 			}
 
+			
 			// Add Custom Values Dom
 			if (opt.showCustomValues)
 			{
@@ -2009,6 +2013,8 @@
 					}
 				}
 			}
+			
+			
 
 			html += '</div></div>';
 

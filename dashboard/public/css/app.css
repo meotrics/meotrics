@@ -13,3 +13,14 @@
 th {
     font-weight: normal;
 }
+
+
+.mr
+{
+  vertical-align: middle;
+	margin-right: 20px;
+}
+
+.mr5
+{vertical-align: middle;
+margin-right: 10px;}
