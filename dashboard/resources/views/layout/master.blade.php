@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <link rel="icon" type="image/png" href="/favicon.ico">
+  <link rel="icon" type="image/png" href="{{asset('favicon.ico')}}">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <title>@yield('title')</title>
 
@@ -11,13 +11,13 @@
 
   <!-- Bootstrap core CSS     -->
   <link href="{{asset('css/bootstrap.min.css')}}" rel="stylesheet" />
-  <link href="/css/animate.min.css" rel="stylesheet"/>
-  <link href="/css/light-bootstrap-dashboard.css" rel="stylesheet"/>
+  <link href="{{asset('css/animate.min.css')}}" rel="stylesheet"/>
+  <link href="{{asset('css/light-bootstrap-dashboard.css')}}" rel="stylesheet"/>
 
   <!--     Fonts and icons     -->
   <link href="{{asset('css/font-awesome.min.css')}}" rel="stylesheet">
   <link href="{{asset('css/gf-roboto.css')}}" rel='stylesheet' type='text/css'>
-  <link href="/css/pe-icon-7-stroke.css" rel="stylesheet" />
+  <link href="{{asset('css/pe-icon-7-stroke.css')}}" rel="stylesheet" />
   <link href="{{asset('css/app.css')}}" rel="stylesheet" />
   <link rel="stylesheet" href="{{asset('css/daterangepicker.css')}}"/>
   @yield('style')
@@ -157,12 +157,12 @@
   <script src="{{asset('js/bootstrap.min.js')}}" type="text/javascript"></script>
 
   <!--  Checkbox, Radio & Switch Plugins -->
-  <script src="/js/bootstrap-checkbox-radio-switch.js"></script>
-  <script src="/js/chartist.min.js"></script>
+  <script src="{{asset('/js/bootstrap-checkbox-radio-switch.js')}}"></script>
+  <script src="{{asset('/js/chartist.min.js')}}"></script>
 
   <!--  Notifications Plugin    -->
-  <script src="/js/bootstrap-notify.js"></script>
-  <script src="/js/light-bootstrap-dashboard.js"></script>
+  <script src="{{asset('/js/bootstrap-notify.js')}}"></script>
+  <script src="{{asset('/js/light-bootstrap-dashboard.js')}}"></script>
 
   <script src="{{asset('js/moment.js')}}"></script>
   <script src="{{asset('js/jquery.daterangepicker.js')}}"> </script>

@@ -140,7 +140,7 @@ body,
 }
 
 a {
-  color: #1DC7EA;
+  color: #367ECE;
 }
 a:hover, a:focus {
   color: #42d0ed;
@@ -832,18 +832,18 @@ body > .navbar-collapse[data-color="purple"]:after {
 }
 
 .form-control {
-  background-color: #EFEFEF;
-  border: 1px solid #E6E6E6;
+  background-color: #FFFFFF;
+  border: 1px solid #e0e0e0;
   border-radius: 4px;
   color: #333;
   padding: 0px 6px;
   height: 31px;
-  -webkit-box-shadow: none;
-  box-shadow: none;
+  /* -webkit-box-shadow: none; */
+  /* box-shadow: none; */
 }
 .form-control:focus {
   background-color: #FFFFFF;
-  border: 1px solid #AAAAAA;
+  border: 1px solid #367ECE;
   -webkit-box-shadow: none;
   box-shadow: none;
   outline: 0 !important;
@@ -1060,7 +1060,7 @@ body > .navbar-collapse[data-color="purple"]:after {
   border-bottom-width: 1px;
   font-size: 12px;
   text-transform: uppercase;
-  color: #9A9A9A;
+  color: #9E9E9E;
   font-weight: 400;
   padding-bottom: 5px;
 }
