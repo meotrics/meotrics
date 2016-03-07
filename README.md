@@ -46,7 +46,7 @@ trỏ danh sách tên miền sau
 
 2. Khởi tạo Laravel framework
 
-	Chuyển vào thư mục dashboard (`meotrics/dashboard`), gõ
+	Chuyển vào thư mục dashboard (`meotrics/dashboard`), tạo thư mục database, gõ
 
 	```
 	composer require "laravel/installer"
@@ -96,16 +96,11 @@ trỏ danh sách tên miền sau
 				# Redirect everything that isn't a real file to index.php
 				try_files $uri $uri/ /index.php?$args;
 			}
-			# uncomment to avoid processing of calls to non-existing static files by Yii
-			#location ~ \.(js|css|png|jpg|gif|swf|ico|pdf|mov|fla|zip|rar)$ {
-			#    try_files $uri =404;
-		       #}
-		       #error_page 404 /404.html;
-
+			
 			location ~ \.php$ {
 				include fastcgi_params;
 		           fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
-		           fastcgi_pass   unix:/var/run/php5-fpm-meotrics.sock;
+		           fastcgi_pass   unix:/var/run/php5-fpm.sock;
 		           try_files $uri =404;
 			}
 
@@ -113,8 +108,6 @@ trỏ danh sách tên miền sau
 				deny all;
 			}
 		}
-
-		
 		```
 4. Đường dẫn chuẩn
   * Dashboard:
