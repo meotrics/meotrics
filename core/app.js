@@ -100,7 +100,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "actiontype";
 		db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(atid) })
 		.then(function (results) {
-			res.json({ s: true });
+			res.end(200);
 		}).catch(mtthrow);
 	});
 
@@ -110,7 +110,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "actiontype";
 		db.collection(collection).deleteMany({ appid: appid })
 		.then(function (results) {
-			res.json({ s: true });
+			res.end(200);
 		}).catch(mtthrow);
 	});
 
@@ -122,7 +122,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "actiontype";
 		db.collection(collection).updateOne({ _id: new mongodb.ObjectID(atid) }, { $set: data })
 		.then(function (results) {
-			res.json({ s: true });
+			res.end(200);
 		}).catch(mtthrow);
 	});
 
