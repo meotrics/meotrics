@@ -6,7 +6,8 @@
 <script>
 //$('#actionselect').select2();
 
-$('.id_querytrend').click(function(){
+function updateQuery()
+{
 
   $.get('queryTrend', {
     typeid: $('#actionselect').val(),
@@ -39,11 +40,15 @@ $('.id_querytrend').click(function(){
 
     $head.empty();
     $head.append(head);
-
-
-
   });
+
+}
+$('#actionselect, #fieldselect, #opertorselect, #paramselect').change(function(){
+  updateQuery();
 });
+
+updateQuery();
+
 </script>
 @endsection
 
@@ -54,63 +59,64 @@ $('.id_querytrend').click(function(){
 @section('content')
 
 <div class="card row">
-  <div class="content col-md-12">
+  <div class="header col-md-12">
     <form class="">
       <label class="mr5">TREND SELECT</label>
       <select id="trendselect" class="form-control mr" style="width: 250px; display:inline-block">
         <option value="56dab10c44aee0d1bd499a29">Purchase</option>
         <option value="56dab10544aee0d1bd499a27">Pageview</option>
       </select>
-      <a class="id_querytrend btn btn-fill btn-success mr "><i class="fa fa-play" style="font-size: 15px; vertical-align: middle"></i> <span style="vertical-align: middle">Query</span></a>
+      <!-- <a class="id_querytrend btn btn-fill btn-success mr "><i class="fa fa-play" style="font-size: 15px; vertical-align: middle"></i> <span style="vertical-align: middle">Query</span></a> -->
       <a class="btn">  <i class="fa fa-floppy-o" style="font-size: 18px;padding-top: 4px;vertical-align: middle"></i></a>
       <a class="id_querytrend btn "><i class="fa fa-trash-o" style="font-size: 19px;vertical-align: middle"></i></a>
-    </form></div>
+    </form>
   </div>
-  <div class="card row">
-    <div class="content col-md-12">
-      <form class="">
-        <label>IN ACTION</label>
-        <select id="actionselect" class="form-control" style="width: 150px; display:inline-block">
-          <option value="56dab10c44aee0d1bd499a29">Purchase</option>
-          <option value="56dab10544aee0d1bd499a27">Pageview</option>
-        </select>
 
 
-        <label>LIST TOP</label>
-        <select id="fieldselect" class="form-control" style="width: 150px; display:inline-block">
-          <option value="pid">Product ID</option>
-          <option value="cid">Category ID</option>
-          <option value="amount">Amount</option>
-          <option value="price">Price</option>
-        </select>
+  <div class="content col-md-12">
+    <form class="">
+      <label>IN ACTION</label>
+      <select id="actionselect" class="form-control" style="width: 150px; display:inline-block">
+        <option value="56dab10c44aee0d1bd499a29">Purchase</option>
+        <option value="56dab10544aee0d1bd499a27">Pageview</option>
+      </select>
 
-        <label>ORDER BY </label>
-        <select id="opertorselect" class="form-control" style="width: 150px; display:inline-block">
-          <option value="sum">Sum</option>
-          <option value="count">Number of occurs</option>
 
-          <option value="avg">Avg</option>
-        </select>
-        <select id="paramselect" class="form-control" style="width: 150px; display:inline-block">
-          <option value="pid">Product ID</option>
-          <option value="cid">Category ID</option>
-          <option value="amount">Amount</option>
-          <option value="price">Price</option>
-        </select>
-      </form>
+      <label>LIST TOP</label>
+      <select id="fieldselect" class="form-control" style="width: 150px; display:inline-block">
+        <option value="pid">Product ID</option>
+        <option value="cid">Category ID</option>
+        <option value="amount">Amount</option>
+        <option value="price">Price</option>
+      </select>
 
-      <div class="row">
-        <div class=" col-sm-12">
-          <table class="table table-hover table-striped">
-            <thead class="tbhead"></thead>
-            <tbody class="tbbody">
+      <label>ORDER BY </label>
+      <select id="opertorselect" class="form-control" style="width: 150px; display:inline-block">
+        <option value="sum">Sum</option>
+        <option value="count">Number of occurs</option>
 
-            </tbody>
-          </table>
+        <option value="avg">Avg</option>
+      </select>
+      <select id="paramselect" class="form-control" style="width: 150px; display:inline-block">
+        <option value="pid">Product ID</option>
+        <option value="cid">Category ID</option>
+        <option value="amount">Amount</option>
+        <option value="price">Price</option>
+      </select>
+    </form>
 
-        </div>
+    <div class="row">
+      <div class=" col-sm-12">
+        <table class="table table-hover table-striped">
+          <thead class="tbhead"></thead>
+          <tbody class="tbbody">
+
+          </tbody>
+        </table>
+
       </div>
     </div>
+
   </div>
 </div>
 @endsection

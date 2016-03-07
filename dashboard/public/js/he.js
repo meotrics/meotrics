@@ -134,6 +134,7 @@
 	/*--------------------------------------------------------------------------*/
 
 	var encode = function(string, options) {
+		if(typeof(string) !== 'string') string += ""; 
 		options = merge(options, encode.options);
 		var strict = options.strict;
 		if (strict && regexInvalidRawCodePoint.test(string)) {

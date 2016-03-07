@@ -10,13 +10,13 @@
   <meta name="viewport" content="width=device-width" />
 
   <!-- Bootstrap core CSS     -->
-  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="{{asset('css/bootstrap.min.css')}}" rel="stylesheet" />
   <link href="/css/animate.min.css" rel="stylesheet"/>
   <link href="/css/light-bootstrap-dashboard.css" rel="stylesheet"/>
 
   <!--     Fonts and icons     -->
-  <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
+  <link href="{{asset('css/font-awesome.min.css')}}" rel="stylesheet">
+  <link href="{{asset('css/gf-roboto.css')}}" rel='stylesheet' type='text/css'>
   <link href="/css/pe-icon-7-stroke.css" rel="stylesheet" />
   <link href="{{asset('css/app.css')}}" rel="stylesheet" />
   <link rel="stylesheet" href="{{asset('css/daterangepicker.css')}}"/>
@@ -68,7 +68,8 @@
                 <h5 style="color:white;" class="media-heading">thanhpk</h5>
                 <a class="small" href="/auth/default/view?id=4">profile</a>
                 &nbsp; &nbsp;
-                <a class="small" href="/auth/logout" data-method="post">logout</a>
+                <a class="small" href="/auth/logout" data-method="get">logout</a>
+                <a class="small" href="/actiontype" data-method="get">action type</a>
               </div>
             </li>
           </ul>
@@ -114,7 +115,7 @@
 
     <div class="content">
       <div class="container-fluid">@yield('content')</div>
-      <footer class="footer">
+      <!-- <footer class="footer">
         <div class="container-fluid">
           <nav class="pull-left">
             <ul>
@@ -144,16 +145,16 @@
             &copy; 2016 <a href="http://meotrics.com">Meotrics</a>, made with love for a better insight
           </p>
         </div>
-      </footer>
+      </footer> -->
     </div>
 
 
 
   </div>
   <script src="{{asset('js/he.js')}}" type="text/javascript"></script>
-  <script src="//code.jquery.com/jquery-1.12.1.min.js" type="text/javascript"></script>
+  <script src="{{asset('js/jquery-1.12.1.min.js')}}" type="text/javascript"></script>
 
-  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" type="text/javascript"></script>
+  <script src="{{asset('js/bootstrap.min.js')}}" type="text/javascript"></script>
 
   <!--  Checkbox, Radio & Switch Plugins -->
   <script src="/js/bootstrap-checkbox-radio-switch.js"></script>
