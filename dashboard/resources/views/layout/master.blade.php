@@ -68,7 +68,8 @@
                 <h5 style="color:white;" class="media-heading">thanhpk</h5>
                 <a class="small" href="/auth/default/view?id=4">profile</a>
                 &nbsp; &nbsp;
-                <a class="small" href="/auth/logout" data-method="post">logout</a>
+                <a class="small" href="/auth/logout" data-method="get">logout</a>
+                <a class="small" href="/actiontype" data-method="get">action type</a>
               </div>
             </li>
           </ul>
@@ -114,7 +115,7 @@
 
     <div class="content">
       <div class="container-fluid">@yield('content')</div>
-      <footer class="footer">
+      <!-- <footer class="footer">
         <div class="container-fluid">
           <nav class="pull-left">
             <ul>
@@ -144,7 +145,7 @@
             &copy; 2016 <a href="http://meotrics.com">Meotrics</a>, made with love for a better insight
           </p>
         </div>
-      </footer>
+      </footer> -->
     </div>
 
 
