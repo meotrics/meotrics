@@ -41,6 +41,8 @@ function getTrending(object){
 function getQueryTrending(object){
 	console.log(object);
 	var query = [];
+
+
 	query.push({$match: {actiontype: object.event}});
 	if(object.operation == 'count'){
 		query.push({$group: {
@@ -65,4 +67,8 @@ function getQueryTrending(object){
 	return query;
 }
 
-connectMongoDB();
+// connectMongoDB();
+var filter = {
+	a: [1, 2, 3, 4, 5]
+};
+console.log(filter);

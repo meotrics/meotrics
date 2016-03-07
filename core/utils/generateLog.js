@@ -1,7 +1,7 @@
 var MongoClient = require('mongodb').MongoClient,
-    url = 'mongodb://localhost:1234/local',
+    url = 'mongodb://localhost:1234/test',
     n = 100000,
-    collection = 'meotrics_1',
+    collection = 'test',
     users = null,
     numberUsers = 0,
     db = null;
@@ -25,7 +25,7 @@ function getUsers(){
             db.on('close', function(err){
               console.log('[MongoDB] disconnected');
             });
-            return db.collection('meotrics_1').find({isUser: true}).toArray();
+            return db.collection('test').find({isUser: true}).toArray();
         }).then(function(results){
             users = results;
             numberUsers = users.length;

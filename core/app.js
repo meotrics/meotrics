@@ -48,7 +48,7 @@ function getQueryTrending(object) {
 function route(app, db, segmgr, prefix, mongodb) {
 	var bodyParser = require('body-parser');
 	var async = require('async');
-			
+
 	// parse application/x-www-form-urlencoded
 	// app.use(bodyParser.urlencoded({ extended: false }))
 
@@ -64,16 +64,13 @@ function route(app, db, segmgr, prefix, mongodb) {
 	//ACTION TYPE-----------------------------------------------------------------
 	// create an action type
 	app.post('/actiontype/:appid', function (req, res) {
-				var data = req.body;
-				data.appid = Number(req.params.appid);
-				var collection = prefix + "actiontype";
-				db.collection(collection).insertOne(data) // add options: w, j, timeout ...
+		var data = req.body;
+		data.appid = Number(req.params.appid);
+		var collection = prefix + "actiontype";
+		db.collection(collection).insertOne(data) // add options: w, j, timeout ...
 			.then(function (r) {
-				res.json({ s: true, _id: r.insertedId });
-			}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-			});
+				res.json({_id: r.insertedId });
+			}).catch(mtthrow);
 	});
 
 	//get all actiontype
@@ -81,12 +78,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "actiontype";
 		db.collection(collection).find({ appid: appid }, { appid: 0 }).toArray()
-						.then(function (results) {
-				res.json({ s: true, results });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			res.json(results);
+		}).catch(mtthrow);
 	});
 
 	app.get('/actiontype/:appid/:id', function (req, res) {
@@ -94,12 +88,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var atid = req.params.id;
 		var collection = prefix + "actiontype";
 		db.collection(collection).find({ _id: new mongodb.ObjectID(atid) }, { appid: 0 }).toArray()
-						.then(function (results) {
-				res.json({ s: true, results });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			res.json(results);
+		}).catch(mtthrow);
 	});
 
 	//delete an actiontype
@@ -108,12 +99,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var atid = req.params.id;
 		var collection = prefix + "actiontype";
 		db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(atid) })
-						.then(function (results) {
-				res.json({ s: true });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			res.json({ s: true });
+		}).catch(mtthrow);
 	});
 
 	//delete all actiontypes in an app
@@ -121,12 +109,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "actiontype";
 		db.collection(collection).deleteMany({ appid: appid })
-						.then(function (results) {
-				res.json({ s: true });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			res.json({ s: true });
+		}).catch(mtthrow);
 	});
 
 	// update actiontype
@@ -136,12 +121,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var atid = req.params.id;
 		var collection = prefix + "actiontype";
 		db.collection(collection).updateOne({ _id: new mongodb.ObjectID(atid) }, { $set: data })
-						.then(function (results) {
-				res.json({ s: true });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			res.json({ s: true });
+		}).catch(mtthrow);
 	});
 
 
@@ -153,22 +135,21 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "trend";
 
 		db.collection(collection)
-			.insertOne(data)
-			.then(function (r) {
-				res.json({ _id: r.insertedId });
-			})
-			.catch(mtthrow);
+		.insertOne(data)
+		.then(function (r) {
+			res.json({ _id: r.insertedId });
+		})
+		.catch(mtthrow);
 	});
 
 	//get all trends in a app
 	app.get('/trend/:appid', function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "trend";
-		db.collection(collection)
-			.find({ appid: appid }, { appid: 0 })
-			.toArray()
-			.then(res.json)
-			.catch(mtthrow);
+		db.collection(collection).find({ appid: appid }, { appid: 0 }).toArray()
+			.then(function (results){
+				res.json(results);
+			}).catch(mtthrow);
 	});
 
 	//list a trend from a app
@@ -177,12 +158,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var trid = req.params.id;
 		var collection = prefix + "trend";
 		db.collection(collection).find({ _id: new mongodb.ObjectID(trid) }, { _id: 0, appid: 0 }).toArray()
-						.then(function (results) {
-				res.json({ s: true, results });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			res.json(results);
+		}).catch(mtthrow);
 	});
 
 
@@ -193,12 +171,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var trid = req.params.id;
 		var collection = prefix + "trend";
 		db.collection(collection).updateOne({ _id: new mongodb.ObjectID(trid) }, { $set: data })
-						.then(function (results) {
-				res.json({ s: true });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			res.json({ s: true });
+		}).catch(mtthrow);
 	});
 
 	app.delete('/trend/:appid/:id', function (req, res) {
@@ -206,12 +181,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var trid = req.params.id;
 		var collection = prefix + "trend";
 		db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(trid) })
-						.then(function (results) {
-				res.json({ s: true });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			res.json({ s: true });
+		}).catch(mtthrow);
 	});
 
 	//delete all trends in an app
@@ -219,12 +191,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "trend";
 		db.collection(collection).deleteMany({ appid: appid })
-						.then(function (results) {
-				res.json({ s: true });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			res.json({ s: true });
+		}).catch(mtthrow);
 	});
 
 
@@ -234,17 +203,18 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var trid = req.params.id;
 		var collection = prefix + "trend";
 		db.collection(collection).find({ _id: new mongodb.ObjectID(trid) }, { _id: 0, appid: 0 }).toArray()
-			.then(function (results) {
-				var trendData = results[0];
-				collection = prefix + appid;
-				console.log(getQueryTrending(trendData));
-				return db.collection(collection).aggregate(getQueryTrending(trendData)).toArray();
-			}).then(function(results){res.json(results)})
-			.catch(mtthrow);
+		.then(function (results) {
+			var trendData = results[0];
+			collection = prefix + appid;
+			console.log(getQueryTrending(trendData));
+			return db.collection(collection).aggregate(getQueryTrending(trendData)).toArray();
+		}).then(function(results){
+			res.json(results);
+		}).catch(mtthrow);
 	});
 
 	//CLIENT------------------------------------------------------------------------
-				
+
 	/* Ghi nhận một action mới
 	Tham số: {
 		mtid : number, ( Em tuong? lay _id cua mongodb?????)
@@ -272,24 +242,14 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var data = req.body;
 		var collection = prefix + req.params.appid;
 		// Convert string to ObjectID in mongodb
-		data.mtid = new mongodb.ObjectID(data.mtid);
-		data.typeid = new mongodb.ObjectID(data.typeid);
-		// This is for add prefix to userfields
-		var userfields = data.userfields;
-		delete data.userfields;
-		var keys = Object.keys(userfields);
-		for (var i = 0; i < keys.length; i++) {
-						data["f_" + keys[i]] = userfields[keys[i]];
-		}
+		data._mtid = new mongodb.ObjectID(data._mtid);
+		data._typeid = new mongodb.ObjectID(data._typeid);
 		// Add created time 
 		data.ctime = Math.round(new Date() / 1000);
 		db.collection(collection).insertOne(data)
-						.then(function (r) {
-				res.json({ s: true });
-						}).catch(function (e) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (r) {
+			res.json({ s: true });
+		}).catch(mtthrow);
 	});
 
 	/* Phương thức này dùng để báo cho hệ thống biết một anonymous user thực ra là
@@ -309,60 +269,60 @@ function route(app, db, segmgr, prefix, mongodb) {
 				user thành userid ở tham số.
 		2. Toàn bộ thông tin về user được cập nhật mới.
 		*/
-	app.post('/i/:appid', function (req, res) {
-		var data = req.body;
-		var collection = prefix + req.params.appid;
-		var uid = data.user.uid;
+		app.post('/i/:appid', function (req, res) {
+			var data = req.body;
+			var collection = prefix + req.params.appid;
+			var uid = data.user.uid;
 
-		async.waterfall([
-						function (callback) {
-				delete data.user.uid;
-				db.collection(collection).findOneAndUpdate({ isUser: true, uid: uid }, { $set: data.user }, { projection: { _id: 1 } })
+			async.waterfall([
+				function (callback) {
+					delete data.user.uid;
+					db.collection(collection).findOneAndUpdate({ isUser: true, uid: uid }, { $set: data.user }, { projection: { _id: 1 } })
 					.then(function (r) {
 						if (r.value != null) {
-							var mtid = r.value._id;
-							res.json({ s: true, mtid: mtid });
-							callback(null, true, mtid);
+							var _mtid = r.value._id;
+							res.json({ s: true, _mtid: _mtid });
+							callback(null, true, _mtid);
 						} else {
-							res.json({ s: true, mtid: data.cookie });
+							res.json({ s: true, _mtid: data.cookie });
 							callback(null, false);
 						}
 					}).catch(function (err) {
 						// [ERROR]
 						callback(err, res);
 					});
-						}, function (isCreated, mtid, callback) {
-				if (isCreated) {
-					callback(null, true, mtid);
-				} else {
-					data.user.uid = uid;
-					data.user.isUser = true;
+				},function (isCreated, _mtid, callback) {
+					if (isCreated) {
+						callback(null, true, _mtid);
+					} else {
+						data.user.uid = uid;
+						data.user.isUser = true;
 
-					db.collection(collection).updateOne({ _id: new mongodb.ObjectID(data.cookie) }, data.user, function (err, result) {
-						if (err) callback(err, null);
-						else callback(null, false);
-					});
-				}
-						}, function (needUpdate, mtid, callback) {
-				if (needUpdate) {
-					db.collection(collection).updateMany({ mtid: new mongodb.ObjectID(data.cookie) }, { $set: { mtid: new mongodb.ObjectID(mtid) } })
+						db.collection(collection).updateOne({ _id: new mongodb.ObjectID(data.cookie) }, data.user, function (err, result) {
+							if (err) callback(err, null);
+							else callback(null, false);
+						});
+					}
+				}, function (needUpdate, _mtid, callback) {
+					if (needUpdate) {
+						db.collection(collection).updateMany({ mtid: new mongodb.ObjectID(data.cookie) }, { $set: { mtid: new mongodb.ObjectID(_mtid) } })
 						.then(function (r) {
 							db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(data.cookie) }, {}, function (err, result) {
-											callback(err, null);
-										});
-									}).catch(function (err) {
-										callback(err, null);
-									});
-							} else {
-								callback(null);
-							}
-						}
-		], function (err, res) {
-						if (err) {
-				throw { err: err, res: res };
-						}
-		});
-	});
+								callback(err, null);
+							});
+						}).catch(function (err) {
+							callback(err, null);
+						});
+					} else {
+						callback(null);
+					}
+				}
+				], function (err, res) {
+					if (err) {
+						throw { err: err, res: res };
+					}
+				});
+});
 
 	/* Thiết lập cookie mới cho người dùng mới
 	Tham số: {
@@ -377,17 +337,14 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.get('/s/:appid', function (req, res) {
 		var collection = prefix + req.params.appid;
 		db.collection(collection).insertOne({})
-						.then(function (results) {
-				var mtid = results.insertedId;
-				res.json({ s: true, mtid: mtid });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			var _mtid = results.insertedId;
+			res.json({ s: true, _mtid: _mtid });
+		}).catch(mtthrow);
 	});
 
 	//SEGMENTATION-------------------------------------------------------------
-				
+
 	//create a segment
 	app.post('/segment/:appid', function (req, res) {
 		var data = req.body;
@@ -395,12 +352,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 
 		var collection = prefix + "segment";
 		db.collection(collection).insertOne(data) // add options: w, j, timeout ...
-						.then(function (r) {
-				res.json({ s: true, _id: r.insertedId });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (r) {
+			res.json({ s: true, _id: r.insertedId });
+		}).catch(mtthrow);
 	});
 
 	//get all segments in a app
@@ -408,12 +362,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "segment";
 		db.collection(collection).find({ appid: appid }, { appid: 0 }).toArray()
-						.then(function (results) {
-				res.json({ s: true, results });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			res.json({ s: true, results });
+		}).catch(mtthrow);
 	});
 
 	//list a segment from a app
@@ -422,15 +373,12 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var trid = req.params.id;
 		var collection = prefix + "segment";
 		db.collection(collection).find({ _id: new mongodb.ObjectID(trid) }, { _id: 0, appid: 0 }).toArray()
-						.then(function (results) {
-				res.json({ s: true, results });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			res.json({ s: true, results });
+		}).catch(mtthrow);
 	});
 
-				
+
 	// Update a segment
 	app.put('/segment/:appid/:id', function (req, res) {
 		var data = req.body;
@@ -438,12 +386,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var trid = req.params.id;
 		var collection = prefix + "segment";
 		db.collection(collection).updateOne({ _id: new mongodb.ObjectID(trid) }, { $set: data })
-						.then(function (results) {
-				res.json({ s: true });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			res.json({ s: true });
+		}).catch(mtthrow);
 	});
 
 	app.delete('/segment/:appid/:id', function (req, res) {
@@ -451,12 +396,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var trid = req.params.id;
 		var collection = prefix + "segment";
 		db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(trid) })
-						.then(function (results) {
-				res.json({ s: true });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			res.json({ s: true });
+		}).catch(mtthrow);
 	});
 
 	//delete all segments in an app
@@ -464,14 +406,11 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "segment";
 		db.collection(collection).deleteMany({ appid: appid })
-						.then(function (results) {
-				res.json({ s: true });
-						}).catch(function (err) {
-				// [ERROR]
-				throw { err: err, res: res };
-						});
+		.then(function (results) {
+			res.json({ s: true });
+		}).catch(mtthrow);
 	});
-				
+
 	//update or create a segment
 	// app.post('segment', function (req, res) {
 	// 	segmgr.create(req.params, function () {
@@ -487,21 +426,21 @@ MongoClient.connect(buildconnstr(), function (err, db) {
 
 	// var SegmentMgr = require('segment').SegmentMgr;
 	var express = require('express');
-				
+
 	//create component
 	// var segmgr = new SegmentMgr(db);
-				
+
 	//set up new express application
 	var app = express();
 	// route(app, db, segmgr);
 	var prefix = config.get("prefix") || "meotrics_";
 
 	route(app, db, null, prefix, mongodb);
-				
+
 	//run the app
 	var port = config.get("port") || 2108;
 	app.listen(port, function () {
-				console.log('Meotrics core listening on port ' + port + '!');
+		console.log('Meotrics core listening on port ' + port + '!');
 	});
 
 	// app.get('/segment', function (req, res) {
