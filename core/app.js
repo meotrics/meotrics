@@ -14,33 +14,36 @@ function buildconnstr() {
 
 function mtthrow(err)
 {
-	console.log(err);
-	setTimeout(function(){
-		throw err;
-	});
+	if(err){
+		console.log(err);
+		setTimeout(function(){
+			throw err;
+		});
+	}
 }
 
 function getQueryTrending(object) {
 	var query = [];
-	console.log(object);
-	query.push({ $match: { typeid: new mongodb.ObjectID(object.event) } });
+
+	query.push({ $match: { _typeid: new mongodb.ObjectID(object.event) } });
 
 	if (object.segment != undefined) {
-		var field = "segment_" + object.segment;
+		var field = "_segment_" + object.segment;
 		query[0].$match[field] = true;
 	}
-	if(object.order === undefined) object.order = 1;
+	object.order = object.order || 1;
+
 	if(object.operation == 'count') {
 		query.push({$group: {_id: '$'+object.object, count: {'$sum': 1}}});
 		query.push({$sort: {count: object.order}});
 	}else if(object.operation == 'avg'){
-		query.push({$group: {_id: '$'+object.object,result: {$avg: '$'+object.param}}});
+		query.push({$group: {_id: '$'+object.object,result: {'$avg': '$'+object.param}}});
 		query.push({$sort: {result: object.order}});
 	} else if(object.operation == 'sum'){
 		query.push({$group: {_id: '$'+object.object,result: {'$sum': '$'+object.param}}});				
 		query.push({$sort: {result: object.order}});
 	}
-	if(object.limit === undefined) object.limit = 10;
+	object.limit = object.limit || 10;
 	query.push({$limit: object.limit});
 	return query;
 }
@@ -61,11 +64,11 @@ function route(app, db, segmgr, prefix, mongodb) {
 
 	});
 
-	//ACTION TYPE-----------------------------------------------------------------
+	// ACTION TYPE-----------------------------------------------------------------
 	// create an action type
 	app.post('/actiontype/:appid', function (req, res) {
 		var data = req.body;
-		data.appid = Number(req.params.appid);
+		data._appid = Number(req.params.appid);
 		var collection = prefix + "actiontype";
 		db.collection(collection).insertOne(data) // add options: w, j, timeout ...
 			.then(function (r) {
@@ -77,7 +80,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.get('/actiontype/:appid', function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "actiontype";
-		db.collection(collection).find({ appid: appid }, { appid: 0 }).toArray()
+		db.collection(collection).find({ _appid: appid }, { _appid: 0 }).toArray()
 		.then(function (results) {
 			res.json(results);
 		}).catch(mtthrow);
@@ -87,7 +90,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		// var appid = req.params.appid;
 		var atid = req.params.id;
 		var collection = prefix + "actiontype";
-		db.collection(collection).find({ _id: new mongodb.ObjectID(atid) }, { appid: 0 }).toArray()
+		db.collection(collection).find({ _id: new mongodb.ObjectID(atid) }, { _appid: 0 }).toArray()
 		.then(function (results) {
 			res.json(results);
 		}).catch(mtthrow);
@@ -100,7 +103,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "actiontype";
 		db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(atid) })
 		.then(function (results) {
-			res.end(200);
+			res.status(200).end();
 		}).catch(mtthrow);
 	});
 
@@ -108,9 +111,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.delete('/actiontype/:appid', function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "actiontype";
-		db.collection(collection).deleteMany({ appid: appid })
+		db.collection(collection).deleteMany({ _appid: appid })
 		.then(function (results) {
-			res.end(200);
+			res.status(200).end();
 		}).catch(mtthrow);
 	});
 
@@ -122,7 +125,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "actiontype";
 		db.collection(collection).updateOne({ _id: new mongodb.ObjectID(atid) }, { $set: data })
 		.then(function (results) {
-			res.end(200);
+			res.status(200).end();
 		}).catch(mtthrow);
 	});
 
@@ -131,22 +134,20 @@ function route(app, db, segmgr, prefix, mongodb) {
 	//create a trend
 	app.post('/trend/:appid', function (req, res) {
 		var data = req.body;
-		data.appid = Number(req.params.appid);
+		data._appid = Number(req.params.appid);
 		var collection = prefix + "trend";
 
-		db.collection(collection)
-		.insertOne(data)
-		.then(function (r) {
-			res.json({ _id: r.insertedId });
-		})
-		.catch(mtthrow);
+		db.collection(collection).insertOne(data)
+			.then(function (r) {
+				res.json({ _id: r.insertedId });
+			}).catch(mtthrow);
 	});
 
 	//get all trends in a app
 	app.get('/trend/:appid', function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "trend";
-		db.collection(collection).find({ appid: appid }, { appid: 0 }).toArray()
+		db.collection(collection).find({ _appid: appid }, { _appid: 0 }).toArray()
 			.then(function (results){
 				res.json(results);
 			}).catch(mtthrow);
@@ -157,7 +158,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		// var appid = req.params.appid;
 		var trid = req.params.id;
 		var collection = prefix + "trend";
-		db.collection(collection).find({ _id: new mongodb.ObjectID(trid) }, { _id: 0, appid: 0 }).toArray()
+		db.collection(collection).find({ _id: new mongodb.ObjectID(trid) }, { _id: 0, _appid: 0 }).toArray()
 		.then(function (results) {
 			res.json(results);
 		}).catch(mtthrow);
@@ -172,7 +173,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "trend";
 		db.collection(collection).updateOne({ _id: new mongodb.ObjectID(trid) }, { $set: data })
 		.then(function (results) {
-			res.json({ s: true });
+			res.status(200).end();
 		}).catch(mtthrow);
 	});
 
@@ -182,7 +183,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "trend";
 		db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(trid) })
 		.then(function (results) {
-			res.json({ s: true });
+			res.status(200).end();
 		}).catch(mtthrow);
 	});
 
@@ -190,9 +191,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.delete('/trend/:appid', function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "trend";
-		db.collection(collection).deleteMany({ appid: appid })
+		db.collection(collection).deleteMany({ _appid: appid })
 		.then(function (results) {
-			res.json({ s: true });
+			res.status(200).end();
 		}).catch(mtthrow);
 	});
 
@@ -245,11 +246,11 @@ function route(app, db, segmgr, prefix, mongodb) {
 		data._mtid = new mongodb.ObjectID(data._mtid);
 		data._typeid = new mongodb.ObjectID(data._typeid);
 		// Add created time 
-		data.ctime = Math.round(new Date() / 1000);
+		data._ctime = Math.round(new Date() / 1000);
 		db.collection(collection).insertOne(data)
-		.then(function (r) {
-			res.json({ s: true });
-		}).catch(mtthrow);
+			.then(function (r) {
+				res.status(200).end();
+			}).catch(mtthrow);
 	});
 
 	/* Phương thức này dùng để báo cho hệ thống biết một anonymous user thực ra là
@@ -277,52 +278,48 @@ function route(app, db, segmgr, prefix, mongodb) {
 			async.waterfall([
 				function (callback) {
 					delete data.user.uid;
-					db.collection(collection).findOneAndUpdate({ isUser: true, uid: uid }, { $set: data.user }, { projection: { _id: 1 } })
+					db.collection(collection).findOneAndUpdate({ _isUser: true, uid: uid }, { $set: data.user }, { projection: { _id: 1 } })
 					.then(function (r) {
 						if (r.value != null) {
 							var _mtid = r.value._id;
-							res.json({ s: true, _mtid: _mtid });
+							res.json({_mtid: _mtid });
 							callback(null, true, _mtid);
 						} else {
-							res.json({ s: true, _mtid: data.cookie });
-							callback(null, false);
+							res.json({_mtid: data.cookie});
+							callback(null, false, '');
 						}
 					}).catch(function (err) {
 						// [ERROR]
-						callback(err, res);
+						callback(err);
 					});
 				},function (isCreated, _mtid, callback) {
 					if (isCreated) {
 						callback(null, true, _mtid);
 					} else {
 						data.user.uid = uid;
-						data.user.isUser = true;
+						data.user._isUser = true;
 
 						db.collection(collection).updateOne({ _id: new mongodb.ObjectID(data.cookie) }, data.user, function (err, result) {
-							if (err) callback(err, null);
-							else callback(null, false);
+							if (err) callback(err);
+							else callback(null, false, '');
 						});
 					}
 				}, function (needUpdate, _mtid, callback) {
 					if (needUpdate) {
-						db.collection(collection).updateMany({ mtid: new mongodb.ObjectID(data.cookie) }, { $set: { mtid: new mongodb.ObjectID(_mtid) } })
-						.then(function (r) {
-							db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(data.cookie) }, {}, function (err, result) {
-								callback(err, null);
+						db.collection(collection).updateMany({ _mtid: new mongodb.ObjectID(data.cookie) }, { $set: { _mtid: new mongodb.ObjectID(_mtid) } })
+							.then(function (r) {
+								db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(data.cookie) }, {}, function (err, result) {
+									callback(err);
+								});
+							}).catch(function (err) {
+								callback(err);
 							});
-						}).catch(function (err) {
-							callback(err, null);
-						});
 					} else {
 						callback(null);
 					}
 				}
-				], function (err, res) {
-					if (err) {
-						throw { err: err, res: res };
-					}
-				});
-});
+			], mtthrow);
+	});
 
 	/* Thiết lập cookie mới cho người dùng mới
 	Tham số: {
@@ -339,7 +336,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		db.collection(collection).insertOne({})
 		.then(function (results) {
 			var _mtid = results.insertedId;
-			res.json({ s: true, _mtid: _mtid });
+			res.json({_mtid: _mtid });
 		}).catch(mtthrow);
 	});
 
@@ -353,7 +350,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "segment";
 		db.collection(collection).insertOne(data) // add options: w, j, timeout ...
 		.then(function (r) {
-			res.json({ s: true, _id: r.insertedId });
+			res.json({_id: r.insertedId });
 		}).catch(mtthrow);
 	});
 
@@ -363,7 +360,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "segment";
 		db.collection(collection).find({ appid: appid }, { appid: 0 }).toArray()
 		.then(function (results) {
-			res.json({ s: true, results });
+			res.json(results);
 		}).catch(mtthrow);
 	});
 
@@ -374,7 +371,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "segment";
 		db.collection(collection).find({ _id: new mongodb.ObjectID(trid) }, { _id: 0, appid: 0 }).toArray()
 		.then(function (results) {
-			res.json({ s: true, results });
+			res.json(results);
 		}).catch(mtthrow);
 	});
 
@@ -387,7 +384,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "segment";
 		db.collection(collection).updateOne({ _id: new mongodb.ObjectID(trid) }, { $set: data })
 		.then(function (results) {
-			res.json({ s: true });
+			res.status(200).end();
 		}).catch(mtthrow);
 	});
 
@@ -397,7 +394,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "segment";
 		db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(trid) })
 		.then(function (results) {
-			res.json({ s: true });
+			res.status(200).end();
 		}).catch(mtthrow);
 	});
 
@@ -407,14 +404,14 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "segment";
 		db.collection(collection).deleteMany({ appid: appid })
 		.then(function (results) {
-			res.json({ s: true });
+			res.status(200).end();
 		}).catch(mtthrow);
 	});
 
 	//update or create a segment
 	// app.post('segment', function (req, res) {
 	// 	segmgr.create(req.params, function () {
-	// 		res.send(200);
+	// 		res.sstatus(200).end();
 	// 	});
 	// })
 }
