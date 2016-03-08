@@ -1,29 +1,23 @@
 
 .fg-menu-container {
-	position: absolute;
+	position: absolute ;
 	top: 0;
 	left: -999px;
 	overflow: hidden;
 	margin: 0;
 	padding: 0;
-	border-radius: 10px;
+
 	z-index: 9000;
 	font-size: 14px;
-	text-align: left;
+	text-align: left !important;
 	list-style: none;
-	background-color: #fff;
-	-webkit-box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.125);
-	box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.125);
-	-webkit-background-clip: padding-box;
-	background-clip: padding-box;
-	border: 1px solid #ccc;
+	background-color: #fff !important;
+	-webkit-background-clip: padding-box !important;
+	background-clip: padding-box !important;
 	border: 1px solid rgba(0, 0, 0, .15);
 	border-radius: 4px;
-	-webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
 	box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
-	-webkit-font-smoothing: antialiased;
-	font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
-	font-weight: 400;
+
 }
 
 .fg-menu-container.fg-menu-flyout {
@@ -79,22 +73,16 @@
 
 /* inner li font size must be reset so that they don't blow up */
 
-.fg-menu-flyout ul ul {
-
-	overflow: hidden;
+.fg-menu-flyout ul ul {/* overflow: hidden; */
 
 	margin: 0;
-	padding: 0;
-	border-radius: 10px;
-
-	z-index: 9000;
+	padding: 0;z-index: 9000;
 
 	font-size: 14px;
 	text-align: left;
 	list-style: none;
 	background-color: #fff;
-	-webkit-box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.125);
-	box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.125);
+
 	-webkit-background-clip: padding-box;
 	background-clip: padding-box;
 	border: 1px solid #ccc;
@@ -104,11 +92,11 @@
 	box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
 	-webkit-font-smoothing: antialiased;
 	font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
-	font-weight: 400;
-}
+	font-weight: 400;}
 
 .fg-menu-flyout li {
 	position: relative;
+	overflow: visible;
 }
 
 /* REQUIRED LINK STYLES: links are "display:block" by default; if the menu options are split into
@@ -119,13 +107,13 @@
 .fg-menu a:hover,
 .fg-menu a:active {
 	float: left;
-	width: 148px;
+	width: 100%;
 	text-decoration: none;
 	outline: 0 !important;
 }
 
 .fg-menu a {
-	padding: 8px 16px;
+	padding: 8px 0px 8px 16px;
 	color: #333333;
 	display: block;
 	clear: both;
@@ -155,18 +143,28 @@
 }
 
 .fg-menu a span {
-	display: block;
+	/* display: block; */
 	cursor: pointer;
 }
 
 /* SUGGESTED STYLES - for use with jQuery UI Themeroller CSS */
 
-.fg-menu-indicator span {
-	float: left;
-}
 
 .fg-menu-indicator span.ui-icon {
 	float: right;
+	width: 18px;
+	text-align: center;
+	margin-top: 5px;
+	display: inline-block;
+	font: normal normal normal 14px/1 FontAwesome;
+	font-size: inherit;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+span.ui-icon:before {
+    content: "\f105";
 }
 
 .fg-menu-content.ui-widget-content,
