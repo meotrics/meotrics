@@ -243,8 +243,21 @@ function Menu(caller, options){
 	
 	this.chooseItem = function(item){
 		menu.kill();
+
+		container.find('.fg-recent').removeClass('fg-recent');
+
+		var $item = $(item);
+		var $e = $item;
+		while($e.parent().hasClass('fg-menu-container') === false)
+		{
+			$e = $e.parent();
+			if($e.is('li'))
+				$e.addClass('fg-recent');
+		}
+
+		console.log($(item).parent().text())
 		// edit this for your own custom function/callback:
-		$('#menuSelection').text($(item).text());	
+		$('#menuSelection').text($(item).text());
 		location.href = $(item).attr('href');
 	};
 };

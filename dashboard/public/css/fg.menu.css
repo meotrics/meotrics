@@ -164,7 +164,7 @@
 }
 
 span.ui-icon:before {
-    content: "\f105";
+	content: "\f105";
 }
 
 .fg-menu-content.ui-widget-content,
@@ -197,3 +197,8 @@ span.ui-icon:before {
 	padding-left: .2em;
 }
 
+
+
+.fg-recent > a {
+color: red !important;
+}
