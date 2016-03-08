@@ -227,7 +227,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 			var trendData = results[0];
 			collection = prefix + appid;
 			console.log(getQueryTrending(trendData));
-			// return db.collection(collection).aggregate(getQueryTrending(trendData)).toArray();
+			return db.collection(collection).aggregate(getQueryTrending(trendData)).toArray();
 		}).then(function(results){
 			res.json(results);
 		}).catch(mtthrow);
