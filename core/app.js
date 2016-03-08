@@ -22,15 +22,33 @@ function mtthrow(err)
 	}
 }
 
+
 function getQueryTrending(object) {
 	var query = [];
 
 	query.push({ $match: { _typeid: new mongodb.ObjectID(object.event) } });
 
-	if (object.segment != undefined) {
-		var field = "_segment_" + object.segment;
-		query[0].$match[field] = true;
+	if (object._segment != undefined) {
+		var field = "_segment_" + object._segment;
+		query[0]['$match'][field] = true;
 	}
+
+	if(object.startTime != undefined){
+		query[0]['$match']['_ctime'] = {
+			$gte: object.startTime
+		};
+	}
+
+	if(object.endTime != undefined){
+		if(query[0]['$match']['_ctime'] != undefined){
+			query[0]['$match']['_ctime']['$lte'] = object.endTime;
+		}else{
+			query[0]['$match']['_ctime'] = {
+				$lte: object.endTime
+			};
+		}
+	}
+
 	object.order = object.order || 1;
 
 	if(object.operation == 'count') {
@@ -43,6 +61,7 @@ function getQueryTrending(object) {
 		query.push({$group: {_id: '$'+object.object,result: {'$sum': '$'+object.param}}});				
 		query.push({$sort: {result: object.order}});
 	}
+
 	object.limit = object.limit || 10;
 	query.push({$limit: object.limit});
 	return query;
@@ -208,7 +227,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 			var trendData = results[0];
 			collection = prefix + appid;
 			console.log(getQueryTrending(trendData));
-			return db.collection(collection).aggregate(getQueryTrending(trendData)).toArray();
+			// return db.collection(collection).aggregate(getQueryTrending(trendData)).toArray();
 		}).then(function(results){
 			res.json(results);
 		}).catch(mtthrow);
