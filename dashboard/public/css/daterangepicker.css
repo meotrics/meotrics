@@ -240,6 +240,7 @@
 .date-picker-wrapper .selected-days
 {
     display: none;
+    color: #185BA0;
 }
 .date-picker-wrapper .drp_top-bar
 {

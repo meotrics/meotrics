@@ -24,3 +24,17 @@ th {
 .mr5
 {vertical-align: middle;
 margin-right: 10px;}
+
+
+select
+{
+	box-shadow: inset 0px -3px 10px -8px #717171 !important;
+}
+
+.fmonospaced
+{
+	color: #2C629A;
+	text-transform: uppercase;
+	/* background-color: rgba(0,0,0,0.09); */
+	font-family: 'consolas', 'Monaco', monospace;
+}
