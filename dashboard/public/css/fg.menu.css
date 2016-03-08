@@ -1,0 +1,201 @@
+
+.fg-menu-container {
+	position: absolute;
+	top: 0;
+	left: -999px;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+	border-radius: 10px;
+	z-index: 9000;
+	font-size: 14px;
+	text-align: left;
+	list-style: none;
+	background-color: #fff;
+	-webkit-box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.125);
+	box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.125);
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	border: 1px solid #ccc;
+	border: 1px solid rgba(0, 0, 0, .15);
+	border-radius: 4px;
+	-webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+	box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+	-webkit-font-smoothing: antialiased;
+	font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
+	font-weight: 400;
+}
+
+.fg-menu-container.fg-menu-flyout {
+	overflow: visible;
+}
+
+.fg-menu, .fg-menu ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+.fg-menu {
+	position: relative;
+}
+
+.fg-menu-flyout .fg-menu {
+	position: static;
+}
+
+.fg-menu ul {
+	position: absolute;
+	top: 0;
+}
+
+.fg-menu ul ul {
+	top: -1px;
+}
+
+.fg-menu-container.fg-menu-ipod .fg-menu-content,
+.fg-menu-container.fg-menu-ipod .fg-menu-content ul {
+	background: none !important;
+}
+
+.fg-menu.fg-menu-scroll,
+.fg-menu ul.fg-menu-scroll {
+	overflow: scroll;
+	overflow-x: hidden;
+}
+
+.fg-menu li {
+	clear: both;
+	float: left;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.fg-menu li li {
+	font-size: 1em;
+}
+
+/* inner li font size must be reset so that they don't blow up */
+
+.fg-menu-flyout ul ul {
+
+	overflow: hidden;
+
+	margin: 0;
+	padding: 0;
+	border-radius: 10px;
+
+	z-index: 9000;
+
+	font-size: 14px;
+	text-align: left;
+	list-style: none;
+	background-color: #fff;
+	-webkit-box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.125);
+	box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.125);
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	border: 1px solid #ccc;
+	border: 1px solid rgba(0, 0, 0, .15);
+	border-radius: 4px;
+	-webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+	box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+	-webkit-font-smoothing: antialiased;
+	font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
+	font-weight: 400;
+}
+
+.fg-menu-flyout li {
+	position: relative;
+}
+
+/* REQUIRED LINK STYLES: links are "display:block" by default; if the menu options are split into
+	selectable node links and 'next' links, the script floats the node links left and floats the 'next' links to the right	*/
+
+.fg-menu a:link,
+.fg-menu a:visited,
+.fg-menu a:hover,
+.fg-menu a:active {
+	float: left;
+	width: 148px;
+	text-decoration: none;
+	outline: 0 !important;
+}
+
+.fg-menu a {
+	padding: 8px 16px;
+	color: #333333;
+	display: block;
+	clear: both;
+	font-weight: 400;
+	line-height: 1.42857143;
+	background-color: transparent;
+}
+
+.fg-menu a.ui-state-default:link,
+.fg-menu a.ui-state-default:visited,
+.fg-menu a.ui-state-default:hover,
+.fg-menu a.ui-state-default:active,
+.fg-menu a.ui-state-hover:link,
+.fg-menu a.ui-state-hover:visited,
+.fg-menu a.ui-state-hover:hover,
+.fg-menu a.ui-state-hover:active,
+.fg-menu a.ui-state-active:link,
+.fg-menu a.ui-state-active:visited,
+.fg-menu a.ui-state-active:hover,
+.fg-menu a.ui-state-active:active { /* border-style: solid; */
+	font-weight: normal;
+
+	background-color: #2C629A;
+	color: #eee;
+	opacity: 1;
+	text-decoration: none;
+}
+
+.fg-menu a span {
+	display: block;
+	cursor: pointer;
+}
+
+/* SUGGESTED STYLES - for use with jQuery UI Themeroller CSS */
+
+.fg-menu-indicator span {
+	float: left;
+}
+
+.fg-menu-indicator span.ui-icon {
+	float: right;
+}
+
+.fg-menu-content.ui-widget-content,
+.fg-menu-content ul.ui-widget-content {
+	border: 0;
+}
+
+/* ICONS AND DIVIDERS */
+
+.fg-menu.fg-menu-has-icons a:link,
+.fg-menu.fg-menu-has-icons a:visited,
+.fg-menu.fg-menu-has-icons a:hover,
+.fg-menu.fg-menu-has-icons a:active {
+	padding-left: 20px;
+}
+
+.fg-menu .horizontal-divider hr, .fg-menu .horizontal-divider span {
+	padding: 0;
+	margin: 5px .6em;
+}
+
+.fg-menu .horizontal-divider hr {
+	border: 0;
+	height: 1px;
+}
+
+.fg-menu .horizontal-divider span {
+	font-size: .9em;
+	text-transform: uppercase;
+	padding-left: .2em;
+}
+
