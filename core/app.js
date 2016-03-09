@@ -23,15 +23,13 @@ function mtthrow(err)
 }
 
 
-function getQueryTrending(object, callback) {
-	CONVERTHERE.toID(object.param)
+function getQueryTrending(object, converter, callback) {
+	var query = [];
+	converter.toID(object.object)
 		.then(function(r){
-			object.param = r;
-			return CONVERTHERE.toID(object.object);
-		.then(function(r){
-			object.object = r;
-			var query = [];
+			object.object = r[0];
 
+			// -- START MATCH CLAUSE
 			query.push({ $match: { _typeid: new mongodb.ObjectID(object.event) } });
 
 			if (object._segment != undefined) {
@@ -55,27 +53,48 @@ function getQueryTrending(object, callback) {
 					};
 				}
 			}
+			// -- END OF MATCH CLAUSE
 
 			object.order = object.order || 1;
 
 			if(object.operation == 'count') {
-				query.push({$group: {_id: '$'+object.object, count: {'$sum': 1}, temp: {$first : "$$ROOT"} }});
+				query.push({$group: {_id: '$'+object.object, count: {'$sum': 1}, temp: {$first : "$$ROOT"}}});
 				query.push({$sort: {count: object.order}});
-			}else if(object.operation == 'avg'){
-				query.push({$group: {_id: '$'+object.object,result: {'$avg': '$'+object.param}, temp: {$first : "$$ROOT"} }});
-				query.push({$sort: {result: object.order}});
-			} else if(object.operation == 'sum'){
-				query.push({$group: {_id: '$'+object.object,result: {'$sum': '$'+object.param}, temp: {$first : "$$ROOT"} }});				
-				query.push({$sort: {result: object.order}});
-			}
 
-			object.limit = object.limit || 10;
-			query.push({$limit: object.limit});
+				object.limit = object.limit || 10;
+				query.push({$limit: object.limit});
 
-			return CONVERTHERE.toObject(query[0]['$match']);		
-		}).then(function(r){
-			query[0]['$match'] = r;
-			callback(null, query);
+				converter.toObject(query[0]['$match'])		
+					.then(function(r){
+						query[0]['$match'] = r;
+						callback(null, query);
+					}).catch(function(e){
+						callback(e);
+					});
+			}else{
+				converter.toID(object.param)
+					.then(function(r){
+						object.param = r;
+
+						if(object.operation == 'avg'){
+							query.push({$group: {_id: '$'+object.object,result: {'$avg': '$'+object.param}, temp: {$first : "$$ROOT"} }});
+							query.push({$sort: {result: object.order}});
+						} else if(object.operation == 'sum'){
+							query.push({$group: {_id: '$'+object.object,result: {'$sum': '$'+object.param}, temp: {$first : "$$ROOT"} }});				
+							query.push({$sort: {result: object.order}});
+						}
+
+						object.limit = object.limit || 10;
+						query.push({$limit: object.limit});
+
+						return converter.toObject(query[0]['$match']);			
+					}).then(function(r){
+						query[0]['$match'] = r;
+						callback(null, query);
+					}).catch(function(e){
+						callback(e);
+					});
+			}		
 		}).catch(function(e){
 			callback(e);
 		});
@@ -84,7 +103,8 @@ function getQueryTrending(object, callback) {
 function route(app, db, segmgr, prefix, mongodb) {
 	var bodyParser = require('body-parser');
 	var async = require('async');
-
+	var converter = require('./utils/idmanager.js');
+	converter = new converter.IdManager();
 	// parse application/x-www-form-urlencoded
 	// app.use(bodyParser.urlencoded({ extended: false }))
 
@@ -234,33 +254,38 @@ function route(app, db, segmgr, prefix, mongodb) {
 	// load trend ....
 	app.get('/trend/query/:appid/:id', function (req, res) {
 		var appid = req.params.appid;
+		var collection = prefix + "trend";
+		var results = [];
 		async.waterfall([
 			function(callback){
 				var trid = req.params.id;
-				var collection = prefix + "trend";
 				db.collection(collection).find({ _id: new mongodb.ObjectID(trid) }, { _id: 0}).toArray()
-				.then(function (results) {
-					callback(null, results[0]);
-					// return db.collection(collection).aggregate(getQueryTrending(trendData)).toArray();
-				}).catch(function(err){
-					callback(err);
-				});
+					.then(function (r) {
+						callback(null, r[0], converter);
+					}).catch(function(e){
+						callback(e);
+					});
 			}, getQueryTrending
 			, function(query, callback){
+				collection = prefix + appid;
+
 				db.collection(collection).aggregate(query).toArray()
 					.then(function(array){
-						async.forEachOf(array, function(value, key, resultback){
-							CONVERTHERE.toOriginal(value.temp)
+						results = array;
+						async.forEachOf(results, function(value, key, asyncCallback){
+							converter.toOriginal(value.temp)
 								.then(function(r){
-									array[key].temp = r;
+									results[key].temp = r;
+									asyncCallback(null);
 								}).catch(function(e){
-									resultback(e);
+									asyncCallback(e);
 								});
 						}, function(err){
 							if(err){
 								callback(err);
 							}else{
-								res.json(array);
+								res.json(results);
+								callback(null);
 							}
 						});	
 					}).catch(function(err){
@@ -268,8 +293,6 @@ function route(app, db, segmgr, prefix, mongodb) {
 					});
 			}
 		], mtthrow);
-		
-		
 	});
 
 	//CLIENT------------------------------------------------------------------------
@@ -300,18 +323,17 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.post('/r/:appid', function (req, res) {
 		var data = req.body;
 		var collection = prefix + req.params.appid;
-		// Convert string to ObjectID in mongodb
+		// Convert string to ObjectID in mongodgodb
 		data._mtid = new mongodb.ObjectID(data._mtid);
 		data._typeid = new mongodb.ObjectID(data._typeid);
 		// Add created time 
 		data._ctime = Math.round(new Date() / 1000);
-		CONVERTHERE.toObject(data)
+		converter.toObject(data) 
 			.then(function(results){
 				return db.collection(collection).insertOne(results);
 			}).then(function (r) {
 				res.status(200).end();
 			}).catch(mtthrow);
-		})
 	});
 
 	/* Phương thức này dùng để báo cho hệ thống biết một anonymous user thực ra là
@@ -319,7 +341,6 @@ function route(app, db, segmgr, prefix, mongodb) {
 		
 		Tham số:
 		{
-			appid: number,
 			cookie: string, //mtid của anonymous user
 			user: {userid, name, email, age, birth, gender, ...}
 		}
@@ -334,29 +355,29 @@ function route(app, db, segmgr, prefix, mongodb) {
 		app.post('/i/:appid', function (req, res) {
 			var data = req.body;
 			var collection = prefix + req.params.appid;
-			data.user._isUser = true;
 			var userConverted;
 
 			async.waterfall([
 				function (callback) {
 					var query;
-					CONVERTHERE.toObject({_isUser: true, uid: data.user.uid})
+					converter.toObject({_isUser: true, uid: data.user.uid})
 						.then(function(r){
 							query = r;
-							return CONVERTHERE.toObject(data.user);
+							return converter.toObject(data.user);
 						}).then(function(r){
 							userConverted = r;
-							return db.collection(collection).findOneAndUpdate(query, userConverted, { projection: { _id: 1 } });
+							return db.collection(collection).findOneAndUpdate(query, {$set: userConverted}, { projection: { _id: 1 } });
 						}).then(function (r) {
 							if (r.value != null) {
 								var _mtid = r.value._id;
-								res.json({_mtid: _mtid });
+								res.send(_mtid);
 								callback(null, true, _mtid);
 							} else {
-								res.json({_mtid: data.cookie});
+								res.send(data.cookie);
 								callback(null, false, '');
 							}
 						}).catch(function (err) {
+							res.status(500).end();
 							// [ERROR]
 							callback(err);
 						});
@@ -364,14 +385,14 @@ function route(app, db, segmgr, prefix, mongodb) {
 					if (isCreated) {
 						callback(null, true, _mtid);
 					} else {
-						db.collection(collection).updateOne({ _id: new mongodb.ObjectID(data.cookie) }, userConverted, function (err, result) {
+						db.collection(collection).updateOne({ _id: new mongodb.ObjectID(data.cookie) }, {$set: userConverted}, function (err, result) {
 							if (err) callback(err);
 							else callback(null, false, '');
 						});
 					}
 				}, function (needUpdate, _mtid, callback) {
-					if (needUpdate) {
-						CONVERTHERE.toID('_mtid')
+					if (needUpdate) { 
+						converter.toID('_mtid')
 							.then(function(id){
 								var query = {};
 								var update = {};
@@ -401,14 +422,19 @@ function route(app, db, segmgr, prefix, mongodb) {
 	Đầu ra:
 	mtid vừa được tạo
 	*/
-
 	app.get('/s/:appid', function (req, res) {
 		var collection = prefix + req.params.appid;
-		db.collection(collection).insertOne({})
-			.then(function (results) {
+		converter.toID('_isUser')
+			.then(function(r){
+				console.log(r);
+				var query = {};
+				query[r] = true;
+				return db.collection(collection).insertOne(query);
+			}).then(function (results) {
 				var _mtid = results.insertedId;
-				res.send(_mtid);
+				res.send(_mtid);	
 			}).catch(mtthrow);
+		
 	});
 
 	//SEGMENTATION-------------------------------------------------------------
