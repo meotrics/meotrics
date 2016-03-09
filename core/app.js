@@ -23,48 +23,62 @@ function mtthrow(err)
 }
 
 
-function getQueryTrending(object) {
-	var query = [];
+function getQueryTrending(object, callback) {
+	CONVERTHERE.toID(object.param)
+		.then(function(r){
+			object.param = r;
+			return CONVERTHERE.toID(object.object);
+		.then(function(r){
+			object.object = r;
+			var query = [];
 
-	query.push({ $match: { _typeid: new mongodb.ObjectID(object.event) } });
+			query.push({ $match: { _typeid: new mongodb.ObjectID(object.event) } });
 
-	if (object._segment != undefined) {
-		var field = "_segment_" + object._segment;
-		query[0]['$match'][field] = true;
-	}
+			if (object._segment != undefined) {
+				query[0]['$match']['_segments'] = {
+					'$in': [object._segment]
+				};
+			}
 
-	if(object.startTime != undefined){
-		query[0]['$match']['_ctime'] = {
-			$gte: object.startTime
-		};
-	}
+			if(object.startTime != undefined){
+				query[0]['$match']['_ctime'] = {
+					$gte: object.startTime
+				};
+			}
 
-	if(object.endTime != undefined){
-		if(query[0]['$match']['_ctime'] != undefined){
-			query[0]['$match']['_ctime']['$lte'] = object.endTime;
-		}else{
-			query[0]['$match']['_ctime'] = {
-				$lte: object.endTime
-			};
-		}
-	}
+			if(object.endTime != undefined){
+				if(query[0]['$match']['_ctime'] != undefined){
+					query[0]['$match']['_ctime']['$lte'] = object.endTime;
+				}else{
+					query[0]['$match']['_ctime'] = {
+						$lte: object.endTime
+					};
+				}
+			}
 
-	object.order = object.order || 1;
+			object.order = object.order || 1;
 
-	if(object.operation == 'count') {
-		query.push({$group: {_id: '$'+object.object, count: {'$sum': 1}}});
-		query.push({$sort: {count: object.order}});
-	}else if(object.operation == 'avg'){
-		query.push({$group: {_id: '$'+object.object,result: {'$avg': '$'+object.param}}});
-		query.push({$sort: {result: object.order}});
-	} else if(object.operation == 'sum'){
-		query.push({$group: {_id: '$'+object.object,result: {'$sum': '$'+object.param}}});				
-		query.push({$sort: {result: object.order}});
-	}
+			if(object.operation == 'count') {
+				query.push({$group: {_id: '$'+object.object, count: {'$sum': 1}, temp: {$first : "$$ROOT"} }});
+				query.push({$sort: {count: object.order}});
+			}else if(object.operation == 'avg'){
+				query.push({$group: {_id: '$'+object.object,result: {'$avg': '$'+object.param}, temp: {$first : "$$ROOT"} }});
+				query.push({$sort: {result: object.order}});
+			} else if(object.operation == 'sum'){
+				query.push({$group: {_id: '$'+object.object,result: {'$sum': '$'+object.param}, temp: {$first : "$$ROOT"} }});				
+				query.push({$sort: {result: object.order}});
+			}
 
-	object.limit = object.limit || 10;
-	query.push({$limit: object.limit});
-	return query;
+			object.limit = object.limit || 10;
+			query.push({$limit: object.limit});
+
+			return CONVERTHERE.toObject(query[0]['$match']);		
+		}).then(function(r){
+			query[0]['$match'] = r;
+			callback(null, query);
+		}).catch(function(e){
+			callback(e);
+		});
 }
 
 function route(app, db, segmgr, prefix, mongodb) {
@@ -220,32 +234,57 @@ function route(app, db, segmgr, prefix, mongodb) {
 	// load trend ....
 	app.get('/trend/query/:appid/:id', function (req, res) {
 		var appid = req.params.appid;
-		var trid = req.params.id;
-		var collection = prefix + "trend";
-		db.collection(collection).find({ _id: new mongodb.ObjectID(trid) }, { _id: 0, appid: 0 }).toArray()
-		.then(function (results) {
-			var trendData = results[0];
-			collection = prefix + appid;
-			console.log(getQueryTrending(trendData));
-			return db.collection(collection).aggregate(getQueryTrending(trendData)).toArray();
-		}).then(function(results){
-			res.json(results);
-		}).catch(mtthrow);
+		async.waterfall([
+			function(callback){
+				var trid = req.params.id;
+				var collection = prefix + "trend";
+				db.collection(collection).find({ _id: new mongodb.ObjectID(trid) }, { _id: 0}).toArray()
+				.then(function (results) {
+					callback(null, results[0]);
+					// return db.collection(collection).aggregate(getQueryTrending(trendData)).toArray();
+				}).catch(function(err){
+					callback(err);
+				});
+			}, getQueryTrending
+			, function(query, callback){
+				db.collection(collection).aggregate(query).toArray()
+					.then(function(array){
+						async.forEachOf(array, function(value, key, resultback){
+							CONVERTHERE.toOriginal(value.temp)
+								.then(function(r){
+									array[key].temp = r;
+								}).catch(function(e){
+									resultback(e);
+								});
+						}, function(err){
+							if(err){
+								callback(err);
+							}else{
+								res.json(array);
+							}
+						});	
+					}).catch(function(err){
+						callback(err);
+					});
+			}
+		], mtthrow);
+		
+		
 	});
 
 	//CLIENT------------------------------------------------------------------------
 
 	/* Ghi nhận một action mới
 	Tham số: {
-		mtid : number, ( Em tuong? lay _id cua mongodb?????)
-		typeid: number // type of action, eg: "purchase", "pageview", ( Them cai typeid cua "user" nua a nhe, luu chung ma)
+		_mtid : number, ( Em tuong? lay _id cua mongodb?????)
+		_typeid: number // type of action, eg: "purchase", "pageview", ( Them cai typeid cua "user" nua a nhe, luu chung ma)
 		osid: number // os information, eg: "window", "linux", 
 		browserid : number // eg, "chrome", "firefox", "opera", 
 		locationid : number // location code, eg: Hanoi, Vietnam 
 		referer: string
 		campaignid : number
 		deviceid : number
-		ctime: date // created time (Cai nay co van de ae minh lay time cua ae minh hay cua thang user, em nghi sai so k qua nhieu lay cua minh di)
+		_ctime: date // created time (Cai nay co van de ae minh lay time cua ae minh hay cua thang user, em nghi sai so k qua nhieu lay cua minh di)
 		ip: string // public ip address
 		screenres: string // screen resolution of the device
 		totalsec: number // total number of sec to finish the action
@@ -266,10 +305,13 @@ function route(app, db, segmgr, prefix, mongodb) {
 		data._typeid = new mongodb.ObjectID(data._typeid);
 		// Add created time 
 		data._ctime = Math.round(new Date() / 1000);
-		db.collection(collection).insertOne(data)
-			.then(function (r) {
+		CONVERTHERE.toObject(data)
+			.then(function(results){
+				return db.collection(collection).insertOne(results);
+			}).then(function (r) {
 				res.status(200).end();
 			}).catch(mtthrow);
+		})
 	});
 
 	/* Phương thức này dùng để báo cho hệ thống biết một anonymous user thực ra là
@@ -292,41 +334,51 @@ function route(app, db, segmgr, prefix, mongodb) {
 		app.post('/i/:appid', function (req, res) {
 			var data = req.body;
 			var collection = prefix + req.params.appid;
-			var uid = data.user.uid;
+			data.user._isUser = true;
+			var userConverted;
 
 			async.waterfall([
 				function (callback) {
-					delete data.user.uid;
-					db.collection(collection).findOneAndUpdate({ _isUser: true, uid: uid }, { $set: data.user }, { projection: { _id: 1 } })
-					.then(function (r) {
-						if (r.value != null) {
-							var _mtid = r.value._id;
-							res.json({_mtid: _mtid });
-							callback(null, true, _mtid);
-						} else {
-							res.json({_mtid: data.cookie});
-							callback(null, false, '');
-						}
-					}).catch(function (err) {
-						// [ERROR]
-						callback(err);
-					});
+					var query;
+					CONVERTHERE.toObject({_isUser: true, uid: data.user.uid})
+						.then(function(r){
+							query = r;
+							return CONVERTHERE.toObject(data.user);
+						}).then(function(r){
+							userConverted = r;
+							return db.collection(collection).findOneAndUpdate(query, userConverted, { projection: { _id: 1 } });
+						}).then(function (r) {
+							if (r.value != null) {
+								var _mtid = r.value._id;
+								res.json({_mtid: _mtid });
+								callback(null, true, _mtid);
+							} else {
+								res.json({_mtid: data.cookie});
+								callback(null, false, '');
+							}
+						}).catch(function (err) {
+							// [ERROR]
+							callback(err);
+						});
 				},function (isCreated, _mtid, callback) {
 					if (isCreated) {
 						callback(null, true, _mtid);
 					} else {
-						data.user.uid = uid;
-						data.user._isUser = true;
-
-						db.collection(collection).updateOne({ _id: new mongodb.ObjectID(data.cookie) }, data.user, function (err, result) {
+						db.collection(collection).updateOne({ _id: new mongodb.ObjectID(data.cookie) }, userConverted, function (err, result) {
 							if (err) callback(err);
 							else callback(null, false, '');
 						});
 					}
 				}, function (needUpdate, _mtid, callback) {
 					if (needUpdate) {
-						db.collection(collection).updateMany({ _mtid: new mongodb.ObjectID(data.cookie) }, { $set: { _mtid: new mongodb.ObjectID(_mtid) } })
-							.then(function (r) {
+						CONVERTHERE.toID('_mtid')
+							.then(function(id){
+								var query = {};
+								var update = {};
+								query[id] = new mongodb.ObjectID(data.cookie);
+								update[id] = new mongodb.ObjectID(_mtid);
+								return db.collection(collection).updateMany(query, { $set: update });
+							}).then(function (r) {
 								db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(data.cookie) }, {}, function (err, result) {
 									callback(err);
 								});
@@ -353,10 +405,10 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.get('/s/:appid', function (req, res) {
 		var collection = prefix + req.params.appid;
 		db.collection(collection).insertOne({})
-		.then(function (results) {
-			var _mtid = results.insertedId;
-			res.json({_mtid: _mtid });
-		}).catch(mtthrow);
+			.then(function (results) {
+				var _mtid = results.insertedId;
+				res.send(_mtid);
+			}).catch(mtthrow);
 	});
 
 	//SEGMENTATION-------------------------------------------------------------
@@ -449,7 +501,7 @@ MongoClient.connect(buildconnstr(), function (err, db) {
 	//set up new express application
 	var app = express();
 	// route(app, db, segmgr);
-	var prefix = config.get("prefix") || "meotrics_";
+	var prefix = config.get("mongod.prefix") || "meotrics_";
 
 	route(app, db, null, prefix, mongodb);
 
