@@ -16,6 +16,11 @@ function mtthrow(err)
 
 var idmgr = new IdManager();
 var obj = {$namefff: 'thanh', surff: 'kieu', '_id': 4};
+
+idmgr.toID('_iddd').then(function(ret, val){
+console.log('ret= '+ ret);
+});
+
 idmgr.toObject(obj).then(function(ret, val){
   console.log( ret);
 
