@@ -130,7 +130,9 @@ function unzip(string)
         if(value == null){
           newID(function(newid){
             db.set(newid, name  );
-            db.set(name, newid);
+            console.log('sss_' + name + "|" + defname);
+
+            db.set('_' + zip(newid), defname);
             if( name.startsWith("$") )
               sucback('$' + zip(newid));
             sucback(zip(newid));
@@ -151,6 +153,54 @@ function unzip(string)
 
   }
 
+  this.toOriginal = function(object)
+  {
+    var sucback;
+    var errback;
+    var p = new Promise( function(resolve, reject){
+      sucback = resolve;
+      errback = reject;
+    });
+
+
+    var newobj = {};
+    var ci = 0;
+    for(let i in object)
+    {
+      if(i == '_id')
+      {
+        (function(){
+          newobj[i] = object[i];
+          ci--;
+          console.log('44' + ci);
+          if(ci ==0) return sucback(newobj);
+        })();
+      }
+      else {
+        var j = i;
+        if( j.startsWith('$')  )
+          j = j.substring(1);
+console.log('_' + j);
+        db.get('_' + j, function(err, value)
+        {
+
+          if( i.startsWith('$')  )
+            newobj['$' + value] = object[i];
+          else {
+            newobj[value] = object[i];
+          }
+          ci--;
+          console.log(ci);
+          if(ci == 0) return sucback(newobj);
+        });
+
+      }
+
+      ci++;
+
+    }
+    return p;
+  }
 
   this.toObject = function( object)
   {
