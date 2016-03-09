@@ -1,0 +1,13 @@
+{
+	"port": 2108,
+	"mongod": {
+		"host": "127.0.0.1",
+		"username": "admin",
+		"password": ""
+	},
+	"redis": {
+		"host": "103.24.244.236",
+		"port": 6379,
+		"password": "RF81DXk7BOwKp8+xPCJvnxsaAnk="
+	}
+}

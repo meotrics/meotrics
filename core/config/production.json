@@ -5,8 +5,14 @@
 		"username": "admin",
 		"password": "",
 		"database": "local",
-		"port" : 27017
+		"port" : 27017,
+		"prefix": "meotrics_"
 	},
 	"numWebservers": 4,
-	"prefix": "meotrics_"
+	"redis": {
+			"host": "127.0.0.1",
+			"port": 6379,
+			"password": ""
+		}
+
 }
