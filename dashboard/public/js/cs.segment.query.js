@@ -1,13 +1,13 @@
 function SegmentQuery() {
 
 	this.produce = function (callback) {
-		var $container = $('<div class=" "> <a class="id_largequery "> Just pick</a>    dfghdf gh</div>');
+		var $container = $('<div class="id_textbf"> sd sdf <a class="id_largequery btn "> More </a></div>');
 
 		var options = '<ul> \
-	<li data-type="action"> \
+	<li data-value="Purchase" data-type="action"> \
   <a href="#"  >Purchase</a> \
 		<ul> \
-			<li data-value="count" ><a  href="#">Number of occours</a></li> \
+			<li data-value="count"  ><a  href="#">Number of occours</a></li> \
 			<li data-value="sum"><a  href="#">Total</a></li> \
 			<li data-value="avg"><a  href="#">Average</a></li> \
 		</ul> \
@@ -69,24 +69,32 @@ function SegmentQuery() {
     </ul> \
   </li> \
 </ul>';
-console.log(	$container.find('.id_largequery'))
+		console.log($container.find('.id_largequery'));
+		var segmentop = new SegmentOp();
 		//generate menu
 		$container.find('.id_largequery').menu({
 			content: options,
 			flyOut: true,
 			showSpeed: 0,
 			selback: function (values) {
-				if(values[0].type === 'action')
-				{
-					if(values[1].value === 'count')
-					{
-						var segmentop = new SegmentOp();
-						$container.append(segmentop.produce({type: 'number'}));
 
+				if (values[0].type === 'action') {
+					if (values[1].value == 'count') {
+						$container.find('.id_largequery').html("Number occours of " + values[0].value + " is ");
 					}
+					else if (values[1].value == 'sum') {
+						$container.find('.id_largequery').html("Total of " + values[0].value);
+					}
+					else if (values[1].value == 'avg') {
+						$container.find('.id_largequery').html("Average of " + values[0].value);
+					}
+					else
+						throw "wrong data";
+
+					segmentop.destroy();
+					$container.append(segmentop.produce({type: 'number'}));
 				}
-				else if(values[0].type === 'prop')
-				{
+				else if (values[0].type === 'prop') {
 
 				}
 			}
@@ -100,13 +108,20 @@ console.log(	$container.find('.id_largequery'))
 
 
 function SegmentOp() {
+	var $container = $('<span>');
+	this.destroy = function () {
+		$container.empty();
+	};
+
 	this.produce = function (options) {
+
+
 		var $opnum = $('<select class="form-control"> \
 		<option value="greater">greater than</option> \
 		<option value="less">less than</option> \
 		<option value="greater">greater than</option> \
 		<option value="equal">equal</option> \
-		</select> <input type="number" class="id_val form-control" value="1" />' );
+		</select> <input type="number" class="id_val form-control" value="1" />');
 
 		var $opselect = $('<select class="form-control"> \
 		<option value="less">less than</option> \
@@ -139,15 +154,15 @@ function SegmentOp() {
 			}
 
 		});
-		if(options.type == 'number')
-		{
-			return $opnum;
+		if (options.type == 'number') {
+			$container.append($opnum);
+			return $container;
 		}
 
 		return $opselect;
 	};
 
-	this.val = function(){
+	this.val = function () {
 		if (val == 'from') {
 
 		}
