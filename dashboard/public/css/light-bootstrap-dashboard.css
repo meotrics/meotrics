@@ -832,6 +832,8 @@ body > .navbar-collapse[data-color="purple"]:after {
 }
 
 .form-control {
+  display: inline-block;
+  width: auto;
   background-color: #FFFFFF;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
