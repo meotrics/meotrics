@@ -84,6 +84,7 @@ function SegmentQuery() {
 					}
 					else if (values[1].value == 'sum') {
 						$container.find('.id_largequery').html("Total of " + values[0].value);
+
 					}
 					else if (values[1].value == 'avg') {
 						$container.find('.id_largequery').html("Average of " + values[0].value);
@@ -106,6 +107,73 @@ function SegmentQuery() {
 
 }
 
+function FieldOp()
+{
+	var $container = $('<span>');
+	this.destroy = function () {
+		$container.empty();
+	};
+
+	this.produce = function (options) {
+
+		var $fiselect = $('<select class="form-control"> \
+		 <option>Price</option>\
+		 <option>Amount</option>\
+		 <option>Url</option>\
+		 <option>Total Time</option>\
+		 <option>Creation time</option>\
+		 </select>\
+		<select class="form-control"> \
+		<option value="less">less than</option> \
+		<option value="greater">greater than</option> \
+		<option value="equal">equal</option> \
+		<option value="contain">contains</option> \
+		<option value="startswith">starts with</option> \
+		<option value="endswith">ends with</option> \
+		<option value ="not">not equal</option> \
+		<option value="from">from</option> \
+		<option value ="fromto">from ... to ...</option> \
+		<option value="isset">is set</option> \
+		<option value = "isnotset">is not set</option> \
+		</select> <input type="text" class="id_val form-control" />');
+
+		$opselect.change(function () {
+			var val = $(this).val();
+
+			if (val == 'from') {
+
+			}
+			else if (val == 'fromto') {
+
+			}
+			else if (val == 'isset' || val == 'isnotset') {
+
+			}
+			else {
+				//cac phep toan thong thuong on string, number
+			}
+
+		});
+
+
+		return $fiselect;
+	};
+
+	this.val = function () {
+		if (val == 'from') {
+
+		}
+		else if (val == 'fromto') {
+
+		}
+		else if (val == 'isset' || val == 'isnotset') {
+
+		}
+		else {
+			//cac phep toan thong thuong on string, number
+		}
+	};
+}
 
 function SegmentOp() {
 	var $container = $('<span>');
