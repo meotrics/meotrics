@@ -491,11 +491,12 @@ body > .navbar-collapse[data-color="purple"]:after {
 .btn {
   /* border-width: 1px; */
   background-color: transparent;
-  font-weight: 200;
+  /* font-weight: bold; */
+  font-size: 14px;
   /* opacity: 0.8; */
   filter: alpha(opacity=80);
-  padding: 3px 9px;
-  border-color: #E6E6E6;
+  padding: 4px 9px;
+  border-color: #BBBBBB;
   color: #333;
 }
 .btn:hover, .btn:focus, .btn:active, .btn.active, .open > .btn.dropdown-toggle {
@@ -835,7 +836,7 @@ body > .navbar-collapse[data-color="purple"]:after {
   display: inline-block;
   width: auto;
   background-color: #FFFFFF;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #BBB;
   border-radius: 4px;
   color: #333;
   padding: 0px 6px;

@@ -22,8 +22,7 @@ th {
 }
 
 .mr5
-{vertical-align: middle;
-margin-right: 10px;}
+{vertical-align: top;margin-right: 10px;}
 
 
 select
@@ -37,4 +36,17 @@ select
 	text-transform: uppercase;
 	/* background-color: rgba(0,0,0,0.09); */
 	font-family: 'consolas', 'Monaco', monospace;
+}
+
+.querybtn{
+	padding-top: 5px;
+}
+
+.mt5
+{
+	margin-top: 5px;
+}
+
+.mb{
+	margin-bottom: 10px;
 }

@@ -1,11 +1,11 @@
 function SegmentQuery() {
 
 	this.produce = function (callback) {
-		var $container = $('<div class="id_textbf"> sd sdf <a class="id_largequery btn "> More </a></div>');
+		var $container = $('<div class="id_textbf mb mr5" style="display: inline-block"><a class="id_largequery btn mr5 querybtn form-control"> Add Filter </a> </div>');
 
 		var options = '<ul> \
 	<li data-value="Purchase" data-type="action"> \
-  <a href="#"  >Purchase</a> \
+  <a href="#" >Purchase</a> \
 		<ul> \
 			<li data-value="count"  ><a  href="#">Number of occours</a></li> \
 			<li data-value="sum"><a  href="#">Total</a></li> \
@@ -69,7 +69,7 @@ function SegmentQuery() {
     </ul> \
   </li> \
 </ul>';
-		console.log($container.find('.id_largequery'));
+
 		var segmentop = new SegmentOp();
 		//generate menu
 		$container.find('.id_largequery').menu({
@@ -77,6 +77,11 @@ function SegmentQuery() {
 			flyOut: true,
 			showSpeed: 0,
 			selback: function (values) {
+				$container.css('display', 'block');
+				var seg = new SegmentQuery();
+				seg.produce(function(data){
+					$container.after(data);
+				});
 
 				if (values[0].type === 'action') {
 					if (values[1].value == 'count') {
@@ -98,8 +103,10 @@ function SegmentQuery() {
 				else if (values[0].type === 'prop') {
 
 				}
+
 			}
 		});
+
 
 		callback($container);
 	}
@@ -107,16 +114,17 @@ function SegmentQuery() {
 
 }
 
-function FieldOp()
-{
+function FieldOp() {
 	var $container = $('<span>');
+
 	this.destroy = function () {
 		$container.empty();
 	};
 
+
 	this.produce = function (options) {
 
-		var $fiselect = $('<select class="form-control"> \
+		var $fiselect = $('<div class="mt5"><select class="form-control"> \
 		 <option>Price</option>\
 		 <option>Amount</option>\
 		 <option>Url</option>\
@@ -135,9 +143,9 @@ function FieldOp()
 		<option value ="fromto">from ... to ...</option> \
 		<option value="isset">is set</option> \
 		<option value = "isnotset">is not set</option> \
-		</select> <input type="text" class="id_val form-control" />');
+		</select> <input type="text" class="id_val form-control" /> <a href="#"> <i class="fa fa-trash"></i></a></div>');
 
-		$opselect.change(function () {
+		$fiselect.change(function () {
 			var val = $(this).val();
 
 			if (val == 'from') {
@@ -152,6 +160,7 @@ function FieldOp()
 			else {
 				//cac phep toan thong thuong on string, number
 			}
+
 
 		});
 
@@ -176,22 +185,31 @@ function FieldOp()
 }
 
 function SegmentOp() {
-	var $container = $('<span>');
+	var $container = $('<span style="display: inline-block">');
 	this.destroy = function () {
 		$container.empty();
 	};
 
+
+	var $addBtn = $('<a class="btn btn-default form-control querybtn"><i class="fa fa-plus" style="color:#ddd"></i></a>');
+	$addBtn.click(function () {
+		var field = new FieldOp();
+		var $field = field.produce();
+
+		$container.append($field);
+		$container.append($addBtn);
+	});
 	this.produce = function (options) {
 
 
-		var $opnum = $('<select class="form-control"> \
+		var $opnum = $('<select class="form-control mr5"> \
 		<option value="greater">greater than</option> \
 		<option value="less">less than</option> \
 		<option value="greater">greater than</option> \
 		<option value="equal">equal</option> \
-		</select> <input type="number" class="id_val form-control" value="1" />');
+		</select> <input type="number" class="id_val form-control mr5" value="1" />');
 
-		var $opselect = $('<select class="form-control"> \
+		var $opselect = $('<select class="form-control mr5"> \
 		<option value="less">less than</option> \
 		<option value="greater">greater than</option> \
 		<option value="equal">equal</option> \
@@ -203,7 +221,7 @@ function SegmentOp() {
 		<option value ="fromto">from ... to ...</option> \
 		<option value="isset">is set</option> \
 		<option value = "isnotset">is not set</option> \
-		</select> <input type="text" class="id_val form-control" />');
+		</select> <input type="text" class="id_val form-control mr5" />');
 
 		$opselect.change(function () {
 			var val = $(this).val();
@@ -221,12 +239,15 @@ function SegmentOp() {
 				//cac phep toan thong thuong on string, number
 			}
 
+
 		});
+
 		if (options.type == 'number') {
 			$container.append($opnum);
+			$container.append($addBtn);
 			return $container;
 		}
-
+		$container.append($addBtn);
 		return $opselect;
 	};
 
