@@ -199,6 +199,4 @@ span.ui-icon:before {
 
 
 
-.fg-recent > a {
-color: red !important;
-}
+.fg-recent > a {background-color: #C8D5E2;}

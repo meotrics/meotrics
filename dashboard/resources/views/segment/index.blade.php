@@ -1,10 +1,20 @@
 @extends('../layout/master', ['sidebarselect' => 'segment'])
 
 @section('script')
+	<script src="{{asset('js/cs.segmentop.js')}}"></script>
+	<script src="{{asset('js/cs.segment.query.js')}}"></script>
 	<script>
 
 		$(function () {
-			$('#flyout').menu({content: $('.lists').html(), flyOut: true, showSpeed: 0});
+
+
+			var sq = new SegmentQuery();
+
+			sq.produce(function($query){
+				$('#flyout').append($query);
+
+			});
+
 		});
 		function loadSegment(segment) {
 
@@ -57,6 +67,10 @@
 @section('content')
 	<div class="card row">
 		<div class="header col-md-12">
+
+			<div id="flyout">
+				adsflkjalsdfjlajs dflj lajsdfl kjalksdj flkjal kjdsf
+			</div>
 			<form class="">
 				<label class="mr5">SEGMENTATION SELECT</label>
 				<select id="segmentselect" class="form-control mr" style="width: 250px; display:inline-block">
@@ -79,8 +93,9 @@
 
 			<div class="hidden id_segmenttem">
 				<div class="">
-					<a tabindex="0" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="flyout">
-						<span class="ui-icon ui-icon-triangle-1-s"></span>flyout menu</a>
+
+					{{--<a tabindex="0" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="flyout">--}}
+						{{--<span class="ui-icon ui-icon-triangle-1-s"></span>flyout menu</a>--}}
 
 					<h6>Has done</h6>
 					<select class="id_actionselect form-control" style="width:150px; display: inline-block">

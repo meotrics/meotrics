@@ -246,16 +246,20 @@ function Menu(caller, options){
 
 		container.find('.fg-recent').removeClass('fg-recent');
 
+		var values = [];
 		var $item = $(item);
 		var $e = $item;
 		while($e.parent().hasClass('fg-menu-container') === false)
 		{
 			$e = $e.parent();
-			if($e.is('li'))
+			if($e.is('li')) {
+
+				values = [{ type: $e.data('type'), value: $e.data('value')}].concat(values);
 				$e.addClass('fg-recent');
+			}
 		}
 
-		console.log($(item).parent().text())
+		if(options.selback) options.selback(values);
 		// edit this for your own custom function/callback:
 		$('#menuSelection').text($(item).text());
 		location.href = $(item).attr('href');
