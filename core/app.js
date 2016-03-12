@@ -402,7 +402,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 								return db.collection(collection).updateMany(query, { $set: update });
 							}).then(function (r) {
 								return db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(data.cookie) });
-							})then(function(r){
+							}).then(function(r){
 								callback(null);
 							}).catch(function (err) {
 								callback(err);
