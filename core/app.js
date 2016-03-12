@@ -27,7 +27,7 @@ function getQueryTrending(object, converter, callback) {
 	var query = [];
 	converter.toID(object.object)
 		.then(function(r){
-			object.object = r[0];
+			object.object = r;
 
 			// -- START MATCH CLAUSE
 			query.push({ $match: { _typeid: new mongodb.ObjectID(object.event) } });
@@ -55,6 +55,7 @@ function getQueryTrending(object, converter, callback) {
 			}
 			// -- END OF MATCH CLAUSE
 
+			// -- START GROUP FUNCTION
 			object.order = object.order || 1;
 
 			if(object.operation == 'count') {
@@ -400,9 +401,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 								update[id] = new mongodb.ObjectID(_mtid);
 								return db.collection(collection).updateMany(query, { $set: update });
 							}).then(function (r) {
-								db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(data.cookie) }, {}, function (err, result) {
-									callback(err);
-								});
+								return db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(data.cookie) });
+							})then(function(r){
+								callback(null);
 							}).catch(function (err) {
 								callback(err);
 							});
@@ -426,7 +427,6 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + req.params.appid;
 		converter.toID('_isUser')
 			.then(function(r){
-				console.log(r);
 				var query = {};
 				query[r] = true;
 				return db.collection(collection).insertOne(query);
