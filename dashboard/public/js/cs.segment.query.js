@@ -1,8 +1,7 @@
 function SegmentQuery() {
 
 	this.produce = function (callback) {
-		var $container = $('<div class="id_textbf mb mr5" style="display: inline-block"><a class="id_largequery btn btn-fill mr5 querybtn form-control"> Add Filter ...</a> </div>');
-
+		var $container = $('<div class="id_textbf mb mr5" style="display: inline-block"><a href="#" class="dim lefticon"> <i class="fa fa-trash-o hidden id_rmbtn" ></i></a><a class="id_largequery btn btn-fill mr5 querybtn form-control"> Add Filter ...</a> </div>');
 		var options = '<ul> \
 	<li data-value="Purchase" data-type="action"> \
   <a href="#" >Purchase</a> \
@@ -96,7 +95,7 @@ function SegmentQuery() {
 					}
 					else
 						throw "wrong data";
-
+					$container.find('.id_rmbtn').removeClass('hidden');
 					segmentop.destroy();
 					$container.append(segmentop.produce({type: 'number'}));
 				}
@@ -124,7 +123,7 @@ function FieldOp() {
 
 	this.produce = function (options) {
 
-		var $fiselect = $('<div class="mt5"><select class="form-control"> \
+		var $fiselect = $('<div class="mt5"> <a href="#" class="dim lefticon"> <i class="fa fa-trash"></i></a><select class="form-control"> \
 		 <option>Price</option>\
 		 <option>Amount</option>\
 		 <option>Url</option>\
@@ -143,7 +142,7 @@ function FieldOp() {
 		<option value ="fromto">from ... to ...</option> \
 		<option value="isset">is set</option> \
 		<option value = "isnotset">is not set</option> \
-		</select> <input type="text" class="id_val form-control" /> <a href="#"> <i class="fa fa-trash"></i></a></div>');
+		</select> <input type="text" class="id_val form-control" /></div>');
 
 		$fiselect.change(function () {
 			var val = $(this).val();
@@ -191,7 +190,8 @@ function SegmentOp() {
 	};
 
 
-	var $addBtn = $('<a class="btn btn-default form-control querybtn"><i class="fa fa-plus" style="color:#ddd"></i></a>');
+	var $addBtn = $('<a href="#" class=" dim "><i class="fa fa-plus" style="margin-top: 11px;"></i></a>');
+
 	$addBtn.click(function () {
 		var field = new FieldOp();
 		var $field = field.produce();

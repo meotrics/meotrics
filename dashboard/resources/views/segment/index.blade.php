@@ -38,7 +38,7 @@
 			</div>
 			<div class="content row">
 				<div class="col-md-12">
-						<label class="mr5">BY </label>
+						<h5 class="mr5 mb">FILTER BY </h5>
 						<select class="fieldselect form-control mr5" style="width:150px; display: inline-block">
 							<option value="pid">Product ID</option>
 							<option value="cid">Category ID</option>
