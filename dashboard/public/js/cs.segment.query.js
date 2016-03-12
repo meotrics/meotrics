@@ -1,27 +1,11 @@
 function SegmentQuery() {
 
-	this.produce = function (callback) {
+	this.produce = function (callback, data) {
 		var $container = $('<div class="id_textbf mb mr5" style="display: inline-block"><a href="#" class="dim lefticon"> <i class="fa fa-trash-o hidden id_rmbtn" ></i></a><a class="id_largequery btn btn-fill mr5 querybtn form-control"> Add Filter ...</a> </div>');
-		var options = '<ul> \
-	<li data-value="Purchase" data-type="action"> \
-  <a href="#" >Purchase</a> \
-		<ul> \
-			<li data-value="count"  ><a  href="#">Number of occours</a></li> \
-			<li data-value="sum"><a  href="#">Total</a></li> \
-			<li data-value="avg"><a  href="#">Average</a></li> \
-		</ul> \
-  </li> \
-  <li> \
-    <a href="#">Pageview</a> \
-    <ul > \
-			<li><a href="#">Number of occours</a></li> \
-			<li><a href="#">Total</a></li> \
-			<li><a href="#">Average</a></li> \
-     </ul> \
-  </li> \
-  <li> \
-    <a href="#">Gender</a> \
-    <ul> \
+
+		var $data = $('<ul>');
+		var $action2level = $('<ul><li data-value="count"  ><a  href="#">Total of occours</a></li> <li data-value="sum"><a  href="#">Sum</a></li> <li data-value="avg"><a  href="#">Average</a></li></ul>');
+		var $prop2level = $('<ul> \
       <li data-value="less"><a href="#">less than</a></li> \
       <li data-value="greater"><a href="#">greater than</a></li> \
       <li data-value="equal"><a href="#">equal</a></li> \
@@ -33,52 +17,39 @@ function SegmentQuery() {
       <li data-value ="fromto"><a href="#">from ... to ...</a></li> \
       <li data-value="isset"><a href="#">is set</a></li> \
       <li data-value = "isnotset"><a href="#">is not set</a></li> \
-    </ul> \
-  </li> \
-  <li> \
-    <a href="#">Age</a> \
-    <ul> \
-      <li data-value="less"><a href="#">less than</a></li> \
-      <li data-value="greater"><a href="#">greater than</a></li> \
-      <li data-value="equal"><a href="#">equal</a></li> \
-      <li data-value="contain"><a href="#">contains</a></li> \
-      <li data-value="startswith"><a href="#">starts with</a></li> \
-      <li data-value="endswith"><a href="#">ends with</a></li> \
-      <li data-value ="not"><a href="#">not equal</a></li> \
-      <li data-value="from"><a href="#">from</a></li> \
-      <li data-value ="fromto"><a href="#">from ... to ...</a></li> \
-      <li data-value="isset"><a href="#">is set</a></li> \
-      <li data-value = "isnotset"><a href="#">is not set</a></li> \
-    </ul> \
-  </li> \
-  <li> \
-    <a href="#">User type</a> \
-    <ul> \
-      <li data-value="less"><a href="#">less than</a></li> \
-      <li data-value="greater"><a href="#">greater than</a></li> \
-      <li data-value="equal"><a href="#">equal</a></li> \
-      <li data-value="contain"><a href="#">contains</a></li> \
-      <li data-value="startswith"><a href="#">starts with</a></li> \
-      <li data-value="endswith"><a href="#">ends with</a></li> \
-      <li data-value ="not"><a href="#">not equal</a></li> \
-      <li data-value="from"><a href="#">from</a></li> \
-      <li data-value ="fromto"><a href="#">from ... to ...</a></li> \
-      <li data-value="isset"><a href="#">is set</a></li> \
-      <li data-value = "isnotset"><a href="#">is not set</a></li> \
-    </ul> \
-  </li> \
-</ul>';
+    </ul>');
+		for (var i  in data) {
+			var item = data[i];
+			var $litem = $('<li>');
+
+			if (item.type == 'action') {
+
+				$litem.data('type', 'action');
+				$litem.data('value', item.id);
+				var $a = $('<a href="#">' + he.encode(item.name) + '</a>');
+				$litem.append($a);
+				$litem.append($action2level.clone());
+			}
+			else {
+				$litem.data('type', 'prop');
+				$litem.data('value', he.encode(item.name));
+				var $a = $('<a href="#">' + he.encode(item.dpname) + '</a>');
+				$litem.append($a);
+				$litem.append($prop2level.clone());
+			}
+			$data.append($litem)
+		}
 
 		var segmentop = new SegmentOp();
 		//generate menu
 		$container.find('.id_largequery').menu({
-			content: options,
+			content: $data.html(),
 			flyOut: true,
 			showSpeed: 0,
 			selback: function (values) {
 				$container.css('display', 'block');
 				var seg = new SegmentQuery();
-				seg.produce(function(data){
+				seg.produce(function (data) {
 					$container.after(data);
 				});
 
@@ -123,26 +94,32 @@ function FieldOp() {
 
 	this.produce = function (options) {
 
-		var $fiselect = $('<div class="mt5"> <a href="#" class="dim lefticon"> <i class="fa fa-trash"></i></a><select class="form-control"> \
-		 <option>Price</option>\
-		 <option>Amount</option>\
-		 <option>Url</option>\
-		 <option>Total Time</option>\
-		 <option>Creation time</option>\
-		 </select>\
+
+		var field = "";
+		if (options.data) {
+			field = '<select class="form-control">';
+			for (var i in options.data) {
+				var f = options.data[i];
+				field += '<option value="' + he.encode(f.pcode) + '">' + he.encode(f.pname) + '</option>';
+			}
+
+			field += '</selec> \
 		<select class="form-control"> \
-		<option value="less">less than</option> \
-		<option value="greater">greater than</option> \
-		<option value="equal">equal</option> \
-		<option value="contain">contains</option> \
-		<option value="startswith">starts with</option> \
-		<option value="endswith">ends with</option> \
-		<option value ="not">not equal</option> \
-		<option value="from">from</option> \
-		<option value ="fromto">from ... to ...</option> \
-		<option value="isset">is set</option> \
-		<option value = "isnotset">is not set</option> \
-		</select> <input type="text" class="id_val form-control" /></div>');
+			<option value="less">less than</option> \
+			<option value="greater">greater than</option> \
+			<option value="equal">equal</option> \
+			<option value="contain">contains</option> \
+			<option value="startswith">starts with</option> \
+			<option value="endswith">ends with</option> \
+			<option value ="not">not equal</option> \
+			<option value="from">from</option> \
+			<option value ="fromto">from ... to ...</option> \
+			<option value="isset">is set</option> \
+			<option value = "isnotset">is not set</option> \
+		</select> <input type="text" class="id_val form-control" />';
+		}
+
+		var $fiselect = $('<div class="mt5"><a href="#" class="dim lefticon"><i class="fa fa-trash"></i></a>' + field + '</div>');
 
 		$fiselect.change(function () {
 			var val = $(this).val();

@@ -34,7 +34,7 @@ select
 {
 	color: #2C629A;
 	text-transform: uppercase;
-	/* background-color: rgba(0,0,0,0.09); */
+	background-color: rgba(0, 0, 0, 0.08);
 	font-family: 'consolas', 'Monaco', monospace;
 }
 
