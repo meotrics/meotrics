@@ -16,48 +16,7 @@
 			});
 
 		});
-		function loadSegment(segment) {
 
-		}
-
-
-		$('.addactionlink').click(function () {
-			var $segment = $('.id_segmenttem').children().clone();
-			var $list = $('.id_segmentlist');
-			$list.append($segment);
-		});
-
-		function newSegment() {
-			var $segment = $('.id_segmenttem').children().clone();
-			var $list = $('.id_segmentlist');
-			$list.empty();
-
-
-			$segment.find('.removelink').click(function () {
-				$segment.addClass('hidden');
-			});
-
-			var $segcondlist = $segment.find('.subconditionlist');
-			$segment.find('.addcondlink').click(function () {
-				var $cond = $('.id_condtemp').children().clone();
-
-				$cond.find('.removecondlink').click(function () {
-					$cond.addClass('hidden');
-				});
-				$segcondlist.append($cond);
-			});
-
-			$list.append($segment);
-		}
-
-
-		function segment_change(segment) {
-
-		}
-		;
-		var $list = $('.id_segmentlist');
-		$list.empty();
-		newSegment();
 
 	</script>
 @endsection
@@ -66,61 +25,31 @@
 
 @section('content')
 	<div class="card row">
-		<div class="header col-md-12">
+		<div class="col-md-12">
 
-			<div id="flyout">
+			<div class="header row">
 
-			</div>
-
-
-		</div>
-		<div class="content col-sm-12">
-
-			<div class="id_segmentlist">
-
-			</div>
+				<div id="flyout" class="col-sm-12">
 
 
-			<div class="hidden id_segmenttem">
-				<div class="">
-
-					{{--<a tabindex="0" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="flyout">--}}
-					{{--<span class="ui-icon ui-icon-triangle-1-s"></span>flyout menu</a>--}}
-
-
-					<div class="hidden id_condtemp">
-						<div>
-							<select class="joinselect form-control" style="width:80px; display: inline-block">
-								<option value="and">and</option>
-								<option value="or">or</option>
-							</select>
-							<select class="subfieldselect form-control" style="width:150px; display: inline-block"></select>
-							<select class="operatorselect form-control" style="width:70px; display: inline-block">
-								<option value="&gt;">&gt;</option>
-								<option value="&gt;">&gt;</option>
-								<option value="&lt;">&lt;</option>
-								<option value="&#x2260;">&#x2260;</option>
-							</select>
-							<input type="text" class="value form-control" style="width:150px; display: inline-block"/>
-							<a href='#' class="removecondlink"><i class="fa fa-remove"></i> </a>
-						</div>
-					</div>
 				</div>
+
+
+			</div>
+			<div class="content row">
 				<div class="col-md-12">
-
-					<label>Filter by </label>
-					<select class="fieldselect form-control " style="width:150px; display: inline-block">
-						<option value="pid">Product ID</option>
-						<option value="cid">Category ID</option>
-					</select>
-					<select class="fieldselect form-control " style="width:150px; display: inline-block">
-						<option value="pid">Product ID</option>
-						<option value="cid">Category ID</option>
-					</select>
-					<button>Excute</button>
-					<button>Save</button>
+						<label class="mr5">BY </label>
+						<select class="fieldselect form-control mr5" style="width:150px; display: inline-block">
+							<option value="pid">Product ID</option>
+							<option value="cid">Category ID</option>
+						</select>
+						<select class="fieldselect form-control mr5" style="width:150px; display: inline-block">
+							<option value="pid">Product ID</option>
+							<option value="cid">Category ID</option>
+						</select>
+						<a class="btn btn-success btn-fill mr5"><i class="fa fa-bolt"></i> Excute</a>
+						<a class="btn "><i class="fa fa-save"></i></a>
 				</div>
-
 			</div>
 
 			<div class="lists hidden">

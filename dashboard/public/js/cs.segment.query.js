@@ -1,7 +1,7 @@
 function SegmentQuery() {
 
 	this.produce = function (callback) {
-		var $container = $('<div class="id_textbf mb mr5" style="display: inline-block"><a class="id_largequery btn mr5 querybtn form-control"> Add Filter </a> </div>');
+		var $container = $('<div class="id_textbf mb mr5" style="display: inline-block"><a class="id_largequery btn btn-fill mr5 querybtn form-control"> Add Filter ...</a> </div>');
 
 		var options = '<ul> \
 	<li data-value="Purchase" data-type="action"> \
