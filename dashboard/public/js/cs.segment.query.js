@@ -1,8 +1,7 @@
 function SegmentQuery() {
 
 	this.produce = function (callback, data) {
-		var $container = $('<div class="id_textbf mb mr5" style="display: inline-block"><a href="#" class="dim lefticon"> <i class="fa fa-trash-o hidden id_rmbtn" ></i></a><a class="id_largequery btn btn-fill mr5 querybtn form-control"> Add Filter ...</a> </div>');
-
+		var $container = $('<div class="id_textbf mb mr5"><a href="#" class="dim lefticon"> <i class="fa fa-trash-o hidden id_rmbtn" ></i></a><a class="id_largequery btn btn-fill mr5 querybtn form-control"> Add Filter ...</a> </div>');
 		var $data = $('<ul>');
 		var $action2level = $('<ul><li data-value="count"  ><a  href="#">Total of occours</a></li> <li data-value="sum"><a  href="#">Sum</a></li> <li data-value="avg"><a  href="#">Average</a></li></ul>');
 		var $prop2level = $('<ul> \
@@ -15,24 +14,36 @@ function SegmentQuery() {
       <li data-value ="not"><a href="#">not equal</a></li> \
       <li data-value="from"><a href="#">from</a></li> \
       <li data-value ="fromto"><a href="#">from ... to ...</a></li> \
-      <li data-value="isset"><a href="#">is set</a></li> \
-      <li data-value = "isnotset"><a href="#">is not set</a></li> \
     </ul>');
+
+		//find item by name
+		function find(name) {
+			for (var i in data) {
+				if (data[i].type == 'action' && data[i].name == name) {
+					return data[i];
+				}
+			}
+			return null;
+		}
+
+		//convert data to better form
 		for (var i  in data) {
 			var item = data[i];
 			var $litem = $('<li>');
 
 			if (item.type == 'action') {
 
-				$litem.data('type', 'action');
-				$litem.data('value', item.id);
+				$litem.attr('data-type', 'action');
+				$litem.attr('data-value', item.name);
+				$litem.attr('data-id', item.id);
 				var $a = $('<a href="#">' + he.encode(item.name) + '</a>');
 				$litem.append($a);
 				$litem.append($action2level.clone());
 			}
 			else {
-				$litem.data('type', 'prop');
-				$litem.data('value', he.encode(item.name));
+				$litem.attr('data-type', 'prop');
+
+				$litem.attr('data-value', he.encode(item.name));
 				var $a = $('<a href="#">' + he.encode(item.dpname) + '</a>');
 				$litem.append($a);
 				$litem.append($prop2level.clone());
@@ -41,37 +52,50 @@ function SegmentQuery() {
 		}
 
 		var segmentop = new SegmentOp();
-		//generate menu
+
 		$container.find('.id_largequery').menu({
-			content: $data.html(),
+			content: $data[0].outerHTML,
 			flyOut: true,
 			showSpeed: 0,
 			selback: function (values) {
-				$container.css('display', 'block');
-				var seg = new SegmentQuery();
-				seg.produce(function (data) {
-					$container.after(data);
-				});
+				//check if user change select or create a new one
+				if ($container.data('edited') !== 'true') //change
+				{
+					//append another query
+					var seg = new SegmentQuery();
+					seg.produce(function (html) {
+						$container.after(html);
+					}, data);
+				}
 
+				//mark that list has been edited
+				$container.data('edited', 'true');
 				if (values[0].type === 'action') {
 					if (values[1].value == 'count') {
-						$container.find('.id_largequery').html("Number occours of " + values[0].value + " is ");
+						$container.find('.id_largequery').html('<b>Has done</b>' + "Total occours of " + values[0].value);
 					}
 					else if (values[1].value == 'sum') {
-						$container.find('.id_largequery').html("Total of " + values[0].value);
+						$container.find('.id_largequery').html('<b>Has done </b>' + "Sum of " + values[0].value);
 
 					}
 					else if (values[1].value == 'avg') {
-						$container.find('.id_largequery').html("Average of " + values[0].value);
+						$container.find('.id_largequery').html('<b>Has done</b>' + "Average of " + values[0].value);
 					}
 					else
 						throw "wrong data";
 					$container.find('.id_rmbtn').removeClass('hidden');
 					segmentop.destroy();
-					$container.append(segmentop.produce({type: 'number'}));
+					$container.append(segmentop.produce({
+						type: 'number',
+						data: find(values[0].value).fields,
+						defop: values[1].value
+					}));
 				}
 				else if (values[0].type === 'prop') {
-
+					$container.find('.id_largequery').html('<b>Has </b>' + values[0].value);
+					$container.find('.id_rmbtn').removeClass('hidden');
+					segmentop.destroy();
+					$container.append(segmentop.produce({defop: values[1].value}));
 				}
 
 			}
@@ -100,10 +124,10 @@ function FieldOp() {
 			field = '<select class="form-control">';
 			for (var i in options.data) {
 				var f = options.data[i];
-				field += '<option value="' + he.encode(f.pcode) + '">' + he.encode(f.pname) + '</option>';
+				field += '<option value="' + he.encode(f.code) + '">' + he.encode(f.name) + '</option>';
 			}
 
-			field += '</selec> \
+			field += '</select> \
 		<select class="form-control"> \
 			<option value="less">less than</option> \
 			<option value="greater">greater than</option> \
@@ -114,10 +138,15 @@ function FieldOp() {
 			<option value ="not">not equal</option> \
 			<option value="from">from</option> \
 			<option value ="fromto">from ... to ...</option> \
-			<option value="isset">is set</option> \
-			<option value = "isnotset">is not set</option> \
 		</select> <input type="text" class="id_val form-control" />';
 		}
+
+
+		if(field !== '' && options.defop !== undefined)
+		{
+			field= $(field).val(options.defop)[0].outerHTML;
+		}
+
 
 		var $fiselect = $('<div class="mt5"><a href="#" class="dim lefticon"><i class="fa fa-trash"></i></a>' + field + '</div>');
 
@@ -162,23 +191,29 @@ function FieldOp() {
 
 function SegmentOp() {
 	var $container = $('<span style="display: inline-block">');
+	var data;
+
+	//clear
 	this.destroy = function () {
+		$addBtn.detach();
 		$container.empty();
+		//$container = $('<span style="display: inline-block">');
 	};
 
-
 	var $addBtn = $('<a href="#" class=" dim "><i class="fa fa-plus" style="margin-top: 11px;"></i></a>');
-
+	var defop;
 	$addBtn.click(function () {
 		var field = new FieldOp();
-		var $field = field.produce();
+		var $field = field.produce({data: data,defop : defop});
 
 		$container.append($field);
 		$container.append($addBtn);
 	});
+
 	this.produce = function (options) {
-
-
+		options = options || {};
+		defop = options.defop;
+		data = options.data;
 		var $opnum = $('<select class="form-control mr5"> \
 		<option value="greater">greater than</option> \
 		<option value="less">less than</option> \
@@ -196,8 +231,6 @@ function SegmentOp() {
 		<option value ="not">not equal</option> \
 		<option value="from">from</option> \
 		<option value ="fromto">from ... to ...</option> \
-		<option value="isset">is set</option> \
-		<option value = "isnotset">is not set</option> \
 		</select> <input type="text" class="id_val form-control mr5" />');
 
 		$opselect.change(function () {
@@ -218,13 +251,15 @@ function SegmentOp() {
 
 
 		});
-
+		$container.append($opnum);
 		if (options.type == 'number') {
-			$container.append($opnum);
-			$container.append($addBtn);
+
+			if (data !== undefined)
+				$container.append($addBtn);
 			return $container;
 		}
-		$container.append($addBtn);
+		if (data !== undefined)
+			$container.append($addBtn);
 		return $opselect;
 	};
 
