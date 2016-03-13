@@ -72,7 +72,7 @@ function SegmentQuery() {
 				$container.data('edited', 'true');
 				if (values[0].type === 'action') {
 					if (values[1].value == 'count') {
-						$container.find('.id_largequery').html('<b>Has done</b>' + "Total occours of " + values[0].value);
+						$container.find('.id_largequery').html('<b>Has done</b>' + values[0].value);
 					}
 					else if (values[1].value == 'sum') {
 						$container.find('.id_largequery').html('<b>Has done </b>' + "Sum of " + values[0].value);
@@ -88,7 +88,8 @@ function SegmentQuery() {
 					$container.append(segmentop.produce({
 						type: 'number',
 						data: find(values[0].value).fields,
-						defop: values[1].value
+
+
 					}));
 				}
 				else if (values[0].type === 'prop') {
@@ -201,10 +202,10 @@ function SegmentOp() {
 	};
 
 	var $addBtn = $('<a href="#" class=" dim "><i class="fa fa-plus" style="margin-top: 11px;"></i></a>');
-	var defop;
+
 	$addBtn.click(function () {
 		var field = new FieldOp();
-		var $field = field.produce({data: data,defop : defop});
+		var $field = field.produce({data: data});
 
 		$container.append($field);
 		$container.append($addBtn);
@@ -251,16 +252,21 @@ function SegmentOp() {
 
 
 		});
-		$container.append($opnum);
-		if (options.type == 'number') {
 
+		if (options.type == 'number') {
+			if(options.defop !== undefined)
+				$opnum.val(options.defop);
+			$container.append($opnum);
 			if (data !== undefined)
 				$container.append($addBtn);
 			return $container;
 		}
+		$container.append($opselect);
+		if(options.defop !== undefined)
+			$opselect.val(options.defop);
 		if (data !== undefined)
 			$container.append($addBtn);
-		return $opselect;
+		return $container;
 	};
 
 	this.val = function () {
