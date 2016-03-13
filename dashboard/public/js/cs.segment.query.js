@@ -57,50 +57,58 @@ function SegmentQuery() {
 			content: $data[0].outerHTML,
 			flyOut: true,
 			showSpeed: 0,
-			selback: function (values) {
-				//check if user change select or create a new one
-				if ($container.data('edited') !== 'true') //change
-				{
-					//append another query
-					var seg = new SegmentQuery();
-					seg.produce(function (html) {
-						$container.after(html);
-					}, data);
-				}
-
-				//mark that list has been edited
-				$container.data('edited', 'true');
-				if (values[0].type === 'action') {
-					if (values[1].value == 'count') {
-						$container.find('.id_largequery').html('<b>Has done</b>' + values[0].value);
-					}
-					else if (values[1].value == 'sum') {
-						$container.find('.id_largequery').html('<b>Has done </b>' + "Sum of " + values[0].value);
-
-					}
-					else if (values[1].value == 'avg') {
-						$container.find('.id_largequery').html('<b>Has done</b>' + "Average of " + values[0].value);
-					}
-					else
-						throw "wrong data";
-					$container.find('.id_rmbtn').removeClass('hidden');
-					segmentop.destroy();
-					$container.append(segmentop.produce({
-						type: 'number',
-						data: find(values[0].value).fields,
-
-
-					}));
-				}
-				else if (values[0].type === 'prop') {
-					$container.find('.id_largequery').html('<b>Has </b>' + values[0].value);
-					$container.find('.id_rmbtn').removeClass('hidden');
-					segmentop.destroy();
-					$container.append(segmentop.produce({defop: values[1].value}));
-				}
-
-			}
+			selback: largequeryselback
 		});
+
+		function remove() {
+			$container.addClass('hidden');
+		}
+
+		function largequeryselback(values) {
+
+			$container.find('.id_rmbtn').unbind('click', remove).bind('click', remove);
+			//check if user change select or create a new one
+			if ($container.data('edited') !== 'true') //change
+			{
+				//append another query
+				var seg = new SegmentQuery();
+				seg.produce(function (html) {
+					$container.after(html);
+				}, data);
+			}
+
+			//mark that list has been edited
+			$container.data('edited', 'true');
+			if (values[0].type === 'action') {
+				if (values[1].value == 'count') {
+					$container.find('.id_largequery').html('<b>Has done</b> ' + values[0].value);
+				}
+				else if (values[1].value == 'sum') {
+					$container.find('.id_largequery').html('<b>Has done </b>' + "Sum of " + values[0].value);
+
+				}
+				else if (values[1].value == 'avg') {
+					$container.find('.id_largequery').html('<b>Has done</b>' + "Average of " + values[0].value);
+				}
+				else
+					throw "wrong data";
+				$container.find('.id_rmbtn').removeClass('hidden');
+				segmentop.destroy();
+				$container.append(segmentop.produce({
+					type: 'number',
+					data: find(values[0].value).fields,
+
+
+				}));
+			}
+			else if (values[0].type === 'prop') {
+				$container.find('.id_largequery').html('<b>Has </b>' + values[0].value);
+				$container.find('.id_rmbtn').removeClass('hidden');
+				segmentop.destroy();
+				$container.append(segmentop.produce({defop: values[1].value}));
+			}
+
+		}
 
 
 		callback($container);
@@ -143,13 +151,16 @@ function FieldOp() {
 		}
 
 
-		if(field !== '' && options.defop !== undefined)
-		{
-			field= $(field).val(options.defop)[0].outerHTML;
+		if (field !== '' && options.defop !== undefined) {
+			field = $(field).val(options.defop)[0].outerHTML;
 		}
 
 
-		var $fiselect = $('<div class="mt5"><a href="#" class="dim lefticon"><i class="fa fa-trash"></i></a>' + field + '</div>');
+		var $fiselect = $('<div class="mt5"><a href="#" class="dim lefticon id_rmbt"><i class="fa fa-trash"></i></a>' + field + '</div>');
+
+		$fiselect.find('.id_rmbt').click(function(){
+			$fiselect.addClass('hidden');
+		});
 
 		$fiselect.change(function () {
 			var val = $(this).val();
@@ -254,16 +265,16 @@ function SegmentOp() {
 		});
 
 		if (options.type == 'number') {
-			if(options.defop !== undefined)
-				$opnum.val(options.defop);
+			if (options.defop !== undefined)
+				$opnum.find('select').val(options.defop);
 			$container.append($opnum);
 			if (data !== undefined)
 				$container.append($addBtn);
 			return $container;
 		}
 		$container.append($opselect);
-		if(options.defop !== undefined)
-			$opselect.val(options.defop);
+		if (options.defop !== undefined)
+			$opselect.find('select').val(options.defop);
 		if (data !== undefined)
 			$container.append($addBtn);
 		return $container;
