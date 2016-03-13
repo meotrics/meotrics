@@ -66,6 +66,10 @@ function SegmentQuery() {
 
 		function largequeryselback(values) {
 
+			//make sure 2nd level is selected
+			if (values.length == 1) {
+				return;
+			}
 			$container.find('.id_rmbtn').unbind('click', remove).bind('click', remove);
 			//check if user change select or create a new one
 			if ($container.data('edited') !== 'true') //change
@@ -158,7 +162,7 @@ function FieldOp() {
 
 		var $fiselect = $('<div class="mt5"><a href="#" class="dim lefticon id_rmbt"><i class="fa fa-trash"></i></a>' + field + '</div>');
 
-		$fiselect.find('.id_rmbt').click(function(){
+		$fiselect.find('.id_rmbt').click(function () {
 			$fiselect.addClass('hidden');
 		});
 
