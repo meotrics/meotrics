@@ -1,6 +1,5 @@
 "use strict";
 
-
 var config = require('config');
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
@@ -126,7 +125,8 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var collection = prefix + "actiontype";
 		db.collection(collection).insertOne(data) // add options: w, j, timeout ...
 			.then(function (r) {
-				res.json({_id: r.insertedId });
+				var _typeid = r.insertedId;
+				res.send(_typeid);
 			}).catch(mtthrow);
 	});
 
@@ -144,7 +144,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		// var appid = req.params.appid;
 		var atid = req.params.id;
 		var collection = prefix + "actiontype";
-		db.collection(collection).find({ _id: new mongodb.ObjectID(atid) }, { _appid: 0 }).toArray()
+		db.collection(collection).find({ _id: new mongodb.ObjectID(atid) }, { _appid: 0, _id: 0 }).toArray()
 		.then(function (results) {
 			res.json(results);
 		}).catch(mtthrow);
@@ -193,7 +193,8 @@ function route(app, db, segmgr, prefix, mongodb) {
 
 		db.collection(collection).insertOne(data)
 			.then(function (r) {
-				res.json({ _id: r.insertedId });
+				var trendId = r.insertedId;
+				res.send(trendId);
 			}).catch(mtthrow);
 	});
 
@@ -327,6 +328,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		// Convert string to ObjectID in mongodgodb
 		data._mtid = new mongodb.ObjectID(data._mtid);
 		data._typeid = new mongodb.ObjectID(data._typeid);
+		data._segments = [];
 		// Add created time 
 		data._ctime = Math.round(new Date() / 1000);
 		converter.toObject(data) 
@@ -402,7 +404,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 								return db.collection(collection).updateMany(query, { $set: update });
 							}).then(function (r) {
 								return db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(data.cookie) });
-							})then(function(r){
+							}).then(function(r){
 								callback(null);
 							}).catch(function (err) {
 								callback(err);
@@ -442,12 +444,13 @@ function route(app, db, segmgr, prefix, mongodb) {
 	//create a segment
 	app.post('/segment/:appid', function (req, res) {
 		var data = req.body;
-		data.appid = Number(req.params.appid);
+		data._appid = Number(req.params.appid);
 
 		var collection = prefix + "segment";
 		db.collection(collection).insertOne(data) // add options: w, j, timeout ...
 		.then(function (r) {
-			res.json({_id: r.insertedId });
+			var segid = r.insertedId; 
+			res.send(segid);
 		}).catch(mtthrow);
 	});
 
@@ -455,7 +458,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.get('/segment/:appid', function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "segment";
-		db.collection(collection).find({ appid: appid }, { appid: 0 }).toArray()
+		db.collection(collection).find({ _appid: appid }, { _appid: 0 }).toArray()
 		.then(function (results) {
 			res.json(results);
 		}).catch(mtthrow);
@@ -464,9 +467,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 	//list a segment from a app
 	app.get('/segment/:appid/:id', function (req, res) {
 		// var appid = req.params.appid;
-		var trid = req.params.id;
+		var segid = req.params.id;
 		var collection = prefix + "segment";
-		db.collection(collection).find({ _id: new mongodb.ObjectID(trid) }, { _id: 0, appid: 0 }).toArray()
+		db.collection(collection).find({ _id: new mongodb.ObjectID(segid) }, { _id: 0, _appid: 0 }).toArray()
 		.then(function (results) {
 			res.json(results);
 		}).catch(mtthrow);
@@ -477,9 +480,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.put('/segment/:appid/:id', function (req, res) {
 		var data = req.body;
 		// var appid = req.params.appid;
-		var trid = req.params.id;
+		var segid = req.params.id;
 		var collection = prefix + "segment";
-		db.collection(collection).updateOne({ _id: new mongodb.ObjectID(trid) }, { $set: data })
+		db.collection(collection).updateOne({ _id: new mongodb.ObjectID(segid) }, { $set: data })
 		.then(function (results) {
 			res.status(200).end();
 		}).catch(mtthrow);
@@ -487,9 +490,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 
 	app.delete('/segment/:appid/:id', function (req, res) {
 		// var appid = req.params.appid;
-		var trid = req.params.id;
+		var segid = req.params.id;
 		var collection = prefix + "segment";
-		db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(trid) })
+		db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(segid) })
 		.then(function (results) {
 			res.status(200).end();
 		}).catch(mtthrow);
@@ -499,7 +502,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.delete('/segment/:appid', function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "segment";
-		db.collection(collection).deleteMany({ appid: appid })
+		db.collection(collection).deleteMany({ _appid: appid })
 		.then(function (results) {
 			res.status(200).end();
 		}).catch(mtthrow);
