@@ -19,6 +19,10 @@ function SegmentQuery() {
 				var $conds = $child.find('.id_condition');
 				for (var t = 0; t < $conds.length; t++) if ($conds.hasOwnProperty(t)) {
 					var $cond = $($conds[t]);
+
+					//jump over deleted condition
+					if($cond.hasClass('hidden')) continue;
+					
 					if (ele.fields.length !== 0) ele.fields.push('and');
 					ele.fields.push($cond.find('.id_fi').val());
 					ele.fields.push($cond.find('.id_op').val());
@@ -30,15 +34,9 @@ function SegmentQuery() {
 			}
 			else if ($child.attr('data-type') == 'prop') {
 				ele.type = undefined;
-				ele.fields = [];
-				var $conds = $child.find('.id_condition');
-				for (var t = 0; t < $conds.length; t++) if ($conds.hasOwnProperty(t)) {
-					var $cond = $($conds[t]);
-					if (ele.fields.length !== 0) ele.fields.push('and');
-					ele.fields.push($cond.find('.id_fi').val());
-					ele.fields.push($cond.find('.id_op').val());
-					ele.fields.push($cond.find('.id_val').val());
-				}
+				ele.field = $child.data('code');
+				ele.operator = $child.find('.id_fop').find('.id_op').val();
+				ele.value = $child.find('.id_fop').find('.id_val').val();
 				query.push(ele);
 			}
 			else {
@@ -51,18 +49,6 @@ function SegmentQuery() {
 	this.produce = function (callback, data) {
 		var $data = $('<ul>');
 		var $action2level = $('<ul><li data-value="count"  ><a  href="#">Total of occours</a></li> <li data-value="sum"><a  href="#">Sum</a></li> <li data-value="avg"><a  href="#">Average</a></li></ul>');
-		var $prop2level = $('<ul> \
-      <li data-value="less"><a href="#">less than</a></li> \
-      <li data-value="greater"><a href="#">greater than</a></li> \
-      <li data-value="equal"><a href="#">equal</a></li> \
-      <li data-value="contain"><a href="#">contains</a></li> \
-      <li data-value="startswith"><a href="#">starts with</a></li> \
-      <li data-value="endswith"><a href="#">ends with</a></li> \
-      <li data-value ="not"><a href="#">not equal</a></li> \
-      <li data-value="from"><a href="#">from</a></li> \
-      <li data-value ="fromto"><a href="#">from ... to ...</a></li> \
-    </ul>');
-
 
 		//find item by name
 		function find(name) {
@@ -89,11 +75,10 @@ function SegmentQuery() {
 			}
 			else {
 				$litem.attr('data-type', 'prop');
-
-				$litem.attr('data-value', he.encode(item.name));
+				$litem.attr('data-id', he.encode(item.name));
+				$litem.attr('data-value', he.encode(item.dpname));
 				var $a = $('<a href="#">' + he.encode(item.dpname) + '</a>');
 				$litem.append($a);
-				$litem.append($prop2level.clone());
 			}
 			$data.append($litem)
 		}
@@ -113,9 +98,7 @@ function SegmentQuery() {
 
 		function largequeryselback(values) {
 			//make sure 2nd level is selected
-			if (values.length == 1) {
-				return;
-			}
+			if (values.length == 1 && values[0].type === 'action') return;
 
 			$container.find('.id_rmbtn').unbind('click', remove).bind('click', remove);
 			//check if user change select or create a new one
@@ -130,6 +113,7 @@ function SegmentQuery() {
 
 			//mark that list has been edited
 			$container.data('edited', 'true');
+			$container.find('.id_rmbtn').removeClass('hidden');
 			if (values[0].type === 'action') {
 				$container.attr('data-id', values[0].id);
 				$container.attr('data-type', 'action');
@@ -142,7 +126,7 @@ function SegmentQuery() {
 				}
 				else if (values[1].value == 'sum') {
 					$container.attr('data-f', 'sum');
-					$container.find('.id_largequery').html('<b>Has done </b>' + "Sum of " + values[0].value);
+					$container.find('.id_largequery').html('<b>Has done </b> ' + values[0].value + " which <b>sum</b> of");
 
 					//make a operator select
 					$container.append(segmentop.produce({
@@ -152,7 +136,7 @@ function SegmentQuery() {
 				}
 				else if (values[1].value == 'avg') {
 					$container.attr('data-f', 'avg');
-					$container.find('.id_largequery').html('<b>Has done</b>' + "Average of " + values[0].value);
+					$container.find('.id_largequery').html('<b>Has done</b> ' + values[0].value + ' which <b>average</b> of ');
 
 					//make a operator select
 					$container.append(segmentop.produce({
@@ -169,10 +153,11 @@ function SegmentQuery() {
 			}
 			else if (values[0].type === 'prop') {
 				$container.attr('data-type', 'prop');
+				$container.attr('data-code', values[0].id);
 				$container.find('.id_largequery').html('<b>Has </b>' + values[0].value);
-				$container.find('.id_rmbtn').removeClass('hidden');
+
 				segmentop.destroy();
-				$container.append(segmentop.produce({defop: values[1].value}));
+				$container.append(segmentop.produce({canadd: false}));
 			}
 
 		}
@@ -299,7 +284,7 @@ function SegmentOp() {
 		//$container = $('<span style="display: inline-block">');
 	};
 
-	var $addBtn = $('<a href="#" class=" dim "><i class="fa fa-plus" style="margin-top: 11px;"></i></a>');
+	var $addBtn = $('<a href="#" class=" dim  id_addbtn"><i class="fa fa-plus" style="margin-top: 11px;"></i></a>');
 
 	$addBtn.click(function () {
 		var field = new FieldOp();
@@ -313,6 +298,8 @@ function SegmentOp() {
 
 	this.produce = function (options) {
 		options = options || {};
+
+		if (options.canadd == false) $addBtn.addClass('hidden');
 		defop = options.defop;
 		data = options.data;
 		fields = options.fields;
@@ -327,7 +314,11 @@ function SegmentOp() {
 			}))
 		}
 		else {
-			$container.append(field.produce({defop: options.defop, canremove: false, type: 'number', class: 'id_fop'}))
+			$container.append(field.produce({
+				defop: options.defop,
+				canremove: false,
+				class: 'id_fop'
+			}))
 		}
 
 		$container.append($addBtn);
