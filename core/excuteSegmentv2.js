@@ -1,16 +1,260 @@
-var testJson = [{
-  type: "purchase", f: "avg", field: "amount", operator: ">", value: 5,
-  conditions: ["amount", ">", 2, "and", "price", "==", 40]
-},
-	"and", {
-		type: "pageview", f: "count", field: "pid", operator: ">", value: 5,
-		conditions: ["amount", ">", 5, "and", "price", "==", "30"]
-	},
-  "and", {
-    type: undefined, field: 'gender',  operator: 'equal', value: 'male'
+"use strict";
 
+var converter = require('./utils/idmanager.js'),
+    async = require('async'),
+    mongodb = require('mongodb'),
+    converter = new converter.IdManager();
+
+function handleInput(object){
+  var sucback;
+  var errback;
+  var p = new Promise(function (resolve, reject) {
+    sucback = resolve;
+    errback = reject;
+  });
+
+  var counti = 0;
+  var countj = 0;
+  for(let i=0;i<object.length;i+=2){
+    counti++;
+    if(object[i].type === 'user'){
+      counti--;
+      if(object[i].conditions != undefined){
+        for(let j=0;j<object[i].conditions.length;j+=4){
+          countj++;
+          converter.toID(object[i].conditions[j])
+            .then(function(r){
+              object[i].conditions[j] = r;
+              countj--;
+              if(counti == 0 && countj == 0){
+                sucback(object);
+              }
+            }).catch(function(e){
+              errback(e);
+            });
+        }
+      }else if(counti == 0){
+        sucback(object);
+      }
+    }else{
+      converter.toID(object[i].field)
+        .then(function(r){
+          counti--;
+          object[i].field = r;
+          if(object[i].conditions != undefined){
+            for(let j=0;j<object[i].conditions.length;j+=4){
+              countj++;
+              converter.toID(object[i].conditions[j])
+                .then(function(r){
+                  object[i].conditions[j] = r;
+                  countj--;
+                  if(counti == 0 && countj == 0){
+                    sucback(object);
+                  }
+                }).catch(function(e){
+                  errback(e);
+                });
+            }
+          }else if(counti == 0){
+            sucback(object);
+          }
+        }).catch(function(e){
+          errback(e);
+        });
+    }
+  }
+  return p;
+}
+
+function queryFilter(object){
+  var sucback;
+  var errback;
+  var p = new Promise(function (resolve, reject) {
+    sucback = resolve;
+    errback = reject;
+  });
+
+  var length = object.length;
+  var query = {};
+
+  if(length > 1){
+    query['$or'] = [];
+    let c = 0;
+    for(let i=0;i<length;i+=2){
+      c++;
+      conditionToQuery(object[i])
+        .then(function(r){
+          query['$or'].push(r);
+          c--;
+          if(c == 0){
+            sucback(query);
+          }
+        }).catch(function(e){
+          errback(e);
+        });
+    }
+  }else{
+    conditionToQuery(object[0])
+      .then(function(r){
+        sucback(r);
+      }).catch(function(e){
+        errback(e);
+      });
+  }
+
+  return p;
+}
+
+function conditionToQuery(element){
+  var sucback;
+  var errback;
+  var p = new Promise(function (resolve, reject) {
+    sucback = resolve;
+    errback = reject;
+  });
+
+  var query = {};
+  if(element.conditions != undefined){
+    var conditions = element.conditions;
+    var size = conditions.length;
+
+    if(size > 3){
+      var hasOr = false;
+      for(var i=3;i<size;i+=4){
+        if(conditions[i] == 'or'){
+          hasOr = true;
+          break;
+        }
+      }
+      if(hasOr){
+        query['$or'] = [];
+        for(var i=0;i<size;i+=4){
+          if(conditions[i+3] == 'or'){
+            query['$or'].push(translateOperator(conditions, i));
+          }else{
+            for(var j=i+7;j<size;j+=4){
+              if(conditions[j] == 'or'){
+                break;
+              }
+            }
+            var andQuery = {'$and': []};
+            for(i;i<j;i+=4){
+              andQuery['$and'].push(translateOperator(conditions, i));
+            }
+            query['$or'].push(andQuery);
+          }
+        }
+      }else{
+        query['$and'] = [];
+        for(var i=0;i<size;i+=4){
+          query['$and'].push(translateOperator(conditions, i));
+        }
+      }
+
+    }else{
+      query = translateOperator(conditions, 0);
+    }
+
+    if(element.type == 'user'){
+      converter.toID('_isUser')
+        .then(function(r){
+          var temp = {};
+          temp[r] = true;
+          query = {'$and': [temp, query]};
+          sucback(query);
+        }).catch(function(e){
+          errback(e);
+        });
+    }else{
+      converter.toID('_typeid')
+        .then(function(r){
+          var temp = {};
+          temp[r] = new mongodb.ObjectID(element.type);
+          query = {'$and': [temp, query]};
+          sucback(query);
+        }).catch(function(e){
+          errback(e);
+        });
+    }
+  }else{
+    converter.toID('_typeid')
+      .then(function(r){
+        query[r] = new mongodb.ObjectID(element.type);
+        sucback(query);
+      });
+  }
+  return p;
+}
+
+function translateOperator(conditions, i){
+  var query = {};
+  switch(conditions[i+1]){
+    case 'gt':query[conditions[i]] = {
+                '$gt': conditions[i+2]
+              };
+              break;
+    case 'lt':query[conditions[i]] = {
+                '$lt': conditions[i+2]
+              };
+              break;
+    case 'eq':query[conditions[i]] = {
+                '$eq': conditions[i+2]
+              };
+              break;
+    case 'ne':query[conditions[i]] = {
+                '$ne': conditions[i+2]
+              };
+              break;
+    case 'gte':query[conditions[i]] = {
+                '$gte': conditions[i+2]
+              };
+              break;
+    case 'lte':query[conditions[i]] = {
+                '$lte': conditions[i+2]
+              };
+              break;
+    case 'con':query[conditions[i]] = {
+                '$regex': conditions[i+2]
+              }
+              break; 
+    case 'ncon':query[conditions[i]] = {
+                  '$regex': "^((?!" + conditions[i+2] + ").)*$/"
+                }
+                break;
+    case 'sw':query[conditions[i]] = {
+                '$regex': '^'+conditions[i+2]
+              }
+              break;
+    case 'ew':query[conditions[i]] = {
+                '$regex': conditions[i+2]+'$'
+              }
+              break;                                                                             
+  }
+  return query;
+}
+
+var testJson = [{
+    type: "56e3a14a44ae6d70ddbf82a2", f: "avg", field: "amount", operator: ">", value: 5,
+    conditions: ["amount", "gt", 2, "and", "price", "eq", 40]
+  },
+  "and", 
+  {
+    type: "56e3a14a44ae6d70ddbf82a2", f: "count", field: "pid", operator: ">", value: 5,
+    conditions: ["amount", "gt", 5, "and", "price", "eq", "30"]
+  },
+  "and", 
+  {
+    type: 'user',
+    conditions: ["gender", "eq", "male"]
   }];
 
+handleInput(testJson)
+  .then(function(r){
+    console.log(r);
+    return queryFilter(r);
+  }).then(function(r){
+    console.log(JSON.stringify(r));
+  });
 
 //purpose: build javascript code based on json condition
 //example: buildConditionsCode(["amount", ">", 5, "and", "price", "=", "30"])
