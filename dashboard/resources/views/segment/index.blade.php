@@ -4,6 +4,7 @@
 	<script src="{{asset('js/cs.segmentop.js')}}"></script>
 	<script src="{{asset('js/cs.segment.query.js')}}"></script>
 	<script>
+		var sq;
 		var actions ={!!   $actions !!} ;
 		var props ={!! $props !!};
 
@@ -25,7 +26,7 @@
 
 		$(function () {
 
-			var sq = new SegmentQuery();
+			sq = new SegmentQuery();
 
 			sq.produce(function ($query) {
 				$('.id_query').append($query);

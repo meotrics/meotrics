@@ -5,7 +5,12 @@ var testJson = [{
 	"and", {
 		type: "pageview", f: "count", field: "pid", operator: ">", value: 5,
 		conditions: ["amount", ">", 5, "and", "price", "==", "30"]
-	}];
+	},
+  "and", {
+    type: undefined,
+    conditions:["gender", "contains", 'male']
+
+  }];
 
 
 //purpose: build javascript code based on json condition
