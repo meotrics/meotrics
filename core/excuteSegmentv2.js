@@ -7,8 +7,7 @@ var testJson = [{
 		conditions: ["amount", ">", 5, "and", "price", "==", "30"]
 	},
   "and", {
-    type: undefined,
-    conditions:["gender", "contains", 'male']
+    type: undefined, field: 'gender',  operator: 'equal', value: 'male'
 
   }];
 
