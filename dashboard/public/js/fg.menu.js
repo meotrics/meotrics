@@ -247,14 +247,14 @@ function Menu(caller, options){
 		container.find('.fg-recent').removeClass('fg-recent');
 
 		var values = [];
-		var $item = $(item);
-		var $e = $item;
+
+		var $e = $(item);
 		while($e.parent().hasClass('fg-menu-container') === false)
 		{
 			$e = $e.parent();
 			if($e.is('li')) {
 
-				values = [{ type: $e.data('type'), value: $e.data('value')}].concat(values);
+				values = [{ type: $e.data('type'), value: $e.data('value'), id: $e.data('id')}].concat(values);
 				$e.addClass('fg-recent');
 			}
 		}
