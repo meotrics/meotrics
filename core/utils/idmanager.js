@@ -101,7 +101,7 @@ exports.IdManager = function () {
 	var me = this;
 	this.toIDs = function (names, callback) {
 		var outs = {};
-		var n = names.length()
+		var n = names.length;
 		for (var i in names) {
 			(function (j) {
 				me.toID(names[j]).then(function (out) {
@@ -142,7 +142,6 @@ exports.IdManager = function () {
 				if (value == null) {
 					newID(function (newid) {
 						db.set(newid, name);
-						console.log('sss_' + name + "|" + defname);
 						db.set(' ' + name, newid);
 						db.set('_' + zip(newid), defname);
 						if (name.startsWith("$"))

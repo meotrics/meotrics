@@ -28,3 +28,6 @@ idmgr.toObject(obj).then(function(ret, val){
     console.log(rets);
   }).catch(mtthrow)
 }).catch(mtthrow);
+
+
+idmgr.toIDs(['_id', 'thanh', 'surff'], function(out){console.log(11,out)});
