@@ -1,10 +1,12 @@
 var MongoClient = require('mongodb').MongoClient,
-    url = 'mongodb://localhost:1234/test',
-    n = 100000,
+    url = 'mongodb://localhost:1234/local',
+    n = 20000,
     collection = 'test',
     users = null,
     numberUsers = 0,
-    db = null;
+    db = null,
+    converter = require('./idmanager.js'),
+    converter = new converter.IdManager();
 
     var mongodb = require('mongodb');
 
@@ -25,7 +27,11 @@ function getUsers(){
             db.on('close', function(err){
               console.log('[MongoDB] disconnected');
             });
-            return db.collection('test').find({isUser: true}).toArray();
+            return converter.toID('_isUser');
+        }).then(function(r){
+            var query = {};
+            query[r] = true;
+            return db.collection(collection).find(query, {_id: 1}).toArray();
         }).then(function(results){
             users = results;
             numberUsers = users.length;
@@ -39,10 +45,10 @@ function getUsers(){
 function generatePageView(){
 	var user = users[generateNumber(0, numberUsers-1)];
 	return {
-		typeid: new mongodb.ObjectID("56dab10544aee0d1bd499a27"),
+		_typeid: new mongodb.ObjectID("56dab10544aee0d1bd499a27"),
 		url: 'http://' + generateNumber(1, 1000) + '.com',
-		ctime: Math.floor(new Date().getTime()/1000),
-		mtid: user._id
+		_ctime: Math.floor(new Date().getTime()/1000),
+		_mtid: user._id
 	}
 }
 
@@ -50,11 +56,12 @@ function generatePurchase(){
     var user = users[generateNumber(0, numberUsers-1)];
     var pid = generateNumber(1, 1000);
     return {
-        typeid: new mongodb.ObjectID("56dab10c44aee0d1bd499a29"),
-        ctime: Math.floor(new Date().getTime()/1000),
-        mtid: user._id,
+        _typeid: new mongodb.ObjectID("56dab10c44aee0d1bd499a29"),
+        _ctime: Math.floor(new Date().getTime()/1000),
+        _mtid: user._id,
         cid: pid%10,
         pid: pid,
+        _ctime: Math.floor(new Date().getTime()/1000),
         amount: generateNumber(1, 10),
         price: generateNumber(10, 200)
     }
@@ -70,11 +77,14 @@ function generateNumber(min, max){
 function generateDB(){
     var count = 0;
     for(var i=0;i<n;i++){
-        db.collection(collection).insertOne(generatePurchase())
-            .then(function(results){
-                count++;
-                console.log(count + ' records');
-                if(count == n){
+        count++;
+        converter.toObject(generatePageView())
+            .then(function(r){
+                return db.collection(collection).insertOne(r);
+            }).then(function(results){
+                count--;
+                console.log((n-count) + ' records');
+                if(count == 0){
                     db.close();
                     console.log('Done');
                 }

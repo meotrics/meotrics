@@ -1,7 +1,9 @@
-var MongoClient = require('mongodb').MongoClient,
+var converter = require('./idmanager.js'),
+	converter = new converter.IdManager(),
+	MongoClient = require('mongodb').MongoClient,
 	url = 'mongodb://localhost:1234/local',
 	n = 20000,
-	collection = 'meotrics_1';
+	collection = 'test';
 
 function generateDB(){
 	MongoClient.connect(url)
@@ -9,11 +11,14 @@ function generateDB(){
 		    console.log('[MongoDB] connected');
 		    var count = 0;
 		    for(var i=0;i<n;i++){
-		    	db.collection(collection).insertOne(generateUsers())
-		    		.then(function(results){
-		    			count++;
-		    			console.log(count + ' records');
-		    			if(count == n){
+		    	count++;
+		    	converter.toObject(generateUsers())
+		    		.then(function(r){
+		    			return db.collection(collection).insertOne(r);
+		    		}).then(function(results){
+		    			count--;
+		    			console.log((n-count) + ' records');
+		    			if(count == 0){
 		    				db.close();
 		    				console.log('Done');
 		    			}
@@ -42,7 +47,7 @@ function generateDB(){
 
 function generateUsers(){
 	return {
-		isUser: true,
+		_isUser: true,
 		name: generateName(),
 		height: generateNumber(150, 180),
 		iq: generateNumber(30, 40),
