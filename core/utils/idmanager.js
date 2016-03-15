@@ -1,6 +1,6 @@
-'use strict'
-var config = require('config')
-var redis = require("redis")
+'use strict';
+var config = require('config');
+var redis = require("redis");
 
 
 //will call callback after call done() for n times
@@ -66,10 +66,6 @@ exports.IdManager = function () {
 		return ((N < 0) ? "-" + HexN : HexN);
 	}
 
-	function fromRadix(S, radis) {
-
-	}
-
 	var db = redis.createClient(config.get('redis.port'), config.get('redis.host'));
 	db.auth(config.get('redis.password'), function () {
 	});
@@ -98,7 +94,6 @@ exports.IdManager = function () {
 		}
 	}
 
-	var me = this;
 	this.toIDs = function (names, callback) {
 		var outs = {};
 		var n = names.length;
@@ -160,9 +155,7 @@ exports.IdManager = function () {
 		}
 
 		return p;
-
-
-	}
+	};
 
 	this.toOriginal = function (object) {
 		var sucback;
@@ -207,7 +200,7 @@ exports.IdManager = function () {
 
 		}
 		return p;
-	}
+	};
 
 	this.toObject = function (object) {
 		var sucback;
@@ -216,8 +209,6 @@ exports.IdManager = function () {
 			sucback = resolve;
 			errback = reject;
 		});
-
-
 		var newobj = {};
 		var ci = 0;
 		for (let i in object) {
@@ -230,5 +221,4 @@ exports.IdManager = function () {
 		}
 		return p;
 	}
-
-}
+};
