@@ -427,16 +427,17 @@ function route(app, db, segmgr, prefix, mongodb) {
 	*/
 	app.get('/s/:appid', function (req, res) {
 		var collection = prefix + req.params.appid;
-		converter.toID('_isUser')
+		var query = {
+			_isUser: true,
+			_segments: []
+		}
+		converter.toObject(query)
 			.then(function(r){
-				var query = {};
-				query[r] = true;
-				return db.collection(collection).insertOne(query);
+				return db.collection(collection).insertOne(r);
 			}).then(function (results) {
 				var _mtid = results.insertedId;
 				res.send(_mtid);	
 			}).catch(mtthrow);
-		
 	});
 
 	//SEGMENTATION-------------------------------------------------------------
