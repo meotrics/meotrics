@@ -1,9 +1,12 @@
 "use strict";
 
-var IDMgr = require('./utils/idmanager.js'),
+var IDMgr = require('./utils/fakeidmanager.js'),
 		async = require('async'),
 		mongodb = require('mongodb'),
 		converter = new IDMgr.IdManager();
+
+//Chú ký triển khai hàm sinh match
+//phải chia ra làm 2 loại, phép toán trên người và action
 
 function handleInput(object) {
 	var sucback;
@@ -129,10 +132,14 @@ function conditionToQuery(element) {
 	});
 
 	var query = {};
+
+	//you can decrease indenting by putting the else in front of the if
 	if (element.conditions != undefined) {
 		var conditions = element.conditions;
 		var size = conditions.length;
 		var hasOr = false;
+		// you dont have to check for <or> operator, <or> and <and> operator
+		// are treated same way, just delete the loop and the if
 		for (var i = 3; i < size; i += 4) {
 			if (conditions[i] == 'or') {
 				hasOr = true;
@@ -207,6 +214,7 @@ function conditionToQuery(element) {
 	return p;
 }
 
+//really, put conditions[i+2] to a variable, its much easier to read
 function translateOperator(conditions, i) {
 	var query = {};
 	switch (conditions[i + 1]) {
@@ -275,7 +283,7 @@ var testJson =
 			"and",
 			{
 				type: 'user',
-				conditions: []
+				conditions: ['age', 'eq', 'male']
 			}];
 
 handleInput(testJson)
@@ -291,12 +299,12 @@ handleInput(testJson)
 //example: buildMapChunk({actiontype: "pageview", conditions: [{f: "count", field: "pid", operator: ">", value: 5, conditions: ["amount", ">", 5, "and", "price", "=", "dd"]})
 //return: string contains compiled javascript code
 //param: i=index of condition, for iteration purpose, condition=see example
-function buildChunk(ind, element) {
+function buildChunk(ind, element, _typeid) {
 	var reducecondcode = "";
 	var reduceinitcode = "";
 	var reduceaggcode = "";
 
-	var code = 'if(this.actiontype==="' + element.type + '"){';
+	var code = 'if(this["' + _typeid + '"]===ObjectId("' + element.type + '")){';
 	//var conditions = element.conditions;
 	var defvalcode = "";
 	//var aggcode = "";
@@ -311,14 +319,14 @@ function buildChunk(ind, element) {
 		reduceinitcode += "returnObject.f" + ind + "=0;";
 		reduceaggcode += "returnObject.f" + ind + "+=value.f" + ind + ";";
 		defvalcode += "value.f" + ind + "=0;";
-		reducecondcode += "(value.f" + ind + element.operator + JSON.stringify(element.value) + ")";
+		reducecondcode += "(returnObject.f" + ind + element.operator + JSON.stringify(element.value) + ")";
 	}
 	else if (element.f === "sum") {
 		code += "value.f" + ind + "=(" + inlineconditions + ")?this." + element.field + ":0;";
 		reduceinitcode += "returnObject.f" + ind + "=0;";
 		reduceaggcode += "returnObject.f" + ind + "+=value.f" + ind + ";";
 		defvalcode += "value.f" + ind + "=0;";
-		reducecondcode += "(value.f" + ind + element.operator + JSON.stringify(element.value) + ")";
+		reducecondcode += "(returnObject.f" + ind + element.operator + JSON.stringify(element.value) + ")";
 	}
 	else if (element.f === "avg") {
 		code += "value.f" + ind + "_1=(" + inlineconditions + ")?this." + element.field + ":0;";
@@ -329,7 +337,7 @@ function buildChunk(ind, element) {
 		reduceaggcode += "returnObject.f" + ind + "_2+=value.f" + ind + "_2;";
 		defvalcode += "value.f" + ind + "_1=0;";
 		defvalcode += "value.f" + ind + "_2=0;";
-		reducecondcode += "(1.0*value.f" + ind + "_1/value.f" + ind + "_2" + element.operator + JSON.stringify(element.value) + ")";
+		reducecondcode += "(1.0*returnObject.f" + ind + "_1/returnObject.f" + ind + "_2" + element.operator + JSON.stringify(element.value) + ")";
 	}
 	else throw "wrong operator";
 
@@ -377,39 +385,39 @@ function buildMapReduce(segmentid, query, callback) {
 	var _id = 0;
 	var _mtid = 0;
 	converter.toIDs(['_isUser', '_segments', '_id', '_mtid'], function (ids) {
-		var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true){if(this["' + ids._segments + '"].indexOf(ObjectId("' + segmentid + '"))==-1)return;userid=this["' + ids._id + '"];value=this;}else{if(this["' + ids._segments + '"].indexOf(ObjectId( "' + segmentid + '"))==-1) return;userid=this["' + ids._mtid + '"];';
+		var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true){if(this["' + ids._segments + '"].indexOf(ObjectId("' + segmentid + '"))==-1)return;userid=this["' + ids._id + '"];value._hasUser=true;}else{if(this["' + ids._segments + '"].indexOf(ObjectId( "' + segmentid + '"))==-1) return;userid=this["' + ids._mtid + '"];';
 
-		mapfunccode = mapinitcode + mapfunccode + "}emit(userid,value)}";
-		var reducefunccode = "function(key,values){var returnObject={};" + reduceinitcode + "for(var i in values){var value=values[i];" + reduceaggcode + "};return " + reducecondcode + "?key:null;}";
+		mapfunccode = mapinitcode + mapfunccode + "}emit(userid,value);}";
+		var reducefunccode = "function(key,values){var returnObject={};" + reduceinitcode + "var hasUser=false;for(var i in values){var value=values[i];if(value._hasUser==true)hasUser=true;" + reduceaggcode + "};return " + reducecondcode + "&&hasUser==true?key:null;}";
 		if (callback !== undefined)callback({map: mapfunccode, reduce: reducefunccode});
 	});
 }
 
+//function () {
+//	var value = {};
+//	var userid = -1;
+//	if (this["_isUser"] == true) {
+//		if (this["_segments"].indexOf(ObjectId("adc43c")) == -1)return;
+//		userid = this["_id"];
+//		value._hasUser = true;
+//	} else {
+//		if (this["_segments"].indexOf(ObjectId("adc43c")) == -1) return;
+//		userid = this["_mtid"];
+//		value.f0_1 = 0;
+//		value.f0_2 = 0;
+//		if (this["undefined"] === ObjectId("56e3a14a44ae6d70ddbf82a2")) {
+//			value.f0_1 = (true) ? this.amount : 0;
+//			value.f0_2 = (true) ? 1 : 0;
+//		}
+//		;
+//		value.f1 = 0;
+//		if (this["undefined"] === ObjectId("56e3a14a44ae6d70ddbf82a2")) {
+//			value.f1 = (true) ? 1 : 0;
+//		}
+//		;
+//	}
+//	emit(userid, value);
+//}
 
-function () {
-	var value = {};
-	var userid = -1;
-	if (this["undefined"] == true) {
-		if (this["undefined"].indexOf(ObjectId("adc43c")) == -1) return; else {
-			userid = this["undefined"];
-			value = this;
-		}
-	}
-	else {
-		if (this["undefined"].indexOf(ObjectId("adc43c")) == -1) return;
-		userid = this["undefined"];
-		value.f0_1 = 0;
-		value.f0_2 = 0;
-		if (this.actiontype === "56e3a14a44ae6d70ddbf82a2") {
-			value.f0_1 = (true) ? this.amount : 0;
-			value.f0_2 = (true) ? 1 : 0;
-		}
-		;
-		value.f1 = 0;
-		if (this.actiontype === "56e3a14a44ae6d70ddbf82a2") {
-			value.f1 = (true) ? 1 : 0;
-		}
-		;
-	}
-	emit(userid, value)
-}
+
+
