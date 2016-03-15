@@ -98,6 +98,23 @@ exports.IdManager = function () {
 		}
 	}
 
+	var me = this;
+	this.toIDs = function (names, callback) {
+		var outs = {};
+		var n = names.length()
+		for (var i in names) {
+			(function (j) {
+				me.toID(names[j]).then(function (out) {
+					n--;
+
+					outs[names[j]] = out;
+					if (n == 0)
+						callback(outs);
+				});
+			})(i);
+		}
+	};
+
 	this.toID = function (name) {
 		var defname = name;
 		var sucback;
