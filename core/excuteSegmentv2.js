@@ -77,7 +77,7 @@ function queryFilter(object){
   var length = object.length;
   var query = {};
 
-  if(length > 1){
+  if(length != 0){
     query['$or'] = [];
     let c = 0;
     for(let i=0;i<length;i+=2){
@@ -87,19 +87,34 @@ function queryFilter(object){
           query['$or'].push(r);
           c--;
           if(c == 0){
-            sucback(query);
+            var hasUser = false;
+            for(var i=0;i<length;i+=2){
+              if(object[i].type == 'user'){
+                hasUser = true;
+                break;
+              }
+            }
+
+            if(hasUser){
+              sucback(query);
+            }else{  
+              converter.toID('_isUser')
+                .then(function(r){
+                  var temp = {};
+                  temp[r] = true;
+                  query['$or'].push(temp);
+                  sucback(query);
+                }).catch(function(e){
+                  errback(e);
+                });
+            }
           }
         }).catch(function(e){
           errback(e);
         });
     }
   }else{
-    conditionToQuery(object[0])
-      .then(function(r){
-        sucback(r);
-      }).catch(function(e){
-        errback(e);
-      });
+    sucback({});
   }
 
   return p;
@@ -129,7 +144,7 @@ function conditionToQuery(element){
       if(hasOr){
         query['$or'] = [];
         for(var i=0;i<size;i+=4){
-          if(conditions[i+3] == 'or'){
+          if((conditions[i+3] == 'or')||(i+3 == size)){
             query['$or'].push(translateOperator(conditions, i));
           }else{
             for(var j=i+7;j<size;j+=4){
@@ -145,9 +160,11 @@ function conditionToQuery(element){
           }
         }
       }else{
-        query['$and'] = [];
+        query = {};
         for(var i=0;i<size;i+=4){
-          query['$and'].push(translateOperator(conditions, i));
+          var returnValue = translateOperator(conditions, i);
+          var key = Object.keys(returnValue)[0];
+          query[key] = returnValue[key];
         }
       }
 
@@ -158,9 +175,14 @@ function conditionToQuery(element){
     if(element.type == 'user'){
       converter.toID('_isUser')
         .then(function(r){
-          var temp = {};
-          temp[r] = true;
-          query = {'$and': [temp, query]};
+          console.log("USER");
+          if(query['$or'] != undefined){
+            var temp = {};
+            temp[r] = true;
+            query = {"$and": [temp, query]};
+          }else{
+            query[r] = true;  
+          }
           sucback(query);
         }).catch(function(e){
           errback(e);
@@ -168,9 +190,14 @@ function conditionToQuery(element){
     }else{
       converter.toID('_typeid')
         .then(function(r){
-          var temp = {};
-          temp[r] = new mongodb.ObjectID(element.type);
-          query = {'$and': [temp, query]};
+          console.log("NOT USER");
+          if(query['$or'] != undefined){
+            var temp = {};
+            temp[r] = new mongodb.ObjectID(element.type);
+            query = {'$and': [temp, query]};
+          }else{
+            query[r] =  new mongodb.ObjectID(element.type);     
+          }
           sucback(query);
         }).catch(function(e){
           errback(e);
@@ -197,9 +224,7 @@ function translateOperator(conditions, i){
                 '$lt': conditions[i+2]
               };
               break;
-    case 'eq':query[conditions[i]] = {
-                '$eq': conditions[i+2]
-              };
+    case 'eq':query[conditions[i]] = conditions[i+2];
               break;
     case 'ne':query[conditions[i]] = {
                 '$ne': conditions[i+2]
@@ -233,19 +258,20 @@ function translateOperator(conditions, i){
   return query;
 }
 
-var testJson = [{
+var testJson = 
+[{
     type: "56e3a14a44ae6d70ddbf82a2", f: "avg", field: "amount", operator: ">", value: 5,
     conditions: ["amount", "gt", 2, "and", "price", "eq", 40]
   },
   "and", 
   {
     type: "56e3a14a44ae6d70ddbf82a2", f: "count", field: "pid", operator: ">", value: 5,
-    conditions: ["amount", "gt", 5, "and", "price", "eq", "30"]
+    conditions: ["amount", "gt", 5, "or", "price", "eq", "30"]
   },
   "and", 
   {
     type: 'user',
-    conditions: ["gender", "eq", "male"]
+    conditions: ["gender", "eq", "male", 'or', 'sexy', "gt", 1]
   }];
 
 handleInput(testJson)
