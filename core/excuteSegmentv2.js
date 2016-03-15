@@ -132,44 +132,38 @@ function conditionToQuery(element){
   if(element.conditions != undefined){
     var conditions = element.conditions;
     var size = conditions.length;
-
-    if(size > 3){
-      var hasOr = false;
-      for(var i=3;i<size;i+=4){
-        if(conditions[i] == 'or'){
-          hasOr = true;
-          break;
-        }
+    var hasOr = false;
+    for(var i=3;i<size;i+=4){
+      if(conditions[i] == 'or'){
+        hasOr = true;
+        break;
       }
-      if(hasOr){
-        query['$or'] = [];
-        for(var i=0;i<size;i+=4){
-          if((conditions[i+3] == 'or')||(i+3 == size)){
-            query['$or'].push(translateOperator(conditions, i));
-          }else{
-            for(var j=i+7;j<size;j+=4){
-              if(conditions[j] == 'or'){
-                break;
-              }
+    }
+    if(hasOr){
+      query['$or'] = [];
+      for(var i=0;i<size;i+=4){
+        if((conditions[i+3] == 'or')||(i+3 == size)){
+          query['$or'].push(translateOperator(conditions, i));
+        }else{
+          for(var j=i+7;j<size;j+=4){
+            if(conditions[j] == 'or'){
+              break;
             }
-            var andQuery = {'$and': []};
-            for(i;i<j;i+=4){
-              andQuery['$and'].push(translateOperator(conditions, i));
-            }
-            query['$or'].push(andQuery);
           }
-        }
-      }else{
-        query = {};
-        for(var i=0;i<size;i+=4){
-          var returnValue = translateOperator(conditions, i);
-          var key = Object.keys(returnValue)[0];
-          query[key] = returnValue[key];
+          var andQuery = {'$and': []};
+          for(i;i<j;i+=4){
+            andQuery['$and'].push(translateOperator(conditions, i));
+          }
+          query['$or'].push(andQuery);
         }
       }
-
     }else{
-      query = translateOperator(conditions, 0);
+      query = {};
+      for(var i=0;i<size;i+=4){
+        var returnValue = translateOperator(conditions, i);
+        var key = Object.keys(returnValue)[0];
+        query[key] = returnValue[key];
+      }
     }
 
     if(element.type == 'user'){
@@ -271,7 +265,7 @@ var testJson =
   "and", 
   {
     type: 'user',
-    conditions: ["gender", "eq", "male", 'or', 'sexy', "gt", 1]
+    conditions: []
   }];
 
 handleInput(testJson)
