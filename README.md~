@@ -49,7 +49,7 @@ trỏ danh sách tên miền sau
 	Chuyển vào thư mục dashboard (`meotrics/dashboard`), tạo thư mục database, gõ
 
 	```
-	composer install
+	composer require "laravel/installer"
 	```
 	
 	**Tạo một file .env có nội dung giống với .env.example, sửa config csdl ở đây**
