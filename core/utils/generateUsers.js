@@ -9,7 +9,7 @@ function generateDB(converter, url, n, collection, callback) {
 			.then(function (db) {
 				console.log('[MongoDB] connected');
 				var count = 0;
-				converter.toIDs(['_isUser', 'name', 'age', 'iq', 'gender', 'height'], function (ids) {
+				converter.toIDs(['_isUser', 'name', 'age', 'iq', 'gender', 'height', '_segments'], function (ids) {
 					for (var i = 0; i < n; i++) {
 						count++;
 						var user = generateUsers(ids);
@@ -55,6 +55,7 @@ function generateUsers(ids) {
 	users[ids.name] = generateName();
 	users[ids.height] = generateNumber(150, 180);
 	users[ids.iq] = generateNumber(30, 40);
+	users[ids._segments] = [];
 	users[ids.age] = generateNumber(20, 60);
 	users[ids.gender] = generateNumber(1, 2) == 1 ? 'male' : 'female';
 	// console.log(users);

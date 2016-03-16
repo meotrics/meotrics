@@ -55,6 +55,7 @@ function generatePageView(ids) {
 	var page = {};
 	page[ids._typeid] = new mongodb.ObjectID("56e8c128282aa21428689c6a");
 	page[ids.url] = 'http://' + generateNumber(1, 1000) + '.com';
+    page[ids._segments] = [];
 	page[ids.camid] = generateNumber(1, 10);
 	page[ids._ctime] = Math.floor(new Date().getTime() / 1000);
 	page[ids._mtid] = user._id;
@@ -68,6 +69,7 @@ function generatePurchase(ids) {
 	purchase[ids._typeid] = new mongodb.ObjectID("56e8c0ca282aa21428689c68");
 	purchase[ids._ctime] = Math.floor(new Date().getTime() / 1000);
 	purchase[ids._mtid] = user._id;
+    purchase[ids._segments] = [];
 	purchase[ids.cid] = pid % 10;
 	purchase[ids.pid] = pid;
 	purchase[ids.quantity] = generateNumber(1, 10);
@@ -85,7 +87,7 @@ function generateNumber(min, max) {
 function generateDB(actiontype, converter, url, n, collection, callback) {
 	var count = 0;
 	if (actiontype == 'purchase') {
-		converter.toIDs(['_typeid', '_ctime', '_mtid', 'cid', 'pid', 'quantity', 'price'], function (ids) {
+		converter.toIDs(['_typeid', '_ctime', '_mtid', 'cid', 'pid', 'quantity', 'price', '_segments'], function (ids) {
 			for (var i = 0; i < n; i++) {
 				count++;
 				var r = generatePurchase(ids);
@@ -106,7 +108,7 @@ function generateDB(actiontype, converter, url, n, collection, callback) {
 			;
 		});
 	} else {
-		converter.toIDs(['_typeid', 'url', 'camid', '_ctime', '_mtid'], function (ids) {
+		converter.toIDs(['_typeid', 'url', 'camid', '_ctime', '_mtid', '_segments'], function (ids) {
 			for (var i = 0; i < n; i++) {
 				count++;
 				var r = generatePageView(ids);
