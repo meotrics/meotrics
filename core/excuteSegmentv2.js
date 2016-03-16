@@ -58,6 +58,9 @@ function handleInput(object) {
 						errback(e);
 					});
 				}
+				if(object[i].conditions.length == 0){
+					sucback(object);
+				}
 			} else if (counti == 0) {
 				sucback(object);
 			}
@@ -66,7 +69,6 @@ function handleInput(object) {
 				counti--;
 				object[i].field = r;
 				if (object[i].conditions != undefined) {
-					console.log(2);
 
 					for (let j = 0; j < object[i].conditions.length; j += 4) {
 						countj++;
