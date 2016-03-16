@@ -10,7 +10,7 @@ var MongoClient = require('mongodb').MongoClient,
 
     var mongodb = require('mongodb');
 
-function getUsers(){
+function getUsers(actiontype){
     MongoClient.connect(url)
         .then(function(database){
             console.log('[MongoDB] connected');
@@ -27,6 +27,7 @@ function getUsers(){
             db.on('close', function(err){
               console.log('[MongoDB] disconnected');
             });
+
             return converter.toID('_isUser');
         }).then(function(r){
             var query = {};
@@ -35,36 +36,36 @@ function getUsers(){
         }).then(function(results){
             users = results;
             numberUsers = users.length;
-            generateDB();
+            generateDB(actiontype);
         }).catch(function(err){
             console.error("[MongoDB]", err.message);
             setTimeout(getUsers, 2000);
         }); 
 }
 
-function generatePageView(){
+function generatePageView(ids){
 	var user = users[generateNumber(0, numberUsers-1)];
-	return {
-		_typeid: new mongodb.ObjectID("56dab10544aee0d1bd499a27"),
-		url: 'http://' + generateNumber(1, 1000) + '.com',
-		_ctime: Math.floor(new Date().getTime()/1000),
-		_mtid: user._id
-	}
+    var page = {};
+    page[ids._typeid] = new mongodb.ObjectID("56e8c128282aa21428689c6a");
+    page[ids.url] = 'http://' + generateNumber(1, 1000) + '.com';
+    page[ids.camid] = generateNumber(1, 10);
+    page[ids._ctime] = Math.floor(new Date().getTime()/1000);
+    page[ids._mtid] = user._id;
+	return page;
 }
 
-function generatePurchase(){
+function generatePurchase(ids){
     var user = users[generateNumber(0, numberUsers-1)];
     var pid = generateNumber(1, 1000);
-    return {
-        _typeid: new mongodb.ObjectID("56dab10c44aee0d1bd499a29"),
-        _ctime: Math.floor(new Date().getTime()/1000),
-        _mtid: user._id,
-        cid: pid%10,
-        pid: pid,
-        _ctime: Math.floor(new Date().getTime()/1000),
-        amount: generateNumber(1, 10),
-        price: generateNumber(10, 200)
-    }
+    var purchase = {};
+    purchase[ids._typeid] = new mongodb.ObjectID("56e8c0ca282aa21428689c68");
+    purchase[ids._ctime] = Math.floor(new Date().getTime()/1000);
+    purchase[ids._mtid] = user._id;
+    purchase[ids.cid] = pid%10;
+    purchase[ids.pid] = pid;
+    purchase[ids.quantity] = generateNumber(1, 10);
+    purchase[ids.price] = generateNumber(10, 200);
+    return purchase;
 }
 
 function generateNumber(min, max){
@@ -74,24 +75,45 @@ function generateNumber(min, max){
     return number;
 }
 
-function generateDB(){
+function generateDB(actiontype){
     var count = 0;
-    for(var i=0;i<n;i++){
-        count++;
-        converter.toObject(generatePageView())
-            .then(function(r){
-                return db.collection(collection).insertOne(r);
-            }).then(function(results){
-                count--;
-                console.log((n-count) + ' records');
-                if(count == 0){
-                    db.close();
-                    console.log('Done');
-                }
-            }).catch(function(err){
-                console.log('[MongoDB] insert err', err.message);
-            });
+    if(actiontype == 'purchase'){
+        converter.toIDs(['_typeid', '_ctime', '_mtid', 'cid', 'pid', 'quantity', 'price'], function(ids){
+            for(var i=0;i<n;i++){
+                count++;
+                var r = generatePurchase(ids);
+                db.collection(collection).insertOne(r)
+                   .then(function(results){
+                    count--;
+                    console.log((n-count) + ' records');
+                    if(count == 0){
+                        db.close();
+                        console.log('Done');
+                    }
+                }).catch(function(err){
+                    console.log('[MongoDB] insert err', err.message);
+                }); 
+            };              
+        });  
+    }else{
+        converter.toIDs(['_typeid', 'url', 'camid', '_ctime', '_mtid'], function(ids){
+            for(var i=0;i<n;i++){
+                count++;
+                var r = generatePageView(ids);
+                db.collection(collection).insertOne(r)
+                   .then(function(results){
+                    count--;
+                    console.log((n-count) + ' records');
+                    if(count == 0){
+                        db.close();
+                        console.log('Done');
+                    }
+                }).catch(function(err){
+                    console.log('[MongoDB] insert err', err.message);
+                }); 
+            };              
+        });
     }
 }
 
-getUsers();
+getUsers('pageview');
