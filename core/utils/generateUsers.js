@@ -10,22 +10,26 @@ function generateDB(){
 	  	.then(function(db){
 		    console.log('[MongoDB] connected');
 		    var count = 0;
-		    for(var i=0;i<n;i++){
-		    	count++;
-		    	converter.toObject(generateUsers())
-		    		.then(function(r){
-		    			return db.collection(collection).insertOne(r);
-		    		}).then(function(results){
-		    			count--;
-		    			console.log((n-count) + ' records');
-		    			if(count == 0){
-		    				db.close();
-		    				console.log('Done');
-		    			}
-		    		}).catch(function(err){
-		    			console.log('[MongoDB] insert err', err.message);
-		    		});
-		    }
+		    converter.toIDs(['_isUser', 'name', 'age', 'iq', 'gender', 'height'], function(ids){
+		    	console.log(ids);
+		    	for(var i=0;i<n;i++){
+		    		console.log('hha');
+			    	count++;
+			    	var user = generateUsers(ids);
+			    	console.log(user);
+					db.collection(collection).insertOne(user)
+			 			.then(function(results){
+			    			count--;
+			    			console.log((n-count) + ' records');
+			    			if(count == 0){
+			    				db.close();
+			    				console.log('Done');
+			    			}
+			    		}).catch(function(err){
+			    			console.log('[MongoDB] insert err', err.message);
+			    		});	
+		    	}
+		    });
 		    
 		    // Listen for some events
 		    db.on('reconnect', function(data){
@@ -44,16 +48,16 @@ function generateDB(){
 	  	});	
 }
 
-
-function generateUsers(){
-	return {
-		_isUser: true,
-		name: generateName(),
-		height: generateNumber(150, 180),
-		iq: generateNumber(30, 40),
-		age: generateNumber(20, 60),
-		gender: generateNumber(1,2) == 1? 'male':'female'
-	};
+function generateUsers(ids){
+	var users = {};
+	users[ids._isUser] = true;
+	users[ids.name] = generateName();
+	users[ids.height] = generateNumber(150, 180);
+	users[ids.iq] = generateNumber(30, 40);
+	users[ids.age] = generateNumber(20, 60);
+	users[ids.gender] = generateNumber(1, 2) == 1? 'male' : 'female';
+	// console.log(users);
+	return users;
 }
 
 function generateNumber(min, max){
