@@ -8,6 +8,28 @@ var IDMgr = require('./utils/fakeidmanager.js'),
 //Chú ký triển khai hàm sinh match
 //phải chia ra làm 2 loại, phép toán trên người và action
 
+exports.getQuery = function (segmentid, json, callback) {
+	console.log(json);
+	handleInput(json).then(function (r) {
+		console.log(r);
+		return queryFilter(r);
+	}).then(function (r) {
+		buildMapReduce(segmentid, json, function (ret) {
+			ret.option = r;
+			callback(ret);
+		});
+	}).catch(mtthrow);
+};
+
+function mtthrow(err) {
+	if (err) {
+		console.log(err);
+		setTimeout(function () {
+			throw err;
+		});
+	}
+}
+
 function handleInput(object) {
 	var sucback;
 	var errback;
@@ -40,28 +62,31 @@ function handleInput(object) {
 				sucback(object);
 			}
 		} else {
-			converter.toID(object[i].field)
-					.then(function (r) {
-						counti--;
-						object[i].field = r;
-						if (object[i].conditions != undefined) {
-							for (let j = 0; j < object[i].conditions.length; j += 4) {
-								countj++;
-								converter.toID(object[i].conditions[j])
-										.then(function (r) {
-											object[i].conditions[j] = r;
-											countj--;
-											if (counti == 0 && countj == 0) {
-												sucback(object);
-											}
-										}).catch(function (e) {
-									errback(e);
-								});
+			converter.toID(object[i].field).then(function (r) {
+				counti--;
+				object[i].field = r;
+				if (object[i].conditions != undefined) {
+					console.log(2);
+
+					for (let j = 0; j < object[i].conditions.length; j += 4) {
+						countj++;
+						converter.toID(object[i].conditions[j]).then(function (r) {
+							object[i].conditions[j] = r;
+							countj--;
+							if (counti == 0 && countj == 0) {
+								sucback(object);
 							}
-						} else if (counti == 0) {
-							sucback(object);
-						}
-					}).catch(function (e) {
+						}).catch(function (e) {
+							errback(e);
+						});
+					}
+					if(object[i].conditions.length==0){
+						sucback(object);
+					}
+				} else if (counti == 0) {
+					sucback(object);
+				}
+			}).catch(function (e) {
 				errback(e);
 			});
 		}
@@ -286,13 +311,13 @@ var testJson =
 				conditions: ['age', 'eq', 'male']
 			}];
 
-handleInput(testJson)
-		.then(function (r) {
-			console.log(r);
-			return queryFilter(r);
-		}).then(function (r) {
-	console.log(JSON.stringify(r));
-});
+//handleInput(testJson)
+//		.then(function (r) {
+//			console.log(r);
+//			return queryFilter(r);
+//		}).then(function (r) {
+//	console.log(JSON.stringify(r));
+//});
 
 
 //purpose: build a piece of map function
@@ -355,42 +380,42 @@ function buildChunk(ind, element, _typeid) {
 //return: string contains compiled javascript code
 //param: query=see testJson
 function buildMapReduce(segmentid, query, callback) {
+
 	var mapfunccode = "";
 	var reducecondcode = "";
 	var reduceinitcode = "";
 	var reduceaggcode = "";
 
-
 	var i = 0;
-	while (i < query.length) {
-		if (i % 2 == 0) {
-			var tmpcode = buildChunk(i / 2, query[i]);
-			mapfunccode += tmpcode.mapcode;
-			reduceinitcode += tmpcode.reduceinitcode;
-			reducecondcode += tmpcode.reducecondcode;
-			reduceaggcode += tmpcode.reduceaggcode;
+	converter.toIDs(['_isUser', '_segments', '_id', '_mtid', '_typeid'], function (ids) {
+		while (i < query.length) {
+			if (i % 2 == 0) {
+				if (query[i].type == 'user') {
+					i++;
+					continue
+				}
+				var tmpcode = buildChunk(i / 2, query[i], ids._typeid);
+				mapfunccode += tmpcode.mapcode;
+				reduceinitcode += tmpcode.reduceinitcode;
+				reducecondcode += tmpcode.reducecondcode;
+				reduceaggcode += tmpcode.reduceaggcode;
+			}
+			else {
+				var joinop = query[i];
+				if (joinop === 'and') joinop = '&&';
+				else if (joinop === 'or') joinop = '||';
+				else throw "wrong join operator: " + joinop;
+				reducecondcode += joinop;
+			}
+			i++;
 		}
-		else {
-			var joinop = query[i];
-			if (joinop === 'and') joinop = '&&';
-			else if (joinop === 'or') joinop = '||';
-			else throw "wrong join operator: " + joinop;
-			reducecondcode += joinop;
-		}
-		i++;
-	}
-
-	var _isUser = 0;
-	var _segments = 0;
-	var _id = 0;
-	var _mtid = 0;
-	converter.toIDs(['_isUser', '_segments', '_id', '_mtid'], function (ids) {
-		var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true){if(this["' + ids._segments + '"].indexOf(ObjectId("' + segmentid + '"))==-1)return;userid=this["' + ids._id + '"];value._hasUser=true;}else{if(this["' + ids._segments + '"].indexOf(ObjectId( "' + segmentid + '"))==-1) return;userid=this["' + ids._mtid + '"];';
-
+		var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true){userid=this["' + ids._id + '"];value._hasUser=true;}else{userid=this["' + ids._mtid + '"];';
 		mapfunccode = mapinitcode + mapfunccode + "}emit(userid,value);}";
 		var reducefunccode = "function(key,values){var returnObject={};" + reduceinitcode + "var hasUser=false;for(var i in values){var value=values[i];if(value._hasUser==true)hasUser=true;" + reduceaggcode + "};return " + reducecondcode + "&&hasUser==true?key:null;}";
-		if (callback !== undefined)callback({map: mapfunccode, reduce: reducefunccode});
+		if (callback !== undefined)
+			callback({map: mapfunccode, reduce: reducefunccode});
 	});
+
 }
 
 //function () {
@@ -418,6 +443,4 @@ function buildMapReduce(segmentid, query, callback) {
 //	}
 //	emit(userid, value);
 //}
-
-
 

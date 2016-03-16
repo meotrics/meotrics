@@ -7,8 +7,6 @@ var UserG = require('./generateUsers.js');
 var ActionG = require('./generateLog.js');
 
 var url = 'mongodb://' + config.get('mongod.host') + ':' + config.get('mongod.port') + '/' + config.get('mongod.database');
-var collection = config.get('mongod.database');
-
 
 var collection = process.argv[2];
 var nusers = process.argv[3];
@@ -22,3 +20,6 @@ UserG.generate(converter, url, nusers, collection,function()
 		process.exit();
 	});
 });
+
+
+//node utils/generateDb.js meotrics_1 2000 100000 50000

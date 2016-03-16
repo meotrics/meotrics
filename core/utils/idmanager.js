@@ -69,7 +69,8 @@ exports.IdManager = function () {
 	}
 
 	var db = redis.createClient(config.get('redis.port'), config.get('redis.host'));
-	db.auth(config.get('redis.password'), function () {});
+	db.auth(config.get('redis.password'), function () {
+	});
 
 	var lastid = undefined;
 
@@ -101,6 +102,10 @@ exports.IdManager = function () {
 				outs[names[i]] = out;
 				if (n == 0)
 					callback(outs);
+			}).catch(function (err) {
+				setTimeout(function () {
+					throw err;
+				}, 1);
 			});
 		}
 	};

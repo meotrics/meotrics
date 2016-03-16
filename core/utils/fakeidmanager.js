@@ -15,6 +15,10 @@ exports.IdManager = function () {
 					outs[names[j]] = out;
 					if (n == 0)
 						callback(outs);
+				}).catch(function (err) {
+					setTimeout(function () {
+						throw err;
+					}, 1);
 				});
 			})(i);
 		}
