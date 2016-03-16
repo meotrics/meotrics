@@ -29,7 +29,65 @@ function mtthrow(err) {
 		});
 	}
 }
-
+function updateDB(actionC, reduceC, segmentID){
+  var _mtid = '';
+  var _segments = '';
+  converter.toID('_mtid')
+    .then(function(r){
+      _mtid = r;
+      return converter.toID('_segments');
+    }).then(function(r){
+      _segments = r;
+      return db.collection(reduceC).find({isIn: true}, {_id: 1}).batchSize(100);
+    }).then(function(cursor){
+      var _mtids = [];
+      async.forever(
+        function(next){
+          cursor.hasNext(function(err, r){
+            if(err){
+              next(err);
+            }else{
+              if(r){
+                cursor.next(function(err, rs){
+                  if(err){
+                    next(err);
+                  }else{
+                    _mtids.push(rs._id);
+                    if(_mtids.length == 100){      
+                      var query = {};
+                      var update = {'$addToSet': {}};
+                      query[_mtid] = { '$in': _mtids };
+                      update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
+                      db.collection(actionC).updateMany(query, update);
+                      db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
+                      _mtids = [];
+                    }
+                    next(null);
+                  }
+                });
+              }else{
+                next({code: -1});
+              }
+            }
+          })
+        }, function(e){
+          if(e.code == -1){
+            if(_mtids.length != 0){
+              var query = {};
+              var update = {'$addToSet': {}};
+              query[_mtid] = { '$in': _mtids };
+              update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
+              db.collection(actionC).updateMany(query, update);
+              db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
+            }
+          }else{
+            throw e;
+          }
+        });
+    }).catch(function(e){
+         
+    });
+}
 function handleInput(object) {
 	var sucback;
 	var errback;
