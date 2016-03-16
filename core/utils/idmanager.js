@@ -2,7 +2,6 @@
 var config = require('config');
 var redis = require("redis");
 
-
 //will call callback after call done() for n times
 exports.IdManager = function () {
 	var me = this;
@@ -18,6 +17,9 @@ exports.IdManager = function () {
 	function fromRadix(v, radix) {
 		var digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
+		/**
+		 * @return {number}
+		 */
 		function ZdigitToInt(ch) {
 			for (var i = 0; i < digits.length; i++)
 				if (ch == digits.charAt(i))
@@ -67,15 +69,11 @@ exports.IdManager = function () {
 	}
 
 	var db = redis.createClient(config.get('redis.port'), config.get('redis.host'));
-	db.auth(config.get('redis.password'), function () {
-	});
-
-	var initcallbacks = [];
+	db.auth(config.get('redis.password'), function () {});
 
 	var lastid = undefined;
 
 	function newID(callback) {
-		var retval = 0;
 		if (lastid == undefined) {
 			db.get('lastid', function (err, value) {
 
@@ -97,16 +95,13 @@ exports.IdManager = function () {
 	this.toIDs = function (names, callback) {
 		var outs = {};
 		var n = names.length;
-		for (var i in names) {
-			(function (j) {
-				me.toID(names[j]).then(function (out) {
-					n--;
-
-					outs[names[j]] = out;
-					if (n == 0)
-						callback(outs);
-				});
-			})(i);
+		for (let i in names) if (names.hasOwnProperty(i)) {
+			me.toID(names[i]).then(function (out) {
+				n--;
+				outs[names[i]] = out;
+				if (n == 0)
+					callback(outs);
+			});
 		}
 	};
 
@@ -119,16 +114,14 @@ exports.IdManager = function () {
 			errback = reject;
 		});
 
-
 		// escape case
 		if (name == '_id') {
 			(function () {
 				sucback(name)
 			})();
-
 		}
 		else {
-			if (name.startsWith("$"))
+			if (name.startsWith('$'))
 				name = (name.substring(1));
 
 			db.get(' ' + name, function (err, value) {
@@ -153,7 +146,6 @@ exports.IdManager = function () {
 
 			});
 		}
-
 		return p;
 	};
 
@@ -164,7 +156,6 @@ exports.IdManager = function () {
 			sucback = resolve;
 			errback = reject;
 		});
-
 
 		var newobj = {};
 		var ci = 0;
@@ -190,7 +181,6 @@ exports.IdManager = function () {
 						newobj[value] = object[i];
 					}
 					ci--;
-					console.log(ci);
 					if (ci == 0) return sucback(newobj);
 				});
 
