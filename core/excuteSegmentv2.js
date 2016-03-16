@@ -88,6 +88,143 @@ function updateDB(actionC, reduceC, segmentID){
          
     });
 }
+// ------------------------------------------------------
+function revenue(collection, segID, wrap, inside, callback){
+  var maxWrap;
+  var minWrap;
+  var maxInside;
+  var minInside;
+  var ids;
+  converter.toIDs(['_isUser', '_segments', wrap, inside], function(r){
+    ids = r;
+    
+    var query = {};
+    var sort = {};
+    query[ids['_isUser']] = true;
+    sort[ids[wrap]] = -1;
+
+    db.collection(collection).find(query).sort(sort).limit(1).toArray().then(function(r){
+      maxWrap = r[0][ids[wrap]];
+      sort[ids[wrap]] = 1;
+      return db.collection(collection).find(query).sort(sort).limit(1).toArray();
+    }).then(function(r){
+        minWrap = r[0][ids[wrap]];
+        sort = {};
+        sort[ids[inside]] = -1;
+        return db.collection(collection).find(query).sort(sort).limit(1).toArray();
+    }).then(function(r){
+        maxInside = r[0][ids[inside]];
+        sort[ids[inside]] = 1;
+        return db.collection(collection).find(query).sort(sort).limit(1).toArray();
+    }).then(function(r){
+        minInside = r[0][ids[inside]];
+
+        var matchClause = {"$match": {}};
+        matchClause['$match'][ids['_isUser']] = true;
+        matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segID);
+        
+        var projectClause = {"$project": {}};
+        projectClause['$project']['_id'] = 0;
+        projectClause['$project'][ids[wrap]] = 1;
+        projectClause['$project'][ids[inside]] = 1;
+        
+        var groupClause = {"$group": {}};
+        groupClause['$group']['_id'] = '$'+ids[wrap];
+        groupClause['$group']['values'] = {'$push': '$'+ids[inside]};
+        groupClause['$group']['count'] = {'$sum': 1};
+
+        var cursor = db.collection(collection).aggregate([
+          matchClause,
+          projectClause,
+          groupClause
+        ], {
+          cursor: {batchSize: 20},
+          allowDiskUse: true
+        });
+        var spaces = 5;
+        var result = [];
+
+        if(wrap == "gender" && inside == "age"){
+          async.forever(
+            function(next){
+              cursor.next()
+                .then(function(r){
+                  if(r){
+                    var element = {};
+                    var array = r.values;
+                    element['key'] = r._id;
+                    element['total'] = r.count;
+                    array.sort();
+
+                    var values = [0, 0, 0, 0, 0, 0, 0];
+                    for(var i=0;i<array.length;i++){
+                      if(typeof array[i] != 'number'){
+                        
+                      }else if(array[i]<=18){
+                        values[1]++;
+                      }else if ((array[i] > 18)&&(array[i]<=24)){
+                        values[2]++;
+                      }else if ((array[i] > 25)&&(array[i]<=34)){
+                        values[3]++;
+                      }else if ((array[i] > 35)&&(array[i]<=44)){
+                        values[4]++;
+                      }else if ((array[i] > 44)&&(array[i]<=54)){
+                        values[5]++;
+                      }else {
+                        values[6]++;
+                      }
+                    }
+                    values[0] = r.count - (values[1]+values[2]+values[3]+values[4]+values[5]+values[6]);
+                    element['values'] = values;
+                    result.push(element);
+                    next(null);
+                  }else{
+                    callback(null, result);
+                    next({code: -1});
+                  }
+                }).catch(function(e){
+                  next(e);
+                });
+            }, function(err){
+
+            });
+        }else{
+          // if(typeof maxWrap === 'number'){
+          //   if(typeof minWrap === 'number'){
+          //     if(maxWrap - minWrap >= spaces){
+          //       var result = [];
+          //       var distance = (maxWrap - minWrap + 1) / spaces;
+          //       var oldValue = minWrap;
+          //       var newValue = minWrap;
+          //       for(var i=0;i<spaces;i++){
+          //         newValue += distance;
+          //         var element = {};
+          //         element.key = {
+          //           min: oldValue,
+          //           max: newValue
+          //         };
+
+          //         element.value = {
+
+          //         }
+          //       }
+          //     }
+          //   }
+          // }else
+
+          // }
+        }
+
+
+
+    }).catch(function(e){
+      callback(e);
+    });
+
+  });
+}
+
+// ----------------------------------------------------
 function handleInput(object) {
 	var sucback;
 	var errback;
