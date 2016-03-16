@@ -9,9 +9,7 @@ var IDMgr = require('./utils/fakeidmanager.js'),
 //phải chia ra làm 2 loại, phép toán trên người và action
 
 exports.getQuery = function (segmentid, json, callback) {
-	console.log(json);
 	handleInput(json).then(function (r) {
-		console.log(r);
 		return queryFilter(r);
 	}).then(function (r) {
 		buildMapReduce(segmentid, json, function (ret) {
@@ -80,7 +78,7 @@ function handleInput(object) {
 							errback(e);
 						});
 					}
-					if(object[i].conditions.length==0){
+					if (object[i].conditions.length == 0) {
 						sucback(object);
 					}
 				} else if (counti == 0) {

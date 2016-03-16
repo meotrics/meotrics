@@ -57,7 +57,7 @@
 
 	<div class="card row">
 		<div class="header col-md-12">
-			<form class="">
+			<form class="hidden">
 				<label class="mr5">TREND SELECT</label>
 				<select id="trendselect" class="form-control mr" style="width: 250px; display:inline-block">
 					<option value="56dab10c44aee0d1bd499a29">Purchase</option>
