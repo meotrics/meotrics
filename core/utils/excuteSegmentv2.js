@@ -8,11 +8,11 @@ var IDMgr = require('./fakeidmanager.js'),
 //Chú ký triển khai hàm sinh match
 //phải chia ra làm 2 loại, phép toán trên người và action
 
-exports.getQuery = function ( json, callback) {
+exports.getQuery = function (json, callback) {
 	handleInput(json).then(function (r) {
 		return queryFilter(r);
 	}).then(function (r) {
-		buildMapReduce( json, function (ret) {
+		buildMapReduce(json, function (ret) {
 			ret.option = r;
 			callback(ret);
 		});
@@ -525,7 +525,7 @@ function buildChunk(ind, element, _typeid, element_field) {
 	var reduceaggcode = "";
 	var finalizecode = "";
 
-	var code = 'if(this["' + _typeid + '"]===ObjectId("' + element.type + '")){';
+	var code = 'if(this["' + _typeid + '"].str==="' + element.type + '"){';
 	//var conditions = element.conditions;
 	var defvalcode = "";
 	//var aggcode = "";
@@ -538,14 +538,14 @@ function buildChunk(ind, element, _typeid, element_field) {
 	if (element.f === "count") {
 		code += "value.f" + ind + "=(" + inlineconditions + ")?1:0;";
 		reduceinitcode += "returnObject.f" + ind + "=0;";
-		reduceaggcode += "returnObject.f" + ind + "+=value.f" + ind + ";";
+		reduceaggcode += "if(value.f" + ind + "===undefined) value.f" + ind + "=0;returnObject.f" + ind + "+=value.f" + ind + ";";
 		defvalcode += "value.f" + ind + "=0;";
 		finalizecode += "(returnObject.f" + ind + element.operator + JSON.stringify(element.value) + ")";
 	}
 	else if (element.f === "sum") {
 		code += "value.f" + ind + "=(" + inlineconditions + ")?this." + element_field + ":0;";
 		reduceinitcode += "returnObject.f" + ind + "=0;";
-		reduceaggcode += "returnObject.f" + ind + "+=value.f" + ind + ";";
+		reduceaggcode += "if(value.f" + ind + "===undefined) value.f" + ind + "=0;returnObject.f" + ind + "+=value.f" + ind + ";";
 		defvalcode += "value.f" + ind + "=0;";
 		finalizecode += "(returnObject.f" + ind + element.operator + JSON.stringify(element.value) + ")";
 	}
@@ -553,12 +553,12 @@ function buildChunk(ind, element, _typeid, element_field) {
 		code += "value.f" + ind + "_1=(" + inlineconditions + ")?this." + element_field + ":0;";
 		code += "value.f" + ind + "_2=(" + inlineconditions + ")?1:0;";
 		reduceinitcode += "returnObject.f" + ind + "_1=0;";
-		reduceaggcode += "returnObject.f" + ind + "_1+=value.f" + ind + "_1;";
+		reduceaggcode += "if(value.f" + ind + "_1===undefined) value.f" + ind + "_1=0;returnObject.f" + ind + "_1+=value.f" + ind + "_1;";
 		reduceinitcode += "returnObject.f" + ind + "_2=0;";
-		reduceaggcode += "returnObject.f" + ind + "_2+=value.f" + ind + "_2;";
+		reduceaggcode += "if(value.f" + ind + "_2===undefined) value.f" + ind + "_2=0;returnObject.f" + ind + "_2+=value.f" + ind + "_2;";
 		defvalcode += "value.f" + ind + "_1=0;";
 		defvalcode += "value.f" + ind + "_2=0;";
-		finalizecode += "(1.0*returnObject.f" + ind + "_1/returnObject.f" + ind + "_2" + element.operator + JSON.stringify(element.value) + ")";
+		finalizecode += "(1.0*value.f" + ind + "_1/value.f" + ind + "_2" + element.operator + JSON.stringify(element.value) + ")";
 	}
 	else throw "wrong operator " + element;
 
@@ -567,7 +567,7 @@ function buildChunk(ind, element, _typeid, element_field) {
 		mapcode: code,
 		reduceinitcode: reduceinitcode,
 		reduceaggcode: reduceaggcode,
-		finalizecode : finalizecode
+		finalizecode: finalizecode
 	};
 }
 

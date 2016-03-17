@@ -42,9 +42,10 @@ seg.getQuery( testJson2, function (out) {
 	var url = 'mongodb://' + config.get('mongod.host') + ':' + config.get('mongod.port') + '/' + config.get('mongod.database');
 	var collection = process.argv[2];
 
-	//MongoClient.connect(url)
-	//		.then(function (db) {
-	//			db.collection(collection).mapReduce(out.map, out.reduce, {out: "meotrics_out", query: out.option})
-	//		}).catch(mtthrow);
+	MongoClient.connect(url)
+			.then(function (db) {
+				db.collection(collection).mapReduce(out.map, out.reduce, {out: "meotrics_out", query: out.option, finalize: out.finalize, jsMode: true, sort:{_mtid:1}})
+	
+				}).catch(mtthrow);
 });
 
