@@ -15,15 +15,19 @@ function generateDB(converter, url, n, collection, callback) {
 						var user = generateUsers(ids);
 						db.collection(collection).insertOne(user)
 								.then(function (results) {
-									count--;
-									if (count % 1000 == 0)
-										console.log((n - count) + ' records');
+									var newuser = results.ops[0];
+									newuser._mtid = newuser._id;
+									db.collection(collection).updateOne({_id: newuser._id}, newuser, function () {
+										count--;
+										if (count % 1000 == 0)
+											console.log((n - count) + ' records');
 
-									if (count == 0) {
-										db.close();
-										console.log('Done');
-										callback();
-									}
+										if (count == 0) {
+											db.close();
+											console.log('Done');
+											callback();
+										}
+									});
 								}).catch(function (err) {
 							console.log('[MongoDB] insert err', err.message);
 						});
