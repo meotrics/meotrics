@@ -1,6 +1,6 @@
 "use strict";
 
-var IDMgr = require('./utils/fakeidmanager.js'),
+var IDMgr = require('./fakeidmanager.js'),
 		async = require('async'),
 		mongodb = require('mongodb'),
 		converter = new IDMgr.IdManager();
@@ -8,11 +8,11 @@ var IDMgr = require('./utils/fakeidmanager.js'),
 //Chú ký triển khai hàm sinh match
 //phải chia ra làm 2 loại, phép toán trên người và action
 
-exports.getQuery = function (segmentid, json, callback) {
+exports.getQuery = function ( json, callback) {
 	handleInput(json).then(function (r) {
 		return queryFilter(r);
 	}).then(function (r) {
-		buildMapReduce(segmentid, json, function (ret) {
+		buildMapReduce( json, function (ret) {
 			ret.option = r;
 			callback(ret);
 		});
@@ -27,199 +27,198 @@ function mtthrow(err) {
 		});
 	}
 }
-function updateDB(actionC, reduceC, segmentID){
-  var _mtid = '';
-  var _segments = '';
-  converter.toID('_mtid')
-    .then(function(r){
-      _mtid = r;
-      return converter.toID('_segments');
-    }).then(function(r){
-      _segments = r;
-      return db.collection(reduceC).find({isIn: true}, {_id: 1}).batchSize(100);
-    }).then(function(cursor){
-      var _mtids = [];
-      async.forever(
-        function(next){
-          cursor.hasNext(function(err, r){
-            if(err){
-              next(err);
-            }else{
-              if(r){
-                cursor.next(function(err, rs){
-                  if(err){
-                    next(err);
-                  }else{
-                    _mtids.push(rs._id);
-                    if(_mtids.length == 100){      
-                      var query = {};
-                      var update = {'$addToSet': {}};
-                      query[_mtid] = { '$in': _mtids };
-                      update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
-                      db.collection(actionC).updateMany(query, update);
-                      db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
-                      _mtids = [];
-                    }
-                    next(null);
-                  }
-                });
-              }else{
-                next({code: -1});
-              }
-            }
-          })
-        }, function(e){
-          if(e.code == -1){
-            if(_mtids.length != 0){
-              var query = {};
-              var update = {'$addToSet': {}};
-              query[_mtid] = { '$in': _mtids };
-              update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
-              db.collection(actionC).updateMany(query, update);
-              db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
-            }
-          }else{
-            throw e;
-          }
-        });
-    }).catch(function(e){
-         
-    });
+function updateDB(actionC, reduceC, segmentID) {
+	var _mtid = '';
+	var _segments = '';
+	converter.toID('_mtid')
+			.then(function (r) {
+				_mtid = r;
+				return converter.toID('_segments');
+			}).then(function (r) {
+		_segments = r;
+		return db.collection(reduceC).find({isIn: true}, {_id: 1}).batchSize(100);
+	}).then(function (cursor) {
+		var _mtids = [];
+		async.forever(
+				function (next) {
+					cursor.hasNext(function (err, r) {
+						if (err) {
+							next(err);
+						} else {
+							if (r) {
+								cursor.next(function (err, rs) {
+									if (err) {
+										next(err);
+									} else {
+										_mtids.push(rs._id);
+										if (_mtids.length == 100) {
+											var query = {};
+											var update = {'$addToSet': {}};
+											query[_mtid] = {'$in': _mtids};
+											update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
+											db.collection(actionC).updateMany(query, update);
+											db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
+											_mtids = [];
+										}
+										next(null);
+									}
+								});
+							} else {
+								next({code: -1});
+							}
+						}
+					})
+				}, function (e) {
+					if (e.code == -1) {
+						if (_mtids.length != 0) {
+							var query = {};
+							var update = {'$addToSet': {}};
+							query[_mtid] = {'$in': _mtids};
+							update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
+							db.collection(actionC).updateMany(query, update);
+							db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
+						}
+					} else {
+						throw e;
+					}
+				});
+	}).catch(function (e) {
+
+	});
 }
 // ------------------------------------------------------
-function revenue(collection, segID, wrap, inside, callback){
-  var maxWrap;
-  var minWrap;
-  var maxInside;
-  var minInside;
-  var ids;
-  converter.toIDs(['_isUser', '_segments', wrap, inside], function(r){
-    ids = r;
-    
-    var query = {};
-    var sort = {};
-    query[ids['_isUser']] = true;
-    sort[ids[wrap]] = -1;
+function revenue(collection, segID, wrap, inside, callback) {
+	var maxWrap;
+	var minWrap;
+	var maxInside;
+	var minInside;
+	var ids;
+	converter.toIDs(['_isUser', '_segments', wrap, inside], function (r) {
+		ids = r;
 
-    db.collection(collection).find(query).sort(sort).limit(1).toArray().then(function(r){
-      maxWrap = r[0][ids[wrap]];
-      sort[ids[wrap]] = 1;
-      return db.collection(collection).find(query).sort(sort).limit(1).toArray();
-    }).then(function(r){
-        minWrap = r[0][ids[wrap]];
-        sort = {};
-        sort[ids[inside]] = -1;
-        return db.collection(collection).find(query).sort(sort).limit(1).toArray();
-    }).then(function(r){
-        maxInside = r[0][ids[inside]];
-        sort[ids[inside]] = 1;
-        return db.collection(collection).find(query).sort(sort).limit(1).toArray();
-    }).then(function(r){
-        minInside = r[0][ids[inside]];
+		var query = {};
+		var sort = {};
+		query[ids['_isUser']] = true;
+		sort[ids[wrap]] = -1;
 
-        var matchClause = {"$match": {}};
-        matchClause['$match'][ids['_isUser']] = true;
-        matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segID);
-        
-        var projectClause = {"$project": {}};
-        projectClause['$project']['_id'] = 0;
-        projectClause['$project'][ids[wrap]] = 1;
-        projectClause['$project'][ids[inside]] = 1;
-        
-        var groupClause = {"$group": {}};
-        groupClause['$group']['_id'] = '$'+ids[wrap];
-        groupClause['$group']['values'] = {'$push': '$'+ids[inside]};
-        groupClause['$group']['count'] = {'$sum': 1};
+		db.collection(collection).find(query).sort(sort).limit(1).toArray().then(function (r) {
+			maxWrap = r[0][ids[wrap]];
+			sort[ids[wrap]] = 1;
+			return db.collection(collection).find(query).sort(sort).limit(1).toArray();
+		}).then(function (r) {
+			minWrap = r[0][ids[wrap]];
+			sort = {};
+			sort[ids[inside]] = -1;
+			return db.collection(collection).find(query).sort(sort).limit(1).toArray();
+		}).then(function (r) {
+			maxInside = r[0][ids[inside]];
+			sort[ids[inside]] = 1;
+			return db.collection(collection).find(query).sort(sort).limit(1).toArray();
+		}).then(function (r) {
+			minInside = r[0][ids[inside]];
 
-        var cursor = db.collection(collection).aggregate([
-          matchClause,
-          projectClause,
-          groupClause
-        ], {
-          cursor: {batchSize: 20},
-          allowDiskUse: true
-        });
-        var spaces = 5;
-        var result = [];
+			var matchClause = {"$match": {}};
+			matchClause['$match'][ids['_isUser']] = true;
+			matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segID);
 
-        if(wrap == "gender" && inside == "age"){
-          async.forever(
-            function(next){
-              cursor.next()
-                .then(function(r){
-                  if(r){
-                    var element = {};
-                    var array = r.values;
-                    element['key'] = r._id;
-                    element['total'] = r.count;
-                    array.sort();
+			var projectClause = {"$project": {}};
+			projectClause['$project']['_id'] = 0;
+			projectClause['$project'][ids[wrap]] = 1;
+			projectClause['$project'][ids[inside]] = 1;
 
-                    var values = [0, 0, 0, 0, 0, 0, 0];
-                    for(var i=0;i<array.length;i++){
-                      if(typeof array[i] != 'number'){
-                        
-                      }else if(array[i]<=18){
-                        values[1]++;
-                      }else if ((array[i] > 18)&&(array[i]<=24)){
-                        values[2]++;
-                      }else if ((array[i] > 25)&&(array[i]<=34)){
-                        values[3]++;
-                      }else if ((array[i] > 35)&&(array[i]<=44)){
-                        values[4]++;
-                      }else if ((array[i] > 44)&&(array[i]<=54)){
-                        values[5]++;
-                      }else {
-                        values[6]++;
-                      }
-                    }
-                    values[0] = r.count - (values[1]+values[2]+values[3]+values[4]+values[5]+values[6]);
-                    element['values'] = values;
-                    result.push(element);
-                    next(null);
-                  }else{
-                    callback(null, result);
-                    next({code: -1});
-                  }
-                }).catch(function(e){
-                  next(e);
-                });
-            }, function(err){
+			var groupClause = {"$group": {}};
+			groupClause['$group']['_id'] = '$' + ids[wrap];
+			groupClause['$group']['values'] = {'$push': '$' + ids[inside]};
+			groupClause['$group']['count'] = {'$sum': 1};
 
-            });
-        }else{
-          // if(typeof maxWrap === 'number'){
-          //   if(typeof minWrap === 'number'){
-          //     if(maxWrap - minWrap >= spaces){
-          //       var result = [];
-          //       var distance = (maxWrap - minWrap + 1) / spaces;
-          //       var oldValue = minWrap;
-          //       var newValue = minWrap;
-          //       for(var i=0;i<spaces;i++){
-          //         newValue += distance;
-          //         var element = {};
-          //         element.key = {
-          //           min: oldValue,
-          //           max: newValue
-          //         };
+			var cursor = db.collection(collection).aggregate([
+				matchClause,
+				projectClause,
+				groupClause
+			], {
+				cursor: {batchSize: 20},
+				allowDiskUse: true
+			});
+			var spaces = 5;
+			var result = [];
 
-          //         element.value = {
+			if (wrap == "gender" && inside == "age") {
+				async.forever(
+						function (next) {
+							cursor.next()
+									.then(function (r) {
+										if (r) {
+											var element = {};
+											var array = r.values;
+											element['key'] = r._id;
+											element['total'] = r.count;
+											array.sort();
 
-          //         }
-          //       }
-          //     }
-          //   }
-          // }else
+											var values = [0, 0, 0, 0, 0, 0, 0];
+											for (var i = 0; i < array.length; i++) {
+												if (typeof array[i] != 'number') {
 
-          // }
-        }
+												} else if (array[i] <= 18) {
+													values[1]++;
+												} else if ((array[i] > 18) && (array[i] <= 24)) {
+													values[2]++;
+												} else if ((array[i] > 25) && (array[i] <= 34)) {
+													values[3]++;
+												} else if ((array[i] > 35) && (array[i] <= 44)) {
+													values[4]++;
+												} else if ((array[i] > 44) && (array[i] <= 54)) {
+													values[5]++;
+												} else {
+													values[6]++;
+												}
+											}
+											values[0] = r.count - (values[1] + values[2] + values[3] + values[4] + values[5] + values[6]);
+											element['values'] = values;
+											result.push(element);
+											next(null);
+										} else {
+											callback(null, result);
+											next({code: -1});
+										}
+									}).catch(function (e) {
+								next(e);
+							});
+						}, function (err) {
+
+						});
+			} else {
+				// if(typeof maxWrap === 'number'){
+				//   if(typeof minWrap === 'number'){
+				//     if(maxWrap - minWrap >= spaces){
+				//       var result = [];
+				//       var distance = (maxWrap - minWrap + 1) / spaces;
+				//       var oldValue = minWrap;
+				//       var newValue = minWrap;
+				//       for(var i=0;i<spaces;i++){
+				//         newValue += distance;
+				//         var element = {};
+				//         element.key = {
+				//           min: oldValue,
+				//           max: newValue
+				//         };
+
+				//         element.value = {
+
+				//         }
+				//       }
+				//     }
+				//   }
+				// }else
+
+				// }
+			}
 
 
+		}).catch(function (e) {
+			callback(e);
+		});
 
-    }).catch(function(e){
-      callback(e);
-    });
-
-  });
+	});
 }
 
 // ----------------------------------------------------
@@ -235,6 +234,7 @@ function handleInput(object) {
 	var countj = 0;
 	for (let i = 0; i < object.length; i += 2) {
 		counti++;
+		console.log(object)
 		if (object[i].type === 'user') {
 			counti--;
 			if (object[i].conditions != undefined) {
@@ -251,7 +251,7 @@ function handleInput(object) {
 						errback(e);
 					});
 				}
-				if(object[i].conditions.length == 0){
+				if (object[i].conditions.length == 0) {
 					sucback(object);
 				}
 			} else if (counti == 0) {
@@ -519,10 +519,11 @@ var testJson =
 //example: buildMapChunk({actiontype: "pageview", conditions: [{f: "count", field: "pid", operator: ">", value: 5, conditions: ["amount", ">", 5, "and", "price", "=", "dd"]})
 //return: string contains compiled javascript code
 //param: i=index of condition, for iteration purpose, condition=see example
-function buildChunk(ind, element, _typeid) {
-	var reducecondcode = "";
+function buildChunk(ind, element, _typeid, element_field) {
+	//var reducecondcode = "";
 	var reduceinitcode = "";
 	var reduceaggcode = "";
+	var finalizecode = "";
 
 	var code = 'if(this["' + _typeid + '"]===ObjectId("' + element.type + '")){';
 	//var conditions = element.conditions;
@@ -539,17 +540,17 @@ function buildChunk(ind, element, _typeid) {
 		reduceinitcode += "returnObject.f" + ind + "=0;";
 		reduceaggcode += "returnObject.f" + ind + "+=value.f" + ind + ";";
 		defvalcode += "value.f" + ind + "=0;";
-		reducecondcode += "(returnObject.f" + ind + element.operator + JSON.stringify(element.value) + ")";
+		finalizecode += "(returnObject.f" + ind + element.operator + JSON.stringify(element.value) + ")";
 	}
 	else if (element.f === "sum") {
-		code += "value.f" + ind + "=(" + inlineconditions + ")?this." + element.field + ":0;";
+		code += "value.f" + ind + "=(" + inlineconditions + ")?this." + element_field + ":0;";
 		reduceinitcode += "returnObject.f" + ind + "=0;";
 		reduceaggcode += "returnObject.f" + ind + "+=value.f" + ind + ";";
 		defvalcode += "value.f" + ind + "=0;";
-		reducecondcode += "(returnObject.f" + ind + element.operator + JSON.stringify(element.value) + ")";
+		finalizecode += "(returnObject.f" + ind + element.operator + JSON.stringify(element.value) + ")";
 	}
 	else if (element.f === "avg") {
-		code += "value.f" + ind + "_1=(" + inlineconditions + ")?this." + element.field + ":0;";
+		code += "value.f" + ind + "_1=(" + inlineconditions + ")?this." + element_field + ":0;";
 		code += "value.f" + ind + "_2=(" + inlineconditions + ")?1:0;";
 		reduceinitcode += "returnObject.f" + ind + "_1=0;";
 		reduceaggcode += "returnObject.f" + ind + "_1+=value.f" + ind + "_1;";
@@ -557,16 +558,16 @@ function buildChunk(ind, element, _typeid) {
 		reduceaggcode += "returnObject.f" + ind + "_2+=value.f" + ind + "_2;";
 		defvalcode += "value.f" + ind + "_1=0;";
 		defvalcode += "value.f" + ind + "_2=0;";
-		reducecondcode += "(1.0*returnObject.f" + ind + "_1/returnObject.f" + ind + "_2" + element.operator + JSON.stringify(element.value) + ")";
+		finalizecode += "(1.0*returnObject.f" + ind + "_1/returnObject.f" + ind + "_2" + element.operator + JSON.stringify(element.value) + ")";
 	}
-	else throw "wrong operator";
+	else throw "wrong operator " + element;
 
 	code = defvalcode + code + "};";
 	return {
 		mapcode: code,
 		reduceinitcode: reduceinitcode,
-		reducecondcode: reducecondcode,
-		reduceaggcode: reduceaggcode
+		reduceaggcode: reduceaggcode,
+		finalizecode : finalizecode
 	};
 }
 
@@ -574,26 +575,41 @@ function buildChunk(ind, element, _typeid) {
 //example: buildMapFunction(testJson)
 //return: string contains compiled javascript code
 //param: query=see testJson
-function buildMapReduce(segmentid, query, callback) {
+function buildMapReduce(query, callback) {
 
 	var mapfunccode = "";
 	var reducecondcode = "";
 	var reduceinitcode = "";
 	var reduceaggcode = "";
+	var finalizecode = "";
 
+	//get all string need to convert to db
+	var zipfield = [];
 	var i = 0;
-	converter.toIDs(['_isUser', '_segments', '_id', '_mtid', '_typeid'], function (ids) {
+	while (i < query.length) {
+		if (i % 2 == 0) {
+			zipfield.push(query[i].field);
+		}
+		i++;
+	}
+	zipfield = zipfield.concat(['_isUser', '_segments', '_id', '_mtid', '_typeid']);
+
+	i = 0;
+	converter.toIDs(zipfield, function (ids) {
 		while (i < query.length) {
 			if (i % 2 == 0) {
+				//ignore user type
 				if (query[i].type == 'user') {
 					i++;
-					continue
+					continue;
 				}
-				var tmpcode = buildChunk(i / 2, query[i], ids._typeid);
+
+				var tmpcode = buildChunk(i / 2, query[i], ids._typeid, ids[query[i].field]);
 				mapfunccode += tmpcode.mapcode;
 				reduceinitcode += tmpcode.reduceinitcode;
 				reducecondcode += tmpcode.reducecondcode;
 				reduceaggcode += tmpcode.reduceaggcode;
+				finalizecode += tmpcode.finalizecode;
 			}
 			else {
 				var joinop = query[i];
@@ -606,11 +622,11 @@ function buildMapReduce(segmentid, query, callback) {
 		}
 		var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true){userid=this["' + ids._id + '"];value._hasUser=true;}else{userid=this["' + ids._mtid + '"];';
 		mapfunccode = mapinitcode + mapfunccode + "}emit(userid,value);}";
-		var reducefunccode = "function(key,values){var returnObject={};" + reduceinitcode + "var hasUser=false;for(var i in values){var value=values[i];if(value._hasUser==true)hasUser=true;" + reduceaggcode + "};return " + reducecondcode + "&&hasUser==true?key:null;}";
+		var reducefunccode = "function(key,values){var returnObject={};" + reduceinitcode + "var hasUser=false;for(var i in values){var value=values[i];if(value._hasUser!==undefined)returnObject._hasUser=value._hasUser;" + reduceaggcode + "};return returnObject;}";
+		finalizecode = 'function(key, value){return' + finalizecode + '&&value._hasUser?1:0}';
 		if (callback !== undefined)
-			callback({map: mapfunccode, reduce: reducefunccode});
+			callback({map: mapfunccode, reduce: reducefunccode, finalize: finalizecode});
 	});
-
 }
 
 //function () {
