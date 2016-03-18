@@ -8,7 +8,21 @@ var IDMgr = require('./fakeidmanager.js'),
 //Chú ký triển khai hàm sinh match
 //phải chia ra làm 2 loại, phép toán trên người và action
 
-exports.getQuery = function (json, callback) {
+exports.createSegment = function (segment, callback) {
+	var outcollection = "meotrics_segment" + segment._id.toString();
+	getQuery(segment.query, function () {
+		db.collection(collection).mapReduce(out.map, out.reduce, {
+			out: outcollection,
+			query: out.option,
+			finalize: out.finalize,
+			sort: {_mtid: 1}
+		}, function (res) {
+			callback(outcollection);
+		});
+	});
+};
+
+exports.getQuery = function getQuery(json, callback) {
 	handleInput(json).then(function (r) {
 		return queryFilter(r);
 	}).then(function (r) {
@@ -434,6 +448,10 @@ function conditionToQuery(element) {
 	return p;
 }
 
+function buildQuery(condition) {
+
+}
+
 //really, put conditions[i+2] to a variable, its much easier to read
 function translateOperator(conditions, i) {
 	var query = {};
@@ -469,22 +487,22 @@ function translateOperator(conditions, i) {
 		case 'con':
 			query[conditions[i]] = {
 				'$regex': conditions[i + 2]
-			}
+			};
 			break;
 		case 'ncon':
 			query[conditions[i]] = {
 				'$regex': "^((?!" + conditions[i + 2] + ").)*$/"
-			}
+			};
 			break;
 		case 'sw':
 			query[conditions[i]] = {
 				'$regex': '^' + conditions[i + 2]
-			}
+			};
 			break;
 		case 'ew':
 			query[conditions[i]] = {
 				'$regex': conditions[i + 2] + '$'
-			}
+			};
 			break;
 	}
 	return query;
@@ -620,7 +638,7 @@ function buildMapReduce(query, callback) {
 			}
 			i++;
 		}
-		var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true){userid=this["' + ids._id + '"];value._hasUser=true;}else{userid=this["' + ids._mtid + '"];';
+		var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true){userid=this["' + ids._mtid + '"];value._hasUser=true;}else{userid=this["' + ids._mtid + '"];';
 		mapfunccode = mapinitcode + mapfunccode + "}emit(userid,value);}";
 		var reducefunccode = "function(key,values){var returnObject={};" + reduceinitcode + "var hasUser=false;for(var i in values){var value=values[i];if(value._hasUser!==undefined)returnObject._hasUser=value._hasUser;" + reduceaggcode + "};return returnObject;}";
 		finalizecode = 'function(key, value){return' + finalizecode + '&&value._hasUser?1:0}';
