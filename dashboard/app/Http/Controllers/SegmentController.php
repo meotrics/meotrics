@@ -29,6 +29,6 @@ class SegmentController extends Controller
 			)
 		);
 
-    return view('segment/index', ['actions' => json_encode($actions),'props' => json_encode($props)]);
-  }
+		return view('segment/index', ['actions' => json_encode($actions), 'props' => json_encode($props)]);
+	}
 }

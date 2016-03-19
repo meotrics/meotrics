@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
+
 class TrendController extends Controller {
 
 

@@ -24,14 +24,8 @@
 	@yield('style')
 </head>
 <body>
-
 <div class="wrapper">
 	<div class="sidebar" data-color="green" data-image="/img/sidebar-4.jpg">
-		<!--
-		Tip 1: you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple"
-		Tip 2: you can also add an image using data-image tag
-	-->
-
 		<div class="sidebar-wrapper">
 			<div class="logo">
 				<a href="/"> <img src="{{asset('img/logo.png')}}" width="30px"/></a>
@@ -84,7 +78,8 @@
 		<nav class="navbar navbar-default navbar-fixed">
 			<div class="container-fluid">
 				<div class="navbar-header">
-					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+					<button type="button" class="navbar-toggle" data-toggle="collapse"
+					        data-target="#navigation-example-2">
 						<span class="sr-only">Toggle navigation</span>
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
@@ -94,11 +89,12 @@
 				</div>
 				<div class="collapse navbar-collapse">
 					<ul class="nav navbar-nav navbar-left">
-						@include('segment/select')
+						@include('segment/select', array(segments => $segments))
 						<li>
 							<a style="padding: 0px">
 								<div class="input-group" style="width: 250px;">
-									<span class="input-group-addon"><i class="pe-7s-date" style="font-size:26px"></i></span>
+                                    <span class="input-group-addon"><i class="pe-7s-date"
+                                                                       style="font-size:26px"></i></span>
 									<input type="text" class="form-control" id="date-range">
 
 								</div>
@@ -116,37 +112,7 @@
 
 		<div class="content">
 			<div class="container-fluid">@yield('content')</div>
-			<!-- <footer class="footer">
-				<div class="container-fluid">
-					<nav class="pull-left">
-						<ul>
-							<li>
-								<a href="#">
-									Home
-								</a>
-							</li>
-							<li>
-								<a href="#">
-									Company
-								</a>
-							</li>
-							<li>
-								<a href="#">
-									Portfolio
-								</a>
-							</li>
-							<li>
-								<a href="#">
-									Blog
-								</a>
-							</li>
-						</ul>
-					</nav>
-					<p class="copyright pull-right">
-						&copy; 2016 <a href="http://meotrics.com">Meotrics</a>, made with love for a better insight
-					</p>
-				</div>
-			</footer> -->
+
 		</div>
 
 
