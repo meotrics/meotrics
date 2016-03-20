@@ -7,5 +7,5 @@
 @endsection
 
 @section('content')
-	THIS IS HOME
+	THIS IS HOME {{cookie('laravel_session')}}
 @endsection

@@ -1,3 +1,4 @@
+<?php if (isset($segments) == false) $segments = []; ?>
 <li class="dropdown mr">
 	<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 		<i class="pe-7s-user" style="vertical-align: middle; font-size: 28px"></i>
@@ -6,7 +7,7 @@
 	</a>
 	<ul class="dropdown-menu">
 		<li><a href="#" onclick="segmentselect('All users','0')"> All Users</a></li>
-		@foreach ($seg as $segments)
+		@foreach ($segments as $seg )
 			<li><a href="#" data-id="{{$seg->id}}" onclick="segmentselect('{{$seg->name}}','{{$seg->id}}')">{{$seg->name}}</a>
 			</li>
 		@endforeach

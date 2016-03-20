@@ -89,7 +89,7 @@
 				</div>
 				<div class="collapse navbar-collapse">
 					<ul class="nav navbar-nav navbar-left">
-						@include('segment/select', array(segments => $segments))
+						@include('segment/select')
 						<li>
 							<a style="padding: 0px">
 								<div class="input-group" style="width: 250px;">
