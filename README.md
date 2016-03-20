@@ -109,6 +109,8 @@ trỏ danh sách tên miền sau
 			}
 		}
 		```
+4. Generate database
+	Import database trong thư mục resources
 4. Đường dẫn chuẩn
   * Dashboard:
     * Frontend: meotrics.dev | meotrics.run
