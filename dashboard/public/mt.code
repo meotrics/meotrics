@@ -1,0 +1,45 @@
+//define meotrics for queue
+var Meotrics = Meotrics || {};
+
+Meotrics.appid = "1234";
+
+Meotrics.__requestQueue= Meotrics.__requesQueue || [];
+
+//TODO: problem when clone callback function, we dont want clone callback function.
+//2 level deep clone object
+Meotrics.__clone = function (obj)
+{
+	if (null == obj || "object" != typeof obj) return obj;
+	var copy = obj.constructor();
+    for (var attr in obj) if (obj.hasOwnProperty(attr)) copy[attr] = Meotrics.__shallowclone(obj[attr]);
+    return copy;
+}
+
+Meotrics.__shallowclone = function (obj) {
+	if (null == obj || "object" != typeof obj) return obj;
+	var copy = obj.constructor();
+    for (var attr in obj) if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    return copy;
+}
+
+if(Meotrics.record === undefined) {
+	Meotrics.record = function(){
+		//clone arguments
+		var newarguments = [];
+		for(var i in arguments)
+			newarguments.push(Meotrics.__clone (arguments[i]));
+		Meotrics.__requestQueue.push({arguments: newarguments, time: new Date()});
+	}
+}
+
+Meotrics.__callbackQueue = Meotrics.__callbackQueue || [];
+Meotrics.getMtId  = function(callback){
+	Meotrics.__callbackQueue.push(callback);
+}
+
+var script = document.createElement("script");
+script.type = "text/javascript";
+script.src = "meotrics.dev/mt.js";
+//script.onreadystatechange = callbacl;
+//script.onload = callback;
+document.body.appendChild(js);

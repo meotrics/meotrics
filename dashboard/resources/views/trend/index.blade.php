@@ -1,6 +1,13 @@
 @extends('../layout/master', ['sidebarselect' => 'trend'])
 @section('title', 'Trend')
+{{--
+$types: list of action type in the system
+each $types have fields in it
 
+
+
+
+--}}
 @section('script')
 	<script src="{{asset('js/select2.min.js')}}"></script>
 	<script>
@@ -44,6 +51,25 @@
 
 		updateQuery();
 
+		{{--var types ={!!   $types !!} ;--}}
+		{{--onPageLoad(function()--}}
+		{{--{--}}
+			{{--for(var i in types)--}}
+			{{--{--}}
+				{{--var $option = $('<option>');--}}
+				{{--$option.html(types[i].name);--}}
+				{{--$option.val(types[i].id);--}}
+				{{--$('#actionselect').append($option);--}}
+			{{--}--}}
+
+			{{--$('#actionselect').change(function(){--}}
+				{{--//find in types--}}
+				{{--for( var )--}}
+
+			{{--})--}}
+
+
+//		})
 	</script>
 @endsection
 
@@ -58,6 +84,7 @@
 			<form class="">
 				<label class="mr5">TREND SELECT</label>
 				<select id="trendselect" class="form-control mr" style="width: 250px; display:inline-block">
+
 					<option value="56dab10c44aee0d1bd499a29">Purchase</option>
 					<option value="56dab10544aee0d1bd499a27">Pageview</option>
 				</select>

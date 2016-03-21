@@ -43,6 +43,18 @@ trỏ danh sách tên miền sau
 	1. Môi trường linux (ubuntu)
 
 		`curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer`
+	1. Moi truong Mac
+
+		Install mcrypt
+		```
+		brew update
+		brew upgrade
+		brew tap homebrew/dupes
+		brew tap josegonzalez/homebrew-php
+		brew install php54-mcrypt
+		php --version // To Test your php 
+		sudo composer update
+		```
 
 2. Khởi tạo Laravel framework
 
@@ -52,6 +64,10 @@ trỏ danh sách tên miền sau
 	composer install
 	```
 	
+	```
+	sudo chmod -R 777 storage
+	```
+
 	**Tạo một file .env có nội dung giống với .env.example, sửa config csdl ở đây**
 3. Cài đặt nodejs
 	
@@ -60,6 +76,7 @@ trỏ danh sách tên miền sau
 	npm install
 	```
 
+	**go in to meotrics/core/config, copy production.json to default.json, config your database in default.json**
 3. Cấu hình Web Server
 
 	1.  Cấu hình apache
