@@ -51,6 +51,7 @@ class TypeController extends Controller
 		var_dump($request, $a, $b);
 		die;
 	}
+
 	public function create(Request $request)
 	{
 		if ($request->isMethod('post')) {
@@ -60,11 +61,11 @@ class TypeController extends Controller
 			//build array
 			$fields = [];
 			for ($i = 0; $i < count($pcodes); $i++) {
-				array_push($fields, array("pname" => $pnames[$i], "pcode" => $pcodes[$i]));
+				array_push($fields, array("pname" => $pnames[$i], "pcode" => strtolower($pcodes[$i])));
 			}
 
 			$data = json_encode(array(
-				'codename' => $request->input('codename'),
+				'codename' => strtolower($request->input('codename')),
 				'name' => $request->input('name'),
 				'desc' => $request->input('desc'),
 				'fields' => $fields

@@ -4,36 +4,72 @@
 $types: list of action type in the system
 each $types have fields in it
 
-
-
-
 --}}
 @section('script')
 	<script src="{{asset('js/select2.min.js')}}"></script>
 	<script>
+
+		function matchFieldName(code, actionid) {
+			for (var i in types) {
+				if (types[i]._id == actionid) {
+					for (var j in types[i].fields) {
+						var f = types[i].fields[j];
+						if (f.pcode == code) return f.pname;
+					}
+				}
+			}
+			return null;
+		}
+
+		function getLabel(op, objd, typeid) {
+			var label = {
+				count: "Total occurs",
+				sum: "Total of ",
+				avg: "Avg of "
+			};
+			if (op == 'count') {
+				return label[op];
+			}
+			else {
+				return label[op] + he.encode(matchFieldName(objd, typeid))
+			}
+		}
+
 		//$('#actionselect').select2();
 		function updateQuery() {
+			var objcode = $('#fieldselect').val();
+			var typeid = $('#actionselect').val();
+			var op = $('#opertorselect').val();
+			var param = $('#paramselect').val();
+
+
 			$.get('queryTrend', {
-				typeid: $('#actionselect').val(),
-				operation: $('#opertorselect').val(),
-				object: $('#fieldselect').val(),
-				param: $('#paramselect').val()
+				typeid: typeid,
+				operation: op,
+				object: objcode,
+				param: param
 			}, function (data) {
 				$body = $('.tbbody');
 				$head = $('.tbhead');
 				$body.empty();
 				var head;
-				data = JSON.parse(data);
+				//data = JSON.parse(data);
 				var stt = 0;
 				for (var i in data) {
 					stt++;
 					var row = data[i];
-					var rowstr = "<td>" + stt + "</td>";
-					head = "<th>#</th>";
-					for (var j in row) if (row.hasOwnProperty(j)) {
-						head += '<th> ' + he.encode(j) + ' </th>';
-						rowstr += '<td>' + he.encode(row[j]) + '</td>';
+					var rowstr = "<td class='text-muted'>" + stt + "</td>";
+					head = "<th class='text-muted'>#</th>";
 
+					head += '<th> ' + he.encode(matchFieldName(objcode, typeid)) + ' </th>';
+					rowstr += '<td>' + he.encode(row.temp[objcode]) + '</td>';
+
+					head += '<th> ' + getLabel(op, objcode, typeid) + ' </th>';
+					rowstr += '<td>' + he.encode(row.result) + '</td>';
+
+					for (var j in row.temp) if (row.temp.hasOwnProperty(j) && j.toString().startsWith('_') == false && j.toString() !== objcode) {
+						head += '<th> ' + he.encode(matchFieldName(j, typeid)) + ' </th>';
+						rowstr += '<td>' + he.encode(row.temp[j]) + '</td>';
 					}
 					rowstr = '<tr>' + rowstr + '</tr>';
 					head = '<tr>' + head + '</tr>';
@@ -45,52 +81,46 @@ each $types have fields in it
 			});
 
 		}
-		$('#actionselect, #fieldselect, #opertorselect, #paramselect').change(function () {
+		$('#fieldselect, #opertorselect, #paramselect').change(function () {
 			updateQuery();
 		});
 
-		updateQuery();
 
-		function change_type(id)
-		{
+		function change_type(id) {
 			//find in types
-			for( var i in types )
-			{
-				if(types[i]._id == id)
-				{
+			for (var i in types) {
+				if (types[i]._id == id) {
 					$('#paramselect').empty();
 					$('#fieldselect').empty();
 
-					for(var j in types[i].fields){
+					for (var j in types[i].fields) {
 						var field = types[i].fields[j];
 						var $option = $('<option>');
 						$option.val(field.pcode);
 						$option.html(field.pname);
-
-
 						$('#paramselect').append($option.clone());
 						$('#fieldselect').append($option.clone());
 					}
 				}
 			}
-
+			updateQuery();
 		}
 
 		var types ={!!   $types !!} ;
-		onPageLoad(function()
-		{
+		onPageLoad(function () {
 			$('#actionselect').empty();
-			for(var i in types)
-			{
+			for (var i in types) {
 				var $option = $('<option>');
 				$option.html(types[i].name);
 				$option.val(types[i]._id);
 				$('#actionselect').append($option);
 			}
 
-			$('#actionselect').change(function(){
+			$('#actionselect').change(function () {
 				change_type($(this).val());
 			});
+
+
 		})
 	</script>
 @endsection
@@ -122,17 +152,11 @@ each $types have fields in it
 			<form class="">
 				<label>IN ACTION</label>
 				<select id="actionselect" class="form-control" style="width: 150px; display:inline-block">
-					<option value="56dab10c44aee0d1bd499a29">Purchase</option>
-					<option value="56dab10544aee0d1bd499a27">Pageview</option>
 				</select>
 
 
 				<label>LIST TOP</label>
 				<select id="fieldselect" class="form-control" style="width: 150px; display:inline-block">
-					<option value="pid">Product ID</option>
-					<option value="cid">Category ID</option>
-					<option value="amount">Amount</option>
-					<option value="price">Price</option>
 				</select>
 
 				<label>ORDER BY </label>
@@ -143,10 +167,6 @@ each $types have fields in it
 					<option value="avg">Avg</option>
 				</select>
 				<select id="paramselect" class="form-control" style="width: 150px; display:inline-block">
-					<option value="pid">Product ID</option>
-					<option value="cid">Category ID</option>
-					<option value="amount">Amount</option>
-					<option value="price">Price</option>
 				</select>
 			</form>
 
