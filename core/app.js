@@ -120,11 +120,13 @@ function route(app, db, segmgr, prefix, mongodb) {
 	// ACTION TYPE-----------------------------------------------------------------
 	// create an action type
 	app.post('/actiontype/:appid', function (req, res) {
+		var collection = prefix + "actiontype";
 		var data = req.body;
 		data._appid = Number(req.params.appid);
-		var collection = prefix + "actiontype";
-		db.collection(collection).insertOne(data) // add options: w, j, timeout ...
-			.then(function (r) {
+		converter.toObject(data)
+			.then(function(r){
+				return db.collection(collection).insertOne(r);
+			}).then(function(r){
 				var _typeid = r.insertedId;
 				res.send(_typeid);
 			}).catch(mtthrow);
@@ -134,20 +136,66 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.get('/actiontype/:appid', function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "actiontype";
-		db.collection(collection).find({ _appid: appid }, { _appid: 0 }).toArray()
-		.then(function (results) {
-			res.json(results);
-		}).catch(mtthrow);
+		converter.toID('_appid')
+			.then(function(r){
+				var query = {};
+				var projection = {};
+				query[r] = appid;
+				projection[r] = 0;
+				return db.collection(collection).find(query, projection);
+			}).then(function(cursor){
+				var done = false;
+				var results = [];
+				async.whilst(
+    				function () { return done == false; },
+    				function(callback){
+    					cursor.next().then(function(r){
+    						if(r){
+    							converter.toOriginal(r).then(function(r){
+    								results.push(r);
+    								callback(null);
+    							}).catch(function(err){
+    								callback(err);
+    							});
+    						}else{	
+    							done = true;
+    							callback(null, results);
+    						}
+    					}).catch(function(err){
+    						callback(err);
+    					});
+    				}, function(err, results){
+    					if(err){
+    						mtthrow(err);
+    					}else{
+    						res.json(results);
+    					}
+    				});
+			}).catch(mtthrow);
 	});
 
 	app.get('/actiontype/:appid/:id', function (req, res) {
 		// var appid = req.params.appid;
 		var atid = req.params.id;
 		var collection = prefix + "actiontype";
-		db.collection(collection).find({ _id: new mongodb.ObjectID(atid) }, { _appid: 0, _id: 0 }).toArray()
-		.then(function (results) {
-			res.json(results);
-		}).catch(mtthrow);
+		converter.toID('_appid')
+			.then(function(r){
+				var query = {
+					_id:  new mongodb.ObjectID(atid)
+				};
+				var projection = {};
+				projection[r] = 0;
+				projection['_id'] = 0;
+				return db.collection(collection).find(query, projection).toArray();
+			}).then(function(r){
+				if(r.length != 0){
+					converter.toOriginal(r[0]).then(function(r){
+						res.json(r);
+					}).catch(mtthrow);	
+				}else{
+					res.status(200).end();
+				}
+			}).catch(mtthrow);
 	});
 
 	//delete an actiontype
@@ -156,7 +204,7 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var atid = req.params.id;
 		var collection = prefix + "actiontype";
 		db.collection(collection).deleteOne({ _id: new mongodb.ObjectID(atid) })
-		.then(function (results) {
+		.then(function (r) {
 			res.status(200).end();
 		}).catch(mtthrow);
 	});
@@ -165,22 +213,27 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.delete('/actiontype/:appid', function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "actiontype";
-		db.collection(collection).deleteMany({ _appid: appid })
-		.then(function (results) {
-			res.status(200).end();
-		}).catch(mtthrow);
+		converter.toID('_appid')
+			.then(function(r){
+				var query = {};
+				query[r] = appid;
+				return db.collection(collection).deleteMany(query);
+			}).then(function(r){
+				res.status(200).end();
+			}).catch(mtthrow);	
 	});
 
 	// update actiontype
 	app.put('/actiontype/:appid/:id', function (req, res) {
 		var data = req.body;
-		// var appid = req.params.appid;
 		var atid = req.params.id;
 		var collection = prefix + "actiontype";
-		db.collection(collection).updateOne({ _id: new mongodb.ObjectID(atid) }, { $set: data })
-		.then(function (results) {
-			res.status(200).end();
-		}).catch(mtthrow);
+		converter.toObject(data)
+			.then(function(r){
+				return db.collection(collection).updateOne({ _id: new mongodb.ObjectID(atid) }, { $set: r })
+			}).then(function (results) {
+				res.status(200).end();
+			}).catch(mtthrow);
 	});
 
 
@@ -190,21 +243,54 @@ function route(app, db, segmgr, prefix, mongodb) {
 		var data = req.body;
 		data._appid = Number(req.params.appid);
 		var collection = prefix + "trend";
-
-		db.collection(collection).insertOne(data)
-			.then(function (r) {
-				var trendId = r.insertedId;
-				res.send(trendId);
-			}).catch(mtthrow);
+		converter.toObject(data).then(function(r){
+			return db.collection(collection).insertOne(r);
+		}).then(function(r){
+			var trendId = r.insertedId;
+			res.send(trendId);
+		}).catch(mtthrow);
 	});
 
 	//get all trends in a app
 	app.get('/trend/:appid', function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "trend";
-		db.collection(collection).find({ _appid: appid }, { _appid: 0 }).toArray()
-			.then(function (results){
-				res.json(results);
+
+		converter.toID('_appid')
+			.then(function(r){
+				var query = {};
+				var projection = {};
+				query[r] = appid;
+				projection[r] = 0;
+				return db.collection(collection).find(query, projection);
+			}).then(function(cursor){
+				var done = false;
+				var results = [];
+				async.whilst(
+    				function () { return done == false; },
+    				function(callback){
+    					cursor.next().then(function(r){
+    						if(r){
+    							converter.toOriginal(r).then(function(r){
+    								results.push(r);
+    								callback(null);
+    							}).catch(function(err){
+    								callback(err);
+    							});
+    						}else{	
+    							done = true;
+    							callback(null, results);
+    						}
+    					}).catch(function(err){
+    						callback(err);
+    					});
+    				}, function(err, results){
+    					if(err){
+    						mtthrow(err);
+    					}else{
+    						res.json(results);
+    					}
+    				});
 			}).catch(mtthrow);
 	});
 
@@ -213,10 +299,25 @@ function route(app, db, segmgr, prefix, mongodb) {
 		// var appid = req.params.appid;
 		var trid = req.params.id;
 		var collection = prefix + "trend";
-		db.collection(collection).find({ _id: new mongodb.ObjectID(trid) }, { _id: 0, _appid: 0 }).toArray()
-		.then(function (results) {
-			res.json(results);
-		}).catch(mtthrow);
+
+		converter.toID('_appid')
+			.then(function(r){
+				var query = {
+					_id:  new mongodb.ObjectID(trid)
+				};
+				var projection = {};
+				projection[r] = 0;
+				projection['_id'] = 0;
+				return db.collection(collection).find(query, projection).toArray();
+			}).then(function(r){
+				if(r.length != 0){
+					converter.toOriginal(r[0]).then(function(r){
+						res.json(r);
+					}).catch(mtthrow);
+				}else{
+					res.status(200).end();
+				}
+			}).catch(mtthrow);
 	});
 
 
@@ -226,10 +327,13 @@ function route(app, db, segmgr, prefix, mongodb) {
 		// var appid = req.params.appid;
 		var trid = req.params.id;
 		var collection = prefix + "trend";
-		db.collection(collection).updateOne({ _id: new mongodb.ObjectID(trid) }, { $set: data })
-		.then(function (results) {
-			res.status(200).end();
-		}).catch(mtthrow);
+
+		converter.toObject(data)
+			.then(function(r){
+				return db.collection(collection).updateOne({ _id: new mongodb.ObjectID(trid) }, { $set: r })
+			}).then(function (results) {
+				res.status(200).end();
+			}).catch(mtthrow);
 	});
 
 	app.delete('/trend/:appid/:id', function (req, res) {
@@ -246,10 +350,15 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.delete('/trend/:appid', function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "trend";
-		db.collection(collection).deleteMany({ _appid: appid })
-		.then(function (results) {
-			res.status(200).end();
-		}).catch(mtthrow);
+
+		converter.toID('_appid')
+			.then(function(r){
+				var query = {};
+				query[r] = appid;
+				return db.collection(collection).deleteMany(query);
+			}).then(function(r){
+				res.status(200).end();
+			}).catch(mtthrow);
 	});
 
 
@@ -446,10 +555,10 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.post('/segment/:appid', function (req, res) {
 		var data = req.body;
 		data._appid = Number(req.params.appid);
-
 		var collection = prefix + "segment";
-		db.collection(collection).insertOne(data) // add options: w, j, timeout ...
-		.then(function (r) {
+		converter.toObject(data).then(function(r){
+			return db.collection(collection).insertOne(r);
+		}).then(function(r){
 			var segid = r.insertedId; 
 			res.send(segid);
 		}).catch(mtthrow);
@@ -459,10 +568,43 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.get('/segment/:appid', function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "segment";
-		db.collection(collection).find({ _appid: appid }, { _appid: 0 }).toArray()
-		.then(function (results) {
-			res.json(results);
-		}).catch(mtthrow);
+
+		converter.toID('_appid')
+			.then(function(r){
+				var query = {};
+				var projection = {};
+				query[r] = appid;
+				projection[r] = 0;
+				return db.collection(collection).find(query, projection);
+			}).then(function(cursor){
+				var done = false;
+				var results = [];
+				async.whilst(
+    				function () { return done == false; },
+    				function(callback){
+    					cursor.next().then(function(r){
+    						if(r){
+    							converter.toOriginal(r).then(function(r){
+    								results.push(r);
+    								callback(null);
+    							}).catch(function(err){
+    								callback(err);
+    							});
+    						}else{	
+    							done = true;
+    							callback(null, results);
+    						}
+    					}).catch(function(err){
+    						callback(err);
+    					});
+    				}, function(err, results){
+    					if(err){
+    						mtthrow(err);
+    					}else{
+    						res.json(results);
+    					}
+    				});
+			}).catch(mtthrow);
 	});
 
 	//list a segment from a app
@@ -470,10 +612,25 @@ function route(app, db, segmgr, prefix, mongodb) {
 		// var appid = req.params.appid;
 		var segid = req.params.id;
 		var collection = prefix + "segment";
-		db.collection(collection).find({ _id: new mongodb.ObjectID(segid) }, { _id: 0, _appid: 0 }).toArray()
-		.then(function (results) {
-			res.json(results);
-		}).catch(mtthrow);
+
+		converter.toID('_appid')
+			.then(function(r){
+				var query = {
+					_id:  new mongodb.ObjectID(segid)
+				};
+				var projection = {};
+				projection[r] = 0;
+				projection['_id'] = 0;
+				return db.collection(collection).find(query, projection).toArray();
+			}).then(function(r){
+				if(r.length != 0){
+					converter.toOriginal(r[0]).then(function(r){
+						res.json(r);
+					}).catch(mtthrow);
+				}else{
+					res.status(200).end();
+				}
+			}).catch(mtthrow);
 	});
 
 
@@ -483,8 +640,9 @@ function route(app, db, segmgr, prefix, mongodb) {
 		// var appid = req.params.appid;
 		var segid = req.params.id;
 		var collection = prefix + "segment";
-		db.collection(collection).updateOne({ _id: new mongodb.ObjectID(segid) }, { $set: data })
-		.then(function (results) {
+		converter.toObject(data).then(function(r){
+			return 	db.collection(collection).updateOne({ _id: new mongodb.ObjectID(segid) }, { $set: r });
+		}).then(function(r){
 			res.status(200).end();
 		}).catch(mtthrow);
 	});
@@ -503,8 +661,11 @@ function route(app, db, segmgr, prefix, mongodb) {
 	app.delete('/segment/:appid', function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + "segment";
-		db.collection(collection).deleteMany({ _appid: appid })
-		.then(function (results) {
+		converter.toID('_appid').then(function(r){
+			var query = {};
+			query[r] = appid;
+			return db.collection(collection).deleteMany(query);
+		}).then(function (results) {
 			res.status(200).end();
 		}).catch(mtthrow);
 	});
