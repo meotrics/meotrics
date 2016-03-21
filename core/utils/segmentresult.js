@@ -1,43 +1,39 @@
-var MongoClient = require('mongodb').MongoClient,
-    url = 'mongodb://localhost:1234/test',
-    mongodb = require('mongodb'),
+var config = require('config'),
+	mongodb = require('mongodb'),
+	MongoClient = mongodb.MongoClient,
     converter = require('../utils/fakeidmanager.js'),
     async = require('async'),
     converter = new converter.IdManager(),
 	db = null;
 
-MongoClient.connect(url)
-    .then(function(database){
-        console.log('[MongoDB] connected');
-        db = database;
-        
-        groupby('meotrics_1', '56e81a3344ae6d1f522e94da', 'gender', 'string', 'age', 'number', function(err, results){
-          console.log(err);
-          console.log(JSON.stringify(results));
-        });
+var url = 'mongodb://' + config.get('mongod.host') + ':' + config.get('mongod.port') + '/' + config.get('mongod.database');
 
-        // Listen for some events
-        db.on('reconnect', function(data){
-          console.log(data);
-          console.log('[MongoDB] reconnect success');
-        });
-        db.on('error', function(err){
-          console.log('[MongoDB] error', err.message);
-        });
-        db.on('close', function(err){
-          console.log('[MongoDB] disconnected');
-        });
-        // return db.collection('test').find({isUser: true}).toArray();
-    }).catch(function(err){
-        console.error("[MongoDB]", err.message);
-    }); 
+module.exports = function (collection, segmentid, field1, type1, field2,type2, callback){
+	MongoClient.connect(url)
+	    .then(function(database){
+	        console.log('[MongoDB] connected');
+	        db = database;
+	        
+	        groupby(collection, segmentid, field1, type1, field2,type2, callback);
 
-
-
-
-
+	        // Listen for some events
+	        db.on('reconnect', function(data){
+	          console.log(data);
+	          console.log('[MongoDB] reconnect success');
+	        });
+	        db.on('error', function(err){
+	          console.log('[MongoDB] error', err.message);
+	        });
+	        db.on('close', function(err){
+	          console.log('[MongoDB] disconnected');
+	        });
+	        // return db.collection('test').find({isUser: true}).toArray();
+	    }).catch(function(err){
+	        console.error("[MongoDB]", err.message);
+	    });	
+}
+ 
 function groupby(collection, segmentid, field1, type1, field2,type2, callback){
-	console.log('haha');
 	if(field2 == undefined){
 		converter.toIDs(['_isUser', '_segments', field1], function(ids){
 
@@ -91,9 +87,9 @@ function groupby(collection, segmentid, field1, type1, field2,type2, callback){
 			                    results[1]+=r.count;
 			                  }else if ((r._id > 18)&&(r._id<=24)){
 			                    results[2]+=r.count;
-			                  }else if ((r._id > 25)&&(r._id<=34)){
+			                  }else if ((r._id > 24)&&(r._id<=34)){
 			                    results[3]+=r.count;
-			                  }else if ((r._id > 35)&&(r._id<=44)){
+			                  }else if ((r._id > 34)&&(r._id<=44)){
 			                    results[4]+=r.count;
 			                  }else if ((r._id > 44)&&(r._id<=54)){
 			                    results[5]+=r.count;
@@ -200,7 +196,7 @@ function groupby(collection, segmentid, field1, type1, field2,type2, callback){
 				                callback(err, finalResults);
 				              });
 		        		}else{
-		        			// ERROR TYPE NOT HOP LE
+		        			callback (new Error ('Type not valid'));
 		        		}
 		        	}
 		        }
@@ -208,7 +204,6 @@ function groupby(collection, segmentid, field1, type1, field2,type2, callback){
 		});
 	}else{
 		converter.toIDs(['_isUser', '_segments', field1, field2], function(ids){
-
 			var maxfield1;
 			var minfield1;
 			var maxfield2;
@@ -260,10 +255,9 @@ function groupby(collection, segmentid, field1, type1, field2,type2, callback){
 						allowDiskUse: true
 					});
 			}).then(function(cursor){
-
-				if((typeof minfield1 == typeof maxfield1)&&(typeof maxfield1 == typeof type1)&&(type1 == 'string')){
+				if((typeof minfield1 == typeof maxfield1)&&(typeof maxfield1 == type1)&&(type1 == 'string')){
 					var results = [];
-					if((typeof minfield2 == typeof maxfield2)&&(typeof maxfield2 == typeof field2)&&(typeof field2 == 'string')){
+					if((typeof minfield2 == typeof maxfield2)&&(typeof maxfield2 == field2)&&(field2 == 'string')){
 						var done = false;
 						async.whilst(
 							function () { return done == false; },
@@ -287,7 +281,7 @@ function groupby(collection, segmentid, field1, type1, field2,type2, callback){
 							}
 						);
 					}else if((typeof minfield2 == typeof maxfield2)&&(typeof maxfield2 == type2)&&(type2 == 'number')){
-						console.log('ok');
+						
 						var results = [];
 						var spaces = 1;
 						var distance = 0;
@@ -320,19 +314,134 @@ function groupby(collection, segmentid, field1, type1, field2,type2, callback){
 							}
 						);
 					}else{
-	              	// ERROR TYPE
+	              		callback (new Error ('Type not valid'));
 	              	
-	              }
-	          }else if((typeof minfield1 == typeof maxfield1)&&(typeof maxfield1 == typeof field1)&&(typeof field1 == 'number')){
-	          	if((typeof minfield2 == typeof maxfield2)&&(typeof maxfield2 == typeof field2)&&(typeof field1 == 'string')){
+	              	}	
+	          	}else if((typeof minfield1 == typeof maxfield1)&&(typeof maxfield1 == type1)&&(type1 == 'number')){
+	          		
+		          	if( ((typeof minfield2 != typeof maxfield2)||(typeof maxfield2 != type2)) &&
+		          		((filed2 == 'number') || (field2 == 'string'))){
 
-	          	}else if((typeof minfield2 == typeof maxfield2)&&(typeof maxfield2 == typeof field2)&&(typeof field1 == 'number')){
+		          	}else{
 
-	          	}else{
-	              	// ERROR TYPE
-	            }
-	          }else{
-	            	// ERROR TYPE
+				        	
+				        	var results = [];
+							var spaces = 1;
+							var distance = 0;
+							if(maxfield1 - minfield1 >= 5){
+								spaces = 5;
+								distance = Math.floor((maxfield1 - minfield1) / 5);
+							}
+							if(field1 == 'age'){
+								spaces = 6;
+							}
+							for(var i=0;i<spaces;i++){
+								results[i] = {
+									count: 0,
+									values: []
+								}
+							}
+
+							var index = 0;
+							var done = false;
+				            async.whilst(
+								function () { return done == false; },
+								function(callback){
+									cursor.next().then(function(r){
+										var indexNew = 0;
+										if(r){
+											var temp = r._id;
+											if(field1 != 'age'){
+												if(maxfield1 != minfield1){
+													indexNew = Math.floor(((temp-minfield1)*spaces)/(maxfield1-minfield1));
+													if(indexNew == spaces){
+														indexNew --;
+													}	
+												}
+											}else{
+												console.log(temp);
+												if(temp<=18){
+							                    	indexNew = 0;
+							                  	}else if ((temp > 18)&&(temp<=24)){
+							                    	indexNew = 1;
+							                  	}else if ((temp > 24)&&(temp<=34)){
+							                    	indexNew = 2;
+							                 	}else if ((temp > 34)&&(temp<=44)){
+							                    	indexNew = 3;
+							                 	}else if ((temp > 44)&&(temp<=54)){
+							                    	indexNew = 4;
+							                 	}else {
+							                    	indexNew = 5;
+							                 	}
+
+											}
+											
+											results[indexNew].count = results[indexNew].count + r.count;
+											results[indexNew].values = results[indexNew].values.concat(r.values);	
+										}else{
+											// console.log(results);	
+											done = true;
+											indexNew = -1;
+										}
+
+										if(indexNew != index){
+											
+											if(field2 == 'number'){
+												results[index]['detail'] = summingNumber(minfield1, maxfield1, spaces, distance, results[index].values, field2);
+											}else{
+												results[index]['detail'] = summingString(results[index].values);
+											}
+
+											delete results[index].values;
+											index = indexNew;
+										}
+										callback(null, results);
+									}).catch(function(e){
+										callback(e);
+									});
+								}, function(err, results){
+									if(field1 != 'age'){
+										for(var i=0;i<spaces;i++){
+											results[i]['key'] = {
+												from: minfield1+i*distance,
+												to: minfield1+(i+1)*distance
+											};
+											if(i == spaces - 1){
+												results[i]['key']['to'] = maxfield1;
+											}
+										}	
+									}else{
+										results[0].key = {
+											to: 18
+										};
+										results[1].key = {
+											from: 19,
+											to: 24
+										};
+										results[2].key = {
+											from: 25,
+											to: 34
+										};
+										results[3].key = {
+											from: 35,
+											to: 44
+										};
+										results[4].key = {
+											from: 45,
+											to: 54
+										};
+										results[5].key = {
+											from: 55
+										};
+									}
+									
+									callback(err, results);
+								}
+							);
+				        }
+				    
+	        	}else{
+	            	callback (new Error ('Type not valid'));
 	            }
 	        }).catch(function(err){
 	        	callback(err);	
