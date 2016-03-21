@@ -51,25 +51,47 @@ each $types have fields in it
 
 		updateQuery();
 
-		{{--var types ={!!   $types !!} ;--}}
-		{{--onPageLoad(function()--}}
-		{{--{--}}
-			{{--for(var i in types)--}}
-			{{--{--}}
-				{{--var $option = $('<option>');--}}
-				{{--$option.html(types[i].name);--}}
-				{{--$option.val(types[i].id);--}}
-				{{--$('#actionselect').append($option);--}}
-			{{--}--}}
+		function change_type(id)
+		{
+			//find in types
+			for( var i in types )
+			{
+				if(types[i]._id == id)
+				{
+					$('#paramselect').empty();
+					$('#fieldselect').empty();
 
-			{{--$('#actionselect').change(function(){--}}
-				{{--//find in types--}}
-				{{--for( var )--}}
+					for(var j in types[i].fields){
+						var field = types[i].fields[j];
+						var $option = $('<option>');
+						$option.val(field.pcode);
+						$option.html(field.pname);
 
-			{{--})--}}
 
+						$('#paramselect').append($option.clone());
+						$('#fieldselect').append($option.clone());
+					}
+				}
+			}
 
-//		})
+		}
+
+		var types ={!!   $types !!} ;
+		onPageLoad(function()
+		{
+			$('#actionselect').empty();
+			for(var i in types)
+			{
+				var $option = $('<option>');
+				$option.html(types[i].name);
+				$option.val(types[i]._id);
+				$('#actionselect').append($option);
+			}
+
+			$('#actionselect').change(function(){
+				change_type($(this).val());
+			});
+		})
 	</script>
 @endsection
 

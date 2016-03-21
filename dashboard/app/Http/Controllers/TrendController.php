@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers;
+use App\Util\MtHttp;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 
@@ -13,41 +14,22 @@ class TrendController extends Controller {
 
 	public function index()
 	{
-		return view('trend/index');
+		$actiontypes = MtHttp::get('actiontype/' . '1');
+		return view('trend/index', ['types' => json_encode($actiontypes)]);
 	}
 
 	public function query(Request $request)
 	{
-
-		// use key 'http' even if you send the request to https://...
-		$options = array(
-			'http' => array(
-				'header'  => "Content-type: application/json\r\n",
-				'method'  => 'POST',
-				'content' => json_encode(array(
-					'event' => $request->input('typeid') ,
-					'object' => $request->input('object'),
-					'operation' => $request->input('operation'),
-					'param' => $request->input('param')
-					)
-				),
-			),
+		$data = array(
+			'event' => $request->input('typeid') ,
+			'object' => $request->input('object'),
+			'operation' => $request->input('operation'),
+			'param' => $request->input('param')
 		);
-		$context  = stream_context_create($options);
-		$result = json_decode(file_get_contents('http://127.0.0.1:2108/trend/1', false, $context));
-		$trendid = $result->_id;
-		$options = array(
-			'http' => array(
-				'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-				'method'  => 'GET',
 
-			),
-		);
-		$context = stream_context_create($options);
-		$result= file_get_contents('http://127.0.0.1:2108/trend/query/1/' . $trendid, false, $context);
-
+		$trendid = MtHttp::post('trend/1', $data);
+		$result =MtHttp::get('trend/query/1/' . $trendid);
 		return $result;
-
 	}
 
 	public function show()
