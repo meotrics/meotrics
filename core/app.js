@@ -100,11 +100,10 @@ function getQueryTrending(object, converter, callback) {
 		});
 }
 
-function route(app, db, segmgr, prefix, mongodb) {
+function route(app, db, segmgr, prefix, mongodb, converter) {
 	var bodyParser = require('body-parser');
 	var async = require('async');
-	var converter = require('./utils/idmanager.js');
-	converter = new converter.IdManager();
+
 	// parse application/x-www-form-urlencoded
 	// app.use(bodyParser.urlencoded({ extended: false }))
 
@@ -694,7 +693,10 @@ MongoClient.connect(buildconnstr(), function (err, db) {
 	// route(app, db, segmgr);
 	var prefix = config.get("mongod.prefix") || "meotrics_";
 
-	route(app, db, null, prefix, mongodb);
+	var converter = require('./utils/fakeidmanager.js');
+	converter = new converter.IdManager();
+
+	route(app, db, null, prefix, mongodb, converter);
 
 	//run the app
 	var port = config.get("port") || 2108;
