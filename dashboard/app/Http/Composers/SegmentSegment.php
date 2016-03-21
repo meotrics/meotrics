@@ -12,8 +12,8 @@ class SegmentSegment
 	{
 		$appid = 1;
 		$segments = MtHttp::get('segment/' . $appid);
-
-		$view->with('segments', json_encode($segments));
+		$segments = [];
+		$view->with('segments', ($segments));
 
 		$view->with('a', 4);
 	}
