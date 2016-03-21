@@ -93,12 +93,10 @@ function updateDB(actionC, reduceC, segmentID) {
 							db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
 						}
 					} else {
-						throw e;
+						mtthrow(e);
 					}
 				});
-	}).catch(function (e) {
-
-	});
+	}).catch(mtthrow);
 }
 // ------------------------------------------------------
 function revenue(collection, segID, wrap, inside, callback) {

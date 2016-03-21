@@ -1,16 +1,15 @@
-exports.Crud = function (db, mongodb, converter, prefix, mtthrow, col) {
-	var async = require('async');
+exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
+
 	this.create = function (req, res) {
 		var collection = prefix + col;
 		var data = req.body;
 		data._appid = Number(req.params.appid);
-		converter.toObject(data)
-				.then(function (r) {
+		converter.toObject(data).then(function (r) {
 					return db.collection(collection).insertOne(r);
 				}).then(function (r) {
-			var _typeid = r.insertedId;
-			res.send(_typeid);
-		}).catch(mtthrow);
+					var _typeid = r.insertedId;
+					res.send(_typeid);
+				}).catch(mtthrow);
 	};
 
 	this.list = function (req, res) {
