@@ -1,7 +1,7 @@
-exports.Crud = function (db, mongodb, converter, prefix, mtthrow, collection) {
-
+exports.Crud = function (db, mongodb, converter, prefix, mtthrow, col) {
+	var async = require('async');
 	this.create = function (req, res) {
-		var collection = prefix + collection;
+		var collection = prefix + col;
 		var data = req.body;
 		data._appid = Number(req.params.appid);
 		converter.toObject(data)
@@ -15,7 +15,7 @@ exports.Crud = function (db, mongodb, converter, prefix, mtthrow, collection) {
 
 	this.list = function (req, res) {
 		var appid = Number(req.params.appid);
-		var collection = prefix + collection;
+		var collection = prefix + col;
 		converter.toID('_appid')
 				.then(function (r) {
 					var query = {};
@@ -59,7 +59,7 @@ exports.Crud = function (db, mongodb, converter, prefix, mtthrow, collection) {
 	this.match = function (req, res) {
 		// var appid = req.params.appid;
 		var atid = req.params.id;
-		var collection = prefix + collection;
+		var collection = prefix + col;
 		converter.toID('_appid')
 				.then(function (r) {
 					var query = {
@@ -83,7 +83,7 @@ exports.Crud = function (db, mongodb, converter, prefix, mtthrow, collection) {
 	this.delete = function (req, res) {
 		// var appid = req.params.appid;
 		var atid = req.params.id;
-		var collection = prefix +collection;
+		var collection = prefix +col;
 		db.collection(collection).deleteOne({_id: new mongodb.ObjectID(atid)})
 				.then(function (r) {
 					res.status(200).end();
@@ -94,7 +94,7 @@ exports.Crud = function (db, mongodb, converter, prefix, mtthrow, collection) {
 	{
 			var data = req.body;
 			var atid = req.params.id;
-			var collection = prefix + collection;
+			var collection = prefix + col;
 			converter.toObject(data)
 					.then(function (r) {
 						return db.collection(collection).updateOne({_id: new mongodb.ObjectID(atid)}, {$set: r})

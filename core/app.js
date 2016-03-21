@@ -114,7 +114,7 @@ function getQueryTrending(object, converter, callback) {
 function route(app, db, segmgr, prefix, mongodb, converter) {
 	var bodyParser = require('body-parser');
 	var async = require('async');
-	var Crud = require('./module/actiontype.js').Crud;
+	var Crud = require('./module/crud.js').Crud;
 	var typemgr = new Crud(db, mongodb, converter, prefix, mtthrow, "actiontype");
 	var propmgr = new Crud(db, mongodb, converter, prefix, mtthrow, "userprop");
 	var cammgr = new Crud(db, mongodb, converter, prefix, mtthrow, "campaign");

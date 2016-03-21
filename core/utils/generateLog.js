@@ -6,18 +6,22 @@ var numberUsers = 0;
 var db = null;
 
 
-exports.generate = function (converter, url, npageviews, npurchases, collection, callback) {
+exports.generate = function (converter, url, npageviews, npurchases, collection, pageviewid, purchaseid, callback) {
 	if (callback === undefined) callback = function () {
 	};
 
+	//list all action type
+
+	//for each action type, generate n
+
 	console.log('--GENERATE PAGEVIEW--');
-	getUsers('pageview', converter, url, npageviews, collection, function () {
+	getUsers('pageview', converter, url, npageviews, collection, pageviewid, function () {
 		console.log('--GENERATE PURCHASE--');
-		getUsers('purchase', converter, url, npurchases, collection, callback);
+		getUsers('purchase', converter, url, npurchases, collection, purchaseid, callback);
 	});
 };
 
-function getUsers(actiontype, converter, url, n, collection, callback) {
+function getUsers(actiontype, converter, url, n, collection, typeid, callback) {
 	MongoClient.connect(url)
 			.then(function (database) {
 				console.log('[MongoDB] connected');
@@ -41,35 +45,35 @@ function getUsers(actiontype, converter, url, n, collection, callback) {
 	}).then(function (results) {
 		users = results;
 		numberUsers = users.length;
-		generateDB(actiontype, converter, url, n, collection, callback);
+		generateDB(actiontype, converter, url, n, collection, typeid, callback);
 	}).catch(function (err) {
 		console.error("[MongoDB]", err.message);
 		setTimeout(function () {
-			getUsers(actiontype, converter, url, n, collection, callback)
+			getUsers(actiontype, converter, url, n, collection, typeid, callback)
 		}, 2000);
 	});
 }
 
-function generatePageView(ids) {
+function generatePageView(ids, typeid) {
 	var user = users[generateNumber(0, numberUsers - 1)];
 	var page = {};
-	page[ids._typeid] = new mongodb.ObjectID("56e8c128282aa21428689c6a");
+	page[ids._typeid] = new mongodb.ObjectID(typeid);
 	page[ids.url] = 'http://' + generateNumber(1, 1000) + '.com';
-    page[ids._segments] = [];
+	page[ids._segments] = [];
 	page[ids.camid] = generateNumber(1, 10);
 	page[ids._ctime] = Math.floor(new Date().getTime() / 1000);
 	page[ids._mtid] = user._id;
 	return page;
 }
 
-function generatePurchase(ids) {
+function generatePurchase(ids, typeid) {
 	var user = users[generateNumber(0, numberUsers - 1)];
 	var pid = generateNumber(1, 1000);
 	var purchase = {};
-	purchase[ids._typeid] = new mongodb.ObjectID("56e8c0ca282aa21428689c68");
+	purchase[ids._typeid] = new mongodb.ObjectID(typeid);
 	purchase[ids._ctime] = Math.floor(new Date().getTime() / 1000);
 	purchase[ids._mtid] = user._id;
-    purchase[ids._segments] = [];
+	purchase[ids._segments] = [];
 	purchase[ids.cid] = pid % 10;
 	purchase[ids.pid] = pid;
 	purchase[ids.quantity] = generateNumber(1, 10);
@@ -84,13 +88,13 @@ function generateNumber(min, max) {
 	return number;
 }
 
-function generateDB(actiontype, converter, url, n, collection, callback) {
+function generateDB(actiontype, converter, url, n, collection, typeid, callback) {
 	var count = 0;
 	if (actiontype == 'purchase') {
 		converter.toIDs(['_typeid', '_ctime', '_mtid', 'cid', 'pid', 'quantity', 'price', '_segments'], function (ids) {
 			for (var i = 0; i < n; i++) {
 				count++;
-				var r = generatePurchase(ids);
+				var r = generatePurchase(ids, typeid);
 				db.collection(collection).insertOne(r)
 						.then(function (results) {
 							count--;
@@ -111,7 +115,7 @@ function generateDB(actiontype, converter, url, n, collection, callback) {
 		converter.toIDs(['_typeid', 'url', 'camid', '_ctime', '_mtid', '_segments'], function (ids) {
 			for (var i = 0; i < n; i++) {
 				count++;
-				var r = generatePageView(ids);
+				var r = generatePageView(ids, typeid);
 				db.collection(collection).insertOne(r)
 						.then(function (results) {
 							count--;
