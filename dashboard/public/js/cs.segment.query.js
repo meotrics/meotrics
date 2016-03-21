@@ -21,8 +21,8 @@ function SegmentQuery() {
 					var $cond = $($conds[t]);
 
 					//jump over deleted condition
-					if($cond.hasClass('hidden')) continue;
-					
+					if ($cond.hasClass('hidden')) continue;
+
 					if (ele.fields.length !== 0) ele.fields.push('and');
 					ele.fields.push($cond.find('.id_fi').val());
 					ele.fields.push($cond.find('.id_op').val());
@@ -43,7 +43,15 @@ function SegmentQuery() {
 				//do nothing
 			}
 		}
-		return query;
+		var out = [query[0]];
+		for (var i in query) {
+			if (i > 0) {
+				out.push('and');
+				out.push(query[i]);
+			}
+		}
+
+		return out;
 	};
 
 	this.produce = function (callback, data) {

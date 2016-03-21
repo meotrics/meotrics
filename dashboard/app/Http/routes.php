@@ -19,7 +19,7 @@ Route::resource('trend', 'TrendController');
 Route::resource('actiontype', 'TypeController');
 
 Route::post('/actiontype/create', 'TypeController@create');
-Route::resource('segment', 'SegmentController');
+Route::controller('segment', 'SegmentController');
 Route::get('queryTrend', 'TrendController@query');
 Route::controllers([
 	'auth' => 'Auth\AuthController',

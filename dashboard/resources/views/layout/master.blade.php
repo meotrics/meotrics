@@ -22,6 +22,14 @@
 	<link href="{{asset('css/fg.menu.css')}}" rel="stylesheet"/>
 	<link rel="stylesheet" href="{{asset('css/daterangepicker.css')}}"/>
 	@yield('style')
+	<script>
+		function onPageLoad(fn) {
+			if (window.addEventListener)
+				window.addEventListener('load', fn, false);
+			else if (window.attachEvent)
+				window.attachEvent('onload', fn);
+		}
+	</script>
 </head>
 <body>
 <div class="wrapper">
@@ -93,8 +101,9 @@
 						<li>
 							<a style="padding: 0px">
 								<div class="input-group" style="width: 250px;">
-                                    <span class="input-group-addon"><i class="pe-7s-date"
-                                                                       style="font-size:26px"></i></span>
+                  <span class="input-group-addon">
+	                  <i class="pe-7s-date" style="font-size:26px"></i>
+                  </span>
 									<input type="text" class="form-control" id="date-range">
 
 								</div>

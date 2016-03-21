@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\View\View;
 
 //App\Http\Composers\View
-class MasterComposer
+class SegmentSegment
 {
 
 	public function compose(View $view)

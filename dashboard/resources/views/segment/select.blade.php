@@ -1,4 +1,4 @@
-<?php if (isset($segments) == false) $segments = []; ?>
+
 <li class="dropdown mr">
 	<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 		<i class="pe-7s-user" style="vertical-align: middle; font-size: 28px"></i>
@@ -15,7 +15,7 @@
 </li>
 
 <script>
-	$(function () {
+	onPageLoad(function () {
 		function segmentselect(name, id) {
 			$('.segment-label').html(name);
 			setsegment(name, id)
