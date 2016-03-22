@@ -15,45 +15,61 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
 	this.list = function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + col;
-		converter.toID('_appid')
-				.then(function (r) {
-					var query = {};
+		converter.toIDs(['_appid', '_isDraft'], function(ids){
+
+					var query = {'$and':[]};
 					var projection = {};
-					query[r] = appid;
-					projection[r] = 0;
-					return db.collection(collection).find(query, projection);
-				}).then(function (cursor) {
-			var done = false;
-			var results = [];
-			async.whilst(
-					function () {
-						return done == false;
-					},
-					function (callback) {
-						cursor.next().then(function (r) {
-							if (r) {
-								converter.toOriginal(r).then(function (r) {
-									results.push(r);
-									callback(null);
+
+					var andStatement = {};
+					andStatement[ids['_appid']] = appid;
+					query['$and'].push(andStatement);
+
+					andStatement = {'$or': []};
+					var orStatement = {};
+					orStatement[ids['_isDraft']] = false;
+					andStatement['$or'].push(orStatement);
+					orStatement = {};
+					orStatement[ids['_isDraft']] = {'$exists': false};
+					andStatement['$or'].push(orStatement);
+
+					query['$and'].push(andStatement);
+					console.log(JSON.stringify(query));
+					projection[ids['_appid']] = 0;
+					projection[ids['_isDraft']] = 0;
+
+					var cursor = db.collection(collection).find(query, projection);
+						var done = false;
+						var results = [];
+						async.whilst(
+							function () {
+								return done == false;
+							},
+							function (callback) {
+								cursor.next().then(function (r) {
+									if (r) {
+										converter.toOriginal(r).then(function (r) {
+											results.push(r);
+											callback(null);
+										}).catch(function (err) {
+											callback(err);
+										});
+									} else {
+										done = true;
+										callback(null, results);
+									}
 								}).catch(function (err) {
 									callback(err);
 								});
-							} else {
-								done = true;
-								callback(null, results);
-							}
-						}).catch(function (err) {
-							callback(err);
-						});
-					}, function (err, results) {
-						if (err) {
-							mtthrow(err);
-						} else {
-							res.json(results);
-						}
-					});
-		}).catch(mtthrow);
-	};
+							}, function (err, results) {
+								if (err) {
+									mtthrow(err);
+								} else {
+									res.json(results);
+								}
+							});
+
+		});
+	}
 
 	this.match = function (req, res) {
 		// var appid = req.params.appid;
@@ -101,4 +117,5 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
 				res.status(200).end();
 			}).catch(mtthrow);
 	};
+
 };
