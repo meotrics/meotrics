@@ -50,7 +50,7 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, mtthrow, col
                 object.object = r;
 
                 // -- START MATCH CLAUSE
-                query.push({$match: {_typeid: new mongodb.ObjectID(object.event)}});
+                query.push({$match: {_typeid: new mongodb.ObjectID(object.typeid)}});
 
                 if (object._segment != undefined) {
                     query[0]['$match']['_segments'] = {
