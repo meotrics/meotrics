@@ -1,73 +1,85 @@
-.logo-text{
-  font-size: 20px;
-  margin-left: 11px;
-  font-weight: 400;
-  /* padding-top: 21px; */
+.logo-text {
+	font-size: 20px;
+	margin-left: 11px;
+	font-weight: 400;
+	/* padding-top: 21px; */
 }
-.nav>li.user-area
-{
-  position: absolute;;
-  bottom: 20px;
+
+.nav > li.user-area {
+	position: absolute;;
+	bottom: 20px;
 }
 
 th {
-    font-weight: normal;
+	font-weight: normal;
 }
 
-
-.mr
-{
-  vertical-align: middle;
+.mr {
+	vertical-align: middle;
 	margin-right: 20px;
 }
 
-.mr5
-{vertical-align: top;margin-right: 1px;}
-
-
-select
+.ml
 {
+	margin-left: 20px;
+}
+
+.mr5 {
+	vertical-align: top;
+	margin-right: 1px;
+}
+
+select {
 	box-shadow: inset 0px -3px 10px -8px #717171 !important;
 }
 
-.fmonospaced
-{
+.fmonospaced {
 	color: #2C629A;
 	text-transform: uppercase;
 	background-color: rgba(0, 0, 0, 0.08);
 	font-family: 'consolas', 'Monaco', monospace;
 }
 
-.querybtn{
+.querybtn {
 	padding-top: 5px;
 }
 
-.mt5
-{
+.mt5 {
 	margin-top: 5px;
 }
 
-.mb{
+.mb {
 	margin-bottom: 10px;
 }
 
-.dim
-{
+.dim {
 	color: #bbb;
 	transition: color 0.2s;
 }
 
-.dim:hover
-{
+.dim:hover {
 	transition: color 0.2s;
 	color: #083087
 }
 
-.lefticon
-{
+.lefticon {
 	float: left;
 	position: absolute;
 	margin-left: -19px;
 	vertical-align: top;
 	margin-top: 9px;
+}
+
+.modal-header {
+	background-color: #2C629A;
+	color: white;
+	border-bottom: none;
+}
+
+.close{
+	color: white;
+}
+.close:focus, .close:hover
+{
+	color: #FFF;
 }
