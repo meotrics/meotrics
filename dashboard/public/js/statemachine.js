@@ -22,6 +22,6 @@ function StateMachine(_guid, handlers, refreshhandlers) {
 		me.current = state.current = newstate;
 		localStorage[guid] = JSON.stringify(state);
 		//call handler
-		handlers[[state.last, state.current]]();
+		handlers[state.last + "_" + state.current]();
 	};
 }
