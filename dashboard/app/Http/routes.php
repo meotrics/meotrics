@@ -24,3 +24,5 @@ Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',
 ]);
+
+Route::controller('guideline', 'GuidelineController');

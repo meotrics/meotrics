@@ -1,7 +1,7 @@
 //define meotrics for queue
 var Meotrics = Meotrics || {};
 
-Meotrics.appid = "1234";
+Meotrics.appid = "<MT_APP_ID>";
 
 Meotrics.__requestQueue= Meotrics.__requesQueue || [];
 
