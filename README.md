@@ -20,9 +20,6 @@ trỏ danh sách tên miền sau
 | Tên miền              | Địa chỉ           |
 |-----------------------|-------------------|
 |meotrics.dev           | 127.0.0.1         |
-|backend.meotrics.dev   | 127.0.0.1         |
-|meotrics.run           | 198.98.102.113    |
-|backend.meotrics.run   | 198.98.102.113    |
 
 2. Danh sách port chuẩn
 
@@ -33,6 +30,14 @@ trỏ danh sách tên miền sau
 |mysql     	|3306|
 |mongodb   	|27017|
 
+## Yêu cầu
+* Nodejs
+* Mysql
+* Mongodb
+* Redis
+* Composer
+* Npm
+* Nginx or Apache
 ## Cài đặt PHP
 1. Cài đặt Composer
 	1. Môi trường window
@@ -67,9 +72,8 @@ trỏ danh sách tên miền sau
 	```
 	sudo chmod -R 777 storage
 	```
-
-	**Tạo một file .env có nội dung giống với .env.example, sửa config csdl ở đây**
-3. Cài đặt nodejs
+## Cài đặt nodejs
+1. Cài đặt nodejs
 	
 	Chuyển vào thư mục core (`meotrics/core`), gõ
 	```
@@ -77,9 +81,13 @@ trỏ danh sách tên miền sau
 	```
 
 	**go in to meotrics/core/config, copy production.json to default.json, config your database in default.json**
-3. Cấu hình Web Server
 
-	1.  Cấu hình apache
+## Cấu hình
+
+1. Cấu hình Web Server
+	
+	Có thể chạy hệ thống bằng apache hoặc nginx, với mỗi server, copy và sửa các đoạn config như dưới
+	1.  Apache > 2.2
 		```
 		<VirtualHost *:80>
 			DocumentRoot "E:\workspace\nodemeotrics\meotrics\dashboard\public"
@@ -93,32 +101,41 @@ trỏ danh sách tên miền sau
 			</Directory>
 		</VirtualHost>
  		```
+	2. Apache <= 2.2
+		```
+		<VirtualHost *:80>
+			DocumentRoot "E:\workspace\nodemeotrics\meotrics\dashboard\public"
+			ServerName meotrics.dev
+			ErrorLog "logs/meotrics.dev-error.log"
+			CustomLog "logs/meotrics.dev-access.log" common
 
+			<Directory />
+				AllowOverride FileInfo Options=MultiViews
+			</Directory>
+		</VirtualHost>
+ 		```
 	2.  Cấu hình nginx
 		```
 		server {
 			charset utf-8;
-			client_max_body_size 128M;
-			listen 80; ## listen for ipv4
-			#listen [::]:80 default_server ipv6only=on; ## listen for ipv6
+			listen 80;
 
 			server_name meotrics.run;
 			root        /home/thanhpk/space/meotrics/dashboard/public/;
 			index       index.php;
 
-			access_log  /home/thanhpk/tmp/frontend-access.log;
-			error_log   /home/thanhpk/tmp/frontend-error.log;
+			access_log  /home/thanhpk/tmp/meotrics-access.log;
+			error_log   /home/thanhpk/tmp/meotrics-error.log;
 
 			location / {
-				# Redirect everything that isn't a real file to index.php
 				try_files $uri $uri/ /index.php?$args;
 			}
 			
 			location ~ \.php$ {
 				include fastcgi_params;
-		           fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
-		           fastcgi_pass   unix:/var/run/php5-fpm.sock;
-		           try_files $uri =404;
+		        fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+		        fastcgi_pass   unix:/var/run/php5-fpm.sock;
+		        try_files $uri =404;
 			}
 
 			location ~ /\.(ht|svn|git) {
@@ -126,12 +143,25 @@ trỏ danh sách tên miền sau
 			}
 		}
 		```
-4. Generate database
+4. Cấu hình Mysql
+	
+	Tạo tài khoản mysql có tên meotrics/meotrics123
 
-	Import database trong thư mục resources
+    **Trong thư mục `/dashboard` tạo một file .env có nội dung giống với .env.example, sửa config csdl ở đây**
+    
+	Đặt `DB_USERNAME/DB_PASSWORD` là `meotrics/meotrics123`
+	
+    Import database file  `\resources\meotrics_dashboard.sql`
 4. Đường dẫn chuẩn
   * Dashboard:
     * Frontend: meotrics.dev | meotrics.run
   * Core API
 
     127.0.0.1:2108
+
+4. Chạy chương trình
+	1. Vào thư mục core, gõ
+	
+		```node app.js```
+	
+	2. Truy cập vào địa chỉ `http://meotrics.dev/auth/login` để đăng nhập
