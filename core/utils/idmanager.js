@@ -169,7 +169,6 @@ exports.IdManager = function () {
 				(function () {
 					newobj[i] = object[i];
 					ci--;
-					console.log('44' + ci);
 					if (ci == 0) return sucback(newobj);
 				})();
 			}
@@ -177,7 +176,6 @@ exports.IdManager = function () {
 				var j = i;
 				if (j.startsWith('$'))
 					j = j.substring(1);
-				console.log('_' + j);
 				db.get('_' + j, function (err, value) {
 
 					if (i.startsWith('$'))

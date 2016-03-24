@@ -15,12 +15,11 @@ Route::get('/', 'WelcomeController@index');
 
 Route::get('home', 'HomeController@index');
 
-Route::resource('trend', 'TrendController');
+Route::controller('trend', 'TrendController');
 Route::resource('actiontype', 'TypeController');
 
 Route::post('/actiontype/create', 'TypeController@create');
 Route::controller('segment', 'SegmentController');
-Route::get('queryTrend', 'TrendController@query');
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',

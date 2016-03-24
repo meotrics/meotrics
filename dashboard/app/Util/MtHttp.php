@@ -12,14 +12,14 @@ class MtHttp
 		$url = "http://" . MtHttp::$host . ":" . MtHttp::$port . '/' . $url;
 		if ($data !== null)
 			$options = array('http' => array(
-				'header' => "Content-type: application/json\r\n",
+				'header' => "Content-type: application/x-www-form-urlencoded\r\n",
 				'method' => 'GET',
 				'content' => json_encode($data)
 			));
 		else
 			$options = array('http' => array(
 				'header' => "Content-type: application/json\r\n",
-				'method' => 'POST'
+				'method' => 'GET'
 			));
 		$context = stream_context_create($options);
 		return json_decode(file_get_contents($url, false, $context));
@@ -55,7 +55,7 @@ class MtHttp
 		else
 			$options = array('http' => array(
 				'header' => "Content-type: application/json\r\n",
-				'method' => 'POST'
+				'method' => 'PUT'
 			));
 		$context = stream_context_create($options);
 		return json_decode(file_get_contents($url, false, $context));
@@ -73,7 +73,7 @@ class MtHttp
 		else
 			$options = array('http' => array(
 				'header' => "Content-type: application/json\r\n",
-				'method' => 'POST'
+				'method' => 'DELETE'
 			));
 		$context = stream_context_create($options);
 		return json_decode(file_get_contents($url, false, $context));

@@ -8,6 +8,7 @@
 		var actions ={!!   $actions !!} ;
 		var props ={!! $props !!};
 
+		var segments = {!! $segments !!};
 		var data = [];
 
 		for (var i in actions) {
@@ -41,7 +42,13 @@
 			var $field1 = $('.id_field1-43');
 			var $field2 = $('.id_field1-54');
 
-			$.get('/segment/execute', {id: -1, name: 'Draf', query: sq.query(), f1: $field1.val(), f2: $field2.val()}, function (data) {
+			$.get('/segment/execute', {
+				id: -1,
+				name: 'Draf',
+				query: sq.query(),
+				f1: $field1.val(),
+				f2: $field2.val()
+			}, function (data) {
 				console.log(data);
 			});
 
@@ -81,5 +88,39 @@
 			</div>
 
 			<script></script>
+		</div>
+	</div>
 @endsection
 
+
+@section('footer')
+	<div>
+		<div id="saveSegmentModal" class="modal fade " role="dialog">
+			<div class="modal-dialog">
+
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Create New Segment</h4>
+					</div>
+					<div class="modal-body ">
+						<form class=" row">
+							<div class="col-sm-12">
+								<p>Enter a name for your segment. This name will be seen by others if you share this query</p>
+							</div>
+							<div class="col-sm-12">
+								<input type="text" id="trendnametb" class="form-control" style="width:100%" placeholder="Active users"/>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+						<button type="button" class="btn btn-success btn-fill id_savesegmentasbt" data-dismiss="modal">Save</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+@endsection

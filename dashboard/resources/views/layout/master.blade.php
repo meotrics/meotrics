@@ -30,6 +30,17 @@
 			else if (window.attachEvent)
 				window.attachEvent('onload', fn);
 		}
+
+		function throttle(fn, delay) {
+			var timer = null;
+			return function () {
+				var context = this, args = arguments;
+				clearTimeout(timer);
+				timer = setTimeout(function () {
+					fn.apply(context, args);
+				}, delay);
+			};
+		}
 	</script>
 	<style>
 		.wrapper{
@@ -145,43 +156,44 @@
 			<div class="container-fluid">@yield('content')</div>
 
 		</div>
-
-
 	</div>
-	<script src="{{asset('js/he.js')}}" type="text/javascript"></script>
-	<script src="{{asset('js/jquery-1.12.1.min.js')}}" type="text/javascript"></script>
-
-	<script src="{{asset('js/bootstrap.min.js')}}" type="text/javascript"></script>
-
-	<!--  Checkbox, Radio & Switch Plugins -->
-	<script src="{{asset('/js/bootstrap-checkbox-radio-switch.js')}}"></script>
-	<script src="{{asset('/js/chartist.min.js')}}"></script>
-
-	<!--  Notifications Plugin    -->
-	<script src="{{asset('/js/bootstrap-notify.js')}}"></script>
-	<script src="{{asset('/js/light-bootstrap-dashboard.js')}}"></script>
-
-	<script src="{{asset('js/moment.js')}}"></script>
-	<script src="{{asset('js/fg.menu.js')}}"></script>
-	<script src="{{asset('js/jquery.daterangepicker.js')}}"></script>
-	<script src="{{asset('js/sweetalert.js')}}" type="text/javascript"></script>
-	@include('Alerts::alerts')
-
-	@yield('script')
-	<script>
-
-		var config = {
-			customOpenAnimation: function (cb) {
-				$(this).fadeIn(300, cb);
-			},
-			customCloseAnimation: function (cb) {
-				$(this).fadeOut(300, cb);
-			}
-		};
-		$('#date-range').dateRangePicker(config);
-
-
-	</script>
 </div>
+<div class="">
+	@yield('footer')
+</div>
+<script src="{{asset('js/he.js')}}" type="text/javascript"></script>
+<script src="{{asset('js/jquery-1.12.1.min.js')}}" type="text/javascript"></script>
+
+<script src="{{asset('js/bootstrap.min.js')}}" type="text/javascript"></script>
+
+<!--  Checkbox, Radio & Switch Plugins -->
+<script src="{{asset('/js/bootstrap-checkbox-radio-switch.js')}}"></script>
+<script src="{{asset('/js/chartist.min.js')}}"></script>
+
+<!--  Notifications Plugin    -->
+<script src="{{asset('/js/bootstrap-notify.js')}}"></script>
+<script src="{{asset('/js/light-bootstrap-dashboard.js')}}"></script>
+
+<script src="{{asset('js/moment.js')}}"></script>
+<script src="{{asset('js/fg.menu.js')}}"></script>
+<script src="{{asset('js/jquery.daterangepicker.js')}}"></script>
+<script src="{{asset('js/sweetalert.js')}}" type="text/javascript"></script>
+@include('Alerts::alerts')
+
+@yield('script')
+<script>
+
+	var config = {
+		customOpenAnimation: function (cb) {
+			$(this).fadeIn(300, cb);
+		},
+		customCloseAnimation: function (cb) {
+			$(this).fadeOut(300, cb);
+		}
+	};
+	$('#date-range').dateRangePicker(config);
+
+
+</script>
 </body>
 </html>

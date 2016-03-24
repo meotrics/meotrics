@@ -1,24 +1,16 @@
 <?php namespace App\Http\Controllers;
 
+use App\Util\MtHttp;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
-class TypeController extends Controller
+class PropController extends Controller
 {
 	public function index(Request $request)
 	{
-		$options = array(
-			'http' => array(
-				'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-				'method' => 'GET',
-
-			),
-		);
-		$context = stream_context_create($options);
-		$result = json_decode(file_get_contents('http://127.0.0.1:2108/actiontype/1', false, $context));
-
-		return view('actiontype/index', ['actiontypes' => $result]);
+		$results = MtHttp::get('prop/1');
+		return view('actiontype/index', ['actiontypes' => $results]);
 	}
 
 	public function edit(Request $request)
@@ -51,7 +43,6 @@ class TypeController extends Controller
 		var_dump($request, $a, $b);
 		die;
 	}
-
 	public function create(Request $request)
 	{
 		if ($request->isMethod('post')) {
@@ -61,11 +52,12 @@ class TypeController extends Controller
 			//build array
 			$fields = [];
 			for ($i = 0; $i < count($pcodes); $i++) {
-				array_push($fields, array("pname" => $pnames[$i], "pcode" => strtolower($pcodes[$i])));
+				array_push($fields, array("pname" => $pnames[$i], "pcode" => $pcodes[$i]));
 			}
 
 			$data = json_encode(array(
-				'codename' => strtolower($request->input('codename')),
+				'appid' => 1,
+				'codename' => $request->input('codename'),
 				'name' => $request->input('name'),
 				'desc' => $request->input('desc'),
 				'fields' => $fields
