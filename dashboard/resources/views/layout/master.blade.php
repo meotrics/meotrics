@@ -21,6 +21,7 @@
 	<link href="{{asset('css/app.css')}}" rel="stylesheet"/>
 	<link href="{{asset('css/fg.menu.css')}}" rel="stylesheet"/>
 	<link rel="stylesheet" href="{{asset('css/daterangepicker.css')}}"/>
+	<link rel="stylesheet" href="{{asset('css/sweetalert.css')}}"/>
 	@yield('style')
 	<script>
 		function onPageLoad(fn) {
@@ -163,6 +164,7 @@
 	<script src="{{asset('js/moment.js')}}"></script>
 	<script src="{{asset('js/fg.menu.js')}}"></script>
 	<script src="{{asset('js/jquery.daterangepicker.js')}}"></script>
+	<script src="{{asset('js/sweetalert.js')}}" type="text/javascript"></script>
 
 	@yield('script')
 	<script>
