@@ -165,6 +165,7 @@
 	<script src="{{asset('js/fg.menu.js')}}"></script>
 	<script src="{{asset('js/jquery.daterangepicker.js')}}"></script>
 	<script src="{{asset('js/sweetalert.js')}}" type="text/javascript"></script>
+	@include('Alerts::alerts')
 
 	@yield('script')
 	<script>
