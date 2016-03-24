@@ -11,18 +11,38 @@
 
 	<!-- Bootstrap core CSS     -->
 	<link href="{{asset('css/bootstrap.min.css')}}" rel="stylesheet"/>
+	<!-- Light bootstrap dashboard theme -->
 	<link href="{{asset('css/animate.min.css')}}" rel="stylesheet"/>
 	<link href="{{asset('css/light-bootstrap-dashboard.css')}}" rel="stylesheet"/>
-
-	<!--     Fonts and icons     -->
-	<link href="{{asset('css/font-awesome.min.css')}}" rel="stylesheet">
-	<link href="{{asset('css/gf-roboto.css')}}" rel='stylesheet' type='text/css'>
 	<link href="{{asset('css/pe-icon-7-stroke.css')}}" rel="stylesheet"/>
+	<link href="{{asset('css/gf-roboto.css')}}" rel='stylesheet' type='text/css'>
+	<!-- Fonts and icons -->
+	<link href="{{asset('css/font-awesome.min.css')}}" rel="stylesheet">
+	<link href="{{asset('css/fg.menu.css')}}" rel="stylesheet"/> <!-- QUESTION: ??? -->
+	<link href="{{asset('css/daterangepicker.css')}}"/>
+	<link href="{{asset('css/sweetalert.css')}}"/>
+	<!-- App's styles -->
 	<link href="{{asset('css/app.css')}}" rel="stylesheet"/>
-	<link href="{{asset('css/fg.menu.css')}}" rel="stylesheet"/>
-	<link rel="stylesheet" href="{{asset('css/daterangepicker.css')}}"/>
-	<link rel="stylesheet" href="{{asset('css/sweetalert.css')}}"/>
+
 	@yield('style')
+
+	<script src="{{asset('js/he.js')}}" type="text/javascript"></script>
+	<script src="{{asset('js/jquery-1.12.1.min.js')}}" type="text/javascript"></script>
+
+	<script src="{{asset('js/bootstrap.min.js')}}" type="text/javascript"></script>
+
+	<!-- Light bootstrap dashboard theme -->
+	<script src="{{asset('/js/bootstrap-notify.js')}}"></script>
+	<script src="{{asset('/js/bootstrap-checkbox-radio-switch.js')}}"></script>
+	<script src="{{asset('/js/chartist.min.js')}}"></script>
+	<script src="{{asset('/js/light-bootstrap-dashboard.js')}}"></script>
+	<!-- App's dependencies -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.6.1/lodash.js"></script>
+	<script src="{{asset('js/moment.js')}}"></script>
+	<script src="{{asset('js/fg.menu.js')}}"></script>
+	<script src="{{asset('js/jquery.daterangepicker.js')}}"></script>
+	<script src="{{asset('js/sweetalert.js')}}" type="text/javascript"></script> @include('Alerts::alerts')
+
 	<script>
 		function onPageLoad(fn) {
 			if (window.addEventListener)
@@ -41,157 +61,209 @@
 				}, delay);
 			};
 		}
+
+		var _helper = {
+			notification: {
+				error: function(err, options){
+					$.notify({
+	          icon: "pe-7s-attention",
+	          message: err
+	        }, _.merge({
+	          timer: 3000,
+	          placement: {
+	            from: 'top',
+	            align: 'right'
+	          }
+	        }, _.merge(options || {}, { type: 'danger' })));
+				},
+				success: function(message, options){
+					$.notify({
+	          icon: "pe-7s-check",
+	          message: message
+	        }, _.merge({
+	          timer: 3000,
+	          placement: {
+	            from: 'top',
+	            align: 'right'
+	          }
+	        }, _.merge(options || {}, { type: 'success' })));
+				}
+			}
+		}
 	</script>
-	<style>
-		.wrapper{
-	    display: flex;
-  		justify-content: space-between;
-		}
-		.sidebar{
-			flex-shrink: 0;
-	    position: relative;
-	    width: 260px;
-		}
-		.main-panel{
-			margin: 0;
-	    float: none;
-	    width: 100%;
-		}
-	</style>
+
+	@yield('script')
+	
 </head>
 <body>
+
 <div class="wrapper">
-	@if(isset($sidebar) && $sidebar == false)
-
-	@else
-		<div class="sidebar" data-color="green" data-image="/img/sidebar-4.jpg">
-			<div class="sidebar-wrapper">
-				<div class="logo">
-					<a href="/"> <img src="{{asset('img/logo.png')}}" width="30px"/></a>
-					<span class="logo-text">meotrics</span>
-				</div>
-
-				<ul class="nav">
-					<li class="{{ !isset($sidebarselect) ||  $sidebarselect == 'home' ? 'active' : '' }}">
-						<a href="/home">
-							<i class="pe-7s-display2"></i>
-							<p>Dashboard</p>
-						</a>
-					</li>
-					<li class="{{isset($sidebarselect) && $sidebarselect == 'trend' ? 'active' : '' }}">
-						<a href="/trend">
-							<i class="pe-7s-cup"></i>
-							<p>Trend</p>
-						</a>
-					</li>
-					<li class="{{isset($sidebarselect) && $sidebarselect == 'segment' ? 'active' : '' }}">
-						<a href="/segment">
-							<i class="pe-7s-user"></i>
-							<p>Segmentation</p>
-						</a>
-					</li>
-					<li class="user-area">
-						<ul class="media-list" style="margin-left: 10px; margin-top: 10px;">
-							<li class="media">
-								<div class="media-left">
-									<a href="#">
-										<img class="media-object" width="40px" src="/img/user.png" alt="">
-									</a>
-								</div>
-								<div class="media-body">
-									<h5 style="color:white;" class="media-heading">thanhpk</h5>
-									<a class="small" href="/auth/default/view?id=4">profile</a>
-									&nbsp; &nbsp;
-									<a class="small" href="/auth/logout" data-method="get">logout</a>
-									<a class="small" href="/actiontype" data-method="get">action type</a>
-								</div>
-							</li>
-						</ul>
-
-					</li>
-				</ul>
-			</div>
-		</div>
-	@endif
-	<div class="main-panel">
-		@if(isset($navbar) && $navbar == false)
-		@else
-			<nav class="navbar navbar-default navbar-fixed">
-				<div class="container-fluid">
-					<div class="navbar-header">
-						<button type="button" class="navbar-toggle" data-toggle="collapse"
-						        data-target="#navigation-example-2">
-							<span class="sr-only">Toggle navigation</span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-						</button>
-
-					</div>
-					<div class="collapse navbar-collapse">
-						<ul class="nav navbar-nav navbar-left">
-							@include('segment/select')
-							<li>
-								<a style="padding: 0px">
-									<div class="input-group" style="width: 250px;">
-	                  <span class="input-group-addon">
-		                  <i class="pe-7s-date" style="font-size:26px"></i>
-	                  </span>
-										<input type="text" class="form-control" id="date-range">
-
-									</div>
+  <div class="sidebar main_sidebar" data-color="azure" data-image="/img/sidebar-4.jpg">
+    <!--   you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple" --><div class="sidebar-wrapper">
+	    <div class="logo">
+	    	<a class="simple-text" href="{{ URL::to('/') }}">
+	    		<img src="{{ asset('img/logo.png') }}" width="30px"/>
+					<span class="logo-text">Meotrics</span>
+	  		</a>
+	    </div>
+	    <ul class="nav">
+	    	<li class="{{ Route::getCurrentRoute()->getPath() == 'home' ? 'active' : '' }}">
+					<a href="{{ URL::to('/home') }}">
+						<i class="pe-7s-graph"></i>
+						<p>Dashboard</p>
+					</a>
+				</li>
+				<li class="{{ Route::getCurrentRoute()->getPath() == 'trend' ? 'active' : '' }}">
+					<a href="{{ URL::to('/trend') }}">
+						<i class="pe-7s-cup"></i>
+						<p>Trend</p>
+					</a>
+				</li>
+				<li class="{{ Route::getCurrentRoute()->getPath() == 'segment' ? 'active' : '' }}">
+					<a href="/segment">
+						<i class="pe-7s-user"></i>
+						<p>Segmentation</p>
+					</a>
+				</li>
+				<!-- <li class="user-area">
+					<ul class="media-list" style="margin-left: 10px; margin-top: 10px;">
+						<li class="media">
+							<div class="media-left">
+								<a href="#">
+									<img class="media-object" width="40px" src="/img/user.png" alt="">
 								</a>
-							</li>
-						</ul>
+							</div>
+							<div class="media-body">
+								<h5 style="color:white;" class="media-heading">thanhpk</h5>
+								<a class="small" href="/auth/default/view?id=4">profile</a>
+								&nbsp; &nbsp;
+								<a class="small" href="/auth/logout" data-method="get">logout</a>
+								<a class="small" href="/actiontype" data-method="get">action type</a>
+							</div>
+						</li>
+					</ul>
+				</li> -->
+	    </ul>
+	  </div>
+	</div>
 
-						<ul class="nav navbar-nav navbar-right">
+	<div class="main-panel">
+	  <nav class="navbar navbar-default navbar-fixed">
+	    <div class="container-fluid">
+	      <div class="navbar-header">
+	        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+	          <span class="sr-only">Toggle navigation</span>
+	          <span class="icon-bar"></span>
+	          <span class="icon-bar"></span>
+	          <span class="icon-bar"></span>
+	        </button>
+	        <a class="navbar-brand" href="#">pmint93</a>
+	      </div>
+	      <div class="collapse navbar-collapse">
+	        <ul class="nav navbar-nav navbar-left">
+	          <!-- <li>
+	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+	              <i class="fa fa-dashboard"></i>
+	            </a>
+	          </li>
+	          <li class="dropdown">
+	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+	              <i class="fa fa-globe"></i>
+	              <b class="caret"></b>
+	              <span class="notification">5</span>
+	            </a>
+	            <ul class="dropdown-menu">
+	              <li><a href="#">Notification 1</a></li>
+	              <li><a href="#">Notification 2</a></li>
+	              <li><a href="#">Notification 3</a></li>
+	              <li><a href="#">Notification 4</a></li>
+	              <li><a href="#">Another notification</a></li>
+	            </ul>
+	          </li>
+	          <li>
+	           <a href="">
+	            <i class="fa fa-search"></i>
+	          </a>
+		        </li> -->
+		      </ul>
 
-
-						</ul>
-					</div>
-				</div>
-			</nav>
-		@endif
-		<div class="content">
-			<div class="container-fluid">@yield('content')</div>
-
+		      <ul class="nav navbar-nav navbar-right">
+		       <li class="dropdown">
+		        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+		          Settings
+		          <b class="caret"></b>
+		        </a>
+		        <ul class="dropdown-menu">
+		          <li><a href="{{ URL::to('/actiontype') }}">Action types</a></li>
+		          <li><a href="{{ URL::to('#') }}">Comming soon 1</a></li>
+		          <li><a href="{{ URL::to('#') }}">Comming soon 2</a></li>
+		        </ul>
+		      </li>
+		      <li>
+		      	<a href="{{ URL::to('/auth/logout') }}">Logout</a>
+	      	</li>
+		    </ul>
+		  </div>
 		</div>
+	</nav>
+
+
+	<div class="content">
+	  <div class="container-fluid">
+    	@yield('content')
+	  </div>
+	</div>
+
+
+	<footer class="footer">
+	  <div class="container-fluid">
+	    <nav class="pull-left">
+	      <ul>
+	        <li>
+	          <a href="#">
+	            Home
+	          </a>
+	        </li>
+	        <li>
+	          <a href="#">
+	            Company
+	          </a>
+	        </li>
+	        <li>
+	          <a href="#">
+	            Portfolio
+	          </a>
+	        </li>
+	        <li>
+	          <a href="#">
+	           Blog
+	         </a>
+	       </li>
+	     </ul>
+	   </nav>
+	   <p class="copyright pull-right">
+	    &copy; 2016 <a href="http://www.creative-tim.com">Meotrics</a>,
+	    made with <big class="text-danger">&hearts;</big> for a better analyze
+	  </p>
+	</div>
+	</footer>
+
 	</div>
 </div>
-<div class="">
-	@yield('footer')
-</div>
-<script src="{{asset('js/he.js')}}" type="text/javascript"></script>
-<script src="{{asset('js/jquery-1.12.1.min.js')}}" type="text/javascript"></script>
 
-<script src="{{asset('js/bootstrap.min.js')}}" type="text/javascript"></script>
+@include('partials/install_guide')
 
-<!--  Checkbox, Radio & Switch Plugins -->
-<script src="{{asset('/js/bootstrap-checkbox-radio-switch.js')}}"></script>
-<script src="{{asset('/js/chartist.min.js')}}"></script>
-
-<!--  Notifications Plugin    -->
-<script src="{{asset('/js/bootstrap-notify.js')}}"></script>
-<script src="{{asset('/js/light-bootstrap-dashboard.js')}}"></script>
-
-<script src="{{asset('js/moment.js')}}"></script>
-<script src="{{asset('js/fg.menu.js')}}"></script>
-<script src="{{asset('js/jquery.daterangepicker.js')}}"></script>
-<script src="{{asset('js/sweetalert.js')}}" type="text/javascript"></script>
-@include('Alerts::alerts')
-
-@yield('script')
 <script>
 
-	var config = {
-		customOpenAnimation: function (cb) {
-			$(this).fadeIn(300, cb);
-		},
-		customCloseAnimation: function (cb) {
-			$(this).fadeOut(300, cb);
-		}
-	};
-	$('#date-range').dateRangePicker(config);
+	// var config = {
+	// 	customOpenAnimation: function (cb) {
+	// 		$(this).fadeIn(300, cb);
+	// 	},
+	// 	customCloseAnimation: function (cb) {
+	// 		$(this).fadeOut(300, cb);
+	// 	}
+	// };
+	// $('#date-range').dateRangePicker(config);
 
 
 </script>
