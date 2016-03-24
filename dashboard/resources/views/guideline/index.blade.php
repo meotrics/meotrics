@@ -7,19 +7,38 @@
 ?>
 
 @section('script')
+  <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.js"></script>
   <script>
+    var APP_ID = '2222'; // TODO: Fill app id to this line
     function copyScript(){
       var el = $('#guideline').find('textarea');
       el.select();
       document.execCommand('selectAll');
       document.execCommand('copy');
+      toastr.success('', 'Copied !', {
+        positionClass: 'toast-bottom-right'
+      });
     }
+    $.ajax({
+      method: 'GET',
+      url: '/mt.code',
+      success: function(response){
+        $('#guideline').find('textarea').html(response.replace(RegExp('<MT_APP_ID>', 'g'), APP_ID));
+      },
+      error: function(err){
+        toastr.error(err);
+      }
+    })
   </script>
 @endsection
 
 @section('style')
   <link rel="stylesheet" href="{{asset('css/guideline.css')}}"/>
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css" />
   <style>
+    #guideline .modal-content{
+      overflow: hidden;
+    }
     #guideline .meotrics_script{
       width: 100%;
       height: auto;
@@ -51,64 +70,25 @@
 @endsection
 
 @section('content')
-  <div id="guideline">
-    <div id="step_1">
-      <h5>
-        Make sure to add this script to your site
-      </h5>
-      <div class="well well-sm meotrics_script">
-        <button class="btn btn-success copy-btn" onclick="copyScript()">
-          Copy
-        </button>
-        <textarea onkeydown="return false">
-          //define meotrics for queue
-          var Meotrics = Meotrics || {};
-
-          Meotrics.appid = "1234";
-
-          Meotrics.__requestQueue= Meotrics.__requesQueue || [];
-
-          //TODO: problem when clone callback function, we dont want clone callback function.
-          //2 level deep clone object
-          Meotrics.__clone = function (obj)
-          {
-            if (null == obj || "object" != typeof obj) return obj;
-            var copy = obj.constructor();
-              for (var attr in obj) if (obj.hasOwnProperty(attr)) copy[attr] = Meotrics.__shallowclone(obj[attr]);
-              return copy;
-          }
-
-          Meotrics.__shallowclone = function (obj) {
-            if (null == obj || "object" != typeof obj) return obj;
-            var copy = obj.constructor();
-              for (var attr in obj) if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
-              return copy;
-          }
-
-          if(Meotrics.record === undefined) {
-            Meotrics.record = function(){
-              //clone arguments
-              var newarguments = [];
-              for(var i in arguments)
-                newarguments.push(Meotrics.__clone (arguments[i]));
-              Meotrics.__requestQueue.push({arguments: newarguments, time: new Date()});
-            }
-          }
-
-          Meotrics.__callbackQueue = Meotrics.__callbackQueue || [];
-          Meotrics.getMtId  = function(callback){
-            Meotrics.__callbackQueue.push(callback);
-          }
-
-          var script = document.createElement("script");
-          script.type = "text/javascript";
-          script.src = "meotrics.dev/mt.js";
-          //script.onreadystatechange = callbacl;
-          //script.onload = callback;
-          document.body.appendChild(js);
-        </textarea>
-      </div>
-    </div>
-  </div>
+  <div class="modal show" id="guideline">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">First thing you need to do, make sure to add this script to your site</h5>
+        </div>
+        <div class="modal-body">
+          <div class="well well-sm meotrics_script">
+            <button class="btn btn-success copy-btn" onclick="copyScript()">
+              Copy
+            </button>
+            <textarea onkeydown="return false" placeholder="Loading..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <a class="btn btn-success" href="{{ URL::to('/') }}">Go to Dashboard</a>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
 
 @endsection
