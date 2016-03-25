@@ -249,7 +249,7 @@
 		     </ul>
 		   </nav>
 		   <p class="copyright pull-right">
-			    &copy; 2016 <a href="http://www.creative-tim.com">Meotrics</a>,
+			    &copy; 2016 <a href="{{ URL::to('/') }}">Meotrics</a>,
 			    made with <big class="text-danger">&hearts;</big> for a better analyze
 			  </p>
 			</div>
