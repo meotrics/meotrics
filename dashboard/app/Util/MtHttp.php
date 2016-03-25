@@ -6,6 +6,14 @@ class MtHttp
 	private static $port;
 	private static $host;
 
+	private static function json_decodeEx($data)
+	{
+		//unction isJson($string) {
+			$ret = json_decode($data);
+			return (json_last_error() == JSON_ERROR_NONE) ? $data : $ret;
+		//}
+
+	}
 
 	public static function get($url, $data = null)
 	{
@@ -22,7 +30,7 @@ class MtHttp
 				'method' => 'GET'
 			));
 		$context = stream_context_create($options);
-		return json_decode(file_get_contents($url, false, $context));
+		return json_decodeEx(file_get_contents($url, false, $context));
 	}
 
 	public static function post($url, $data = null)
@@ -40,7 +48,7 @@ class MtHttp
 				'method' => 'POST'
 			));
 		$context = stream_context_create($options);
-		return json_decode(file_get_contents($url, false, $context));
+		return json_decodeEx(file_get_contents($url, false, $context));
 	}
 
 	public static function put($url, $data)
@@ -58,7 +66,7 @@ class MtHttp
 				'method' => 'PUT'
 			));
 		$context = stream_context_create($options);
-		return json_decode(file_get_contents($url, false, $context));
+		return json_decodeEx(file_get_contents($url, false, $context));
 	}
 
 	public static function delete($url, $data)
@@ -76,7 +84,7 @@ class MtHttp
 				'method' => 'DELETE'
 			));
 		$context = stream_context_create($options);
-		return json_decode(file_get_contents($url, false, $context));
+		return json_decodeEx(file_get_contents($url, false, $context));
 	}
 
 	public static function init()
