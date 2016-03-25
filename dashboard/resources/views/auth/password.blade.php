@@ -1,21 +1,21 @@
-@extends('app')
+@extends('../layout/landing')
+@section('title', 'Forgot password')
 
 @section('content')
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-md-8 col-md-offset-2">
-			<div class="panel panel-default">
-				<div class="panel-heading">Reset Password</div>
-				<div class="panel-body">
-					@if (session('status'))
+
+<div class="row">                   
+	<div class="col-md-4 col-sm-6 col-md-offset-4 col-sm-offset-3">
+		<form method="POST" action="{{ URL::to('/password/email') }}">
+	    <div class="card">
+	      <div class="header text-center">Reset password</div>
+	      <div class="content">
+	      	@if (session('status'))
 						<div class="alert alert-success">
 							{{ session('status') }}
 						</div>
 					@endif
-
-					@if (count($errors) > 0)
-						<div class="alert alert-danger">
-							<strong>Whoops!</strong> There were some problems with your input.<br><br>
+	      	@if (count($errors) > 0)
+						<div class="text-danger">
 							<ul>
 								@foreach ($errors->all() as $error)
 									<li>{{ $error }}</li>
@@ -24,27 +24,24 @@
 						</div>
 					@endif
 
-					<form class="form-horizontal" role="form" method="POST" action="{{ url('/password/email') }}">
-						<input type="hidden" name="_token" value="{{ csrf_token() }}">
+	        <div class="form-group">
+	          <label>Email address</label>
+	          <input type="email" placeholder="Enter email" class="form-control"
+	          			 name="email" value="{{ old('email') }}" required>
+	        </div>
 
-						<div class="form-group">
-							<label class="col-md-4 control-label">E-Mail Address</label>
-							<div class="col-md-6">
-								<input type="email" class="form-control" name="email" value="{{ old('email') }}">
-							</div>
-						</div>
-
-						<div class="form-group">
-							<div class="col-md-6 col-md-offset-4">
-								<button type="submit" class="btn btn-primary">
-									Send Password Reset Link
-								</button>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
+	      </div>
+	      <div class="footer text-center">
+	        <button type="submit" class="btn btn-fill btn-primary btn-wd">Send Password Reset Link</button>
+	        <br><br>
+	        <center>
+	        	<a class="text-muted" href="{{ url('/auth/login') }}">
+	        		<i class="fa fa-chevron-left"></i>&nbsp;&nbsp;Back to login
+        		</a>
+	        </center>
+	      </div>
+	    </div>
+	  </form>
+	</div>                    
 </div>
 @endsection
