@@ -1,5 +1,5 @@
 
-<li class="dropdown mr">
+<li class="dropdown">
 	<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 		<i class="pe-7s-user" style="vertical-align: middle; font-size: 28px"></i>
 		<span class="segment-label" style="vertical-align: middle"> All users</span>
@@ -15,28 +15,19 @@
 </li>
 
 <script>
-	onPageLoad(function () {
-		function segmentselect(name, id) {
-			$('.segment-label').html(name);
-			setsegment(name, id)
+	function segmentselect(name, id) {
+		$('.segment-label').html(name);
+		setsegment(name, id)
+	}
+	function setsegment(name, id) {
+		localStorage.segmentid = id;
+		localStorage.segmentname = name;
+	}
+	$(document).ready(function(){
+		if(localStorage.segmentid == undefined){
+			setsegment('All users', 0);
 		}
-
-		function initsegmentselect() {
-			if (localStorage.segmentid == undefined) //first time user in this browser
-			{
-				setsegment('All users', 0);
-			}
-
-			setsegment(localStorage.segmentname, localStorage.segmentid);
-			$('.segment-label').html(localStorage.segmentname);
-
-		}
-
-		function setsegment(name, id) {
-			localStorage.segmentid = id;
-			localStorage.segmentname = name;
-		}
-
-		initsegmentselect();
-	});
+		setsegment(localStorage.segmentname, localStorage.segmentid);
+		$('.segment-label').html(localStorage.segmentname);
+	})
 </script>

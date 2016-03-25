@@ -150,23 +150,21 @@
 	<div class="main-panel">
 	  <nav class="navbar navbar-default navbar-fixed">
 	    <div class="container-fluid">
-	      <div class="navbar-header">
+	      <!-- <div class="navbar-header">
 	        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
 	          <span class="sr-only">Toggle navigation</span>
 	          <span class="icon-bar"></span>
 	          <span class="icon-bar"></span>
 	          <span class="icon-bar"></span>
 	        </button>
-	        <a class="navbar-brand" href="#">pmint93</a>
-	      </div>
+	        <a class="navbar-brand" href="#">{{ Auth::user()->name }}</a>
+	      </div> -->
 	      <div class="collapse navbar-collapse">
 	        <ul class="nav navbar-nav navbar-left">
-	          <!-- <li>
-	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-	              <i class="fa fa-dashboard"></i>
-	            </a>
+	          <li>
+	            @include('segment/select')
 	          </li>
-	          <li class="dropdown">
+	          <!-- <li class="dropdown">
 	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
 	              <i class="fa fa-globe"></i>
 	              <b class="caret"></b>
@@ -181,27 +179,25 @@
 	            </ul>
 	          </li>
 	          <li>
-	           <a href="">
-	            <i class="fa fa-search"></i>
-	          </a>
+	           	<a href="">
+		            <i class="fa fa-search"></i>
+		          </a>
 		        </li> -->
 		      </ul>
 
 		      <ul class="nav navbar-nav navbar-right">
 		       <li class="dropdown">
 		        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-		          Settings
+		          {{ Auth::user()->name }}
 		          <b class="caret"></b>
 		        </a>
 		        <ul class="dropdown-menu">
+		        	<li><a href="{{ URL::to('/profile') }}">Profile</a></li>
 		          <li><a href="{{ URL::to('/actiontype') }}">Action types</a></li>
-		          <li><a href="{{ URL::to('#') }}">Comming soon 1</a></li>
-		          <li><a href="{{ URL::to('#') }}">Comming soon 2</a></li>
+		          <li class="divider"></li>
+		          <li><a href="{{ URL::to('/auth/logout') }}">Logout</a></li>
 		        </ul>
 		      </li>
-		      <li>
-		      	<a href="{{ URL::to('/auth/logout') }}">Logout</a>
-	      	</li>
 		    </ul>
 		  </div>
 		</div>

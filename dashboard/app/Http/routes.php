@@ -24,3 +24,5 @@ Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',
 ]);
+
+Route::get('/helper/setup_status', 'HelperController@setup_status');

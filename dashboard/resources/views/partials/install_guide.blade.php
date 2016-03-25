@@ -51,7 +51,7 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 <script>
-  var APP_ID = '2222'; // TODO: Fill app id to this line
+  var APP_ID = '{{ Auth::user()->id }}'; // TODO: Fill app id to this line
   function copyScript(){
     var el = $('#guideline').find('textarea');
     el.select();
@@ -87,14 +87,18 @@
   $(document).ready(function(){
     $.ajax({
       method: 'GET',
-      url: ':2108/helpers/is_setup', // TODO: replaceurl to setup_check API
+      url: '{{ URL::to("/") }}/helper/setup_status', // TODO: replaceurl to setup_check API
       data: {
         app_id: APP_ID
       },
       success: function(response){
-        // WAITING: API
-        $('#guideline').modal('show');
-        getIntegrationCode();
+        console.log(response);
+        if(response == "true"){
+          console.log('Integrated !');
+        } else {
+          $('#guideline').modal('show');
+          getIntegrationCode();
+        }
       },
       error: function(err){
         _helper.notification.error('Failed to check installation !')
