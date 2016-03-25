@@ -18,8 +18,8 @@
 	<link href="{{asset('css/gf-roboto.css')}}" rel='stylesheet' type='text/css'>
 	<!-- Fonts and icons -->
 	<link href="{{asset('css/font-awesome.min.css')}}" rel="stylesheet">
-	<link href="{{asset('css/fg.menu.css')}}" rel="stylesheet"/> <!-- QUESTION: ??? -->
-	<link href="{{asset('css/daterangepicker.css')}}"/>
+	<link href="{{asset('css/fg.menu.css')}}" rel="stylesheet"/>
+	<link href="{{asset('css/daterangepicker.css')}}" rel="stylesheet"/>
 	<link href="{{asset('css/sweetalert.css')}}"/>
 	<!-- App's styles -->
 	<link href="{{asset('css/app.css')}}" rel="stylesheet"/>
@@ -164,6 +164,17 @@
 	          <li>
 	            @include('segment/select')
 	          </li>
+	          <li>
+							<a style="padding: 0px">
+								<div class="input-group" style="width: 250px;">
+                  <span class="input-group-addon">
+	                  <i class="pe-7s-date" style="font-size:26px"></i>
+                  </span>
+									<input type="text" class="form-control" id="date-range">
+
+								</div>
+							</a>
+						</li>
 	          <!-- <li class="dropdown">
 	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
 	              <i class="fa fa-globe"></i>
@@ -250,15 +261,15 @@
 
 <script>
 
-	// var config = {
-	// 	customOpenAnimation: function (cb) {
-	// 		$(this).fadeIn(300, cb);
-	// 	},
-	// 	customCloseAnimation: function (cb) {
-	// 		$(this).fadeOut(300, cb);
-	// 	}
-	// };
-	// $('#date-range').dateRangePicker(config);
+	var config = {
+		customOpenAnimation: function (cb) {
+			$(this).fadeIn(300, cb);
+		},
+		customCloseAnimation: function (cb) {
+			$(this).fadeOut(300, cb);
+		}
+	};
+	$('#date-range').dateRangePicker(config);
 
 
 </script>
