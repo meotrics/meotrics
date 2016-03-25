@@ -29,6 +29,7 @@ function route(app, db, segmgr, prefix, mongodb, converter) {
 	var CRUD = require('./module/crud.js').CRUD;
 	var TrendMgr = require('./module/trendmgr.js').TrendMgr;
 	var ActionMgr = require('./module/actionmgr.js').ActionMgr;
+	
 	var actionMgr = new ActionMgr(db, mongodb, async, converter, prefix, mtthrow);
 	var trendMrg = new TrendMgr(db, mongodb, async, converter, prefix, mtthrow, "trend");
 	var typeCRUD = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "actiontype");
@@ -36,6 +37,7 @@ function route(app, db, segmgr, prefix, mongodb, converter) {
 	var segCRUD  = new CRUD(db, mongodb,async,  converter, prefix, mtthrow, "segment");
 	var propCRUD  = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "userprop");
 	var camCRUD  = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "campaign");
+	var appmgr = new (require('./module/appmgr.js').AppMgr)(db, mongodb, async, converter, prefix, mtthrow);
 
 	// parse application/json
 	app.use(bodyParser.json());
@@ -89,6 +91,14 @@ function route(app, db, segmgr, prefix, mongodb, converter) {
 	// set up a new cookie
 	app.get('/s/:appid', actionMgr.setup);
 
+	//check whether user has setup tracking code
+	app.get('/api/status/:appid', function(req, res){
+		appmgr.isSetup(req.params.appid, function(ret)
+		{
+			res.send(ret);
+			res.status(200).end();	
+		});
+	});
 
 
 	//update or create a segment
