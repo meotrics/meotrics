@@ -207,6 +207,9 @@
 	      <div class="footer text-center">
 	        <button type="submit" class="btn btn-fill btn-info btn-wd">Login</button>
 	        <center>
+	        	Don't have an account yet? <a class="" href="{{ url('/auth/register') }}">Register</a>
+	        </center>
+	        <center>
 	        	<a class="" href="{{ url('/password/email') }}">Forgot Your Password?</a>
 	        </center>
 	      </div>

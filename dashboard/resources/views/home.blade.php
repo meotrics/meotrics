@@ -9,3 +9,8 @@
 @section('content')
 	THIS IS HOME {{cookie('laravel_session')}}
 @endsection
+
+
+@section('additional')
+  @include('partials/install_guide')
+@endsection
