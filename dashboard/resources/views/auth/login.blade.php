@@ -1,4 +1,5 @@
 @extends('../layout/landing')
+@section('title', 'Login')
 
 @section('style')
 	<style>
