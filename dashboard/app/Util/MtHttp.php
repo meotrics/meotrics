@@ -30,7 +30,7 @@ class MtHttp
 				'method' => 'GET'
 			));
 		$context = stream_context_create($options);
-		return json_decodeEx(file_get_contents($url, false, $context));
+		return MtHttp::json_decodeEx(file_get_contents($url, false, $context));
 	}
 
 	public static function post($url, $data = null)
@@ -48,7 +48,7 @@ class MtHttp
 				'method' => 'POST'
 			));
 		$context = stream_context_create($options);
-		return json_decodeEx(file_get_contents($url, false, $context));
+		return MtHttp::json_decodeEx(file_get_contents($url, false, $context));
 	}
 
 	public static function put($url, $data)
@@ -66,7 +66,7 @@ class MtHttp
 				'method' => 'PUT'
 			));
 		$context = stream_context_create($options);
-		return json_decodeEx(file_get_contents($url, false, $context));
+		return MtHttp::json_decodeEx(file_get_contents($url, false, $context));
 	}
 
 	public static function delete($url, $data)
@@ -84,7 +84,7 @@ class MtHttp
 				'method' => 'DELETE'
 			));
 		$context = stream_context_create($options);
-		return json_decodeEx(file_get_contents($url, false, $context));
+		return MtHttp::json_decodeEx(file_get_contents($url, false, $context));
 	}
 
 	public static function init()
