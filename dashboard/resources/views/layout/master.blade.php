@@ -92,8 +92,8 @@
 		}
 	</script>
 
-	@yield('script')
-	
+
+	@yield('header-script')
 </head>
 <body>
 
@@ -273,5 +273,7 @@
 
 
 </script>
+
+@yield('script')
 </body>
 </html>
