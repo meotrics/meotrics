@@ -1,6 +1,11 @@
 <?php namespace App\Http\Controllers;
 
-class HomeController extends Controller {
+use App\Http\Requests\Request;
+use App\Util\MtHttp;
+use Illuminate\Http\Response;
+
+class HomeController extends Controller
+{
 
 	/*
 	|--------------------------------------------------------------------------
@@ -33,4 +38,29 @@ class HomeController extends Controller {
 		return view('home');
 	}
 
+	public function pageView()
+	{
+	}
+
+	public function pageQuit()
+	{
+	}
+
+	public function track()
+	{
+	}
+
+	public function identify()
+	{
+		
+	}
+
+	public function setup(Request $request)
+	{
+		$response = new Response();
+		$appid = $request->input('appid');
+		$mtid = MtHttp::get('/s/' . $appid);
+		$response->withCookie(cookie()->forever('mtid', $mtid));
+		return $response;
+	}
 }
