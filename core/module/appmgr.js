@@ -1,4 +1,4 @@
-exports.AppMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
+exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud) {
 	this.isSetup = function (appid, callback) {
 		db.collection(prefix + appid).count({_isUser: {$exists: false}}, function (err, count) {
 			if (err) throw err;
@@ -73,7 +73,7 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 			desc: "User like a product",
 			fields: [
 				{pname: "Product ID", pcode: "pid"},
-				{pname: "Product Name", pcode: "pname"}
+				{pname: "Product Name", pcode: "pname"},
 				{pname: "Category ID", pcode: "pid"},
 				{pname: "Category Name", pcode: "cname"}
 			]
@@ -86,10 +86,24 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 			desc: "User submit a form",
 			fields: [
 				{pname: "action", pcode: "pid"},
-				{pname: "formid", pcode: "pname"}
+				{pname: "formid", pcode: "pname"},
 				{pname: "url", pcode: "pid"},
 				{pname: "name", pcode: "Form Name"}
 			]
 		};
+
+		typeCrud.createRaw(appid, purchase, function () {
+			typeCrud.createRaw(appid, pageview, function () {
+				typeCrud.createRaw(appid, click, function () {
+					typeCrud.createRaw(appid, rate, function () {
+						typeCrud.createRaw(appid, like, function () {
+							typeCrud.createRaw(appid, download, function () {
+								typeCrud.createRaw(appid, submit, callback);
+							});
+						});
+					});
+				});
+			});
+		});
 	}
 };

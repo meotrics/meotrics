@@ -1,72 +1,78 @@
 exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
+	var me = this;
+
+	this.createRaw = function (appid, data, callback) {
+		var collection = prefix + col;
+		data._appid = appid;
+		converter.toObject(data).then(function (r) {
+			return db.collection(collection).insertOne(r);
+		}).then(function (r) {
+			var _typeid = r.insertedId;
+			callback(_typeid);
+		}).catch(mtthrow);
+	};
 
 	this.create = function (req, res) {
-		var collection = prefix + col;
-		var data = req.body;
-		data._appid = Number(req.params.appid);
-		converter.toObject(data).then(function (r) {
-					return db.collection(collection).insertOne(r);
-				}).then(function (r) {
-					var _typeid = r.insertedId;
-					res.send(_typeid);
-				}).catch(mtthrow);
+		me.createRaw(req.params.appid, req.body, function (typeid) {
+			res.send(typeid);
+		});
 	};
 
 	this.list = function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + col;
-		converter.toIDs(['_appid', '_isDraft'], function(ids){
+		converter.toIDs(['_appid', '_isDraft'], function (ids) {
 
-					var query = {'$and':[]};
-					var projection = {};
+			var query = {'$and': []};
+			var projection = {};
 
-					var andStatement = {};
-					andStatement[ids['_appid']] = appid;
-					query['$and'].push(andStatement);
+			var andStatement = {};
+			andStatement[ids['_appid']] = appid;
+			query['$and'].push(andStatement);
 
-					andStatement = {'$or': []};
-					var orStatement = {};
-					orStatement[ids['_isDraft']] = false;
-					andStatement['$or'].push(orStatement);
-					orStatement = {};
-					orStatement[ids['_isDraft']] = {'$exists': false};
-					andStatement['$or'].push(orStatement);
+			andStatement = {'$or': []};
+			var orStatement = {};
+			orStatement[ids['_isDraft']] = false;
+			andStatement['$or'].push(orStatement);
+			orStatement = {};
+			orStatement[ids['_isDraft']] = {'$exists': false};
+			andStatement['$or'].push(orStatement);
 
-					query['$and'].push(andStatement);
-					console.log(JSON.stringify(query));
-					projection[ids['_appid']] = 0;
-					projection[ids['_isDraft']] = 0;
+			query['$and'].push(andStatement);
+			console.log(JSON.stringify(query));
+			projection[ids['_appid']] = 0;
+			projection[ids['_isDraft']] = 0;
 
-					var cursor = db.collection(collection).find(query, projection);
-						var done = false;
-						var results = [];
-						async.whilst(
-							function () {
-								return done == false;
-							},
-							function (callback) {
-								cursor.next().then(function (r) {
-									if (r) {
-										converter.toOriginal(r).then(function (r) {
-											results.push(r);
-											callback(null);
-										}).catch(function (err) {
-											callback(err);
-										});
-									} else {
-										done = true;
-										callback(null, results);
-									}
+			var cursor = db.collection(collection).find(query, projection);
+			var done = false;
+			var results = [];
+			async.whilst(
+					function () {
+						return done == false;
+					},
+					function (callback) {
+						cursor.next().then(function (r) {
+							if (r) {
+								converter.toOriginal(r).then(function (r) {
+									results.push(r);
+									callback(null);
 								}).catch(function (err) {
 									callback(err);
 								});
-							}, function (err, results) {
-								if (err) {
-									mtthrow(err);
-								} else {
-									res.json(results);
-								}
-							});
+							} else {
+								done = true;
+								callback(null, results);
+							}
+						}).catch(function (err) {
+							callback(err);
+						});
+					}, function (err, results) {
+						if (err) {
+							mtthrow(err);
+						} else {
+							res.json(results);
+						}
+					});
 
 		});
 	}
@@ -98,36 +104,35 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
 	this.delete = function (req, res) {
 		// var appid = req.params.appid;
 		var atid = req.params.id;
-		var collection = prefix +col;
+		var collection = prefix + col;
 		db.collection(collection).deleteOne({_id: new mongodb.ObjectID(atid)})
 				.then(function (r) {
 					res.status(200).end();
 				}).catch(mtthrow);
 	};
 
-	this.update = function(req,res)
-	{
-			var data = req.body;
-			var atid = req.params.id;
-			var collection = prefix + col;
-			converter.toObject(data)
-					.then(function (r) {
-						return db.collection(collection).updateOne({_id: new mongodb.ObjectID(atid)}, {$set: r})
-					}).then(function (results) {
-				res.status(200).end();
-			}).catch(mtthrow);
+	this.update = function (req, res) {
+		var data = req.body;
+		var atid = req.params.id;
+		var collection = prefix + col;
+		converter.toObject(data)
+				.then(function (r) {
+					return db.collection(collection).updateOne({_id: new mongodb.ObjectID(atid)}, {$set: r})
+				}).then(function (results) {
+			res.status(200).end();
+		}).catch(mtthrow);
 	};
 
-	this.deleteDraf = function(req, res){
+	this.deleteDraf = function (req, res) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + col;
 		console.log(collection);
-		converter.toIDs(['_appid', '_isDraft'], function(ids){
+		converter.toIDs(['_appid', '_isDraft'], function (ids) {
 			var query = {};
 			query[ids['_appid']] = appid;
 			query[ids['_isDraft']] = true;
 			console.log(query);
-			db.collection(collection).deleteMany(query).then(function(r){
+			db.collection(collection).deleteMany(query).then(function (r) {
 				res.status(200).end();
 			}).catch(mtthrow);
 		});
