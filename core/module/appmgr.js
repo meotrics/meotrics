@@ -77,19 +77,22 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud) {
 				{pname: "Category ID", pcode: "pid"},
 				{pname: "Category Name", pcode: "cname"}
 			]
-		}
+		};
 
-		var submit =
+		var register =
 		{
-			codename: "submit",
-			name: "Submit Form",
-			desc: "User submit a form",
-			fields: [
-				{pname: "action", pcode: "pid"},
-				{pname: "formid", pcode: "pname"},
-				{pname: "url", pcode: "pid"},
-				{pname: "name", pcode: "Form Name"}
-			]
+			codename: "register",
+			name: "Register",
+			desc: "User register to a page",
+			fields: []
+		};
+
+		var quit =
+		{
+			codename: "quit",
+			name: "Quit",
+			desc: "User quit website",
+			fields: []
 		};
 
 		typeCrud.createRaw(appid, purchase, function () {
@@ -98,7 +101,9 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud) {
 					typeCrud.createRaw(appid, rate, function () {
 						typeCrud.createRaw(appid, like, function () {
 							typeCrud.createRaw(appid, download, function () {
-								typeCrud.createRaw(appid, submit, callback);
+								typeCrud.createRaw(appid, register, function () {
+									typeCrud.createRaw(appid, quit, callback);
+								});
 							});
 						});
 					});

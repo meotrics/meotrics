@@ -90,9 +90,7 @@ function route(app, db, segmgr, prefix, mongodb, converter) {
 	app.get('/s/:appid', actionMgr.setup);
 
 	app.get('/app/init/:appid', function (req, res) {
-		console.log(1);
 		appmgr.initApp(req.params.appid, function () {
-			console.log(2);
 			res.status(200).end();
 		})
 	});
