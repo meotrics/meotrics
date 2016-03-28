@@ -27,6 +27,9 @@
   .editable-input input{
     height: auto;
   }
+  .avatar .form-group{
+    padding: 0;
+  }
   </style>
 @endsection
 
@@ -46,7 +49,9 @@
     <h4>Profile management</h4>
     <div class="content">
       <h3 class="avatar">
-        <i class="pe-7s-user"></i><span class="text-info">{{ Auth::user()->name }}</span>
+        <i class="pe-7s-user"></i>
+        <a class="text-info"  href="#" xeditable data-type="text" data-name="name"
+           data-mode="inline" data-showbuttons="false" data-pk="{{ Auth::user()->id }}">{{ Auth::user()->name }}</a>
       </h3>
       <div class="form-group">
         <span class="col-xs-2 control-label">UserID</span>
@@ -71,7 +76,12 @@
         <span class="col-xs-2 control-label">Password</span>
         <div class="col-xs-10">
           <b>************</b>
-          <a class="btn btn-xs btn-info" href="{{ URL::to('/user/change_password') }}">Change</a>
+          <a class="btn btn-xs btn-info" href="{{ URL::to('/user/password') }}">Change</a>
+          @if(session('success'))
+            <span class="text-success">
+              {{ session('success') }}
+            </span>
+          @endif
         </div>
       </div>
       <br>

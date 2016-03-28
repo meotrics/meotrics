@@ -122,7 +122,7 @@
 								<h1 class="login-msg">Hey Buddy, welcome back!</h1>
 								<form role="form" class="col-sm-8 col-sm-offset-2" method="POST" action="{{ URL::to('/auth/login') }}">
 									<input type="hidden" name="_token" value="{{ csrf_token() }}">
-									@if (count($errors) > 0)
+									@if(count($errors) > 0)
 										<div class="text-danger">
 											<ul>
 												@foreach ($errors->all() as $error)
