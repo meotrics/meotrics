@@ -21,8 +21,6 @@ function mtthrow(err) {
 }
 
 
-
-
 function route(app, db, segmgr, prefix, mongodb, converter) {
 	var bodyParser = require('body-parser');
 	var async = require('async');
@@ -33,11 +31,11 @@ function route(app, db, segmgr, prefix, mongodb, converter) {
 	var actionMgr = new ActionMgr(db, mongodb, async, converter, prefix, mtthrow);
 	var trendMrg = new TrendMgr(db, mongodb, async, converter, prefix, mtthrow, "trend");
 	var typeCRUD = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "actiontype");
-	var trendCRUD  = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "trend");
-	var segCRUD  = new CRUD(db, mongodb,async,  converter, prefix, mtthrow, "segment");
-	var propCRUD  = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "userprop");
-	var camCRUD  = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "campaign");
-	var appmgr = new (require('./module/appmgr.js').AppMgr)(db, mongodb, async, converter, prefix, mtthrow);
+	var trendCRUD = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "trend");
+	var segCRUD = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "segment");
+	var propCRUD = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "userprop");
+	var camCRUD = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "campaign");
+	var appmgr = new (require('./module/appmgr.js').AppMgr)(db, mongodb, async, converter, prefix, typeCRUD);
 
 	// parse application/json
 	app.use(bodyParser.json());
@@ -91,12 +89,17 @@ function route(app, db, segmgr, prefix, mongodb, converter) {
 	// set up a new cookie
 	app.get('/s/:appid', actionMgr.setup);
 
+	app.get('/app/init/:appid', function (req, res) {
+		appmgr.initApp(req.params.appid, function () {
+			res.status(200).end();
+		})
+	});
+
 	//check whether user has setup tracking code
-	app.get('/api/status/:appid', function(req, res){
-		appmgr.isSetup(req.params.appid, function(ret)
-		{
+	app.get('/api/status/:appid', function (req, res) {
+		appmgr.isSetup(req.params.appid, function (ret) {
 			res.send(ret);
-			res.status(200).end();	
+			res.status(200).end();
 		});
 	});
 
