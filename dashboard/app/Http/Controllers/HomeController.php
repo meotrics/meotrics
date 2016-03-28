@@ -1,12 +1,13 @@
 <?php namespace App\Http\Controllers;
-
-use App\Http\Requests\Request;
 use App\Util\MtHttp;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use UAParser\Parser;
 
 class HomeController extends Controller
 {
 
+	private static $parser;
 	/*
 	|--------------------------------------------------------------------------
 	| Home Controller
@@ -25,6 +26,7 @@ class HomeController extends Controller
 	 */
 	public function __construct()
 	{
+		HomeController::$parser = Parser::create();
 		$this->middleware('auth');
 	}
 
@@ -46,13 +48,19 @@ class HomeController extends Controller
 	{
 	}
 
-	public function track()
+	public function track(Request $request)
 	{
+		$ua = $request->server('HTTP_USER_AGENT');
+		return $ua;
+		$ua = $request->header('User-Agent');
+		return $ua;
+		//$result = $parser->parse($ua)
+
 	}
 
 	public function identify()
 	{
-		
+
 	}
 
 	public function setup(Request $request)
