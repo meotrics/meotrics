@@ -41,14 +41,14 @@
         <div class="step step-3">
           <div class="step-title text-primary">
             <div class="step-number">3</div>
-            <h5 class="step-text">Step 3: Complete! Lets start your </h5>
+            <h5 class="step-text">Step 3: Complete! Lets start your journey</h5>
           </div>
           <small>Just give us a few second for checking, then refresh your browser and you can start using Meotrics. Or else, you still can explore by clicking on Demo icon on the left conner.</small>
         </div>
       </div>
       <div class="modal-footer">
         <small>Done ?</small>&nbsp;
-        <button type="button" class="btn btn-sm btn-fill btn-success"
+        <button type="button" class="btn btn-sm btn-fill btn-primary"
                 data-dismiss="modal" aria-label="Close">
           Close
         </button>
