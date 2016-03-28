@@ -26,3 +26,5 @@ Route::controllers([
 ]);
 
 Route::get('/helper/setup_status', 'HelperController@setup_status');
+
+Route::controller('user', 'UserController');

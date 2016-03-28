@@ -203,7 +203,7 @@
 			          <b class="caret"></b>
 			        </a>
 			        <ul class="dropdown-menu">
-			        	<li><a href="{{ URL::to('/profile') }}">Profile</a></li>
+			        	<li><a href="{{ URL::to('/user/profile') }}">Profile</a></li>
 			          <li><a href="{{ URL::to('/actiontype') }}">Action types</a></li>
 			          <li class="divider"></li>
 			          <li><a href="{{ URL::to('/auth/logout') }}">Logout</a></li>
