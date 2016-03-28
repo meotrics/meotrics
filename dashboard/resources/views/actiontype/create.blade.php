@@ -38,28 +38,32 @@
 
 	<div class="card row">
 		<div class="content col-sm-12">
-			<form>
+			<form action="/actiontype/create" method="POST">
 				<div class="row">
 					<div class="form-group col-sm-2 ">
 						<h6 class="pull-right " style="margin-top: 11px">Code Name</h6>
 					</div>
 					<div class="form-group col-sm-5">
-						<input type="text" class="form-control fmonospaced" name="codename" placeholder="Name">
+						<input type="text" class="form-control fmonospaced" name="codename" placeholder="Name" required>
 					</div>
 				</div>
 				<div class="row">
 					<div class="form-group col-sm-2">
 						<h6 class="pull-right" style="margin-top: 11px">Display Name</h6>
 					</div>
-					<div class="col-sm-5"><input type="text" name="name" class="form-control" id="exampleInputEmail1"
-					                             placeholder=" Display Name"></div>
+					<div class="col-sm-5">
+						<input type="text" name="name" class="form-control" id="exampleInputEmail1"
+                   placeholder=" Display Name" required>
+          </div>
 				</div>
 				<div class="row">
 					<div class="form-group col-sm-2">
 						<h6 class="pull-right" style="margin-top: 11px">Description</h6>
 					</div>
-					<div class="col-sm-5"><input type="text" name="desc" class="form-control" id="exampleInputEmail1"
-					                             placeholder="Description"></div>
+					<div class="col-sm-5">
+						<input type="text" name="desc" class="form-control" id="exampleInputEmail1"
+                   placeholder="Description">
+          </div>
 				</div>
 				<div class="row">
 
@@ -86,7 +90,10 @@
 				</div>
 				<div class="row">
 					<div class="col-sm-push-2 col-sm-2">
-						<button type="submit" formaction="/actiontype/create" formmethod="post" class="btn btn-success btn-fill "> <i class="pe-7s-diskette mr5" style="font-size:19px; vertical-align: middle"></i> <span class="" style="vertical-align: middle">Create</span></button>
+						<button class="btn btn-success btn-fill ">
+							<i class="pe-7s-diskette mr5" style="font-size:19px; vertical-align: middle"></i>
+							<span class="" style="vertical-align: middle">Create</span>
+						</button>
 					</div>
 
 				</div>
@@ -98,10 +105,10 @@
 
 					</div>
 					<div class="col-sm-3">
-						<input type="text" name="pcodes[]" class="form-control fmonospaced" placeholder="Properties Code">
+						<input type="text" name="pcodes[]" class="form-control fmonospaced" placeholder="Properties Code" required>
 					</div>
 					<div class="col-sm-3">
-						<input type="text" name="pnames[]" class="form-control" placeholder="Properties Display Name">
+						<input type="text" name="pnames[]" class="form-control" placeholder="Properties Display Name" required>
 					</div>
 					<div class="col-sm-3">
 						<a class="id_remprop btn  "><i class="fa fa-trash"></i></a>
@@ -110,4 +117,5 @@
 				</div>
 			</div>
 		</div>
+	</div>
 @endsection

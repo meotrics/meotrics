@@ -4,7 +4,7 @@ body {
 }
 
 header{
-  background-image: url("../img/slide-bg.png");
+  background-image: url({{ URL::asset("/img/slide-bg.png") }});
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -224,7 +224,7 @@ header .navbar-brand > img{
 
 #tail{
   height: 200px;
-  background: url("../img/features-bg.png") repeat-x bottom;
+  background: url({{ URL::asset("/img/features-bg.png") }}) repeat-x bottom;
   -webkit-transform: rotate(180deg);
   -moz-transform: rotate(180deg);
   -ms-transform: rotate(180deg);

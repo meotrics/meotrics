@@ -5,7 +5,7 @@
 <style>
   
   body {
-    background-image: url("../img/slide-bg.png");
+    background-image: url({{ URL::asset("/img/slide-bg.png") }});
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
@@ -53,15 +53,15 @@
   <div class="row">
     <div class="col-sm-6 col-sm-offset-3">
       <div class="text-center error">
-        <img src="../img/404.png" alt="404" class="img-responsive">
+        <img src="{{ URL::asset('img/404.png') }}" alt="404" class="img-responsive">
         <h1>Sorry, page not found</h1>
         <p class="des">Perhaps you clicked an outdated link, or we had removed the file</p>
         <p class="text-uppercase" style="font-size: 20px; margin:20px;">back to</p>
 
         <ul class="nav mnavbar mnavbar-center">
-          <li class="bordered"><a href="../index.html">Homepage</a></li>
-          <li class="bordered"><a href="features.html">Features</a></li>
-          <li class="bordered"><a href="contact.html">Contact us</a></li>
+          <li class="bordered"><a href="{{ URL::to('/') }}">Homepage</a></li>
+          <li class="bordered"><a href="{{ URL::to('features.html') }}">Features</a></li>
+          <li class="bordered"><a href="{{ URL::to('contact.html')  }}">Contact us</a></li>
         </ul>
 
       </div>

@@ -3,19 +3,20 @@
 @section('content')
 	<div class="card row">
 		<div class="header col-sm-12">
-			<h3>Action type  <a href="/actiontype/create" class="btn btn-success btn-fill">Add new</a></h3>
+			<h3>Action type</h3>
 		</div>
 		<div class="content col-sm-12">
-
-
 			<div class="content table-responsive table-full-width col-sm-12">
+				<div class="pull-right">
+					<a href="/actiontype/create" class="btn btn-success btn-sm btn-fill">+ Add new</a>
+				</div>
 				<table class="table table-hover table-striped">
 					<thead>
 					<tr>
 						<th>CodeName</th>
 						<th>Name</th>
 						<th>Description</th>
-						<th>Fields</th>
+						<th>Properties</th>
 						<th></th>
 					</tr>
 					</thead>
@@ -31,8 +32,10 @@
 								@endforeach
 							</td>
 							<td>
-								<a class="btn btn-default " href="/actiontype/edit/{{$type->_id}}"><i class="fa fa-edit"></i></a>
-								<a class="btn btn-default" href="/actiontype/delete/{{$type->_id}}"><i class="fa fa-trash"></i></a>
+								<a class="btn btn-primary btn-sm btn-fill"
+									 href="/actiontype/edit/{{$type->_id}}"><i class="fa fa-edit"></i></a>
+								<a class="btn btn-danger  btn-sm btn-fill"
+									 href="/actiontype/delete/{{$type->_id}}"><i class="fa fa-trash"></i></a>
 							</td>
 						</tr>
 					@endforeach
