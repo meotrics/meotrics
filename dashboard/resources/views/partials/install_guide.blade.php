@@ -10,7 +10,7 @@
         </h5>
       </div>
       <div class="modal-body">
-        <div class="bs-callout bs-callout-info">
+        <div class="bs-callout bs-callout-primary">
           <small class="uppercase"><b>Let metrics help you to understand your customers in one click!</b></small>
           <br>
           <small>
@@ -25,7 +25,7 @@
           </div>
           <small>Paste this snippet just before the <b>&lt;/head&gt;</b> tag of your page:</small>
           <div class="well well-sm meotrics_script">
-            <button class="btn btn-sm btn-info btn-fill copy-btn" onclick="copyScript()">
+            <button class="btn btn-sm btn-primary btn-fill copy-btn" onclick="copyScript()">
               Copy
             </button>
             <textarea onkeydown="return false" placeholder="Loading..."></textarea>

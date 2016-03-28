@@ -98,7 +98,7 @@
 <body>
 
 <div class="wrapper">
-  <div class="sidebar main_sidebar" data-color="azure" data-image="/img/sidebar-4.jpg">
+  <div class="sidebar main_sidebar" data-color="blue" data-image="/img/sidebar-4.jpg">
     <!--   you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple" --><div class="sidebar-wrapper">
 	    <div class="logo">
 	    	<a class="simple-text" href="{{ URL::to('/') }}">
