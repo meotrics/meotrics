@@ -18,6 +18,8 @@ Route::get('home', 'HomeController@index');
 Route::controller('trend', 'TrendController');
 Route::resource('actiontype', 'TypeController');
 
+Route::get('track', 'HomeController@track');
+
 Route::post('/actiontype/create', 'TypeController@create');
 Route::controller('segment', 'SegmentController');
 Route::controllers([
