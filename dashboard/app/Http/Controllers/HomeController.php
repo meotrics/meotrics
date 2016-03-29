@@ -1,42 +1,21 @@
 <?php namespace App\Http\Controllers;
 
 use App\Util\MtHttp;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use \Mobile_Detect;
+use PhpSpec\Exception\Exception;
 use UAParser\Parser;
 
 class HomeController extends Controller
 {
-
-	//private  $parser;
-	/*
-	|--------------------------------------------------------------------------
-	| Home Controller
-	|--------------------------------------------------------------------------
-	|
-	| This controller renders your application's "dashboard" for users that
-	| are authenticated. Of course, you are free to change or remove the
-	| controller as you wish. It is just here to get your app started!
-	|
-	*/
-
-	/**
-	 * Create a new controller instance.
-	 *
-	 * @return void
-	 */
 	public function __construct()
 	{
 		$this->parser = Parser::create();
 		//$this->middleware('auth');
 	}
 
-	/**
-	 * Show the application dashboard to the user.
-	 *
-	 * @return Response
-	 */
 	public function index()
 	{
 		return view('home');
@@ -44,14 +23,20 @@ class HomeController extends Controller
 
 	public function pageView(Request $request)
 	{
+		$appid = $request->input('_appid');
 		$req = $this->trackBasic($request);
 		$req['_type'] = 'pageview';
-		MtHttp::post('r', json_encode($req));
-		return '';
+		MtHttp::post('r/' . $appid, json_encode($req));
+		return;
 	}
 
 	public function pageQuit(Request $request)
 	{
+		$appid = $request->input('_appid');
+		$req = $this->trackBasic($request);
+		$req['_type'] = 'pageview';
+		MtHttp::post('r/' . $appid, json_encode($req));
+		return;
 	}
 
 	private function getRemoteIPAddress(Request $request)
@@ -83,7 +68,7 @@ class HomeController extends Controller
 		else
 			$devicetype = 'desktop';
 
-		//input data
+		//copy all $input prop that dont startwith _ into $data
 		$input = $request->all();
 		$data = [];
 		foreach ($input as $k => $v) {
@@ -91,7 +76,16 @@ class HomeController extends Controller
 				$data[$k] = $v;
 		}
 
+
+		//get mtid
+		$mtid = $request->input('_mtid');
+		if ($mtid == null) $mtid = $request->cookie('mtid');
+		if ($mtid == null) throw new Exception("mtid is wrong");
+
+		$userid = $request->input('_userid');
+
 		return [
+			'type' => $type,
 			'ip' => $ip,
 			'browserid' => $ua->ua->family,
 			'browserversion' => $ua->ua->major . "." . $ua->os->minor,
@@ -103,26 +97,53 @@ class HomeController extends Controller
 			'data' => $data,
 			'screenres' => $screenres,
 			'url' => $request->server('HTTP_REFERER'),
-			'language' => $request->server('HTTP_ACCEPT_LANGUAGE')
+			'language' => $request->server('HTTP_ACCEPT_LANGUAGE'),
+			'time' => Carbon::now()->toIso8601String(),
+			'mtid' => $request->cookie('mtid'),
+			'userid' => $userid
 		];
 	}
 
 	public function track(Request $request)
 	{
 		$req = $this->trackBasic($request);
-		MtHttp::post('r', json_encode($req));
-		return '';
+		$appid = $request->input('_appid');
+		MtHttp::post('/r/' . $appid, json_encode($req));
+		return;
 	}
 
-	public function identify()
+	public function identify(Request $request)
 	{
+		$appid = $request->input('_appid');
+		$input = $request->input('_userid');
+		$mtid = $request->input('_mtid');
 
+		//get mtid
+		if ($mtid == null) $mtid = $request->cookie('mtid');
+		if ($mtid == null) throw new Exception("mtid is wrong");
+
+		//copy all $input prop that dont startwith _ into $data
+		$data = [];
+		foreach ($input as $k => $v) {
+			if (substr($k, 0, 1) != '_')
+				$data[$k] = $v;
+		}
+
+		$req = [
+			'userid' => $data['userid'],
+			'mtid' => $mtid,
+			'data' => $data
+		];
+
+		$mtid = MtHttp::post('/i/' . $appid, json_encode($req));
+		$response = new Response($mtid);
+		return $response->withCookie($mtid);
 	}
 
 	public function setup(Request $request)
 	{
 		$response = new Response();
-		$appid = $request->input('appid');
+		$appid = $request->input('_appid');
 		$mtid = MtHttp::get('/s/' . $appid);
 		$response->withCookie(cookie()->forever('mtid', $mtid));
 		return $response;
