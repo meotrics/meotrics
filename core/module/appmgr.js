@@ -105,7 +105,9 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 		};
 
 
-		var segment1 =
+		var segment1 = {
+			name: "Active user",
+			condition: 
 		[{
 			type: "pageview", f: "count", field: "", operator: ">", value: 5,
 			conditions: ["url", "eq", "http://google.com"]
@@ -120,6 +122,7 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 				type: 'user',
 				conditions: ['age', 'eq', 15]
 			}];
+		}
 
 		typeCrud.createRaw(appid, purchase, function () {
 			typeCrud.createRaw(appid, pageview, function () {
