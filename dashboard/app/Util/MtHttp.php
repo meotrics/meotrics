@@ -10,7 +10,7 @@ class MtHttp
 	{
 		//unction isJson($string) {
 			$ret = json_decode($data);
-			return (json_last_error() == JSON_ERROR_NONE) ? $data : $ret;
+			return (json_last_error() != JSON_ERROR_NONE) ? $data : $ret;
 		//}
 
 	}
