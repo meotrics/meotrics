@@ -1,570 +1,605 @@
 var config = require('config'),
-	mongodb = require('mongodb'),
-	MongoClient = mongodb.MongoClient,
+    mongodb = require('mongodb'),
+    MongoClient = mongodb.MongoClient,
     converter = require('../utils/fakeidmanager.js'),
     async = require('async'),
     converter = new converter.IdManager(),
-	db = null;
+    db = null;
 
 var url = 'mongodb://' + config.get('mongod.host') + ':' + config.get('mongod.port') + '/' + config.get('mongod.database');
 
-module.exports = function (collection, segmentid, field1, type1, field2,type2, callback){
-	MongoClient.connect(url)
-	    .then(function(database){
-	        console.log('[MongoDB] connected');
-	        db = database;
-	        
-	        groupby(collection, segmentid, field1, type1, field2,type2, callback);
+module.exports = function (collection, segmentid, field1, type1, field2, type2, callback) {
+    MongoClient.connect(url)
+        .then(function (database) {
+            console.log('[MongoDB] connected');
+            db = database;
 
-	        // Listen for some events
-	        db.on('reconnect', function(data){
-	          console.log(data);
-	          console.log('[MongoDB] reconnect success');
-	        });
-	        db.on('error', function(err){
-	          console.log('[MongoDB] error', err.message);
-	        });
-	        db.on('close', function(err){
-	          console.log('[MongoDB] disconnected');
-	        });
-	        // return db.collection('test').find({isUser: true}).toArray();
-	    }).catch(function(err){
-	        console.error("[MongoDB]", err.message);
-	    });	
-}
- 
-function groupby(collection, segmentid, field1, type1, field2,type2, callback){
-	if(field2 == undefined){
-		converter.toIDs(['_isUser', '_segments', field1], function(ids){
+            groupby(collection, segmentid, field1, type1, field2, type2, callback);
 
-		    var maxfield1;
-		    var minfield1;
-
-		    var query = {};
-		    var sort = {};
-		    query[ids['_isUser']] = true;
-		    sort[ids[field1]] = -1;
-		    db.collection(collection).find(query).sort(sort).limit(1).toArray().then(function(r){
-		      maxfield1 = r[0][ids[field1]];
-		      sort[ids[field1]] = 1;
-		      return db.collection(collection).find(query).sort(sort).limit(1).toArray();
-		    }).then(function(r){
-		      	minfield1 = r[0][ids[field1]];
-		      	console.log(minfield1, maxfield1);
-
-		      	var matchClause = {"$match": {}};
-		      	matchClause['$match'][ids['_isUser']] = true;
-		     	// matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segmentid);
-		      
-		      	var projectClause = {"$project": {}};
-		      	projectClause['$project']['_id'] = 0;
-		      	projectClause['$project'][ids[field1]] = 1;
-		      
-		      	var groupClause = {"$group": {}};
-		      	groupClause['$group']['_id'] = '$'+ids[field1];
-		      	groupClause['$group']['count'] = {'$sum': 1};
-
-		      	var cursor = db.collection(collection).aggregate([
-		        	matchClause,
-		        	projectClause,
-		        	groupClause
-		      	], {
-		        	cursor: {batchSize: 20},
-		        	allowDiskUse: true
-		      	});
-
-		      	if(field1 == 'age'){
-		      		var results = [0, 0, 0, 0, 0, 0, 0];
-		          	var done = false;
-
-		          	async.whilst(
-			            function(){return done == false},
-			            function(callback){
-
-			              cursor.next().then(function(r){
-			                if(r){
-							  if(r._id<=18){
-			                    results[1]+=r.count;
-			                  }else if ((r._id > 18)&&(r._id<=24)){
-			                    results[2]+=r.count;
-			                  }else if ((r._id > 24)&&(r._id<=34)){
-			                    results[3]+=r.count;
-			                  }else if ((r._id > 34)&&(r._id<=44)){
-			                    results[4]+=r.count;
-			                  }else if ((r._id > 44)&&(r._id<=54)){
-			                    results[5]+=r.count;
-			                  }else {
-			                    results[6]+=r.count;
-			                  }
-			                }else{
-			                  done = true;
-			                }
-			                callback(null, results);
-			              }).catch(function(e){
-			                callback(e);
-			              });
-			            }, function(err, results){
-			              if(results != undefined){
-			                results = [{key: {to:18}, count: results[1]}, {key: {from: 19, to:24}, count: results[2]},
-			                           {key: {from: 25, to:34}, count: results[3]}, {key: {from: 35, to:44}, count: results[4]},
-			                           {key: {from: 45, to:54}, count: results[5]}, {key: {from: 55}, count: results[6]}];
-			              }
-			              callback(err, results);
-			            });
-		        }else{
-		        	if(type1 == 'string'){
-						var results = [];
-				        var done = false;
-				        async.whilst(
-				          function () { return done == false; },
-				          function(callback){
-				            cursor.next().then(function(r){
-				              if(r){
-				                var element = {};
-				                element.key = r._id;
-				                element.count = r.count;
-				                results.push(element);
-				              }else{
-				                done = true;
-				              }
-				              callback(null, results);
-				            }).catch(function(e){
-				              callback(e);
-				            });
-				          }, function(err, results){
-				            callback(err, results);
-				          }
-				        );
-		        	}else{
-		        		if(typeof minfield1 == 'number' && typeof maxfield1 == 'number'){
-		        			var spaces = 1;
-				            var distance = 0;
-
-				            if(maxfield1 - minfield1 >= 5){
-				              spaces = 5;
-				              distance = Math.floor((maxfield1 - minfield1) / 5);
-				            }
-
-				            var done = false;
-				       		var results = [];
-				            for(var i=0;i<spaces;i++){
-				              results[i] = 0;
-				            }
-				           
-				            async.whilst(
-				              function(){return done == false},
-				              function(callback){
-				                cursor.next().then(function(r){
-				                  if(r){
-				                    var value = r._id;
-			                      	if((value>=minfield1)&&(value<=maxfield1)){
-			                        	if(maxfield1 == minfield1){
-				                          	results[0] = r.count;
-				                          	done = true;
-			                        	}else{
-				                          	var i = Math.floor(((value-minfield1)*spaces)/(maxfield1-minfield1));
-				                          	if(i == spaces){
-				                            	i--;
-				                          	}
-			                          		results[i] += r.count;
-			                        	}
-			                        }
-			                      }else{
-				                    done = true;
-				                  }
-				                  callback(null, results);
-				                }).catch(function(e){
-				                  callback(e);
-				                });
-				              }, function(err, results){
-				                var finalResults;
-				                if(results != undefined){
-				                  finalResults = [];
-				                  for(var i=0;i<spaces;i++){
-				                    var element = {};
-				                    element.key = {
-				                      from: minfield1+i*distance,
-				                      to: minfield1+(i+1)*distance
-				                    };
-				                    if(i==spaces-1){
-				                      element.key.to = maxfield1;
-				                    }
-				                    element.count = results[i];
-				                    finalResults.push(element);
-				                  }
-				                }
-				                callback(err, finalResults);
-				              });
-		        		}else{
-		        			callback (new Error ('Type not valid'));
-		        		}
-		        	}
-		        }
-		  	});
-		});
-	}else{
-		converter.toIDs(['_isUser', '_segments', field1, field2], function(ids){
-			var maxfield1;
-			var minfield1;
-			var maxfield2;
-			var minfield2;
-
-			var query = {};
-			var sort = {};
-			query[ids['_isUser']] = true;
-			sort[ids[field1]] = -1;
-			db.collection(collection).find(query).sort(sort).limit(1).toArray().then(function(r){
-				maxfield1 = r[0][ids[field1]];
-				sort[ids[field1]] = 1;
-				return db.collection(collection).find(query).sort(sort).limit(1).toArray();
-			}).then(function(r){
-				minfield1 = r[0][ids[field1]];
-				sort[ids[field2]] = -1;
-				return db.collection(collection).find(query).sort(sort).limit(1).toArray();
-			}).then(function(r){
-				maxfield2 = r[0][ids[field2]];
-				sort[ids[field2]] = 1;
-				return db.collection(collection).find(query).sort(sort).limit(1).toArray();
-			}).then(function(r){
-				minfield2 = r[0][ids[field2]];
-
-				var matchClause = {"$match": {}};
-				matchClause['$match'][ids['_isUser']] = true;
-				// matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segmentid);
-
-				var projectClause = {"$project": {}};
-				projectClause['$project']['_id'] = 0;
-				projectClause['$project'][ids[field1]] = 1;
-				projectClause['$project'][ids[field2]] = 1;
-
-				var groupClause = {"$group": {}};
-		        groupClause['$group']['_id'] = '$'+ids[field1];
-		        groupClause['$group']['values'] = {'$push': '$'+ids[field2]};
-		        groupClause['$group']['count'] = {'$sum': 1};
-
-				var sortClause = {"$sort": {}};
-				sortClause['$sort']['_id'] = 1;
-
-				return db.collection(collection).aggregate([
-					matchClause,
-					projectClause,
-					groupClause,
-					sortClause
-					], {
-						cursor: {batchSize: 20},
-						allowDiskUse: true
-					});
-			}).then(function(cursor){
-				if((typeof minfield1 == typeof maxfield1)&&(typeof maxfield1 == type1)&&(type1 == 'string')){
-					var results = [];
-					if((typeof minfield2 == typeof maxfield2)&&(typeof maxfield2 == field2)&&(field2 == 'string')){
-						var done = false;
-						async.whilst(
-							function () { return done == false; },
-							function(callback){
-								cursor.next().then(function(r){
-									if(r){
-										var element = {};
-										element.key = r._id;
-										element.count = r.count;
-										element.detail = summingString(r.values);
-										results.push(element);
-									}else{
-										done = true;
-									}
-									callback(null, results);
-								}).catch(function(e){
-									callback(e);
-								});
-							}, function(err, results){
-								callback(err, results);
-							}
-						);
-					}else if((typeof minfield2 == typeof maxfield2)&&(typeof maxfield2 == type2)&&(type2 == 'number')){
-						
-						var results = [];
-						var spaces = 1;
-						var distance = 0;
-						if(maxfield2 - minfield2 >= 5){
-							spaces = 5;
-							distance = Math.floor((maxfield2 - minfield2) / 5);
-						}
-
-						var done = false;
-			            async.whilst(
-							function () { return done == false; },
-							function(callback){
-								cursor.next().then(function(r){
-									if(r){
-										// console.log(r);
-										var element = {};
-										element.key = r._id;
-										element.count = r.count;
-										element.detail = summingNumber(minfield2, maxfield2, spaces, distance, r.values, field2);
-										results.push(element);
-									}else{
-										done = true;
-									}
-									callback(null, results);
-								}).catch(function(e){
-									callback(e);
-								});
-							}, function(err, results){
-								callback(err, results);
-							}
-						);
-					}else{
-	              		callback (new Error ('Type not valid'));
-	              	
-	              	}	
-	          	}else if((typeof minfield1 == typeof maxfield1)&&(typeof maxfield1 == type1)&&(type1 == 'number')){
-	          		
-		          	if( ((typeof minfield2 != typeof maxfield2)||(typeof maxfield2 != type2)) &&
-		          		((filed2 == 'number') || (field2 == 'string'))){
-
-		          	}else{
-
-				        	
-				        	var results = [];
-							var spaces = 1;
-							var distance = 0;
-							if(maxfield1 - minfield1 >= 5){
-								spaces = 5;
-								distance = Math.floor((maxfield1 - minfield1) / 5);
-							}
-							if(field1 == 'age'){
-								spaces = 6;
-							}
-							for(var i=0;i<spaces;i++){
-								results[i] = {
-									count: 0,
-									values: []
-								}
-							}
-
-							var index = 0;
-							var done = false;
-				            async.whilst(
-								function () { return done == false; },
-								function(callback){
-									cursor.next().then(function(r){
-										var indexNew = 0;
-										if(r){
-											var temp = r._id;
-											if(field1 != 'age'){
-												if(maxfield1 != minfield1){
-													indexNew = Math.floor(((temp-minfield1)*spaces)/(maxfield1-minfield1));
-													if(indexNew == spaces){
-														indexNew --;
-													}	
-												}
-											}else{
-												console.log(temp);
-												if(temp<=18){
-							                    	indexNew = 0;
-							                  	}else if ((temp > 18)&&(temp<=24)){
-							                    	indexNew = 1;
-							                  	}else if ((temp > 24)&&(temp<=34)){
-							                    	indexNew = 2;
-							                 	}else if ((temp > 34)&&(temp<=44)){
-							                    	indexNew = 3;
-							                 	}else if ((temp > 44)&&(temp<=54)){
-							                    	indexNew = 4;
-							                 	}else {
-							                    	indexNew = 5;
-							                 	}
-
-											}
-											
-											results[indexNew].count = results[indexNew].count + r.count;
-											results[indexNew].values = results[indexNew].values.concat(r.values);	
-										}else{
-											// console.log(results);	
-											done = true;
-											indexNew = -1;
-										}
-
-										if(indexNew != index){
-											
-											if(field2 == 'number'){
-												results[index]['detail'] = summingNumber(minfield1, maxfield1, spaces, distance, results[index].values, field2);
-											}else{
-												results[index]['detail'] = summingString(results[index].values);
-											}
-
-											delete results[index].values;
-											index = indexNew;
-										}
-										callback(null, results);
-									}).catch(function(e){
-										callback(e);
-									});
-								}, function(err, results){
-									if(field1 != 'age'){
-										for(var i=0;i<spaces;i++){
-											results[i]['key'] = {
-												from: minfield1+i*distance,
-												to: minfield1+(i+1)*distance
-											};
-											if(i == spaces - 1){
-												results[i]['key']['to'] = maxfield1;
-											}
-										}	
-									}else{
-										results[0].key = {
-											to: 18
-										};
-										results[1].key = {
-											from: 19,
-											to: 24
-										};
-										results[2].key = {
-											from: 25,
-											to: 34
-										};
-										results[3].key = {
-											from: 35,
-											to: 44
-										};
-										results[4].key = {
-											from: 45,
-											to: 54
-										};
-										results[5].key = {
-											from: 55
-										};
-									}
-									
-									callback(err, results);
-								}
-							);
-				        }
-				    
-	        	}else{
-	            	callback (new Error ('Type not valid'));
-	            }
-	        }).catch(function(err){
-	        	callback(err);	
-	        });
-	    });
-	}
+            // Listen for some events
+            db.on('reconnect', function (data) {
+                console.log(data);
+                console.log('[MongoDB] reconnect success');
+            });
+            db.on('error', function (err) {
+                console.log('[MongoDB] error', err.message);
+            });
+            db.on('close', function (err) {
+                console.log('[MongoDB] disconnected');
+            });
+            // return db.collection('test').find({isUser: true}).toArray();
+        }).catch(function (err) {
+        console.error("[MongoDB]", err.message);
+    });
 }
 
-function summingString(values){
-	var results = [];
-	var length = values.length;
-  	values.sort();
+function groupby(collection, segmentid, field1, type1, field2, type2, callback) {
+    if (field2 == undefined) {
+        if ((type1 == 'string') || (type1 == 'array')) {
+            oneFieldString(collection, segmentid, field1, function (err, results) {
+                callback(err, results);
+            });
+        } else {
+            oneFieldNumber(collection, segmentid, field1, function (err, results) {
+                callback(err, results);
+            });
+        }
+    } else {
+        if (type1 == 'string' && type2 == 'string') {
+            stringstring(collection, segmentid, field1, field2, function (err, results) {
+                callback(err, results);
+            });
+        } else {
+            if (type1 == 'number') {
+                if (type2 == 'number') {
+                    numbernumber(collection, segmentid, field1, field2, function (err, results) {
+                        callback(err, results);
+                    });
+                } else {
+                    numberstring(collection, segmentid, field1, field2, function (err, results) {
+                        callback(err, results);
+                    });
+                }
+            } else {
+                stringnumber(collection, segmentid, field1, field2, function (err, results) {
+                    callback(err, results);
+                });
+            }
+        }
+    }
 
-  	for(var i=0;i<length;i++){
-  		var str = values[i];
-  		for(var j=i;j<length;j++){
-  			if(values[j] != values[i]){
-  				var element = {};
-  				element.key = str;
-  				element.count = j-i;
-  				i = j-1;
-  				results.push(element);
-  				break;
-  			}else if((j+1) == length){
-  				var element = {};
-  				element.key = str;
-  				element.count = j - i + 1;
-  				i = j;
-  				results.push(element);
-  			}
-  		}
-  	}
-
-  	return results;
 }
 
-function summingNumber(min, max, spaces, distance, values, field){
-	console.log(min, max, distance);
-	var results = [];
-	var length = values.length;
-	values.sort();
+function stringnumber(collection, segmentid, field1, field2, callback) {
+    converter.toIDs(['_isUser', '_segments', field1, field2], function (ids) {
+        var maxfield2;
+        var minfield2;
 
-	if(field == 'age'){
-		var tempresults = [0, 0, 0, 0, 0, 0];
-		for(var i = 0; i<length;i++){
-			var age = values[i];
-          	var count = 0;
+        var query = {};
+        var sort = {};
+        query[ids['_isUser']] = true;
+        sort[ids[field2]] = -1;
+        db.collection(collection).find(query).sort(sort).limit(1).toArray().then(function (r) {
+            maxfield2 = r[0][ids[field2]];
+            sort[ids[field2]] = 1;
+            return db.collection(collection).find(query).sort(sort).limit(1).toArray();
+        }).then(function (r) {
+            minfield2 = r[0][ids[field2]];
 
-			for(var j=i;j<length;j++){
-				if(values[j] != age){
-					count = j-i;
-					i = j-1;
-					break;
-				}else if((j+1) == length){
-					count = j - i + 1;
-					i = j
-				}
-			}
+            if ((typeof minfield2 == typeof maxfield2) && (typeof minfield2 == 'number')) {
+                var matchClause = {"$match": {}};
+                matchClause['$match'][ids['_isUser']] = true;
+                //matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segmentid);
 
-			if(age<=18){
-	            tempresults[0] += count;
-	        }else if ((age > 18)&&(age<=24)){
-            	tempresults[1] += count;
-          	}else if ((age > 24)&&(age<=34)){
-            	tempresults[2] += count;
-          	}else if ((age > 34)&&(age<=44)){
-            	tempresults[3] += count;
-          	}else if ((age > 44)&&(age<=54)){
-            	tempresults[4] += count;
-          	}else {
-            	tempresults[5] += count;
-          	}
-		}
+                var results2 = range(minfield2, maxfield2, field2);
+                var spaces2 = results2.length;
 
-		results = [{key: {to:18}, count: tempresults[0]}, {key: {from: 19, to:24}, count: tempresults[1]},
-	               {key: {from: 25, to:34}, count: tempresults[2]}, {key: {from: 35, to:44}, count: tempresults[3]},
-	               {key: {from: 45, to:54}, count: tempresults[4]}, {key: {from: 55}, count: tempresults[5]}];
-	}else{
+                var prefix2 = "prefix2_";
+                var projectClause2 = projectRange(results2, field2, prefix2);
+                projectClause2["$project"][field1] = 1;
 
-		var tempresults = [];
-		for(var i=0;i<spaces;i++){
-			tempresults[i] = 0;
-		}
+                var groupClause = {"$group": {}};
+                groupClause["$group"]["_id"] = "$"+field1;
 
-		for(var i=0;i<length;i++){
-			var temp = values[i];
-			for(var j=i;j<length;j++){
-				if(values[j] != temp){
-					var index = Math.floor(((temp-min)*spaces)/(max-min));
-					if(index == spaces){
-						index --;
-					}
-					count = j-i;
-					tempresults[index] += count;
-					i = j-1;
-					break;
-				}else if((j+1) == length){
-					var index = 0;
-					if(max != min){
-						index = Math.floor(((temp-min)*spaces)/(max-min));
-						if(index == spaces){
-							index --;
-						}
-					}
-					count = j - i + 1;
-					tempresults[index] += count;
-					i = j;
-				}
-			}
-		}
+                for(var i=0;i<spaces2;i++){
+                    groupClause["$group"][prefix2 + i] = {"$sum": "$"+prefix2+i};
+                }
 
-		for(var i=0;i<spaces;i++){
-	        var element = {};
-	        element.key = {
-	          from: min+i*distance,
-	          to: min+(i+1)*distance
-	        };
-	        if(i==spaces-1){
-	          element.key.to = max;
-	        }
-	        element.count = tempresults[i];
-	        results.push(element);      
-		}
-	}
-  	return results;
+                groupClause["$group"]["count"] = {"$sum": 1};
+
+                var cursor = db.collection(collection).aggregate([
+                    matchClause,
+                    projectClause2,
+                    groupClause
+                ], {
+                    cursor: {batchSize: 20},
+                    allowDiskUse: true
+                }).toArray().then(function (r) {
+                    var results = [];
+                    for(var i=0;i< r.length;i++){
+                        results[i] = {};
+                        results[i].key = r[i]._id;
+                        results[i].count = r[i].count;
+                        results[i].values = [];
+                        for(var j=0;j< spaces2; j++){
+                            results[i].values[j] = {};
+                            results[i].values[j].key = results2[j].key;
+                            results[i].values[j].count = r[i][prefix2+j];
+                        }
+                    }
+                    callback(null, results);
+                }).catch(function (e) {
+                    callback(e);
+                });
+            } else {
+                callback(new Error('Type data is wrong'));
+            }
+        });
+    });
+}
+
+function numberstring(collection, segmentid, field1, field2, callback) {
+    converter.toIDs(['_isUser', '_segments', field1, field2], function (ids) {
+        var maxfield1;
+        var minfield1;
+
+        var query = {};
+        var sort = {};
+        query[ids['_isUser']] = true;
+        sort[ids[field1]] = -1;
+        db.collection(collection).find(query).sort(sort).limit(1).toArray().then(function (r) {
+            maxfield1 = r[0][ids[field1]];
+            sort[ids[field1]] = 1;
+            return db.collection(collection).find(query).sort(sort).limit(1).toArray();
+        }).then(function (r) {
+            minfield1 = r[0][ids[field1]];
+            if ((typeof minfield1 == typeof maxfield1) && (typeof minfield1 == 'number')) {
+                var matchClause = {"$match": {}};
+                matchClause['$match'][ids['_isUser']] = true;
+                //matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segmentid);
+
+                var results1 = range(minfield1, maxfield1, field1);
+                var spaces1 = results1.length;
+
+                var prefix1 = "prefix1_";
+                var projectClause1 = projectRange(results1, field1, prefix1);
+                projectClause1["$project"][field2] = 1;
+
+                var groupClause1 = {"$group": {}};
+                var temp = {};
+                for (var i = 0; i < spaces1; i++) {
+                    temp[prefix1 + i] = "$" + prefix1 + i
+                }
+                temp[field2] = "$" + field2;
+                groupClause1["$group"]["_id"] = temp;
+                groupClause1["$group"]["count"] = {"$sum": 1};
+
+                var groupClause2 = {"$group": {}};
+
+                temp = {};
+                for (var i = 0; i < spaces1; i++) {
+                    temp[prefix1 + i] = "$_id." + prefix1 + i
+                }
+                groupClause2["$group"]["_id"] = temp;
+                groupClause2["$group"]["values"] = {
+                    "$push": {
+                        "key": "$_id." + field2,
+                        "count": "$count"
+                    }
+                }
+
+                var cursor = db.collection(collection).aggregate([
+                    matchClause,
+                    projectClause1,
+                    groupClause1,
+                    groupClause2
+                ], {
+                    cursor: {batchSize: 20},
+                    allowDiskUse: true
+                }).toArray().then(function (r) {
+                    for (var i = 0; i < r.length; i++) {
+                        for (j = 0; j < spaces1; j++) {
+                            if (r[i]["_id"][prefix1 + j] == 1) {
+                                results1[j].values = r[i].values;
+                                results1[j].count = r[i].count;
+                            }
+                        }
+                    }
+                    callback(null, results1);
+                }).catch(function (e) {
+                    callback(e);
+                });
+            } else {
+                callback(new Error('Type data is wrong'));
+            }
+        });
+    });
+}
+
+function numbernumber(collection, segmentid, field1, field2, callback) {
+
+    converter.toIDs(['_isUser', '_segments', field1, field2], function (ids) {
+        var maxfield1;
+        var minfield1;
+        var maxfield2;
+        var minfield2;
+
+        var query = {};
+        var sort = {};
+        query[ids['_isUser']] = true;
+        sort[ids[field1]] = -1;
+        db.collection(collection).find(query).sort(sort).limit(1).toArray().then(function (r) {
+            maxfield1 = r[0][ids[field1]];
+            sort[ids[field1]] = 1;
+            return db.collection(collection).find(query).sort(sort).limit(1).toArray();
+        }).then(function (r) {
+            minfield1 = r[0][ids[field1]];
+            if ((typeof minfield1 == typeof maxfield1) && (typeof minfield1 == 'number')) {
+                sort = {};
+                sort[ids[field2]] = -1;
+                db.collection(collection).find(query).sort(sort).limit(1).toArray().then(function (r) {
+                    maxfield2 = r[0][ids[field2]];
+                    sort[ids[field2]] = 1;
+                    return db.collection(collection).find(query).sort(sort).limit(1).toArray();
+                }).then(function (r) {
+                    minfield2 = r[0][ids[field2]];
+
+                    if ((typeof minfield2 == typeof maxfield2) && (typeof minfield2 == 'number')) {
+                        var matchClause = {"$match": {}};
+                        matchClause['$match'][ids['_isUser']] = true;
+                        //matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segmentid);
+
+                        var results1 = range(minfield1, maxfield1, field1);
+
+                        var prefix1 = "prefix1_";
+                        var projectClause1 = projectRange(results1, field1, prefix1);
+
+
+                        var results2 = range(minfield2, maxfield2, field2);
+                        var prefix2 = "prefix2_";
+                        var projectClause2 = projectRange(results2, field2, prefix2);
+
+                        delete projectClause2["$project"]["_id"];
+                        var keys = Object.keys(projectClause2["$project"]);
+                        for (var i = 0; i < keys.length; i++) {
+                            projectClause1["$project"][keys[i]] = projectClause2["$project"][keys[i]];
+                        }
+
+                        var projectClause = projectClause1;
+
+                        var spaces1 = results1.length;
+                        var spaces2 = results2.length;
+
+                        var groupClause1 = {"$group": {}};
+                        var temp = {};
+                        for (var i = 0; i < spaces1; i++) {
+                            temp[prefix1 + i] = "$" + prefix1 + i
+                        }
+                        //console.log(temp);
+                        groupClause1["$group"]["_id"] = temp;
+
+                        for (var i = 0; i < spaces2; i++) {
+                            groupClause1["$group"][prefix2 + i] = {"$sum": "$" + prefix2 + i};
+                        }
+
+                        groupClause1["$group"]["count"] = {"$sum": 1};
+
+                        var cursor = db.collection(collection).aggregate([
+                            matchClause,
+                            projectClause,
+                            groupClause1
+                        ], {
+                            cursor: {batchSize: 20},
+                            allowDiskUse: true
+                        }).toArray().then(function (r) {
+                            var results = [];
+
+                            for (var i = 0; i < r.length; i++) {
+                                for (var j = 0; j < spaces1; j++) {
+                                    if (r[i]["_id"][prefix1 + j] == 1) {
+
+                                        results[j] = {};
+                                        results[j].key = results1[j].key;
+                                        results[j].count = r[i].count;
+                                        results[j].values = [];
+                                        for (var k = 0; k < spaces2; k++) {
+                                            results[j].values[k] = {};
+                                            results[j].values[k].key = results2[k].key;
+                                            results[j].values[k].count = r[i][prefix2 + k];
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                            for (var i = 0; i < spaces1; i++) {
+                                if (results[i] == null) {
+                                    results[i] = {};
+                                    results[i].key = results1[i].key;
+                                    results[i].count = results1[i].count;
+                                }
+                            }
+                            callback(null, results);
+                        }).catch(function (e) {
+                            callback(e);
+                        });
+
+                    } else {
+                        callback(new Error('Type data is wrong'));
+                    }
+                });
+            } else {
+                callback(new Error('Type data is wrong'));
+            }
+        });
+    });
+}
+
+function stringstring(collection, segmentid, field1, field2, callback) {
+    converter.toIDs(['_isUser', '_segments', field1, field2], function (ids) {
+        var matchClause = {"$match": {}};
+        matchClause['$match'][ids['_isUser']] = true;
+        //matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segmentid);
+
+        var projectClause = {"$project": {}};
+        projectClause['$project']['_id'] = 0;
+        projectClause['$project'][ids[field1]] = 1;
+        projectClause['$project'][ids[field2]] = 1;
+
+        var groupClause1 = {"$group": {}};
+        groupClause1["$group"]["_id"] = {
+            "field1": "$" + field1,
+            "field2": "$" + field2
+        };
+        groupClause1["$group"]["count"] = {"$sum": 1};
+
+        var groupClause2 = {"$group": {}};
+        groupClause2["$group"]["_id"] = "$_id.field1";
+
+        groupClause2["$group"]["values"] = {
+            "$push": {
+                "key": "$_id.field2",
+                "count": "$count"
+            }
+        }
+        groupClause2["$group"]["count"] = {"$sum": "$count"};
+
+        var cursor = db.collection(collection).aggregate([
+            matchClause,
+            projectClause,
+            groupClause1,
+            groupClause2
+        ], {
+            cursor: {batchSize: 20},
+            allowDiskUse: true
+        }).toArray().then(function (r) {
+            callback(null, r);
+        }).catch(function (e) {
+            callback(e);
+        });
+    });
+}
+
+function oneFieldString(collection, segmentid, field1, callback) {
+    converter.toIDs(['_isUser', '_segments', field1], function (ids) {
+        var matchClause = {"$match": {}};
+        matchClause['$match'][ids['_isUser']] = true;
+        //matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segmentid);
+
+        var projectClause = {"$project": {}};
+        projectClause['$project']['_id'] = 0;
+        projectClause['$project'][ids[field1]] = 1;
+
+        var groupClause = {"$group": {}};
+        groupClause['$group']['_id'] = '$' + ids[field1];
+        groupClause['$group']['count'] = {'$sum': 1};
+
+        var cursor = db.collection(collection).aggregate([
+            matchClause,
+            projectClause,
+            groupClause
+        ], {
+            cursor: {batchSize: 20},
+            allowDiskUse: true
+        });
+
+        var results = [];
+        var done = false;
+        async.whilst(
+            function () {
+                return done == false;
+            },
+            function (callback) {
+                cursor.next().then(function (r) {
+                    if (r) {
+                        var element = {};
+                        element.key = r._id;
+                        element.count = r.count;
+                        results.push(element);
+                    } else {
+                        done = true;
+                    }
+                    callback(null, results);
+                }).catch(function (e) {
+                    callback(e);
+                });
+            }, function (err, results) {
+                callback(err, results);
+            }
+        );
+    });
+}
+
+function oneFieldNumber(collection, segmentid, field1, callback) {
+    converter.toIDs(['_isUser', '_segments', field1], function (ids) {
+        var maxfield1;
+        var minfield1;
+
+        var query = {};
+        var sort = {};
+        query[ids['_isUser']] = true;
+        sort[ids[field1]] = -1;
+        db.collection(collection).find(query).sort(sort).limit(1).toArray().then(function (r) {
+            maxfield1 = r[0][ids[field1]];
+            sort[ids[field1]] = 1;
+            return db.collection(collection).find(query).sort(sort).limit(1).toArray();
+        }).then(function (r) {
+            minfield1 = r[0][ids[field1]];
+
+            if ((typeof minfield1 == typeof maxfield1) && (typeof minfield1 == 'number')) {
+                var matchClause = {"$match": {}};
+                matchClause['$match'][ids['_isUser']] = true;
+                //matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segmentid);
+
+                var results = range(minfield1, maxfield1, field1);
+
+                var prefix = "range_"
+                var projectClause = projectRange(results, field1, prefix);
+
+                var groupClause = {'$group': {}};
+                groupClause['$group']['_id'] = null;
+                var length = results.length;
+
+                for (var i = 0; i < length; i++) {
+                    var fieldName = "range_" + i;
+                    groupClause['$group'][fieldName] = {'$sum': '$' + fieldName};
+                }
+
+                var cursor = db.collection(collection).aggregate([
+                    matchClause,
+                    projectClause,
+                    groupClause
+                ], {
+                    cursor: {batchSize: 20},
+                    allowDiskUse: true
+                }).toArray().then(function (r) {
+                    var temp = r[0];
+                    console.log(temp);
+                    for (var i = 0; i < length; i++) {
+                        var fileName = prefix + i;
+                        results[i].count = temp[fileName];
+                    }
+                    callback(null, results);
+                }).catch(function (e) {
+                    callback(e);
+                });
+
+
+            } else {
+                callback(new Error('Type data is wrong'));
+            }
+        });
+    });
+}
+
+function range(min, max, field) {
+    var results = [];
+    if (field == 'age') {
+        results[0] = {
+            count: 0,
+            key: {
+                to: 18
+            }
+        };
+        results[1] = {
+            count: 0,
+            key: {
+                from: 18,
+                to: 24
+            }
+        };
+        results[2] = {
+            count: 0,
+            key: {
+                from: 24,
+                to: 34
+            }
+        };
+        results[3] = {
+            count: 0,
+            key: {
+                from: 34,
+                to: 44
+            }
+        };
+        results[4] = {
+            count: 0,
+            key: {
+                from: 44,
+                to: 54
+            }
+        };
+        results[5] = {
+            count: 0,
+            key: {
+                from: 54
+            }
+        };
+    } else {
+        var spaces = 1;
+        var distance = 0;
+
+        if (max - min >= 5) {
+            spaces = 5;
+            distance = Math.floor((max - min) / 5);
+        }
+
+        for (var i = 0; i < spaces; i++) {
+            var element = {};
+            element.key = {
+                from: min + i * distance,
+                to: min + (i + 1) * distance
+            };
+            if (i == spaces - 1) {
+                element.key.to = max;
+            }
+            element.count = 0;
+            results.push(element);
+        }
+    }
+    return results;
+}
+
+function projectRange(results, field1, prefix) {
+    var projectClause = {'$project': {}};
+    var length = results.length;
+
+    projectClause['$project']['_id'] = 0;
+    for (var i = 0; i < length; i++) {
+        var temp = results[i];
+        var fieldName = prefix + i;
+        var element = {'$cond': []};
+        var booleanExpression = {};
+        if (temp.key.from != undefined) {
+            booleanExpression['$gt'] = [];
+            booleanExpression['$gt'].push('$' + field1);
+            booleanExpression['$gt'].push(temp.key.from);
+            if (i == 0) {
+                booleanExpression['$gte'] = booleanExpression['$gt'];
+                delete booleanExpression['$gt'];
+            }
+        }
+
+        if (temp.key.to != undefined) {
+            var bool2 = {};
+            bool2['$lte'] = [];
+            bool2['$lte'].push('$' + field1);
+            bool2['$lte'].push(temp.key.to);
+
+            if ((booleanExpression['$gt'] != undefined) || (booleanExpression['$gte'] != undefined)) {
+                var bool1 = booleanExpression;
+                booleanExpression = {"$and": []};
+                booleanExpression["$and"].push(bool1);
+                booleanExpression["$and"].push(bool2);
+            } else {
+                booleanExpression = bool2;
+            }
+        }
+
+        element['$cond'].push(booleanExpression);
+        element['$cond'].push(1);
+        element['$cond'].push(0);
+        projectClause['$project'][fieldName] = element;
+
+    }
+    return projectClause;
 }
