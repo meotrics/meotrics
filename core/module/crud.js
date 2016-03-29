@@ -88,7 +88,6 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
 					};
 					var projection = {};
 					projection[r] = 0;
-					projection['_id'] = 0;
 					return db.collection(collection).find(query, projection).toArray();
 				}).then(function (r) {
 			if (r.length != 0) {
