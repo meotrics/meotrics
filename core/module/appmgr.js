@@ -87,6 +87,14 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud) {
 			fields: []
 		};
 
+		var login =
+		{
+			codename: "login",
+			name: "Login",
+			desc: "User login to site",
+			fields: []
+		};
+
 		var quit =
 		{
 			codename: "quit",
@@ -102,7 +110,9 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud) {
 						typeCrud.createRaw(appid, like, function () {
 							typeCrud.createRaw(appid, download, function () {
 								typeCrud.createRaw(appid, register, function () {
-									typeCrud.createRaw(appid, quit, callback);
+									typeCrud.createRaw(appid, login, function () {
+										typeCrud.createRaw(appid, quit, callback);
+								});
 								});
 							});
 						});
