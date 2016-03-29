@@ -44,7 +44,12 @@ class SegmentController extends Controller
 				'dpname' => 'Browser'
 			)
 		);
+		$segments = MtHttp::get('segment/' . \Auth::user()->id);
 
-		return view('segment/index', ['actions' => json_encode($actions), 'props' => json_encode($props)]);
+		return view('segment/index', [
+			'actions' => json_encode($actions),
+			'props' => json_encode($props),
+			'segments' => json_encode($segments)
+		]);
 	}
 }
