@@ -111,8 +111,8 @@ class HomeController extends Controller
 	{
 		$req = $this->trackBasic($request);
 		$appid = $request->input('_appid');
-		MtHttp::post('/r/' . $appid, json_encode($req));
-		return;
+		//MtHttp::post('r/' . $appid, json_encode($req));
+		return $req;
 	}
 
 	public function identify(Request $request)
@@ -138,7 +138,7 @@ class HomeController extends Controller
 			'data' => $data
 		];
 
-		$mtid = MtHttp::post('/i/' . $appid, json_encode($req));
+		$mtid = MtHttp::post('i/' . $appid, json_encode($req));
 		$response = new Response($mtid);
 		return $response->withCookie($mtid);
 	}
@@ -147,7 +147,7 @@ class HomeController extends Controller
 	{
 		$response = new Response();
 		$appid = $request->input('_appid');
-		$mtid = MtHttp::get('/s/' . $appid);
+		$mtid = MtHttp::get('s/' . $appid);
 		$response->withCookie(cookie()->forever('mtid', $mtid));
 		return $response;
 	}
