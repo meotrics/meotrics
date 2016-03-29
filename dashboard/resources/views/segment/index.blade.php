@@ -1,14 +1,22 @@
 @extends('../layout/master', ['sidebarselect' => 'segment'])
 
+@section('style')
+	<style>
+		.form-control{
+			width: auto;
+		}
+	</style>
+@endsection
+
 @section('script')
 	<script src="{{asset('js/cs.segmentop.js')}}"></script>
 	<script src="{{asset('js/cs.segment.query.js')}}"></script>
 	<script>
 		var sq;
-		var actions ={!!   $actions !!} ;
+		var actions = eval({!!   $actions !!});
 		var props ={!! $props !!};
 
-		var segments = {!! $segments !!};
+		var segments = eval({!! $segments !!});
 		var data = [];
 
 		for (var i in actions) {
