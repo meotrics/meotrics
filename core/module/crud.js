@@ -3,7 +3,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
 
 	this.createRaw = function (appid, data, callback) {
 		var collection = prefix + col;
-		data._appid = appid +"";
+		data._appid = Number(appid);
 		converter.toObject(data).then(function (r) {
 			return db.collection(collection).insertOne(r);
 		}).then(function (r) {
@@ -19,7 +19,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
 	};
 
 	this.list = function (req, res) {
-		var appid = Number(req.params.appid) + "";
+		var appid = Number(req.params.appid);
 		var collection = prefix + col;
 		converter.toIDs(['_appid', '_isDraft'], function (ids) {
 
@@ -39,6 +39,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
 			andStatement['$or'].push(orStatement);
 
 			query['$and'].push(andStatement);
+			console.log(JSON.stringify(query));
 			projection[ids['_appid']] = 0;
 			projection[ids['_isDraft']] = 0;
 
@@ -123,7 +124,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
 	};
 
 	this.deleteDraf = function (req, res) {
-		var appid = Number(req.params.appid) +"";
+		var appid = Number(req.params.appid);
 		var collection = prefix + col;
 		console.log(collection);
 		converter.toIDs(['_appid', '_isDraft'], function (ids) {
