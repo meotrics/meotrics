@@ -16,9 +16,12 @@ class HomeController extends Controller
 		//$this->middleware('auth');
 	}
 
-	public function index()
+	public function index(Request $request)
 	{
-		return view('home');
+		if ($request->user())
+			return view('home');
+		else
+			return redirect('auth/login');
 	}
 
 	public function pageView(Request $request)
