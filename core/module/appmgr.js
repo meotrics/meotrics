@@ -1,4 +1,4 @@
-exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud) {
+exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segmentCrud) {
 	this.isSetup = function (appid, callback) {
 		db.collection(prefix + appid).count({_isUser: {$exists: false}}, function (err, count) {
 			if (err) throw err;
@@ -17,8 +17,9 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud) {
 				{pname: "Product's Name", pcode: "pname"},
 				{pname: "Category's Name", pcode: "pid"},
 				{pname: "Category ID", pcode: "cname"},
-				{pname: "Price", pcode: "price"},
-				{pname: "Quantity", pcode: "Quantity"},
+				{pname: "Price of product", pcode: "price"},
+				{pname: "Total amount", pcode: "amount" },
+				{pname: "Quantity", pcode: "quantity"},
 				{pname: "Payment type", pcode: "paymentype"}]
 		};
 
@@ -103,6 +104,23 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud) {
 			fields: []
 		};
 
+
+		var segment1 =
+		[{
+			type: "pageview", f: "count", field: "", operator: ">", value: 5,
+			conditions: ["url", "eq", "http://google.com"]
+		},
+			"and",
+			{
+				type: "purchase", f: "count", field: "pid", operator: ">", value: 5,
+				conditions: ["amount", "gt", 500, "or", "quantity", "gt", "5"]
+			},
+			"and",
+			{
+				type: 'user',
+				conditions: ['age', 'eq', 15]
+			}];
+
 		typeCrud.createRaw(appid, purchase, function () {
 			typeCrud.createRaw(appid, pageview, function () {
 				typeCrud.createRaw(appid, click, function () {
@@ -111,8 +129,10 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud) {
 							typeCrud.createRaw(appid, download, function () {
 								typeCrud.createRaw(appid, register, function () {
 									typeCrud.createRaw(appid, login, function () {
-										typeCrud.createRaw(appid, quit, callback);
-								});
+										typeCrud.createRaw(appid, quit, function(){
+											segmentCrud.createRaw(appid, segment1, callback);
+										});
+									});
 								});
 							});
 						});

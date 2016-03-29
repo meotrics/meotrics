@@ -35,7 +35,7 @@ function route(app, db, segmgr, prefix, mongodb, converter) {
 	var segCRUD = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "segment");
 	var propCRUD = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "userprop");
 	var camCRUD = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "campaign");
-	var appmgr = new (require('./module/appmgr.js').AppMgr)(db, mongodb, async, converter, prefix, typeCRUD);
+	var appmgr = new (require('./module/appmgr.js').AppMgr)(db, mongodb, async, converter, prefix, typeCRUD, segCRUD);
 
 	// parse application/json
 	app.use(bodyParser.json());
