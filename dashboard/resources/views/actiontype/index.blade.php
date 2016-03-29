@@ -1,5 +1,13 @@
 @extends('../layout/master')
 
+@section('script')
+	<script>
+		function confirmDelete(acode){
+			return confirm('Are you sure ? Detele `' + acode + '` action type !');
+		}
+	</script>
+@endsection
+
 @section('content')
 	<div class="card row">
 		<div class="header col-sm-12">
@@ -33,9 +41,14 @@
 							</td>
 							<td>
 								<a class="btn btn-primary btn-sm btn-fill"
-									 href="/actiontype/edit/{{$type->_id}}"><i class="fa fa-edit"></i></a>
-								<a class="btn btn-danger  btn-sm btn-fill"
-									 href="/actiontype/delete/{{$type->_id}}"><i class="fa fa-trash"></i></a>
+									 href="/actiontype/{{$type->_id}}"><i class="fa fa-edit"></i></a>
+								<form method="POST" action="/actiontype/{{$type->_id}}"
+											onsubmit="return confirmDelete('{{ $type->codename }}')">
+									<input type="hidden" name="_method" value="DELETE">
+									<button type="submit" class="btn btn-danger  btn-sm btn-fill">
+										<i class="fa fa-trash"></i>
+									</button>
+								</form>
 							</td>
 						</tr>
 					@endforeach

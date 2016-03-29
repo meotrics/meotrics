@@ -38,7 +38,7 @@
 
 	<div class="card row">
 		<div class="content col-sm-12">
-			<form action="/actiontype/create" method="POST">
+			<form action="/actiontype" method="POST">
 				<div class="row">
 					<div class="form-group col-sm-2 ">
 						<h6 class="pull-right " style="margin-top: 11px">Code Name</h6>

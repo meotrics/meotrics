@@ -10,7 +10,7 @@ class SegmentSegment
 
 	public function compose(View $view)
 	{
-		$appid = 1;
+		$appid = \Auth::user()->id;
 		$segments = MtHttp::get('segment/' . $appid);
 		$segments = [];
 		$view->with('segments', ($segments));
