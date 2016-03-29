@@ -39,10 +39,10 @@
 									{{$field->pname}} (<code class="fmonospaced">{{$field->pcode}}</code>) <br/>
 								@endforeach
 							</td>
-							<td>
+							<td class="row">
 								<a class="btn btn-primary btn-sm btn-fill"
 									 href="/actiontype/{{$type->_id}}"><i class="fa fa-edit"></i></a>
-								<form method="POST" action="/actiontype/{{$type->_id}}"
+								<form method="POST" action="/actiontype/{{$type->_id}}" style="display: inline-block"
 											onsubmit="return confirmDelete('{{ $type->codename }}')">
 									<input type="hidden" name="_method" value="DELETE">
 									<button type="submit" class="btn btn-danger  btn-sm btn-fill">
