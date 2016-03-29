@@ -9,7 +9,7 @@ each $types have fields in it
 	<script src="{{asset('js/select2.min.js')}}"></script>
 	<script>
 		function loadTrend(trend) {
-
+			console.log(trend);
 			$('#actionselect').val(trend.typeid);
 			change_type(trend.typeid);
 			$('#fieldselect').val(trend.object);
@@ -182,7 +182,7 @@ each $types have fields in it
 
 		function refreshTrendSelect() {
 			$('#trendselect').empty();
-			for (var i in trends) {
+			for (var i = 0; i < trends.length; i++) {
 				$option = $('<option>');
 				$option.html(he.encode(trends[i].name));
 				$option.val(trends[i]._id);
@@ -195,10 +195,9 @@ each $types have fields in it
 			$('#trendselect').append($option);
 		}
 
-		var types ={!!   $types !!};
-		var trends ={!! $trends !!};
+		var types = eval({!!   $types !!});
+		var trends = eval({!! $trends !!});
 		onPageLoad(function () {
-
 			//fetch data
 			var $option;
 			$('#actionselect').empty();
@@ -297,15 +296,11 @@ each $types have fields in it
 	<div class="card row">
 		<div class="header col-md-12">
 			<form class="">
-				<label class="">TREND SELECT</label>
-				<select id="trendselect" class="form-control " style="width: 250px; display:inline-block"></select>
-				<!-- <a class="id_querytrend btn btn-fill btn-success mr "><i class="fa fa-play" style="font-size: 15px; vertical-align: middle"></i> <span style="vertical-align: middle">Query</span></a> -->
-				<a class="btn btn-fill btn-success ml" data-toggle="modal" data-target="#saveTrendModal">Save as ...</a>
-				<a class="btn id_savelnk">
-					<i class="fa fa-floppy-o" style="font-size: 18px;padding-top: 4px;vertical-align: middle"></i>
-				</a>
-
-				<a class="id_querytrend btn "><i class="fa fa-trash-o" style="font-size: 19px;vertical-align: middle"></i></a>
+				<label class="">SELECT TREND</label>&nbsp;&nbsp;
+				<select id="trendselect" class="form-control input-sm " style="width: 250px; display:inline-block">
+					
+				</select>
+				&nbsp; or &nbsp;<a href="{{ URL::to('trend/create') }}">+ CREATE NEW TREND</a>
 			</form>
 		</div>
 
@@ -343,36 +338,4 @@ each $types have fields in it
 	</div>
 
 
-@endsection
-
-@section('footer')
-	<div>
-		<div id="saveTrendModal" class="modal fade " role="dialog">
-			<div class="modal-dialog">
-
-				<!-- Modal content-->
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Save Trend Query</h4>
-					</div>
-					<div class="modal-body ">
-						<form class=" row">
-							<div class="col-sm-12">
-								<p>Enter a name for your query. This name will be seen by others if you share this query</p>
-							</div>
-							<div class="col-sm-12">
-								<input type="text" id="trendnametb" class="form-control" style="width:100%" placeholder="Top product"/>
-							</div>
-						</form>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-						<button type="button" class="btn btn-success btn-fill id_saveasbt" data-dismiss="modal">Save</button>
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</div>
 @endsection

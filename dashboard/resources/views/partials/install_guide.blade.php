@@ -10,7 +10,7 @@
         </h5>
       </div>
       <div class="modal-body">
-        <div class="bs-callout bs-callout-info">
+        <div class="bs-callout bs-callout-primary">
           <small class="uppercase"><b>Let metrics help you to understand your customers in one click!</b></small>
           <br>
           <small>
@@ -25,7 +25,7 @@
           </div>
           <small>Paste this snippet just before the <b>&lt;/head&gt;</b> tag of your page:</small>
           <div class="well well-sm meotrics_script">
-            <button class="btn btn-sm btn-info btn-fill copy-btn" onclick="copyScript()">
+            <button class="btn btn-sm btn-primary btn-fill copy-btn" onclick="copyScript()">
               Copy
             </button>
             <textarea onkeydown="return false" placeholder="Loading..."></textarea>
@@ -41,14 +41,14 @@
         <div class="step step-3">
           <div class="step-title text-primary">
             <div class="step-number">3</div>
-            <h5 class="step-text">Step 3: Complete! Lets start your </h5>
+            <h5 class="step-text">Step 3: Complete! Lets start your journey</h5>
           </div>
           <small>Just give us a few second for checking, then refresh your browser and you can start using Meotrics. Or else, you still can explore by clicking on Demo icon on the left conner.</small>
         </div>
       </div>
       <div class="modal-footer">
         <small>Done ?</small>&nbsp;
-        <button type="button" class="btn btn-sm btn-fill btn-success"
+        <button type="button" class="btn btn-sm btn-fill btn-primary"
                 data-dismiss="modal" aria-label="Close">
           Close
         </button>

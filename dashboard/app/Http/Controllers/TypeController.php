@@ -21,7 +21,7 @@ class TypeController extends Controller
 		return view('actiontype/index', ['actiontypes' => $result]);
 	}
 
-	public function edit(Request $request)
+	public function show(Request $request)
 	{
 		if ($request->isMethod('post')) {
 
@@ -40,7 +40,7 @@ class TypeController extends Controller
 			);
 			$context = stream_context_create($options);
 			$result = json_decode(file_get_contents('http://127.0.0.1:2108/trend/1', false, $context));
-			return Redirect::action('TrendController@index');
+			return Redirect::action('TrendController@getIndex');
 		} else {
 			return view('actiontype/edit');
 		}
@@ -83,7 +83,7 @@ class TypeController extends Controller
 			$context = stream_context_create($options);
 			$result = json_decode(file_get_contents('http://127.0.0.1:2108/actiontype/1', false, $context));
 
-			return Redirect::action('TrendController@index');
+			return Redirect::action('TrendController@getIndex');
 		} else {
 			return view('actiontype/create');
 		}

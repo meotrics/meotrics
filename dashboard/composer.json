@@ -6,7 +6,9 @@
 	"type": "project",
 	"require": {
 		"laravel/framework": "5.0.*",
-		"infinety/alerts": "*@dev"
+		"infinety/alerts": "*@dev",
+		"ua-parser/uap-php": "dev-master",
+		"mobiledetect/mobiledetectlib": "^2.8"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "~4.0",
