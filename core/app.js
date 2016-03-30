@@ -27,7 +27,8 @@ function route(app, db, segmgr, prefix, mongodb, converter) {
 	var CRUD = require('./module/crud.js').CRUD;
 	var TrendMgr = require('./module/trendmgr.js').TrendMgr;
 	var ActionMgr = require('./module/actionmgr.js').ActionMgr;
-	
+	var PropMgr = require('./module/propmgr.js').PropMgr;
+	var propmgr = new PropMgr();
 	var actionMgr = new ActionMgr(db, mongodb, async, converter, prefix, mtthrow);
 	var trendMrg = new TrendMgr(db, mongodb, async, converter, prefix, mtthrow, "trend");
 	var typeCRUD = new CRUD(db, mongodb, async, converter, prefix, mtthrow, "actiontype");
@@ -74,6 +75,8 @@ function route(app, db, segmgr, prefix, mongodb, converter) {
 	app.get('/userprop/:appid/:id', propCRUD.match);
 	app.put('/userprop/:appid/:id', propCRUD.update);
 	app.delete('/userprop/:appid/:id', propCRUD.delete);
+
+	app.get('/prop/:appid', propmgr.list);
 
 	// CRUD campaign
 	app.post('/campaign/:appid', camCRUD.create);

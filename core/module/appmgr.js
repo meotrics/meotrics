@@ -18,7 +18,7 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 				{pname: "Category's Name", pcode: "pid"},
 				{pname: "Category ID", pcode: "cname"},
 				{pname: "Price of product", pcode: "price"},
-				{pname: "Total amount", pcode: "amount" },
+				{pname: "Total amount", pcode: "amount"},
 				{pname: "Quantity", pcode: "quantity"},
 				{pname: "Payment type", pcode: "paymentype"}]
 		};
@@ -107,22 +107,21 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 
 		var segment1 = {
 			name: "Active user",
-			condition: 
-		[{
-			type: "pageview", f: "count", field: "", operator: ">", value: 5,
-			conditions: ["url", "eq", "http://google.com"]
-		},
-			"and",
-			{
-				type: "purchase", f: "count", field: "pid", operator: ">", value: 5,
-				conditions: ["amount", "gt", 500, "or", "quantity", "gt", "5"]
+			condition: [{
+				type: "pageview", f: "count", field: "", operator: ">", value: 5,
+				conditions: ["url", "eq", "http://google.com"]
 			},
-			"and",
-			{
-				type: 'user',
-				conditions: ['age', 'eq', 15]
-			}];
-		}
+				"and",
+				{
+					type: "purchase", f: "avg", field: "price", operator: ">", value: 5,
+					conditions: ["amount", "gt", 500, "and", "quantity", "gt", 5]
+				},
+				"and",
+				{
+					type: 'user',
+					conditions: ['age', 'eq', 15]
+				}]
+		};
 
 		typeCrud.createRaw(appid, purchase, function () {
 			typeCrud.createRaw(appid, pageview, function () {
@@ -132,7 +131,7 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 							typeCrud.createRaw(appid, download, function () {
 								typeCrud.createRaw(appid, register, function () {
 									typeCrud.createRaw(appid, login, function () {
-										typeCrud.createRaw(appid, quit, function(){
+										typeCrud.createRaw(appid, quit, function () {
 											segmentCrud.createRaw(appid, segment1, callback);
 										});
 									});
