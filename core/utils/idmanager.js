@@ -94,10 +94,20 @@ exports.IdManager = function () {
 	}
 
 	this.toIDs = function (names, callback) {
+		
+		setTimeout(function () {
+			setTimeout(function () {
+				setTimeout(function () {
+					throw "1";
+				}, 1)
+			}, 1)
+		}, 1);
 		var outs = {};
 		var n = names.length;
 		for (let i in names) if (names.hasOwnProperty(i)) {
 			me.toID(names[i]).then(function (out) {
+			
+
 				n--;
 				outs[names[i]] = out;
 				if (n == 0)
