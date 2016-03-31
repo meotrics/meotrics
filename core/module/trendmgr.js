@@ -40,7 +40,11 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, mtthrow, col
                     callback(err);
                 });
             }
-        ], mtthrow);
+        ], function(err){
+            if(err){
+                next(err);
+            }
+        });
     };
 
     function getQueryTrending(object, converter, callback) {

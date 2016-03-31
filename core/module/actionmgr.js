@@ -1,4 +1,4 @@
-exports.ActionMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
+exports.ActionMgr = function (db, mongodb, async, converter, prefix) {
     //CLIENT------------------------------------------------------------------------
 
     /* Ghi nhận một action mới
@@ -22,7 +22,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
      }
      */
 
-    this.save = function (req, res) {
+    this.save = function (req, res, next) {
         var data = req.body;
         var collection = prefix + req.params.appid;
         // Convert string to ObjectID in mongodgodb
@@ -35,8 +35,8 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
             .then(function (results) {
                 return db.collection(collection).insertOne(results);
             }).then(function (r) {
-            res.status(200).end();
-        }).catch(mtthrow);
+                res.status(200).end();
+            }).catch(next);
     };
 
     /* Phương thức này dùng để báo cho hệ thống biết một anonymous user thực ra là
@@ -55,7 +55,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
      user thành userid ở tham số.
      2. Toàn bộ thông tin về user được cập nhật mới.
      */
-    this.identify = function (req, res) {
+    this.identify = function (req, res, next) {
         var data = req.body;
         var collection = prefix + req.params.appid;
         var userConverted;
@@ -68,21 +68,21 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
                         query = r;
                         return converter.toObject(data.user);
                     }).then(function (r) {
-                    userConverted = r;
-                    return db.collection(collection).findOneAndUpdate(query, {$set: userConverted}, {projection: {_id: 1}});
-                }).then(function (r) {
-                    if (r.value != null) {
-                        var _mtid = r.value._id;
-                        res.send(_mtid);
-                        callback(null, true, _mtid);
-                    } else {
-                        res.send(data.cookie);
-                        callback(null, false, '');
-                    }
-                }).catch(function (err) {
-                    // [ERROR]
-                    callback(err);
-                });
+                        userConverted = r;
+                        return db.collection(collection).findOneAndUpdate(query, {$set: userConverted}, {projection: {_id: 1}});
+                    }).then(function (r) {
+                        if (r.value != null) {
+                            var _mtid = r.value._id;
+                            res.send(_mtid);
+                            callback(null, true, _mtid);
+                        } else {
+                            res.send(data.cookie);
+                            callback(null, false, '');
+                        }
+                    }).catch(function (err) {
+                        // [ERROR]
+                        callback(err);
+                    });
             }, function (isCreated, _mtid, callback) {
                 if (isCreated) {
                     callback(null, true, _mtid);
@@ -112,7 +112,11 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
                     callback(null);
                 }
             }
-        ], mtthrow);
+        ], function(err){
+            if(err){
+                next(err);
+            }
+        });
     };
 
     /* Thiết lập cookie mới cho người dùng mới
@@ -124,7 +128,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
      Đầu ra:
      mtid vừa được tạo
      */
-    this.setup = function (req, res) {
+    this.setup = function (req, res, next) {
         var collection = prefix + req.params.appid;
         var query = {
             _isUser: true,
@@ -136,6 +140,6 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
             }).then(function (results) {
             var _mtid = results.insertedId;
             res.send(_mtid);
-        }).catch(mtthrow);
+        }).catch(next);
     };
 }
