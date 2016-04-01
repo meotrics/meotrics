@@ -4,13 +4,14 @@ var IDMgr = require('./fakeidmanager.js'),
 	 async = require('async'),
 	 mongodb = require('mongodb'),
 	 converter = new IDMgr.IdManager();
+	 config = require('config');
 
 //Chú ký triển khai hàm sinh match
 //phải chia ra làm 2 loại, phép toán trên người và action
 
 exports.createSegment = function (segment, callback) {
-	var outcollection = "meotrics_segment" + segment._id.toString();
-	getQuery(segment.query, function () {
+	var outcollection = config.get('mongod.prefix') + "segment" + segment._id.toString();
+	getQuery(segment.query, function (out) {
 		db.collection(collection).mapReduce(out.map, out.reduce, {
 			out: outcollection,
 			query: out.option,
@@ -48,33 +49,31 @@ function updateDB(actionC, reduceC, segmentID, callback) {
 			return done == false;
 		}, function (callback) {
 			cursor.next(function (err, r) {
-				if (err) {
-					callback(err);
-				} else {
-					if (r) {
-						_mtids.push(r._id);
-						if (_mtids.length == 100) {
-							var query = {};
-							var update = {'$addToSet': {}};
-							query[_mtid] = {'$in': _mtids};
-							update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
-							db.collection(actionC).updateMany(query, update);
-							db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
-							_mtids = [];
-						}
-					} else {
-						if(_mtids.length != 0) {
-							var query = {};
-							var update = {'$addToSet': {}};
-							query[_mtid] = {'$in': _mtids};
-							update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
-							db.collection(actionC).updateMany(query, update);
-							db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
-						}
-						done = true;
+				if (err) return callback(err);
+				
+				if (r) {
+					_mtids.push(r._id);
+					if (_mtids.length == 100) {
+						var query = {};
+						var update = {'$addToSet': {}};
+						query[_mtid] = {'$in': _mtids};
+						update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
+						db.collection(actionC).updateMany(query, update);
+						db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
+						_mtids = [];
 					}
-					callback(null);
+				} else {
+					if(_mtids.length != 0) {
+						var query = {};
+						var update = {'$addToSet': {}};
+						query[_mtid] = {'$in': _mtids};
+						update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
+						db.collection(actionC).updateMany(query, update);
+						db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
+					}
+					done = true;
 				}
+				callback(null);
 			});
 		}, function (err) {
 			callback(err);

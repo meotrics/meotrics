@@ -15,7 +15,7 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 			fields: [
 				{pname: "Product ID", pcode: "pid"},
 				{pname: "Product's Name", pcode: "pname"},
-				{pname: "Category's Name", pcode: "pid"},
+				{pname: "Category's Name", pcode: "cid"},
 				{pname: "Category ID", pcode: "cname"},
 				{pname: "Price of product", pcode: "price"},
 				{pname: "Total amount", pcode: "amount"},
@@ -50,7 +50,7 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 			fields: [
 				{pname: "Product ID", pcode: "pid"},
 				{pname: "Product Name", pcode: "pname"},
-				{pname: "Category ID", pcode: "pid"},
+				{pname: "Category ID", pcode: "cid"},
 				{pname: "Category Name", pcode: "cname"},
 				{pname: "Level", pcode: "level"}
 			]
@@ -75,7 +75,7 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 			fields: [
 				{pname: "Product ID", pcode: "pid"},
 				{pname: "Product Name", pcode: "pname"},
-				{pname: "Category ID", pcode: "pid"},
+				{pname: "Category ID", pcode: "cid"},
 				{pname: "Category Name", pcode: "cname"}
 			]
 		};
