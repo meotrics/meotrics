@@ -29,8 +29,8 @@ function generateDB(converter, url, n, collection, callback) {
 										}
 									});
 								}).catch(function (err) {
-							console.log('[MongoDB] insert err', err.message);
-						});
+									console.log('[MongoDB] insert err', err.message);
+								});
 					}
 				});
 
@@ -56,13 +56,13 @@ function generateDB(converter, url, n, collection, callback) {
 function generateUsers(ids) {
 	var users = {};
 	users[ids._isUser] = true;
+	//users[ids.userid] = generateNumber(1, 1000000);
 	users[ids.name] = generateName();
 	users[ids.height] = generateNumber(150, 180);
 	users[ids.iq] = generateNumber(30, 40);
 	users[ids._segments] = [];
 	users[ids.age] = generateNumber(20, 60);
 	users[ids.gender] = generateNumber(1, 2) == 1 ? 'male' : 'female';
-	// console.log(users);
 	return users;
 }
 
