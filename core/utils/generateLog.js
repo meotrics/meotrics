@@ -91,12 +91,12 @@ function generateName() {
 	return ho[Math.floor(Math.random() * 100) % ho.length] + ' ' + ten[Math.floor(Math.random() * 100) % ten.length]
 }
 
-function generateNumber(min, max) {
-	var range = max - min;
-
-	var number = Math.floor(Math.random() * (range + 1)) + min;
-	return number;
-}
+//function generateNumber(min, max) {
+//	var range = max - min;
+//
+//	var number = Math.floor(Math.random() * (range + 1)) + min;
+//	return number;
+//}
 
 function generateDB(actiontype, converter, url, n, collection, typeid, callback) {
 	var count = 0;
@@ -144,3 +144,34 @@ function generateDB(actiontype, converter, url, n, collection, typeid, callback)
 		});
 	}
 }
+
+function randomNumber(a,b)
+{
+	if(b == undefined) {
+		b = a - 1;
+		a = 0;
+	}
+	var delta = b - a + 1;
+	return Math.floor(Math.random()*delta) + a
+}
+
+var h = [];
+function generateNumber(a,b)
+{
+	if(h.length == 0)
+	{
+		//init hash
+		var delta = b - a;
+		for(var i = 0 ; i < delta ; i++)
+		{
+			if(i==0) h[i] = randomNumber(0,20);
+			else h[i] = h[i-1] + randomNumber(0,20);
+		}
+	}
+	var r = randomNumber(0, h[delta-1]);
+
+	for(var i =0; i < delta; i++)
+		if(h[i] >= r) return i + a;
+	return 'fuck'
+}
+
