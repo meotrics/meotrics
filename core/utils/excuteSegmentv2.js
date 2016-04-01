@@ -1,9 +1,9 @@
 "use strict";
 
 var IDMgr = require('./fakeidmanager.js'),
-		async = require('async'),
-		mongodb = require('mongodb'),
-		converter = new IDMgr.IdManager();
+	 async = require('async'),
+	 mongodb = require('mongodb'),
+	 converter = new IDMgr.IdManager();
 
 //Chú ký triển khai hàm sinh match
 //phải chia ra làm 2 loại, phép toán trên người và action
@@ -33,190 +33,52 @@ exports.getQuery = function getQuery(json, callback) {
 	})
 };
 
-function updateDB(actionC, reduceC, segmentID) {
+function updateDB(actionC, reduceC, segmentID, callback) {
 	var _mtid = '';
 	var _segments = '';
-	converter.toID('_mtid', function (r) {
-		_mtid = r;
-		converter.toID('_segments', function (r) {
-			_segments = r;
-			var cursor = db.collection(reduceC).find({isIn: true}, {_id: 1}).batchSize(100);
-			var _mtids = [];
-			async.forever(function (next) {
-				cursor.hasNext(function (err, r) {
-					if (err) {
-						next(err);
-					} else {
-						if (r) {
-							cursor.next(function (err, rs) {
-								if (err) {
-									next(err);
-								} else {
-									_mtids.push(rs._id);
-									if (_mtids.length == 100) {
-										var query = {};
-										var update = {'$addToSet': {}};
-										query[_mtid] = {'$in': _mtids};
-										update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
-										db.collection(actionC).updateMany(query, update);
-										db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
-										_mtids = [];
-									}
-									next(null);
-								}
-							});
-						} else {
-							next({code: -1});
-						}
-					}
-				})
-			}, function (e) {
-				if (e.code == -1) {
-					if (_mtids.length != 0) {
-						var query = {};
-						var update = {'$addToSet': {}};
-						query[_mtid] = {'$in': _mtids};
-						update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
-						db.collection(actionC).updateMany(query, update);
-						db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
-					}
+	converter.toIDs(['_mtid', '_segments'], function (ids) {
+		_mtid = ids['_mtid'];
+		_segments = ids['_segments'];
+
+		var cursor = db.collection(reduceC).find({isIn: true}, {_id: 1}).batchSize(100);
+		var _mtids = [];
+		var done = false;
+
+		async.whilst(function () {
+			return done == false;
+		}, function (callback) {
+			cursor.next(function (err, r) {
+				if (err) {
+					callback(err);
 				} else {
-					throw e;
+					if (r) {
+						_mtids.push(r._id);
+						if (_mtids.length == 100) {
+							var query = {};
+							var update = {'$addToSet': {}};
+							query[_mtid] = {'$in': _mtids};
+							update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
+							db.collection(actionC).updateMany(query, update);
+							db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
+							_mtids = [];
+						}
+					} else {
+						if(_mtids.length != 0) {
+							var query = {};
+							var update = {'$addToSet': {}};
+							query[_mtid] = {'$in': _mtids};
+							update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
+							db.collection(actionC).updateMany(query, update);
+							db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
+						}
+						done = true;
+					}
+					callback(null);
 				}
 			});
+		}, function (err) {
+			callback(err);
 		});
-	});
-}
-// ------------------------------------------------------
-function revenue(collection, segID, wrap, inside, callback) {
-	var maxWrap;
-	var minWrap;
-	var maxInside;
-	var minInside;
-	var ids;
-	converter.toIDs(['_isUser', '_segments', wrap, inside], function (r) {
-		ids = r;
-
-		var query = {};
-		var sort = {};
-		query[ids['_isUser']] = true;
-		sort[ids[wrap]] = -1;
-
-		db.collection(collection).find(query).sort(sort).limit(1).toArray().then(function (r) {
-			maxWrap = r[0][ids[wrap]];
-			sort[ids[wrap]] = 1;
-			return db.collection(collection).find(query).sort(sort).limit(1).toArray();
-		}).then(function (r) {
-			minWrap = r[0][ids[wrap]];
-			sort = {};
-			sort[ids[inside]] = -1;
-			return db.collection(collection).find(query).sort(sort).limit(1).toArray();
-		}).then(function (r) {
-			maxInside = r[0][ids[inside]];
-			sort[ids[inside]] = 1;
-			return db.collection(collection).find(query).sort(sort).limit(1).toArray();
-		}).then(function (r) {
-			minInside = r[0][ids[inside]];
-
-			var matchClause = {"$match": {}};
-			matchClause['$match'][ids['_isUser']] = true;
-			matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segID);
-
-			var projectClause = {"$project": {}};
-			projectClause['$project']['_id'] = 0;
-			projectClause['$project'][ids[wrap]] = 1;
-			projectClause['$project'][ids[inside]] = 1;
-
-			var groupClause = {"$group": {}};
-			groupClause['$group']['_id'] = '$' + ids[wrap];
-			groupClause['$group']['values'] = {'$push': '$' + ids[inside]};
-			groupClause['$group']['count'] = {'$sum': 1};
-
-			var cursor = db.collection(collection).aggregate([
-				matchClause,
-				projectClause,
-				groupClause
-			], {
-				cursor: {batchSize: 20},
-				allowDiskUse: true
-			});
-			var spaces = 5;
-			var result = [];
-
-			if (wrap == "gender" && inside == "age") {
-				async.forever(function (next) {
-					cursor.next().then(function (r) {
-						if (r) {
-							var element = {};
-							var array = r.values;
-							element['key'] = r._id;
-							element['total'] = r.count;
-							array.sort();
-
-							var values = [0, 0, 0, 0, 0, 0, 0];
-							for (var i = 0; i < array.length; i++) {
-								if (typeof array[i] != 'number') {
-
-								} else if (array[i] <= 18) {
-									values[1]++;
-								} else if ((array[i] > 18) && (array[i] <= 24)) {
-									values[2]++;
-								} else if ((array[i] > 25) && (array[i] <= 34)) {
-									values[3]++;
-								} else if ((array[i] > 35) && (array[i] <= 44)) {
-									values[4]++;
-								} else if ((array[i] > 44) && (array[i] <= 54)) {
-									values[5]++;
-								} else {
-									values[6]++;
-								}
-							}
-							values[0] = r.count - (values[1] + values[2] + values[3] + values[4] + values[5] + values[6]);
-							element['values'] = values;
-							result.push(element);
-							next(null);
-						} else {
-							callback(null, result);
-							next({code: -1});
-						}
-					}).catch(function (e) {
-						next(e);
-					});
-				}, function (err) {
-
-				});
-			} else {
-				// if(typeof maxWrap === 'number'){
-				//   if(typeof minWrap === 'number'){
-				//     if(maxWrap - minWrap >= spaces){
-				//       var result = [];
-				//       var distance = (maxWrap - minWrap + 1) / spaces;
-				//       var oldValue = minWrap;
-				//       var newValue = minWrap;
-				//       for(var i=0;i<spaces;i++){
-				//         newValue += distance;
-				//         var element = {};
-				//         element.key = {
-				//           min: oldValue,
-				//           max: newValue
-				//         };
-
-				//         element.value = {
-
-				//         }
-				//       }
-				//     }
-				//   }
-				// }else
-
-				// }
-			}
-
-
-		}).catch(function (e) {
-			callback(e);
-		});
-
 	});
 }
 
@@ -450,20 +312,20 @@ function translateOperator(conditions, i) {
 }
 
 var testJson =
-		[{
-			type: "56e3a14a44ae6d70ddbf82a2", f: "avg", field: "amount", operator: ">", value: 5,
-			conditions: ["amount", "gt", 2, "and", "price", "eq", 40]
-		},
-			"and",
-			{
-				type: "56e3a14a44ae6d70ddbf82a2", f: "count", field: "pid", operator: ">", value: 5,
-				conditions: ["amount", "gt", 5, "or", "price", "eq", "30"]
-			},
-			"and",
-			{
-				type: 'user',
-				conditions: ['age', 'eq', 'male']
-			}];
+	 [{
+		 type: "56e3a14a44ae6d70ddbf82a2", f: "avg", field: "amount", operator: ">", value: 5,
+		 conditions: ["amount", "gt", 2, "and", "price", "eq", 40]
+	 },
+		 "and",
+		 {
+			 type: "56e3a14a44ae6d70ddbf82a2", f: "count", field: "pid", operator: ">", value: 5,
+			 conditions: ["amount", "gt", 5, "or", "price", "eq", "30"]
+		 },
+		 "and",
+		 {
+			 type: 'user',
+			 conditions: ['age', 'eq', 'male']
+		 }];
 
 //handleInput(testJson)
 //		.then(function (r) {
