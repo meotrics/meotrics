@@ -91,10 +91,11 @@ function randomNumber(a,b)
 var h = [];
 function generateNumber(a,b)
 {
+	var delta = b - a;
 	if(h.length == 0)
 	{
 		//init hash
-		var delta = b - a;
+		
 		for(var i = 0 ; i < delta ; i++)
 		{
 			if(i==0) h[i] = randomNumber(0,20);
