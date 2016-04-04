@@ -1,28 +1,28 @@
-exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
+exports.CRUD = function (db, mongodb, async, converter, prefix, col) {
 	var me = this;
 
-	this.createRaw = function (appid, data, callback) {
+	this.createRaw = function (appid, data, callback, next) {
 		var collection = prefix + col;
 		data._appid = Number(appid);
+		data._ctime = Math.round(new Date() / 1000);
 		converter.toObject(data).then(function (r) {
 			return db.collection(collection).insertOne(r);
 		}).then(function (r) {
 			var _typeid = r.insertedId;
 			callback(_typeid);
-		}).catch(mtthrow);
+		}).catch(next);
 	};
 
-	this.create = function (req, res) {
+	this.create = function (req, res, next) {
 		me.createRaw(req.params.appid, req.body, function (typeid) {
 			res.send(typeid);
-		});
+		}, next);
 	};
 
-	this.list = function (req, res) {
+	this.list = function (req, res, next) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + col;
 		converter.toIDs(['_appid', '_isDraft'], function (ids) {
-
 			var query = {'$and': []};
 			var projection = {};
 
@@ -67,7 +67,8 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
 						});
 					}, function (err, results) {
 						if (err) {
-							mtthrow(err);
+							console.log('haha');
+							next(err);
 						} else {
 							res.json(results);
 						}
@@ -76,7 +77,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
 		});
 	}
 
-	this.match = function (req, res) {
+	this.match = function (req, res, next) {
 		// var appid = req.params.appid;
 		var atid = req.params.id;
 		var collection = prefix + col;
@@ -89,27 +90,27 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
 					projection[r] = 0;
 					return db.collection(collection).find(query, projection).toArray();
 				}).then(function (r) {
-			if (r.length != 0) {
-				converter.toOriginal(r[0]).then(function (r) {
-					res.json(r);
-				}).catch(mtthrow);
-			} else {
-				res.status(200).end();
-			}
-		}).catch(mtthrow);
+					if (r.length != 0) {
+						converter.toOriginal(r[0]).then(function (r) {
+							res.json(r);
+						}).catch(next);
+					} else {
+						res.status(200).end();
+					}
+				}).catch(next);
 	};
 
-	this.delete = function (req, res) {
+	this.delete = function (req, res, next) {
 		// var appid = req.params.appid;
 		var atid = req.params.id;
 		var collection = prefix + col;
 		db.collection(collection).deleteOne({_id: new mongodb.ObjectID(atid)})
-				.then(function (r) {
-					res.status(200).end();
-				}).catch(mtthrow);
+			.then(function (r) {
+				res.status(200).end();
+			}).catch(next);
 	};
 
-	this.update = function (req, res) {
+	this.update = function (req, res, next) {
 		var data = req.body;
 		var atid = req.params.id;
 		var collection = prefix + col;
@@ -118,7 +119,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
 					return db.collection(collection).updateOne({_id: new mongodb.ObjectID(atid)}, {$set: r})
 				}).then(function (results) {
 			res.status(200).end();
-		}).catch(mtthrow);
+		}).catch(next);
 	};
 
 	this.deleteDraf = function (req, res) {
@@ -130,7 +131,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, mtthrow, col) {
 			query[ids['_isDraft']] = true;
 			db.collection(collection).deleteMany(query).then(function (r) {
 				res.status(200).end();
-			}).catch(mtthrow);
+			}).catch(next);
 		});
 	}
 };

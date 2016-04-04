@@ -1,6 +1,7 @@
 'use strict';
 var config = require('config');
 var redis = require("redis");
+var trycatch = require('trycatch');
 
 //will call callback after call done() for n times
 exports.IdManager = function () {
@@ -17,9 +18,6 @@ exports.IdManager = function () {
 	function fromRadix(v, radix) {
 		var digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
-		/**
-		 * @return {number}
-		 */
 		function ZdigitToInt(ch) {
 			for (var i = 0; i < digits.length; i++)
 				if (ch == digits.charAt(i))
@@ -77,7 +75,6 @@ exports.IdManager = function () {
 	function newID(callback) {
 		if (lastid == undefined) {
 			db.get('lastid', function (err, value) {
-
 				if (err) throw err;
 				if (value == null) value = 1;
 				if (lastid !== undefined)
@@ -97,20 +94,49 @@ exports.IdManager = function () {
 		var outs = {};
 		var n = names.length;
 		for (let i in names) if (names.hasOwnProperty(i)) {
-			me.toID(names[i]).then(function (out) {
+			me.toIDcb(names[i], function (out) {
 				n--;
 				outs[names[i]] = out;
 				if (n == 0)
 					callback(outs);
-			}).catch(function (err) {
-				setTimeout(function () {
-					throw err;
-				}, 1);
 			});
 		}
 	};
 
-	this.toID = function (name) {
+	this.toIDcb = function (name, callback) {
+		var defname = name;
+		// escape case
+		if (name == '_id') {
+			return callback(name);
+		}
+		else {
+			if (name.startsWith('$'))
+				name = (name.substring(1));
+
+			db.get(' ' + name, function (err, value) {
+				if (err) throw err;
+				//name doesn't exist yet
+				if (value == null) {
+					newID(function (newid) {
+						db.set(newid, name);
+						db.set(' ' + name, newid);
+						db.set('_' + zip(newid), defname);
+						if (name.startsWith("$")) callback('$' + zip(newid));
+						else callback(zip(newid));
+					});
+				}
+				else {
+					if (name.startsWith("$"))callback('$' + zip(value));
+					else callback(zip(value));
+				}
+			});
+		}
+	};
+
+	this.toID = function (name, callback) {
+		if(callback !== undefined)
+			return me.toIDcb(name, callback);
+
 		var defname = name;
 		var sucback;
 		var errback;
@@ -118,6 +144,7 @@ exports.IdManager = function () {
 			sucback = resolve;
 			errback = reject;
 		});
+
 
 		// escape case
 		if (name == '_id') {
@@ -130,25 +157,25 @@ exports.IdManager = function () {
 				name = (name.substring(1));
 
 			db.get(' ' + name, function (err, value) {
-
+				if (err) return errback(err);
 				//name doesn't exist yet
 				if (value == null) {
-					newID(function (newid) {
-						db.set(newid, name);
-						db.set(' ' + name, newid);
-						db.set('_' + zip(newid), defname);
-						if (name.startsWith("$"))
-							sucback('$' + zip(newid));
-						sucback(zip(newid));
+					trycatch(function () {
+						newID(function (newid) {
+							db.set(newid, name);
+							db.set(' ' + name, newid);
+							db.set('_' + zip(newid), defname);
+							if (name.startsWith("$")) sucback('$' + zip(newid));
+							else sucback(zip(newid));
+						});
+					}, function (err) {
+						errback(err);
 					});
 				}
 				else {
-					sucback(zip(value));
-					if (name.startsWith("$"))
-						sucback('$' + zip(value));
-					sucback(zip(value));
+					if (name.startsWith("$")) sucback('$' + zip(value));
+					else sucback(zip(value));
 				}
-
 			});
 		}
 		return p;
@@ -162,36 +189,37 @@ exports.IdManager = function () {
 			errback = reject;
 		});
 
-		var newobj = {};
-		var ci = 0;
-		for (let i in object) {
-			if (i == '_id') {
-				(function () {
-					newobj[i] = object[i];
-					ci--;
-					if (ci == 0) return sucback(newobj);
-				})();
+		trycatch(function () {
+			var newobj = {};
+			var ci = 0;
+			for (let i in object) {
+				if (i == '_id') {
+					(function () {
+						newobj[i] = object[i];
+						ci--;
+						if (ci == 0) return sucback(newobj);
+					})();
+				}
+				else {
+					var j = i;
+					if (j.startsWith('$'))
+						j = j.substring(1);
+					db.get('_' + j, function (err, value) {
+						if (err) return errback(err);
+						if (i.startsWith('$'))
+							newobj['$' + value] = object[i];
+						else {
+							newobj[value] = object[i];
+						}
+						ci--;
+						if (ci == 0) return sucback(newobj);
+					});
+				}
+				ci++;
 			}
-			else {
-				var j = i;
-				if (j.startsWith('$'))
-					j = j.substring(1);
-				db.get('_' + j, function (err, value) {
-
-					if (i.startsWith('$'))
-						newobj['$' + value] = object[i];
-					else {
-						newobj[value] = object[i];
-					}
-					ci--;
-					if (ci == 0) return sucback(newobj);
-				});
-
-			}
-
-			ci++;
-
-		}
+		}, function (err) {
+			errback(err);
+		});
 		return p;
 	};
 
@@ -204,14 +232,21 @@ exports.IdManager = function () {
 		});
 		var newobj = {};
 		var ci = 0;
-		for (let i in object) {
-			ci++;
-			me.toID(i).then(function (value) {
-				newobj[value] = object[i];
-				ci--;
-				if (ci == 0) return sucback(newobj);
-			});
-		}
+
+		trycatch(function(){
+			for (let i in object) {
+				ci++;
+				me.toID(i).then(function (value) {
+					newobj[value] = object[i];
+					ci--;
+					if (ci == 0) return sucback(newobj);
+				}).catch(function (err) {
+					errback(err);
+				});
+			}
+		},function(err){
+			errback(err);
+		});
 		return p;
 	}
 };

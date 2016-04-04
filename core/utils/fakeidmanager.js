@@ -9,22 +9,26 @@ exports.IdManager = function () {
 		var n = names.length;
 		for (var i in names) {
 			(function (j) {
-				me.toID(names[j]).then(function (out) {
+				me.toIDcb(names[j], function (out) {
 					n--;
-
 					outs[names[j]] = out;
 					if (n == 0)
 						callback(outs);
-				}).catch(function (err) {
-					setTimeout(function () {
-						throw err;
-					}, 1);
 				});
 			})(i);
 		}
 	};
 
-	this.toID = function (name) {
+	this.toIDcb = function (name, callback) {
+		callback(name);
+	};
+
+	this.toID = function (name, callback) {
+
+		if(callback !== undefined)
+		{
+			return callback(name);
+		}
 
 		var sucback;
 		var errback;
