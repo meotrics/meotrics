@@ -20,7 +20,7 @@ function route(app, db, segmgr, prefix, mongodb, converter) {
 	var ActionMgr = require('./module/actionmgr.js').ActionMgr;
 	var PropMgr = require('./module/propmgr.js').PropMgr;
 	var propmgr = new PropMgr();
-	var actionMgr = new ActionMgr(db, mongodb, async, converter, prefix);
+	var actionMgr = new ActionMgr(db, mongodb, async, converter, prefix, "mapping");
 	var trendMrg = new TrendMgr(db, mongodb, async, converter, prefix, "trend");
 	var typeCRUD = new CRUD(db, mongodb, async, converter, prefix, "actiontype");
 	var trendCRUD = new CRUD(db, mongodb, async, converter, prefix, "trend");

@@ -23,7 +23,12 @@ exports.IdManager = function () {
 		callback(name);
 	};
 
-	this.toID = function (name) {
+	this.toID = function (name, callback) {
+
+		if(callback !== undefined)
+		{
+			return callback(name);
+		}
 
 		var sucback;
 		var errback;

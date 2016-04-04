@@ -4,6 +4,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, col) {
 	this.createRaw = function (appid, data, callback, next) {
 		var collection = prefix + col;
 		data._appid = Number(appid);
+		data._ctime = Math.round(new Date() / 1000);
 		converter.toObject(data).then(function (r) {
 			return db.collection(collection).insertOne(r);
 		}).then(function (r) {
@@ -66,6 +67,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, col) {
 						});
 					}, function (err, results) {
 						if (err) {
+							console.log('haha');
 							next(err);
 						} else {
 							res.json(results);

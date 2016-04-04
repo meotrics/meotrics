@@ -133,7 +133,10 @@ exports.IdManager = function () {
 		}
 	};
 
-	this.toID = function (name) {
+	this.toID = function (name, callback) {
+		if(callback !== undefined)
+			return me.toIDcb(name, callback);
+
 		var defname = name;
 		var sucback;
 		var errback;
