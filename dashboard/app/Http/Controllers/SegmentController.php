@@ -7,16 +7,12 @@ class SegmentController extends Controller
 {
 	public function getExecute(Request $request)
 	{
-		//get app id from cookie
-		$appid = 1; //Cookie::get('appid');
+		$app_id = \Auth::user()->id;
 		$query = $request->input('query');
 		$id = $request->input('id');
 
-
-		//Check if old segment
 		if ($id == null || $id == -1) {
-
-			$id = MtHttp::post('segment/' . $appid, ['query' => $query, 'name' => 'Draf']);
+			$id = MtHttp::post('segment/' . $app_id, ['query' => $query, 'name' => 'Draf']);
 		}
 
 		//run querry on field
@@ -28,28 +24,28 @@ class SegmentController extends Controller
 
 	public function getIndex()
 	{
-		$actions = MtHttp::get('actiontype/' . '1');
+		$app_id = \Auth::user()->id;
 
-		$props = array(
-			0 => array(
-				'name' => 'gender',
-				'dpname' => 'Gender'
-			),
-			1 => array(
-				'name' => 'age',
-				'dpname' => 'Age'
-			),
-			2 => array(
-				'browser' => 'browser',
-				'dpname' => 'Browser'
-			)
-		);
-		$segments = MtHttp::get('segment/' . \Auth::user()->id);
+		$props = MtHttp::get('prop/' . $app_id);
+
+		$segments = MtHttp::get('segment/' . $app_id);
 
 		return view('segment/index', [
-			'actions' => json_encode($actions),
-			'props' => json_encode($props),
-			'segments' => json_encode($segments)
+			'props' => $props,
+			'segments' => $segments
+		]);
+	}
+
+	public function getCreate(){
+		$app_id = \Auth::user()->id;
+
+		$actions = MtHttp::get('actiontype/' . $app_id);
+
+		$props = MtHttp::get('prop/' . $app_id);
+
+		return view('segment/create', [
+			'actions' => $actions,
+			'props' => $props
 		]);
 	}
 }
