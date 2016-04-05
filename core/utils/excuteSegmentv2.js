@@ -3,7 +3,7 @@
 var IDMgr = require('./fakeidmanager.js'),
 	 async = require('async'),
 	 mongodb = require('mongodb'),
-	 converter = new IDMgr.IdManager();
+	 converter = new IDMgr.IdManager(),
 	 config = require('config');
 
 //Chú ký triển khai hàm sinh match

@@ -1,57 +1,39 @@
-var seg = require('../utils/excuteSegmentv2.js');
+var SegmentExr = require('../module/segment.js').SegmentExr;
+
+
 var MongoClient = require('mongodb').MongoClient;
 var config = require('config');
-var testJson =
-		[{
-			type: "56e3a14a44ae6d70ddbf82a2", f: "avg", field: "amount", operator: ">", value: 5,
-			conditions: ["amount", "gt", 2, "and", "price", "eq", 40]
-		},
-			"and",
-			{
-				type: "56e3a14a44ae6d70ddbf82a2", f: "count", field: "pid", operator: ">", value: 5,
-				conditions: ["amount", "gt", 5, "or", "price", "eq", "30"]
-			},
-			"and",
-			{
-				type: 'user',
-				conditions: ['age', 'eq', 'male']
-			}];
+var async = require('async');
+var mongodb = require('mongodb');
 
-function mtthrow(err) {
-	if (err) {
-		console.log(err);
-		setTimeout(function () {
-			throw err;
-		});
+var converter = require('../utils/fakeidmanager.js');
+converter = new converter.IdManager();
+
+
+MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get('mongod.port') + '/' + config.get('mongod.database'), function(err, db) {
+	if (err) throw err;
+	var seg = new SegmentExr(db, mongodb, converter, async, config);
+
+
+	var testJson2 = [{
+		type: "purchase",
+		f: "avg",
+		field: "quantity",
+		operator: ">",
+		value: 3,
+		conditions: []
+	}];
+
+	var segment = {
+		_id: 123,
+		query: testJson2,
+		appid: process.argv[2]
 	}
-}
 
-var testJson2 =
-		[{
-			type: "56e3a14a44ae6d70ddbf82a2", f: "avg", field: "quantity", operator: ">", value: 0,
-			conditions: []
-		}];
+	console.time('mr');
+	seg.runSegment(segment, function(out) {
+		console.timeEnd('mr');
+		console.log(JSON.stringify(out));
+	});
 
-
-seg.getQuery(testJson2, function (out) {
-
-	console.log('--TEST1');
-	console.log(JSON.stringify(out.option));
-
-
-	var url = 'mongodb://' + config.get('mongod.host') + ':' + config.get('mongod.port') + '/' + config.get('mongod.database');
-	var collection = process.argv[2];
-
-	MongoClient.connect(url).then(function (db) {
-		console.time('mr');
-		db.collection(collection).mapReduce(out.map, out.reduce, {
-			out: "meotrics_out",
-			query: out.option,
-			finalize: out.finalize,
-			sort: {_mtid: 1}
-		}, function () {
-			console.timeEnd('mr');
-		});
-	}).catch(mtthrow);
 });
-

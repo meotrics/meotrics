@@ -1,6 +1,9 @@
 var segmentresult = require('../utils/segmentresult');
-
-segmentresult('meotrics_1', '56e81a3344ae6d1f522e94da', 'age', 'number', 'age', 'number', function(err, results){
+var collection = config.get('mongodb.prefix') + process.argv[2];
+var segmentid = process.argv[3];
+console.time('sr');
+segmentresult(collection, segmentid, 'age', 'number', 'gender', 'number', function(err, results){
 	          console.log(err);
 	          console.log(JSON.stringify(results));
-	        })
+	          console.timeEnd('sr');
+})

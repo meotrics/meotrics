@@ -296,7 +296,7 @@ each $types have fields in it
 	<div class="card row">
 		<div class="header col-md-12">
 			<form class="">
-				<label class="">SELECT TREND</label>&nbsp;&nbsp;
+				<label class="">Select trend</label>&nbsp;&nbsp;
 				<select id="trendselect" class="form-control input-sm " style="width: 250px; display:inline-block">
 					
 				</select>

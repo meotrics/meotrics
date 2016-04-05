@@ -12,7 +12,7 @@ class HelperController extends Controller {
   public function setup_status()
   {
     $res = MtHttp::get('api/status/' . \Request::get('app_id'));
-    return $res;
+    return $res . '';
   }
 
 }
