@@ -7,23 +7,23 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, mtthrow, col
 		async.waterfall([
 			function (callback) {
 				var trid = req.params.id;
-				db.collection(collection).find({_id: new mongodb.ObjectID(trid)}, {_id: 0}).toArray().then(function (r) {
+				db.collection(collection).find({_id: new mongodb.ObjectID(trid)}, {_id: 0}).toArray(function (err, r) {
+					if(err) throw err;
 					callback(null, r[0], converter);
-				}).catch(function (e) {
-					callback(e);
 				});
-			}, getQueryTrending
-			, function (query, callback) {
+			},
+			getQueryTrending,
+			function (query, callback) {
 				collection = prefix + appid;
 
-				db.collection(collection).aggregate(query).toArray().then(function (array) {
+				db.collection(collection).aggregate(query).toArray(function (err, array) {
+					if(err) throw err;
 					results = array;
 					async.forEachOf(results, function (value, key, asyncCallback) {
-						converter.toOriginal(value.temp)
-							 .then(function (r) {
-								 results[key].temp = r;
-								 asyncCallback(null);
-							 }).catch(function (e) {
+						converter.toOriginal(value.temp).then(function (r) {
+							results[key].temp = r;
+							asyncCallback(null);
+						}).catch(function (e) {
 							asyncCallback(e);
 						});
 					}, function (err) {
@@ -34,8 +34,6 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, mtthrow, col
 							callback(null);
 						}
 					});
-				}).catch(function (err) {
-					callback(err);
 				});
 			}
 		], function (err) {
@@ -87,10 +85,10 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, mtthrow, col
 				query.push({$limit: object.limit});
 
 				converter.toObject(query[0]['$match'])
-					 .then(function (r) {
-						 query[0]['$match'] = r;
-						 callback(null, query);
-					 }).catch(function (e) {
+						.then(function (r) {
+							query[0]['$match'] = r;
+							callback(null, query);
+						}).catch(function (e) {
 					callback(e);
 				});
 			} else {
@@ -132,4 +130,4 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, mtthrow, col
 			callback(e);
 		});
 	}
-}
+};
