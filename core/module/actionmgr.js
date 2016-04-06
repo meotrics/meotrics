@@ -1,6 +1,7 @@
 exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 	//CLIENT------------------------------------------------------------------------
-
+	var Util = require('./util');
+	var util = new Util(db, converter);
 	/* Ghi nhận một action mới
 	 Tham số: {
 	 _mtid : number
@@ -24,7 +25,11 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 
 	this.save = function (req, res, next) {
 		var data = req.body;
-		var collection = prefix + req.params.appid;
+		var appid = req.params.appid;
+		var _mtid = data._mtid;
+		var temp = data.user;
+		delete data.user;
+		var collection = prefix + appid;
 		var collectionmapping = prefix+mapping;
 		// Convert string to ObjectID in mongodgodb
 		data._mtid = new mongodb.ObjectID(data._mtid);
@@ -45,6 +50,8 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		}).then(function (r) {
 			res.status(200).end();
 		}).catch(next);
+
+		util.updateUserInf(appid, _mtid, temp);
 	};
 
 	/* Phương thức này dùng để báo cho hệ thống biết một anonymous user thực ra là
