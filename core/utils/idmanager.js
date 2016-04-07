@@ -134,7 +134,7 @@ exports.IdManager = function () {
 	};
 
 	this.toID = function (name, callback) {
-		if(callback !== undefined)
+		if (callback !== undefined)
 			return me.toIDcb(name, callback);
 
 		var defname = name;
@@ -181,7 +181,39 @@ exports.IdManager = function () {
 		return p;
 	};
 
-	this.toOriginal = function (object) {
+	this.toOriginal = function (object, callback) {
+		if (callback) {
+			var newobj = {};
+			var ci = 0;
+			for (let i in object) {
+				if (i == '_id') {
+					(function () {
+						newobj[i] = object[i];
+						ci--;
+						if (ci == 0) return callback(newobj);
+					})();
+				}
+				else {
+					var j = i;
+					if (j.startsWith('$'))
+						j = j.substring(1);
+					db.get('_' + j, function (err, value) {
+						if (err) return errback(err);
+						if (i.startsWith('$'))
+							newobj['$' + value] = object[i];
+						else {
+							newobj[value] = object[i];
+						}
+						ci--;
+						if (ci == 0) return callback(newobj);
+					});
+				}
+				ci++;
+			}
+			return;
+		}
+
+
 		var sucback;
 		var errback;
 		var p = new Promise(function (resolve, reject) {
@@ -233,7 +265,7 @@ exports.IdManager = function () {
 		var newobj = {};
 		var ci = 0;
 
-		trycatch(function(){
+		trycatch(function () {
 			for (let i in object) {
 				ci++;
 				me.toID(i).then(function (value) {
@@ -244,7 +276,7 @@ exports.IdManager = function () {
 					errback(err);
 				});
 			}
-		},function(err){
+		}, function (err) {
 			errback(err);
 		});
 		return p;
