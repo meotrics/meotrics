@@ -1,12 +1,13 @@
-exports.TrendMgr = function (db, mongodb, async, converter, prefix) {
+exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 	var me = this;
 	this.queryRaw = function (appid, trid, callback) {
-		var collection = prefix + appid;
+		var collection = prefix + col;
 		var results = [];
 
 		db.collection(collection).find({_id: new mongodb.ObjectID(trid)}, {_id: 0}).toArray(function (err, r) {
 			if (err) throw err;
 			getQueryTrending(r[0], converter, function (query) {
+				var collection = prefix + appid;
 				db.collection(collection).aggregate(query).toArray(function (err, array) {
 					if (err) throw err;
 					results = array;
