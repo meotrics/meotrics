@@ -1,36 +1,16 @@
 "use strict";
 
-var config = require('config');
-var mongodb = require('mongodb');
-var MongoClient = mongodb.MongoClient;
+function route(app, com) {
+	var propmgr = com.propmgr;
+	var actionMgr = com.actionMgr;
+	var trendMgr = com.trendMgr;
+	var typeCRUD = com.typeCrud;
+	var trendCRUD = com.trendCrud;
+	var segCRUD = com.segCrud;
+	var propCRUD = com.propCrud;
+	var camCRUD = com.camCrud;
+	var appmgr = com.appmgr;
 
-function buildconnstr() {
-	var host = config.get("mongod.host") || "127.0.0.1";
-	var port = config.get("mongod.port") || 27017;
-	var database = config.get("mongod.database") || "test";
-	return "mongodb://" + host + ":" + port + "/" + database;
-}
-
-
-function route(app, db, segmgr, prefix, mongodb, converter) {
-	var bodyParser = require('body-parser');
-	var async = require('async');
-	var CRUD = require('./module/crud.js').CRUD;
-	var TrendMgr = require('./module/trendmgr.js').TrendMgr;
-	var ActionMgr = require('./module/actionmgr.js').ActionMgr;
-	var PropMgr = require('./module/propmgr.js').PropMgr;
-	var propmgr = new PropMgr();
-	var actionMgr = new ActionMgr(db, mongodb, async, converter, prefix, "mapping");
-	var trendMrg = new TrendMgr(db, mongodb, async, converter, prefix, "trend");
-	var typeCRUD = new CRUD(db, mongodb, async, converter, prefix, "actiontype");
-	var trendCRUD = new CRUD(db, mongodb, async, converter, prefix, "trend");
-	var segCRUD = new CRUD(db, mongodb, async, converter, prefix, "segment");
-	var propCRUD = new CRUD(db, mongodb, async, converter, prefix, "userprop");
-	var camCRUD = new CRUD(db, mongodb, async, converter, prefix, "campaign");
-	var appmgr = new (require('./module/appmgr.js').AppMgr)(db, mongodb, async, converter, prefix, typeCRUD, segCRUD);
-
-	// parse application/json
-	app.use(bodyParser.json());
 
 	//APP------------------------------------------------------------------------
 	//set up an new app
@@ -51,7 +31,7 @@ function route(app, db, segmgr, prefix, mongodb, converter) {
 	app.putEx('/trend/:appid/:id', trendCRUD.update);
 	app.deleteEx('/trend/:appid/:id', trendCRUD.delete);
 	// Query trend
-	app.get('/trend/query/:appid/:id', trendMrg.query);
+	app.get('/trend/query/:appid/:id', trendMgr.query);
 
 	// CRUD segment
 	app.postEx('/segment/:appid', segCRUD.create);
@@ -106,39 +86,61 @@ function route(app, db, segmgr, prefix, mongodb, converter) {
 	// })
 }
 
-//THE ENTRY POINT
+function buildconnstr(config) {
+	var host = config.get("mongod.host") || "127.0.0.1";
+	var port = config.get("mongod.port") || 27017;
+	var database = config.get("mongod.database") || "test";
+	return "mongodb://" + host + ":" + port + "/" + database;
+}
+
+var mongodb = require('mongodb');
+var config = require('config');
+
+//<<<<<<<<<<<<THE ENTRY POINT
+
 //Using connection pool. Initialize mongodb once
-MongoClient.connect(buildconnstr(), function (err, db) {
+mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 	if (err) throw err;
 
-	// var SegmentMgr = require('segment').SegmentMgr;
-	var express = require('express');
-	var appException = require('./module/appException.js');
-	//create component
-	// var segmgr = new SegmentMgr(db);
-
 	//set up new express application
+	var express = require('express');
 	var app = express();
+	var appException = require('./module/appException.js');
 	appException(app);
-	// route(app, db, segmgr);
-	var prefix = config.get("mongod.prefix") || "meotrics_";
+	var bodyParser = require('body-parser');
+	// parse application/json
+	app.use(bodyParser.json());
 
+	//create component
+	var CRUD = require('./module/crud.js').CRUD;
 	var converter = require('./utils/fakeidmanager.js');
 	converter = new converter.IdManager();
+	var prefix = config.get("mongod.prefix") || "meotrics_";
 
-	route(app, db, null, prefix, mongodb, converter);
+	var TrendMgr = require('./module/trendmgr.js').TrendMgr;
+	var ActionMgr = require('./module/actionmgr.js').ActionMgr;
+	var PropMgr = require('./module/propmgr.js').PropMgr;
+	var AppMgr = require('./module/appmgr.js').AppMgr;
+
+	var async = require('async');
+	var component = {};
+	component.trendMgr = new TrendMgr(db, mongodb, async, converter, prefix, "trend");
+	component.actionMgr = new ActionMgr(db, mongodb, async, converter, prefix, "mapping");
+	component.propmgr = new PropMgr();
+	component.typeCrud = new CRUD(db, mongodb, async, converter, prefix, "actiontype");
+	component.trendCrud = new CRUD(db, mongodb, async, converter, prefix, "trend");
+	component.segCrud = new CRUD(db, mongodb, async, converter, prefix, "segment");
+	component.appmgr = new AppMgr(db, mongodb, async, converter, prefix, component.typeCrud, component.segCrud);
+	component.propCrud = new CRUD(db, mongodb, async, converter, prefix, "userprop");
+	component.camCrud = new CRUD(db, mongodb, async, converter, prefix, "campaign");
+
+	//routing http
+	route(app, component);
 
 	//run the app
 	var port = config.get("port") || 2108;
 	app.listen(port, function () {
-		console.log('Meotrics core listening on port ' + port + '!');
+		console.log('Meotrics CORE API is listening at port ' + port);
 	});
-
-	// app.get('/segment', function (req, res) {
-	// 	segmgr.create(req.params, function (responsetext) {
-	// 		res.send(responsetext);
-	// 		res.end()
-	// 	});
-	// })
 });
 
