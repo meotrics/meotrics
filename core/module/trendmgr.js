@@ -1,51 +1,41 @@
-exports.TrendMgr = function (db, mongodb, async, converter, prefix, mtthrow, col) {
-
-	this.query = function (req, res, next) {
-		var appid = req.params.appid;
-		var collection = prefix + col;
+exports.TrendMgr = function (db, mongodb, async, converter, prefix) {
+	var me = this;
+	this.queryRaw = function (appid, trid, callback) {
+		var collection = prefix + appid;
 		var results = [];
-		async.waterfall([
-			function (callback) {
-				var trid = req.params.id;
-				db.collection(collection).find({_id: new mongodb.ObjectID(trid)}, {_id: 0}).toArray(function (err, r) {
-					if(err) throw err;
-					callback(null, r[0], converter);
-				});
-			},
-			getQueryTrending,
-			function (query, callback) {
-				collection = prefix + appid;
 
+		db.collection(collection).find({_id: new mongodb.ObjectID(trid)}, {_id: 0}).toArray(function (err, r) {
+			if (err) throw err;
+			getQueryTrending(r[0], converter, function (query) {
 				db.collection(collection).aggregate(query).toArray(function (err, array) {
-					if(err) throw err;
+					if (err) throw err;
 					results = array;
+
 					async.forEachOf(results, function (value, key, asyncCallback) {
-						converter.toOriginal(value.temp).then(function (r) {
+						converter.toOriginal(value.temp, function (r) {
 							results[key].temp = r;
 							asyncCallback(null);
-						}).catch(function (e) {
-							asyncCallback(e);
 						});
 					}, function (err) {
-						if (err) {
-							callback(err);
-						} else {
-							res.json(results);
-							callback(null);
-						}
+						if (err) throw err;
+						callback(null, results);
 					});
 				});
-			}
-		], function (err) {
-			if (err) {
-				next(err);
-			}
+			});
+		});
+	};
+
+	this.query = function (req, res) {
+		var appid = req.params.appid;
+		var trid = req.params.id;
+		me.queryRaw(appid, trid, function (err, results) {
+			res.json(results);
 		});
 	};
 
 	function getQueryTrending(object, converter, callback) {
 		var query = [];
-		converter.toID(object.object).then(function (r) {
+		converter.toID(object.object, function (r) {
 			object.object = r;
 
 			// -- START MATCH CLAUSE
@@ -84,50 +74,41 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, mtthrow, col
 				object.limit = object.limit || 10;
 				query.push({$limit: object.limit});
 
-				converter.toObject(query[0]['$match'])
-						.then(function (r) {
-							query[0]['$match'] = r;
-							callback(null, query);
-						}).catch(function (e) {
-					callback(e);
-				});
-			} else {
-				converter.toID(object.param).then(function (r) {
-					object.param = r;
-
-					if (object.operation == 'avg') {
-						query.push({
-							$group: {
-								_id: '$' + object.object,
-								result: {'$avg': '$' + object.param},
-								temp: {$first: "$$ROOT"}
-							}
-						});
-						query.push({$sort: {result: object.order}});
-					} else if (object.operation == 'sum') {
-						query.push({
-							$group: {
-								_id: '$' + object.object,
-								result: {'$sum': '$' + object.param},
-								temp: {$first: "$$ROOT"}
-							}
-						});
-						query.push({$sort: {result: object.order}});
-					}
-
-					object.limit = object.limit || 10;
-					query.push({$limit: object.limit});
-
-					return converter.toObject(query[0]['$match']);
-				}).then(function (r) {
+				converter.toObject(query[0]['$match'], function (r) {
 					query[0]['$match'] = r;
 					callback(null, query);
-				}).catch(function (e) {
-					callback(e);
 				});
+				return;
 			}
-		}).catch(function (e) {
-			callback(e);
+
+			converter.toID(object.param, function (r) {
+				object.param = r;
+
+				if (object.operation == 'avg') {
+					query.push({
+						$group: {
+							_id: '$' + object.object,
+							result: {'$avg': '$' + object.param},
+							temp: {$first: "$$ROOT"}
+						}
+					});
+					query.push({$sort: {result: object.order}});
+				} else if (object.operation == 'sum') {
+					query.push({
+						$group: {
+							_id: '$' + object.object,
+							result: {'$sum': '$' + object.param},
+							temp: {$first: "$$ROOT"}
+						}
+					});
+					query.push({$sort: {result: object.order}});
+				}
+				object.limit = object.limit || 10;
+				query.push({$limit: object.limit});
+				query[0]['$match'] = converter.toObject(query[0]['$match']);
+				callback(query);
+			});
+
 		});
 	}
 };
