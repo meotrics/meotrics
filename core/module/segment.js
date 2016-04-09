@@ -405,7 +405,6 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 	//return: string contains compiled javascript code
 	//param: query=see testJson
 	function buildMapReduce(query, callback) {
-
 		var mapfunccode = "";
 		var reducecondcode = "";
 		var reduceinitcode = "";
@@ -434,7 +433,7 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 					var tmpcode = buildChunk(i / 2, query[i], ids._typeid, ids[query[i].field]);
 					mapfunccode += tmpcode.mapcode;
 					reduceinitcode += tmpcode.reduceinitcode;
-					reducecondcode += tmpcode.reducecondcode;
+					//reducecondcode += tmpcode.reducecondcode;
 					reduceaggcode += tmpcode.reduceaggcode;
 					finalizecode += tmpcode.finalizecode;
 					finalizeinitcode += tmpcode.finalizeinitcode;
@@ -443,7 +442,7 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 					if (joinop === 'and') joinop = '&&';
 					else if (joinop === 'or') joinop = '||';
 					else throw "wrong join operator: " + joinop;
-					reducecondcode += joinop;
+					//reducecondcode += joinop;
 				}
 				i++;
 			}
