@@ -6,6 +6,7 @@ use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\View;
 
 class TrendController extends Controller
 {
@@ -40,35 +41,43 @@ class TrendController extends Controller
 	}
 
 	public function getIndex()
-	{
-		$actiontypes = MtHttp::get('actiontype/' . '1');
-		$trends = MtHttp::get('trend/' . '1');
-		return view('trend/index', [
-			'types' => json_encode($actiontypes),
-			'trends' => json_encode($trends)
-		]);
+	{   
+            $app_id = \Auth::user()->id;
+            $actiontypes = MtHttp::get('actiontype/' . $app_id);
+            $trends = MtHttp::get('trend/' . $app_id);
+            $trend = reset($trends);
+            $outputs = MtHttp::get('trend/query/' . $app_id .'/'. $trend->_id);
+            return view('trend/index', [
+                'types' => json_encode($actiontypes),
+                'trends' => $trends,
+                'outputs' => $outputs,
+            ]);
 	}
 
 	public function getQuery(Request $request)
 	{
-		if ($request->input('_id') != null) {
-			$trendid = $request->input('_id');
-		} else {
-
-			$data = array(
-				'typeid' => $request->input('typeid'),
-				'object' => $request->input('object'),
-				'operation' => $request->input('operation'),
-				'param' => $request->input('param'),
-				'order' => intval($request->input('order')),
-				'name' => 'Draft',
-				'_isDraft' => true
-			);
-			$trendid = MtHttp::post('trend/1', $data);
-		}
-
-		$result = MtHttp::get('trend/query/1/' . $trendid);
-		return $result;
+            $result = ['success' => false];
+            if ($request->input('_id') != null) {
+                $trendid = $request->input('_id');
+                $app_id = \Auth::user()->id;
+                $outputs = MtHttp::get('trend/query/'.$app_id.'/' . $trendid);    
+                $result['success'] = true;
+                $result['outputs'] = $outputs;
+            } 
+            else {
+//			$data = array(
+//				'typeid' => $request->input('typeid'),
+//				'object' => $request->input('object'),
+//				'operation' => $request->input('operation'),
+//				'param' => $request->input('param'),
+//				'order' => intval($request->input('order')),
+//				'name' => 'Draft',
+//				'_isDraft' => true
+//			);
+//			$trendid = MtHttp::post('trend/1', $data);
+                    $result['success'] = false;
+            }
+            return $result;
 	}
         
 	public function show()
@@ -134,4 +143,24 @@ class TrendController extends Controller
             $result['meotrics'] = $meotrics;
             return response()->json($result);
         }
+        
+    public function getHtmloutputs(Request $request)
+    {
+        $result = ['success' => false];
+        if ($request->input('_id') != null) {
+            $trendid = $request->input('_id');
+            $app_id = \Auth::user()->id;
+            $outputs = MtHttp::get('trend/query/'.$app_id.'/' . $trendid);    
+            $view = View::make('trend.partials.outputs', [
+                'outputs' => $outputs,
+            ]);
+            $contents = $view->render();
+            $result['success'] = true;
+            $result['html_outputs'] = $contents;
+        } 
+        else {
+                $result['success'] = false;
+        }
+        return $result;
+    }
 }
