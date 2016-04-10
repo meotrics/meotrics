@@ -17,7 +17,6 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 	this.runSegment = function runSegment(segment, callback) {
 		var outcollection = config.get('mongod.prefix') + "segment" + segment._id.toString();
 		getQuery(segment.query, function(out) {
-			console.log(out.map, out.reduce, out.finalize, out.query)
 			db.collection(config.get('mongod.prefix') + segment.appid).mapReduce(out.map, out.reduce, {
 				out: outcollection,
 				query: out.option,
