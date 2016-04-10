@@ -1,21 +1,20 @@
 "use strict";
 
-exports.SegmentExr = function (db, mongodb, converter, async, config) {
+exports.SegmentExr = function (db, mongodb, converter, async, config, prefix) {
 	var me = this;
-	this.excuteSegment = function (appid, segmentid, callback) {
-		var prefix = config.get('mongod.prefix');
-		db.collection(prefix + 'segments').find({_id: new mongodb.ObjectID(segmentid)}).toArray(function (err, result) {
+
+	//Excute a segment based on segmentid
+	this.excuteSegment = function (segmentid, callback) {
+		db.collection(prefix + 'segments').find({_id: new mongodb.ObjectID(segmentid)}).toArray(function (err, segment) {
 			if (err) throw err;
-			var segment = result[0].query;
-			console.log(segment);
 			runSegment(segment, callback);
 		});
 	};
 
 	this.runSegment = function runSegment(segment, callback) {
-		var outcollection = config.get('mongod.prefix') + "segment" + segment._id.toString();
-		getQuery(segment.query, function (out) {
-			db.collection(config.get('mongod.prefix') + segment.appid).mapReduce(out.map, out.reduce, {
+		var outcollection = prefix+ "segment" + segment._id.toString();
+		getQuery(segment.condition, function (out) {
+			db.collection(prefix+ segment._appid).mapReduce(out.map, out.reduce, {
 				out: outcollection,
 				query: out.option,
 				finalize: out.finalize,

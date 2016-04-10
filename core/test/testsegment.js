@@ -26,9 +26,9 @@ MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get(
 
 	var segment = {
 		_id: 123,
-		query: testJson2,
-		appid: process.argv[2]
-	}
+		condition: testJson2,
+		_appid: process.argv[2]
+	};
 
 	console.time('mr');
 	seg.runSegment(segment, function(out) {
@@ -37,3 +37,5 @@ MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get(
 	});
 
 });
+
+//testsegment <appid>
