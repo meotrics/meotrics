@@ -2,11 +2,15 @@
 namespace App\Http\Controllers;
 
 use App\Util\MtHttp;
-use Illuminate\Http\Response;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
+use stdClass;
+use function redirect;
+use function response;
+use function view;
+use App\Enum\TrendEnum;
 
 class TrendController extends Controller
 {
@@ -47,10 +51,12 @@ class TrendController extends Controller
             $trends = MtHttp::get('trend/' . $app_id);
             $trend = reset($trends);
             $outputs = MtHttp::get('trend/query/' . $app_id .'/'. $trend->_id);
+            
             return view('trend/index', [
                 'types' => json_encode($actiontypes),
                 'trends' => $trends,
                 'outputs' => $outputs,
+                'actiontypes' => $actiontypes,
             ]);
 	}
 
@@ -88,9 +94,24 @@ class TrendController extends Controller
         public function getCreate(){
             $app_id = \Auth::user()->id;
             $actiontypes = MtHttp::get('actiontype/' . $app_id);
-            return view('trend/create', [
+            $actiontype_first = $actiontypes && $actiontypes[0] ? $actiontypes[0] : (object)[
+                'name' => '',
+                'codename' => '',
+                'fields' => [],
+            ];
+            $trend = (object)[
+                '_id' => '',
+                'name' => '',
+                'typeid' => $actiontype_first->codename,
+                'object' => '',
+                'operation' => '',
+                'param' => '',
+                'order' => TrendEnum::DEFAULT_ORDER,
+            ];
+            return view('trend/c_u', [
                 'app_id' => $app_id,
                 'actiontypes' => $actiontypes,
+                'trend' => $trend,
             ]);
         }
         
@@ -102,10 +123,10 @@ class TrendController extends Controller
                     [
                         'typeid' => 'required',
                         'object' => 'required',
-                        'opration' => 'required',
+                        'operation' => 'required',
                         'param' => 'required',
                         'order' => 'required',
-                        'name' => 'required|min:2|max:4|email',
+                        'name' => 'required',
                     ]
                 );
                 if ($validator->fails()){
@@ -114,14 +135,19 @@ class TrendController extends Controller
                 $data = array(
                     'typeid' => isset($data_post['typeid']) ? $data_post['typeid'] : '',
                     'object' => isset($data_post['object']) ? $data_post['object'] : '',
-                    'operation' => isset($data_post['opration']) ? $data_post['opration'] : '',
-                    'param' => isset($data_post['param']) ? $data_post['param'] : '',
-                    'order' => isset($data_post['order']) ? $data_post['order'] : '',
+                    'operation' => isset($data_post['operation']) ? $data_post['operation'] : '',
+                    'param' => 'price',
+                    'order' => isset($data_post['order']) ? (int)$data_post['order'] : (int)TrendEnum::DEFAULT_ORDER,
                     'name' => isset($data_post['name']) ? $data_post['name'] : '',
-                    '_isDraft' => true,
+                    '_isDraft' => false,
                 );
                 $app_id = \Auth::user()->id;
-                $trendid = MtHttp::post('trend/' . $app_id, $data_post);
+                if(isset($data_post['_id']) && $data_post['_id']){
+                    $trendid = MtHttp::put('trend/' . $app_id .'/'.$data_post['_id'] , $data);
+                }
+                else{
+                    $trendid = MtHttp::post('trend/' . $app_id, $data);
+                }
 		return redirect('trend');
             }
             return false;
@@ -133,10 +159,10 @@ class TrendController extends Controller
             
             $meotrics = [];
             for ($i = 0; $i< 5; $i++){
-                $meotric = new \stdClass();
+                $meotric = new stdClass();
                 $meotric->name = "Number of pageview ".$i;
-                $meotric->operation = "count ".$i;
-                $meotric->param = "url ".$i;
+                $meotric->operation = TrendEnum::DEFAULT_OPERATION;
+                $meotric->param = TrendEnum::DEFAULT_PARAM;
                 $meotrics[] = $meotric;
             }
             $result['success'] = true;
@@ -161,6 +187,44 @@ class TrendController extends Controller
         else {
                 $result['success'] = false;
         }
+        return $result;
+    }
+    
+    public function getUpdate($id){
+        $trend = $this->loadTrend($id);
+        $app_id = \Auth::user()->id;
+        $actiontypes = MtHttp::get('actiontype/' . $app_id);
+        $actiontype_first = $actiontypes && $actiontypes[0] ? $actiontypes[0] : (object)[
+            'name' => '',
+            'codename' => '',
+            'fields' => [],
+        ];
+        return view('trend/c_u', [
+            'app_id' => $app_id,
+            'actiontypes' => $actiontypes,
+            'trend' => $trend,
+        ]);
+    }
+    
+    public function loadTrend($id){
+        $app_id = \Auth::user()->id;
+        $trend = MtHttp::get('trend/'.$app_id.'/' . $id);  
+        if($trend){
+            return $trend;
+        }
+        else{
+            App::abort(404, 'Trend not found');
+        }
+    }
+    
+    public function deleteRemove($id){
+        $result = ['success' => false];
+        $app_id = \Auth::user()->id;
+        $trend = $this->loadTrend($id);
+        $result = MtHttp::delete('trend/'.$app_id.'/' . $id, null);  
+        //check result overhere
+        
+        $result['success'] = true;
         return $result;
     }
 }

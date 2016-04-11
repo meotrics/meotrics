@@ -23,12 +23,22 @@ each $types have fields in it
 			<form class="">
 				<label class="">Select trend</label>&nbsp;&nbsp;
 				<select id="trend" class="form-control input-sm " style="width: 250px; display:inline-block">
-				    @if($trends)
+				    <?php
+                                    $trend_first = null;
+                                    if($trends):    
+                                        $trend_first = $trends[0];
+                                    ?>
                                         @foreach($trends as $trend)
                                         <option value="{{$trend->_id}}">{{$trend->name ? $trend->name : TrendEnum::EMPTY_NAME}}</option>
                                         @endforeach
-                                    @endif
+                                    <?php
+                                    endif;
+                                    ?>
 				</select>
+                                <a id="action_update" data-href="{{URL::to('trend/update')}}" href="{{URL::to('trend/update', [
+                                    'id' => $trend_first ? $trend_first->_id : ''
+                                ])}}" class="btn btn-primary" role="button">Update</a>
+                                <a id="action_delete" href="javascript:void(0)" class="btn btn-danger" role="button">Delete</a>
 				&nbsp; or &nbsp;<a href="{{ URL::to('trend/create') }}">+ CREATE NEW TREND</a>
 			</form>
 		</div>
@@ -51,20 +61,37 @@ each $types have fields in it
     
     $('#trend').on('change', function(){
         var that = $(this);
+        $('#action_update').attr('href', $('#action_update').attr('data-href')+'/'+that.val());
         $.ajax({
-        type: 'GET',
-        dataType: 'JSON',
-        url: '{{ URL::to('trend/htmloutputs') }}',
-        data: {
-            '_id' : that.val(),
-        },
-        success: function(data){
-            if(data.success && data.html_outputs){
-                $('#outputs_table').html(data.html_outputs);
-            }
-        },
-    });
+            type: 'GET',
+            dataType: 'JSON',
+            url: '{{ URL::to('trend/htmloutputs') }}',
+            data: {
+                '_id' : that.val(),
+            },
+            success: function(data){
+                if(data.success && data.html_outputs){
+                    $('#outputs_table').html(data.html_outputs);
+                }
+            },
+        });
     return false;
+    });
+    
+    $('#action_delete').on('click', function(){
+        var cf = confirm('This trend will be removed. Are you sure?');
+        if(cf){
+            $.ajax({
+            type: 'DELETE',
+            dataType: 'JSON',
+            url: '{{ URL::to('trend/remove') }}'+'/'+$('#trend').val(),
+            success: function(data){
+                if(data.success){
+                    location.reload();
+                }
+            },
+        });
+        }
     });
 </script>    
 @endsection

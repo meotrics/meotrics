@@ -1,26 +1,44 @@
+<?php
+?>
 <table class="table table-hover table-striped">
     <thead>
         <tr>
             <th>ID</th>
             <th>Result</th>
-            <th>Temp</th>
+            <th>Category</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Amount</th>
+            <th>Price</th>
+            <th>Payment type</th>
         </tr>
     </thead>
     <tbody>
         @if($outputs)
-            @foreach($outputs as $output)
+            <?php
+            foreach($outputs as $output):
+                $temp_value = $output->temp ? $output->temp : (object)[
+                    'cid' => '',
+                    'pid' => '',
+                    'quantity' => '',
+                    'amount' => '',
+                    'price' => '',
+                    'paymentype' => '',
+                ];
+            ?>
             <tr>
                 <td>{{$output->_id}}</td>
                 <td>{{$output->result}}</td>
-                <td>
-                @if($output->temp && is_array($output->temp))
-                    @foreach($output->temp as $key => $value)
-                        {{$key}} (<code class="fmonospaced">{{$value}}</code>) <br/>
-                    @endforeach
-                @endif
-                </td>
+                <td>{{$temp_value->cid}}</td>
+                <td>{{$temp_value->pid}}</td>
+                <td>{{$temp_value->quantity}}</td>
+                <td>{{$temp_value->amount}}</td>
+                <td>{{$temp_value->price}}</td>
+                <td>{{$temp_value->paymentype}}</td>
             </tr>
-            @endforeach
+            <?php
+            endforeach;
+            ?>
         @endif
     </tbody>
 </table>
