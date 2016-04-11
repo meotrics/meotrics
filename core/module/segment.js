@@ -11,19 +11,61 @@ exports.SegmentExr = function (db, mongodb, converter, async, config, prefix) {
 		});
 	};
 
+	//Excute segment based on segment data
 	this.runSegment = function runSegment(segment, callback) {
-		var outcollection = prefix+ "segment" + segment._id.toString();
+		var outcollection = prefix + "segment" + segment._id.toString();
+		var col = db.collection(prefix + segment._appid);
+		console.log(prefix + segment._appid);
 		getQuery(segment.condition, function (out) {
-			db.collection(prefix+ segment._appid).mapReduce(out.map, out.reduce, {
+			col.mapReduce(out.map, out.reduce, {
 				out: outcollection,
 				query: out.option,
 				finalize: out.finalize,
-				sort: {
-					_mtid: 1
-				}
+				sort: {_mtid: 1}
 			}, function (err) {
 				if (err) throw err;
-				callback(outcollection);
+				var cursor = db.collection(outcollection).find({value: 1.0});
+				doNext();
+
+				//inject segment into user
+				var arr = []; //array of userid Object (not string)
+				function updateUser(next) {
+					var bulk = col.initializeUnorderedBulkOp();
+					for (var i in arr) if (arr.hasOwnProperty(i))
+						bulk.find({_id: arr[i]}).update({$addToSet: {_segments: segment._id}});
+
+					//clean the array first
+					arr = [];
+
+					bulk.execute(function (err, res) {
+						if (err) throw err;
+						console.log(err, res);
+						next();
+					});
+				}
+
+				// parse next document, split docs in to bunchs of 100 docs + n last docs
+				// update bunch of 100 users
+				function doNext() {
+					cursor.next(function (err, doc) {
+
+						// the last docs
+						if (null == doc) return updateUser(function () {
+							callback(outcollection);
+						});
+						arr.push(doc._id);
+
+						if (arr.length == 100) {
+							// clean the stack by calling setTimeout
+							setTimeout(function () {
+								updateUser(doNext);
+							}, 1);
+						}
+						else {
+							return doNext();
+						}
+					});
+				}
 			});
 		});
 	};
@@ -89,7 +131,7 @@ exports.SegmentExr = function (db, mongodb, converter, async, config, prefix) {
 		});
 	}
 
-	// ----------------------------------------------------
+// ----------------------------------------------------
 	function handleInput(object, callback) {
 		var counti = 0;
 		var countj = 0;
@@ -229,7 +271,6 @@ exports.SegmentExr = function (db, mongodb, converter, async, config, prefix) {
 
 			if (element.type == 'user') {
 				converter.toID('_isUser', function (r) {
-					console.log("USER");
 					if (query['$or'] != undefined) {
 						var temp = {};
 						temp[r] = true;
@@ -243,7 +284,6 @@ exports.SegmentExr = function (db, mongodb, converter, async, config, prefix) {
 				});
 			} else {
 				converter.toID('_typeid', function (r) {
-					console.log("NOT USER");
 					if (query['$or'] != undefined) {
 						var temp = {};
 						temp[r] = element.type;
@@ -264,7 +304,7 @@ exports.SegmentExr = function (db, mongodb, converter, async, config, prefix) {
 		}
 	}
 
-	//really, put conditions[i+2] to a variable, its much easier to read
+//really, put conditions[i+2] to a variable, its much easier to read
 	function translateOperator(conditions, i) {
 		var query = {};
 		switch (conditions[i + 1]) {
@@ -320,10 +360,10 @@ exports.SegmentExr = function (db, mongodb, converter, async, config, prefix) {
 		return query;
 	}
 
-	//purpose: build a piece of map function
-	//example: buildMapChunk({actiontype: "pageview", conditions: [{f: "count", field: "pid", operator: ">", value: 5, conditions: ["amount", ">", 5, "and", "price", "=", "dd"]})
-	//return: string contains compiled javascript code
-	//param: i=index of condition, for iteration purpose, condition=see example
+//purpose: build a piece of map function
+//example: buildMapChunk({actiontype: "pageview", conditions: [{f: "count", field: "pid", operator: ">", value: 5, conditions: ["amount", ">", 5, "and", "price", "=", "dd"]})
+//return: string contains compiled javascript code
+//param: i=index of condition, for iteration purpose, condition=see example
 	function buildChunk(ind, element, _typeid, element_field) {
 		//var reducecondcode = "";
 		var reduceinitcode = "";
@@ -379,10 +419,10 @@ exports.SegmentExr = function (db, mongodb, converter, async, config, prefix) {
 		};
 	}
 
-	//purpose: build a javascript map function from a json query
-	//example: buildMapFunction(testJson)
-	//return: string contains compiled javascript code
-	//param: query=see testJson
+//purpose: build a javascript map function from a json query
+//example: buildMapFunction(testJson)
+//return: string contains compiled javascript code
+//param: query=see testJson
 	function buildMapReduce(query, callback) {
 		var mapfunccode = "";
 		var reducecondcode = "";
@@ -437,4 +477,5 @@ exports.SegmentExr = function (db, mongodb, converter, async, config, prefix) {
 				});
 		});
 	}
-};
+}
+;
