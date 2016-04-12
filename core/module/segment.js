@@ -15,7 +15,6 @@ exports.SegmentExr = function (db, mongodb, converter, async, config, prefix) {
 	this.runSegment = function runSegment(segment, callback) {
 		var outcollection = prefix + "segment" + segment._id.toString();
 		var col = db.collection(prefix + segment._appid);
-		console.log(prefix + segment._appid);
 		getQuery(segment.condition, function (out) {
 			col.mapReduce(out.map, out.reduce, {
 				out: outcollection,
@@ -27,19 +26,19 @@ exports.SegmentExr = function (db, mongodb, converter, async, config, prefix) {
 				var cursor = db.collection(outcollection).find({value: 1.0});
 				doNext();
 
-				//inject segment into user
+				// inject segment into user
 				var arr = []; //array of userid Object (not string)
 				function updateUser(next) {
 					var bulk = col.initializeUnorderedBulkOp();
 					for (var i in arr) if (arr.hasOwnProperty(i))
 						bulk.find({_id: arr[i]}).update({$addToSet: {_segments: segment._id}});
 
-					//clean the array first
+					// clean the array first
 					arr = [];
 
 					bulk.execute(function (err, res) {
 						if (err) throw err;
-						console.log(err, res);
+						//console.log(err, res);
 						next();
 					});
 				}
@@ -184,7 +183,6 @@ exports.SegmentExr = function (db, mongodb, converter, async, config, prefix) {
 	}
 
 	function queryFilter(object, callback) {
-
 		var length = object.length;
 		var query = {};
 
