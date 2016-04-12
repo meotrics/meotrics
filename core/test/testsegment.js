@@ -1,6 +1,4 @@
 var SegmentExr = require('../module/segment.js').SegmentExr;
-
-
 var MongoClient = require('mongodb').MongoClient;
 var config = require('config');
 var async = require('async');
@@ -25,7 +23,7 @@ MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get(
 	}];
 
 	var segment = {
-		_id: 123,
+		_id: new mongodb.ObjectId('123456789012345678012345'),
 		condition: testJson2,
 		_appid: process.argv[2]
 	};
