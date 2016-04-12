@@ -2,7 +2,6 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 	var me = this;
 	this.queryRaw = function (appid, trid, callback) {
 		var collection = prefix + col;
-		var results = [];
 		db.collection(collection).find({_id: new mongodb.ObjectID(trid)}, {_id: 0}).limit(1).next(function (err, trenddoc) {
 			if (err) throw err;
 			getQueryTrending(trenddoc, converter, function (query) {
@@ -41,20 +40,20 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 			match['$match'][ids["_typeid"]] = object.typeid;
 			// -- START MATCH CLAUSE
 			query.push(match);
-			if (object._segment != undefined) {
+			if (object._segment !== undefined) {
 				match[ids['_segments']] = {
 					'$in': [object._segment]
 				};
 			}
 
-			if (object.startTime != undefined) {
+			if (object.startTime !== undefined) {
 				match[ids['_ctime']] = {
 					$gte: object.startTime
 				};
 			}
 
-			if (object.endTime != undefined) {
-				if (match[ids['_ctime']] != undefined) {
+			if (object.endTime !== undefined) {
+				if (match[ids['_ctime']] !== undefined) {
 					match[ids['_ctime']]['$lte'] = object.endTime;
 				} else {
 					match[ids['_ctime']] = {
@@ -68,8 +67,8 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 			object.order = object.order || 1;
 
 			if (object.operation == 'count') {
-				query.push({$group: {_id: '$' + object.object, count: {'$sum': 1}, temp: {$first: "$$ROOT"}}});
-				query.push({$sort: {count: object.order}});
+				query.push({$group: {_id: '$' + object.object, result: {'$sum': 1}, temp: {$first: "$$ROOT"}}});
+				query.push({$sort: {result: object.order}});
 
 				object.limit = object.limit || 10;
 				query.push({$limit: object.limit});
