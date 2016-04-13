@@ -36,9 +36,31 @@ MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get(
 						console.log(JSON.stringify(ret));
 						console.timeEnd('gb5');
 
-						process.exit(0);
-					});
+						console.time('gb6');
+						seg.groupby(process.argv[2], "123456789012345678012345", "age", "number", 'gender', 'string', function (ret) {
+							console.log(JSON.stringify(ret));
+							console.timeEnd('gb6');
 
+							console.time('gb7');
+							seg.groupby(process.argv[2], "123456789012345678012345", "age", "number", 'height', 'number', function (ret) {
+								console.log(JSON.stringify(ret));
+								console.timeEnd('gb7');
+
+								console.time('gb8');
+								seg.groupby(process.argv[2], "123456789012345678012345", "gender", "string", 'height', 'number', function (ret) {
+									console.log(JSON.stringify(ret));
+									console.timeEnd('gb8');
+
+									console.time('gb9');
+									seg.groupby(process.argv[2], "123456789012345678012345", "age", "number", '_os', 'string', function ( ret) {
+										console.log(JSON.stringify(ret));
+										console.timeEnd('gb9');
+										process.exit(0);
+									});
+								});
+							});
+						});
+					});
 				});
 			});
 		});
