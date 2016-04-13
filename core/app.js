@@ -34,9 +34,19 @@ function route(app, com) {
 	app.get('/trend/query/:appid/:id', trendMgr.query);
 
 	// CRUD segment
-	app.postEx('/segment/:appid', segCRUD.create);
+	app.postEx('/segment/:appid', function (req, res) {
+		segCRUD.create(req, res, function (id) {
+			com.segMgr.excuteSegment(id);
+		});
+	});
+
 	app.getEx('/segment/:appid', segCRUD.list);
-	app.getEx('/segment/:appid/:id', segCRUD.match);
+	app.getEx('/segment/:appid/:id', function (req, res) {
+		segCRUD.match(req, res, function () {
+			com.segMgr.excuteSegment(req.params.id);
+		});
+	});
+
 	app.putEx('/segment/:appid/:id', segCRUD.update);
 	app.deleteEx('/segment/:appid/:id', segCRUD.delete);
 
@@ -77,15 +87,13 @@ function route(app, com) {
 		});
 	});
 
-
-	//update or create a segment
-	// app.post('segment', function (req, res) {
-	// 	segmgr.create(req.params, function () {
-	// 		res.sstatus(200).end();
-	// 	});
-	// })
+	//update or
+	app.get('segment/query/:appid/:id/:field1/:field2', function (req, res) {
+		com.segMgr.querySegment(req.params.appid, req.params.id, req.params.field1, req.param.field2, function (results) {
+			res.json(results);
+		});
+	});
 }
-
 function buildconnstr(config) {
 	var host = config.get("mongod.host") || "127.0.0.1";
 	var port = config.get("mongod.port") || 27017;
@@ -121,6 +129,7 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 	var ActionMgr = require('./module/actionmgr.js').ActionMgr;
 	var PropMgr = require('./module/propmgr.js').PropMgr;
 	var AppMgr = require('./module/appmgr.js').AppMgr;
+	var SegMgr = require('./module/segment.js').SegmentExr;
 
 	var async = require('async');
 	var component = {};
@@ -133,6 +142,7 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 	component.appmgr = new AppMgr(db, mongodb, async, converter, prefix, component.typeCrud, component.segCrud);
 	component.propCrud = new CRUD(db, mongodb, async, converter, prefix, "userprop");
 	component.camCrud = new CRUD(db, mongodb, async, converter, prefix, "campaign");
+	component.segMgr = new SegMgr(db, mongodb, async, converter, prefix);
 
 	//routing http
 	route(app, component);

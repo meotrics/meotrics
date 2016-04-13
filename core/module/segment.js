@@ -1,41 +1,86 @@
-"use strict";
-
-exports.SegmentExr = function(db, mongodb, converter, async, config) {
+exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 	var me = this;
-	this.excuteSegment = function(appid, segmentid, callback) {
-		var prefix = config.get('mongod.prefix');
-		db.collection(prefix + 'segments').find({
-			_id: new mongodb.ObjectID(segmentid)
-		}).toArray(function(err, result) {
-			if (err) throw err;
-			var segment = result[0].query;
-			console.log(segment);
-			runSegment(segment, callback);
-		});
-	}
+	var segRet = new require('../segmentresult.js').SegmentResult(db, mongodb, converter, async, prefix);
 
+	this.querySegment = function (appid, segmentid, field1, field2, callback) {
+		var type1 = 'string', type2 = 'string';
+		var numberfieldarr = ['age', 'height'];
+
+		if (numberfieldarr.indexOf(field1) !== -1) type1 = 'number';
+		if (numberfieldarr.indexOf(field2) !== -1) type2 = 'number';
+		segRet.groupby(appid, segmentid, field1, type1, field2, type2, callback);
+	};
+
+	//Excute a segment based on segmentid
+	this.excuteSegment = function (segmentid, callback) {
+		db.collection(prefix + 'segments').find({_id: new mongodb.ObjectID(segmentid)}).toArray(function (err, segment) {
+			if (err) throw err;
+			runSegment(segment[0], callback);
+		});
+	};
+
+	//Excute segment based on segment data
 	this.runSegment = function runSegment(segment, callback) {
-		var outcollection = config.get('mongod.prefix') + "segment" + segment._id.toString();
-		getQuery(segment.query, function(out) {
-			console.log(out.map, out.reduce, out.finalize, out.query)
-			db.collection(config.get('mongod.prefix') + segment.appid).mapReduce(out.map, out.reduce, {
+		var outcollection = prefix + "segment" + segment._id.toString();
+		var col = db.collection(prefix + segment._appid);
+		getQuery(segment.condition, function (out) {
+			col.mapReduce(out.map, out.reduce, {
 				out: outcollection,
 				query: out.option,
 				finalize: out.finalize,
-				sort: {
-					_mtid: 1
+				sort: {_mtid: 1}
+			}, function (err) {
+				if (err) throw err;
+				var cursor = db.collection(outcollection).find({value: 1.0});
+				doNext();
+
+				// inject segment into user
+				var arr = []; //array of userid Object (not string)
+				function updateUser(next) {
+					var bulk = col.initializeUnorderedBulkOp();
+					for (var i in arr) if (arr.hasOwnProperty(i))
+						bulk.find({_id: arr[i]}).update({$addToSet: {_segments: segment._id}});
+
+					// clean the array first
+					arr = [];
+
+					bulk.execute(function (err, res) {
+						if (err) throw err;
+						//console.log(err, res);
+						next();
+					});
 				}
-			}, function(err) {
-			//	if(err) throw err;
-				callback(outcollection);
+
+				// parse next document, split docs in to bunchs of 100 docs + n last docs
+				// update bunch of 100 users
+				function doNext() {
+					cursor.next(function (err, doc) {
+
+						// the last docs
+						if (null == doc) return updateUser(function () {
+							callback(outcollection);
+						});
+						arr.push(doc._id);
+
+						if (arr.length == 100) {
+							// clean the stack by calling setTimeout
+							setTimeout(function () {
+								updateUser(doNext);
+							}, 1);
+						}
+						else {
+							return doNext();
+						}
+					});
+				}
 			});
 		});
 	};
 
 	function getQuery(json, callback) {
-		handleInput(json, function(r) {
-			queryFilter(r, function(r) {
-				buildMapReduce(json, function(ret) {
+		handleInput(json, function (r) {
+			queryFilter(r, function (r) {
+				buildMapReduce(json, function (ret) {
 					ret.option = r;
 					callback(ret);
 				});
@@ -46,71 +91,54 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 	function updateDB(actionC, reduceC, segmentID, callback) {
 		var _mtid = '';
 		var _segments = '';
-		converter.toIDs(['_mtid', '_segments'], function(ids) {
+		converter.toIDs(['_mtid', '_segments'], function (ids) {
 			_mtid = ids['_mtid'];
 			_segments = ids['_segments'];
 
-			var cursor = db.collection(reduceC).find({
-				isIn: true
-			}, {
-				_id: 1
-			}).batchSize(100);
+			var cursor = db.collection(reduceC).find({isIn: true}, {_id: 1}).batchSize(100);
 			var _mtids = [];
 			var done = false;
 
-			async.whilst(function() {
+			async.whilst(function () {
 				return done == false;
-			}, function(callback) {
-				cursor.next(function(err, r) {
+			}, function (callback) {
+				cursor.next(function (err, r) {
 					if (err) return callback(err);
 
+					var query = {};
+					var update = {
+						'$addToSet': {}
+					};
 					if (r) {
 						_mtids.push(r._id);
 						if (_mtids.length == 100) {
-							var query = {};
-							var update = {
-								'$addToSet': {}
-							};
+
 							query[_mtid] = {
 								'$in': _mtids
 							};
 							update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
 							db.collection(actionC).updateMany(query, update);
-							db.collection(actionC).updateMany({
-								_id: {
-									'$in': _mtids
-								}
-							}, update);
+							db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
 							_mtids = [];
 						}
 					} else {
 						if (_mtids.length != 0) {
-							var query = {};
-							var update = {
-								'$addToSet': {}
-							};
 							query[_mtid] = {
 								'$in': _mtids
 							};
 							update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
 							db.collection(actionC).updateMany(query, update);
-							db.collection(actionC).updateMany({
-								_id: {
-									'$in': _mtids
-								}
-							}, update);
+							db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
 						}
 						done = true;
 					}
 					callback(null);
 				});
-			}, function(err) {
-				callback(err);
-			});
+			}, callback);
 		});
 	}
 
-	// ----------------------------------------------------
+// ----------------------------------------------------
 	function handleInput(object, callback) {
 		var counti = 0;
 		var countj = 0;
@@ -122,7 +150,7 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 				if (object[i].conditions != undefined) {
 					for (let j = 0; j < object[i].conditions.length; j += 4) {
 						countj++;
-						converter.toID(object[i].conditions[j], function(r) {
+						converter.toID(object[i].conditions[j], function (r) {
 							object[i].conditions[j] = r;
 							countj--;
 							if (counti == 0 && countj == 0) {
@@ -137,13 +165,13 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 					callback(object);
 				}
 			} else {
-				converter.toID(object[i].field, function(r) {
+				converter.toID(object[i].field, function (r) {
 					counti--;
 					object[i].field = r;
 					if (object[i].conditions != undefined) {
 						for (let j = 0; j < object[i].conditions.length; j += 4) {
 							countj++;
-							converter.toID(object[i].conditions[j], function(r) {
+							converter.toID(object[i].conditions[j], function (r) {
 								object[i].conditions[j] = r;
 								countj--;
 								if (counti == 0 && countj == 0) {
@@ -163,7 +191,6 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 	}
 
 	function queryFilter(object, callback) {
-
 		var length = object.length;
 		var query = {};
 
@@ -172,7 +199,7 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 			let c = 0;
 			for (let i = 0; i < length; i += 2) {
 				c++;
-				conditionToQuery(object[i], function(r) {
+				conditionToQuery(object[i], function (r) {
 					query['$or'].push(r);
 					c--;
 					if (c == 0) {
@@ -187,7 +214,7 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 						if (hasUser) {
 							callback(query);
 						} else {
-							converter.toID('_isUser', function(r) {
+							converter.toID('_isUser', function (r) {
 								var temp = {};
 								temp[r] = true;
 								query['$or'].push(temp);
@@ -249,8 +276,7 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 			}
 
 			if (element.type == 'user') {
-				converter.toID('_isUser', function(r) {
-					console.log("USER");
+				converter.toID('_isUser', function (r) {
 					if (query['$or'] != undefined) {
 						var temp = {};
 						temp[r] = true;
@@ -263,8 +289,7 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 					callback(query);
 				});
 			} else {
-				converter.toID('_typeid', function(r) {
-					console.log("NOT USER");
+				converter.toID('_typeid', function (r) {
 					if (query['$or'] != undefined) {
 						var temp = {};
 						temp[r] = element.type;
@@ -272,20 +297,20 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 							'$and': [temp, query]
 						};
 					} else {
-						query[r] =  element.type;
+						query[r] = element.type;
 					}
 					callback(query);
 				});
 			}
 		} else {
-			converter.toID('_typeid', function(r) {
+			converter.toID('_typeid', function (r) {
 				query[r] = element.type;
 				callback(query);
 			});
 		}
 	}
 
-	//really, put conditions[i+2] to a variable, its much easier to read
+//really, put conditions[i+2] to a variable, its much easier to read
 	function translateOperator(conditions, i) {
 		var query = {};
 		switch (conditions[i + 1]) {
@@ -341,11 +366,10 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 		return query;
 	}
 
-
-	//purpose: build a piece of map function
-	//example: buildMapChunk({actiontype: "pageview", conditions: [{f: "count", field: "pid", operator: ">", value: 5, conditions: ["amount", ">", 5, "and", "price", "=", "dd"]})
-	//return: string contains compiled javascript code
-	//param: i=index of condition, for iteration purpose, condition=see example
+//purpose: build a piece of map function
+//example: buildMapChunk({actiontype: "pageview", conditions: [{f: "count", field: "pid", operator: ">", value: 5, conditions: ["amount", ">", 5, "and", "price", "=", "dd"]})
+//return: string contains compiled javascript code
+//param: i=index of condition, for iteration purpose, condition=see example
 	function buildChunk(ind, element, _typeid, element_field) {
 		//var reducecondcode = "";
 		var reduceinitcode = "";
@@ -401,12 +425,11 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 		};
 	}
 
-	//purpose: build a javascript map function from a json query
-	//example: buildMapFunction(testJson)
-	//return: string contains compiled javascript code
-	//param: query=see testJson
+//purpose: build a javascript map function from a json query
+//example: buildMapFunction(testJson)
+//return: string contains compiled javascript code
+//param: query=see testJson
 	function buildMapReduce(query, callback) {
-
 		var mapfunccode = "";
 		var reducecondcode = "";
 		var reduceinitcode = "";
@@ -423,7 +446,7 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 		zipfield = zipfield.concat(['_isUser', '_segments', '_id', '_mtid', '_typeid']);
 
 		i = 0;
-		converter.toIDs(zipfield, function(ids) {
+		converter.toIDs(zipfield, function (ids) {
 			while (i < query.length) {
 				if (i % 2 == 0) {
 					//ignore user type
@@ -435,7 +458,7 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 					var tmpcode = buildChunk(i / 2, query[i], ids._typeid, ids[query[i].field]);
 					mapfunccode += tmpcode.mapcode;
 					reduceinitcode += tmpcode.reduceinitcode;
-					reducecondcode += tmpcode.reducecondcode;
+					//reducecondcode += tmpcode.reducecondcode;
 					reduceaggcode += tmpcode.reduceaggcode;
 					finalizecode += tmpcode.finalizecode;
 					finalizeinitcode += tmpcode.finalizeinitcode;
@@ -444,14 +467,14 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 					if (joinop === 'and') joinop = '&&';
 					else if (joinop === 'or') joinop = '||';
 					else throw "wrong join operator: " + joinop;
-					reducecondcode += joinop;
+					//reducecondcode += joinop;
 				}
 				i++;
 			}
 			var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true){userid=this["' + ids._mtid + '"];value._hasUser=true;}else{userid=this["' + ids._mtid + '"];';
 			mapfunccode = mapinitcode + mapfunccode + "}emit(userid,value);}";
 			var reducefunccode = "function(key,values){var returnObject={};" + reduceinitcode + "for(var i in values){var value=values[i];if(value._hasUser!==undefined)returnObject._hasUser=true;" + reduceaggcode + "};return returnObject;}";
-			finalizecode = 'function(key, value){' + finalizeinitcode +'return' + finalizecode + '&&value._hasUser?1:0}';
+			finalizecode = 'function(key, value){' + finalizeinitcode + 'return' + finalizecode + '&&value._hasUser?1:0}';
 			if (callback !== undefined)
 				callback({
 					map: mapfunccode,
@@ -461,3 +484,4 @@ exports.SegmentExr = function(db, mongodb, converter, async, config) {
 		});
 	}
 }
+;

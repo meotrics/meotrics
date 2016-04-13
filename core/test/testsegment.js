@@ -1,6 +1,4 @@
 var SegmentExr = require('../module/segment.js').SegmentExr;
-
-
 var MongoClient = require('mongodb').MongoClient;
 var config = require('config');
 var async = require('async');
@@ -12,7 +10,7 @@ converter = new converter.IdManager();
 
 MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get('mongod.port') + '/' + config.get('mongod.database'), function(err, db) {
 	if (err) throw err;
-	var seg = new SegmentExr(db, mongodb, converter, async, config);
+	var seg = new SegmentExr(db, mongodb, async, converter, config, config.get('mongod.prefix'));
 
 
 	var testJson2 = [{
@@ -25,10 +23,10 @@ MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get(
 	}];
 
 	var segment = {
-		_id: 123,
-		query: testJson2,
-		appid: process.argv[2]
-	}
+		_id: new mongodb.ObjectId('123456789012345678012345'),
+		condition: testJson2,
+		_appid: process.argv[2]
+	};
 
 	console.time('mr');
 	seg.runSegment(segment, function(out) {
@@ -37,3 +35,5 @@ MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get(
 	});
 
 });
+
+//testsegment <appid>
