@@ -172,117 +172,74 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 	function numbernumber(collection, segmentid, field1, field2, callback) {
 
 		converter.toIDs(['_isUser', '_segments', field1, field2], function (ids) {
-			var maxfield1;
-			var minfield1;
-			var maxfield2;
-			var minfield2;
+			// build match clause
+			var matchClause = getMatchClause(ids, segmentid);
 
-			var query = {};
-			var sort = {};
-			query[ids['_isUser']] = true;
-			sort[ids[field1]] = -1;
-			db.collection(collection).find(query).sort(sort).limit(1).toArray().then(function (r) {
-				maxfield1 = r[0][ids[field1]];
-				sort[ids[field1]] = 1;
-				return db.collection(collection).find(query).sort(sort).limit(1).toArray();
-			}).then(function (r) {
-				minfield1 = r[0][ids[field1]];
-				if ((typeof minfield1 == typeof maxfield1) && (typeof minfield1 == 'number')) {
-					sort = {};
-					sort[ids[field2]] = -1;
-					db.collection(collection).find(query).sort(sort).limit(1).toArray().then(function (r) {
-						maxfield2 = r[0][ids[field2]];
-						sort[ids[field2]] = 1;
-						return db.collection(collection).find(query).sort(sort).limit(1).toArray();
-					}).then(function (r) {
-						minfield2 = r[0][ids[field2]];
-
-						if ((typeof minfield2 == typeof maxfield2) && (typeof minfield2 == 'number')) {
-							var matchClause = {"$match": {}};
-							matchClause['$match'][ids['_isUser']] = true;
-							//matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segmentid);
-
-							var results1 = range(minfield1, maxfield1, field1);
-
-							var prefix1 = "prefix1_";
-							var projectClause1 = projectRange(results1, field1, prefix1);
-
-
-							var results2 = range(minfield2, maxfield2, field2);
-							var prefix2 = "prefix2_";
-							var projectClause2 = projectRange(results2, field2, prefix2);
-
-							delete projectClause2["$project"]["_id"];
-							var keys = Object.keys(projectClause2["$project"]);
-							for (var i = 0; i < keys.length; i++) {
-								projectClause1["$project"][keys[i]] = projectClause2["$project"][keys[i]];
-							}
-
-							var projectClause = projectClause1;
-
-							var spaces1 = results1.length;
-							var spaces2 = results2.length;
-
-							var groupClause1 = {"$group": {}};
-							var temp = {};
-							for (var i = 0; i < spaces1; i++) {
-								temp[prefix1 + i] = "$" + prefix1 + i
-							}
-							//console.log(temp);
-							groupClause1["$group"]["_id"] = temp;
-
-							for (var i = 0; i < spaces2; i++) {
-								groupClause1["$group"][prefix2 + i] = {"$sum": "$" + prefix2 + i};
-							}
-
-							groupClause1["$group"]["count"] = {"$sum": 1};
-
-							var cursor = db.collection(collection).aggregate([
-								matchClause,
-								projectClause,
-								groupClause1
-							], {
-								cursor: {batchSize: 20},
-								allowDiskUse: true
-							}).toArray().then(function (r) {
-								var results = [];
-
-								for (var i = 0; i < r.length; i++) {
-									for (var j = 0; j < spaces1; j++) {
-										if (r[i]["_id"][prefix1 + j] == 1) {
-
-											results[j] = {};
-											results[j].key = results1[j].key;
-											results[j].count = r[i].count;
-											results[j].values = [];
-											for (var k = 0; k < spaces2; k++) {
-												results[j].values[k] = {};
-												results[j].values[k].key = results2[k].key;
-												results[j].values[k].count = r[i][prefix2 + k];
-											}
-											break;
-										}
-									}
-								}
-								for (var i = 0; i < spaces1; i++) {
-									if (results[i] == null) {
-										results[i] = {};
-										results[i].key = results1[i].key;
-										results[i].count = results1[i].count;
-									}
-								}
-								callback(null, results);
-							}).catch(function (e) {
-								callback(e);
-							});
-
-						} else {
-							callback(new Error('Type data is wrong'));
-						}
-					});
-				} else {
-					callback(new Error('Type data is wrong'));
+			//build min max group
+			var mmgroupclause = {
+				$group: {
+					_id: "$" + ids._isUser,
+					min1: {$min: "$" + ids[field1]},
+					max1: {$max: "$" + ids[field1]},
+					min2: {$min: "$" + ids[field2]},
+					max2: {$max: "$" + ids[field2]}
 				}
+			};
+
+			//find min, max
+			db.collection(collection).aggregate([matchClause, mmgroupclause]).toArray(function (err, minmax) {
+				//build range and project clause
+				var maxfield1 = parseFloat(minmax[0].max1);
+				var minfield1 = parseFloat(minmax[0].min1);
+				var maxfield2 = parseFloat(minmax[0].max2);
+				var minfield2 = parseFloat(minmax[0].min2);
+				var results1 = range(minfield1, maxfield1, field1);
+				var prefix1 = "prefix1_";
+				var projectClause = projectRange(results1, field1, prefix1);
+				var results2 = range(minfield2, maxfield2, field2);
+				var prefix2 = "prefix2_";
+				var projectClause2 = projectRange(results2, field2, prefix2);
+				delete projectClause2.$project._id;
+				var keys = Object.keys(projectClause2.$project);
+				for (var i = 0; i < keys.length; i++) {
+					projectClause.$project[keys[i]] = projectClause2.$project[keys[i]];
+				}
+
+				var spaces1 = results1.length;
+				var spaces2 = results2.length;
+				var groupClause1 = {$group: {}};
+				var temp = {};
+				for (var i = 0; i < spaces1; i++) {
+					temp[prefix1 + i] = "$" + prefix1 + i
+				}
+				groupClause1.$group._id = temp;
+
+				for (var i = 0; i < spaces2; i++) {
+					groupClause1.$group[prefix2 + i] = {$sum: "$" + prefix2 + i};
+				}
+				groupClause1.$group.count = {$sum: 1};
+
+				db.collection(collection).aggregate([matchClause, projectClause, groupClause1]).toArray(function (err, r) {
+					if (err) throw err;
+					var results = [];
+
+					for (var i = 0; i < r.length; i++) {
+						for (var j = 0; j < spaces1; j++) {
+							if (r[i]["_id"][prefix1 + j] == 1) {
+								results[j] = {key: results1[j].key, count: r[i].count};
+								results[j].values = [];
+								for (var k = 0; k < spaces2; k++)
+									results[j].values[k] = {key: results2[k].key, count: r[i][prefix2 + k]};
+								break;
+							}
+						}
+					}
+					for (var i = 0; i < spaces1; i++)
+						if (results[i] == null)
+							results[i] = {key: results1[i].key, count: results1[i].count};
+
+					callback(results);
+				});
 			});
 		});
 	}
