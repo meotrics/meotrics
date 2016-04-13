@@ -82,7 +82,7 @@ function generateName() {
 function randomNumber(a,b)
 {
 	if(b == undefined) {
-		b = a - 1;
+		b = a;
 		a = 0;
 	}
 	var delta = b - a + 1;
@@ -92,8 +92,8 @@ function randomNumber(a,b)
 var h = [];
 function generateNumber(a,b)
 {
-	var delta = b - a;
-	if(h.length == 0)
+	var delta = b - a + 1;
+	if(h.length == 0 || h.length < delta)
 	{
 		//init hash
 		
