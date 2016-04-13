@@ -255,7 +255,21 @@ exports.IdManager = function () {
 		return p;
 	};
 
-	this.toObject = function (object) {
+	this.toObject = function (object, callback) {
+		if(callback !== undefined)
+		{
+			var arrprop = [];
+			for (var i in object) if(object.hasOwnProperty(i)) {
+				arrprop.push(i);
+			}
+
+			me.toIDs(arrprop, function(newobj)
+			{
+				callback(newobj);
+			});
+			return;
+		}
+
 		var sucback;
 		var errback;
 		var p = new Promise(function (resolve, reject) {

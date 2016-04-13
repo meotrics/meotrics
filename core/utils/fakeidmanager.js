@@ -67,7 +67,11 @@ exports.IdManager = function () {
 		return p;
 	};
 
-	this.toObject = function (object) {
+	this.toObject = function (object, callback) {
+		if(callback !== undefined)
+		{
+			return callback(object);
+		}
 		var sucback;
 		var errback;
 		var p = new Promise(function (resolve, reject) {
