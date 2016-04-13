@@ -1,220 +1,297 @@
-@extends('../layout/master')
 
-@section('style')
-  <style>
-    #segment_index select{
-      width: auto;
-      min-width: 150px;
-    }
-    #segment_index .selections > div > *{
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 5px;
-    }
-    #segment_index .selections label, #segment_index .segment_filters label{
-      width: 16.66666667%;
-    }
-    #addition_filter{
-      margin-right: 0px;
-    }
-    #addition_filter .filter_wrapper{
-      margin-bottom: 5px;
-    }
-    #addition_filter .filter_wrapper > * {
-      width: auto;
-      display: inline-block;
-      margin-right: 10px;
-    }
-    #addition_filter .condition_value input{
-      display: inline-block;
-      vertical-align: middle;
-      width: auto;
-    }
-    #addition_filter .condition_value input.string{
-      width: 200px;
-    }
-    #addition_filter .condition_value input.range{
-      width: 98px;
-    }
-    #addition_filter .remove-btn{
-      padding: 10px;
-    }
-    .form-group{
-      overflow: auto;
-    }
-  </style>
+@extends('../layout/master')
+@section('script')
+<script type="text/javascript">
+var conditions = [];
+var type_options = [];
+<?php
+$type_options = [];
+if($props && is_array($props)):
+    foreach ($props as $prop):
+        $type_options[] = (object)[
+            'value' => $prop->code,
+            'name' => $prop->name,
+            'select_type' => 'user',
+        ];
+?>
+    var operators = [];
+    <?php
+    foreach($prop->operators as $tmp_operator):
+    ?>
+    operators.push({
+        code: '<?= $tmp_operator->code ?>',
+        name: '<?= $tmp_operator->name ?>',
+    });
+    <?php
+    endforeach;
+    ?>
+    var tmp_type_option = {
+        value: '<?= $prop->code ? $prop->code:'' ?>',
+        name: '<?= $prop->code ? $prop->name:'' ?>',
+        operators: operators,
+        select_type: 'user',
+    };
+    type_options.push(tmp_type_option)  ;  
+<?php
+    endforeach;
+endif;
+$type_options[] = (object)[
+    'value' => '[disabled]',
+    'name' => 'OR SELECT',
+    'select_type' => '',
+];
+?>
+type_options.push({
+    value: '[disabled]',
+    name: 'OR SELECT',
+    select_type: '',
+});
+<?php
+if($actions && is_array($actions)):
+    foreach ($actions as $action):
+        $type_options[] = (object)[
+            'value' => $action->codename,
+            'name' => 'Has done '.$action->name,
+            'select_type' => 'behavior',
+        ];
+?>
+    var fields = [];
+    <?php
+    if($action->fields):
+    foreach($action->fields as $tmp_field):
+    ?>
+    fields.push({
+        pcode: '<?= $tmp_field->pcode ?>',
+        pname: "<?= $tmp_field->pname ?>",
+    });
+    <?php
+    endforeach;
+    endif;
+    ?>
+    var tmp_type_option = {
+        value: '<?= $action->codename ? $action->codename:'' ?>',
+        name: '<?= $action->name ? $action->name:'' ?>',
+        fields: fields,
+        select_type: 'behavior',
+    };
+    type_options.push(tmp_type_option)  ;  
+<?php
+    endforeach;
+endif;
+$f_behaviors = [
+    (object)['code' => 'sum', 'name' =>'Sum'],
+    (object)['code' => 'avg', 'name' =>'Avg'],
+    (object)['code' => 'count', 'name' =>'Count']
+]
+?>
+    var f_behavior = [
+        {code: 'sum', name: 'Sum'},
+        {code: 'avg', name: 'Avg'},
+        {code: 'count', name: 'Count'},
+    ];
+    var operator_behavior = [
+        {code: '>', name: '>'},
+        {code: '>=', name: '>='},
+        {code: '=', name: '='},
+        {code: '<', name: '<'},
+        {code: '<=', name: '<='},
+    ];
+</script>
 @endsection
 
-@section('script')
-  <script src="{{asset('js/cs.segmentop.js')}}"></script>
-  <script src="{{asset('js/cs.segment.query.js')}}"></script>
-  <script>
-
-    $(document).ready(function(){
-
-      var actions  = {!! json_encode($actions)  !!};
-      var props    = {!! json_encode($props)    !!};
-
-      var additionFilterElement = $('#addition_filter')
-
-      var dispatchChangeEvent = function(el){
-        // Dispatch change event
-        var evt = document.createEvent('HTMLEvents');
-        evt.initEvent('change', false, true);
-        el.dispatchEvent(evt);
-      }
-      var onSelectSegment = function(){
-        console.log('onSegment selected !');
-      }
-      var appendAdditionFilter = function(){
-        // Filter type selection
-        var wrapper = document.createElement('div');
-        wrapper.setAttribute('class', 'filter_wrapper');
-        var filterType = document.createElement('select');
-        filterType.setAttribute('class', 'filter_type form-control');
-        filterType.addEventListener('change', function(ev){
-          // Refresh filter operators
-          var typeCode = $(this).val();
-          var type = _.find(props, function(prop){ return prop.code == typeCode });
-          $(this).next().empty(); // Clear current options
-          for(var i = 0; i < type.operators.length; i++){
-            var op = document.createElement('option');
-            op.setAttribute('value', type.operators[i].code);
-            op.innerHTML = type.operators[i].name;
-            $(this).next().append(op);
-          }
-          dispatchChangeEvent($(this).next()[0]);
-        });
-        for(var i = 0; i < props.length; i++){
-          var option = document.createElement('option');
-          option.setAttribute('value', props[i].code);
-          option.innerHTML = props[i].name;
-          filterType.appendChild(option);
-        }
-        wrapper.appendChild(filterType);
-        // Filter Operator selection
-        var filterOperator = document.createElement('select');
-        filterOperator.setAttribute('class', 'filter_operator form-control');
-        filterOperator.addEventListener('change', function(ev){
-          // Refresh operator input
-          var typeCode = $(this).prev().val();
-          var type = _.find(props, function(prop){ return prop.code == typeCode });
-          var operatorCode = $(this).val();
-          var conditionValue = $(this).next();
-          if(conditionValue.length > 0) conditionValue.remove(); // Remove old element
-          conditionValue = document.createElement('div');
-          conditionValue.setAttribute('class', 'condition_value');
-          if(operatorCode == 'in'){
-            // Range
-            conditionValue.innerHTML = '\
-              <input class="form-control range" name="fromValue" placeholder="From">\
-              <input class="form-control range" name="toValue"  placeholder="To">\
-            ';
-          } else {
-            // String
-            conditionValue.innerHTML = '<input class="form-control string" name="conditionValue">';
-          }
-          $(this).parent().append(conditionValue);
-        })
-        wrapper.appendChild(filterOperator);
-        additionFilterElement.append(wrapper);
-        // Remove filter button
-        var filterRemoveBtn = document.createElement('a');
-        filterRemoveBtn.setAttribute('href', 'javascript:void(0)');
-        filterRemoveBtn.setAttribute('class', 'remove-btn');
-        filterRemoveBtn.innerHTML = '<i class="fa fa-trash"></i>';
-        filterRemoveBtn.addEventListener('click', function(ev){
-          $(wrapper).remove();
-        });
-        wrapper.insertBefore(filterRemoveBtn, filterType);
-
-        dispatchChangeEvent(filterType);
-      }
-      var removeAdditionFilter = function(){
-
-      }
-
-      appendAdditionFilter();
-      window.appendAdditionFilter = appendAdditionFilter;
-    })
-
-    // var sq;
-    // var data = [];
-
-    // for (var i in actions) {
-    //  var action = actions[i];
-    //  var fis = [];
-    //  for (var f in action.fields)
-    //    fis.push({name: action.fields[f].pname, code: action.fields[f].pcode});
-
-    //  data.push({type: 'action', id: action._id, name: action.name, fields: fis});
-    // }
-
-    // for (var i in props) {
-    //  var prop = props[i];
-    //  data.push({type: 'prop', name: prop.name, dpname: prop.dpname});
-    // }
-
-    // onPageLoad(function () {
-    //  sq = new SegmentQuery();
-
-    //  sq.produce(function ($query) {
-    //    $('.id_query').append($query);
-
-    //  }, data);
-    // });
-
-
-    // $('.id_exebtn').click(function () {
-    //  $(this).attr('disabled', true);
-
-
-    //  var $field1 = $('.id_field1-43');
-    //  var $field2 = $('.id_field1-54');
-
-    //  $.get('/segment/execute', {
-    //    id: -1,
-    //    name: 'Draf',
-    //    query: sq.query(),
-    //    f1: $field1.val(),
-    //    f2: $field2.val()
-    //  }, function (data) {
-    //    console.log(data);
-    //  });
-
-    // });
-
-
-  </script>
+@section('style')
+    <link rel="stylesheet" href="{{asset('css/select2.min.css')}}"/>
 @endsection
 
 @section('content')
-  <div class="card row" id="segment_create">
-    <div class="content col-sm-12">
-      <div class="form-group selections">
-        <label class="text-muted uppercase"><b>Create new segment</b></label>
-        <a href="{{ URL::to('/segment') }}" class="pull-right uppercase text-muted">
-          <b><i class="fa fa-chevron-left"></i> Back</b>
-        </a>
-      </div>
-      <div class="form-group segment_filters">
-        <label class="text-muted uppercase col-lg-2"><b>Filter</b></label>
-        <div class="col-lg-10" id="addition_filter">
-          <!-- Segment addition filter -->
-        </div>
-      </div>
-      <div class="form-group segment_filters">
-        <label class="text-muted uppercase col-lg-2"><b></b></label>
-        <div class="col-lg-10" id="addition_filter">
-          <a class="" href="javascript:void(0);" onclick="appendAdditionFilter()">+ Add filter</a>
-        </div>
-      </div>
-      <div class="form-group segment_buttons">
-        <label class="text-muted uppercase col-lg-2">
-          <button class="btn btn-fill btn-primary">Excute</button>
-        </label>
-      </div>
+<div class="card row">
+    <div class="header col-md-12">
+        <form class="form-horizontal form-segment" method="post" action="{{URL::to('trend/write')}}">
+            <?php
+            foreach($conditions as $condition):
+            ?>
+            <div class="form-group col-md-12">
+                <!--<label class="col-md-2" style="margin-top: 10px">List top</label>-->
+                <div class="col-md-{{$condition->select_type == 'user' ? 4 : 2 }}">
+                    <select class="form-control" id="" name="Segment[type][]" onchange="typeChange(this)">
+                        <?php
+                        foreach ($type_options as $type_option):
+                        ?>
+                        <option value="{{$type_option->value}}" 
+                            <?= $type_option->value == $condition->type ? 'selected=""' : '' ?> 
+                            <?= $type_option->value == '[disabled]' ? 'disabled' : ''?> 
+                            data-select-type="<?= $type_option->select_type ?>"    >
+                            {{$type_option->name}}
+                        </option>
+                        <?php
+                        endforeach;
+                        ?>
+                    </select>
+                </div>
+                <div class="col-md-2" <?= $condition->select_type == 'user' ? 'style="display: none"' : '' ?>>
+                    <select class="form-control" id="" name="Segment[f][]" value="{{$condition->f}}">
+                        <?php
+                        foreach($f_behaviors as $f_behavior):
+                        ?>
+                        <option value="{{$f_behavior->code}}">{{$f_behavior->name}}</option>
+                        <?php
+                        endforeach;
+                        ?>
+                    </select>
+                </div>
+                <div class="col-md-2" <?= $condition->select_type == 'user' ? 'style="display: none"' : '' ?>>
+                    <select class="form-control" id="" name="Segment[field][]" value="{{$condition->field}}">
+                        <?php
+                        foreach ($condition->fields as $c_field):
+                        ?>
+                        <option value="{{$c_field->pcode}}">{{$c_field->pname}}</option>
+                        <?php
+                        endforeach;
+                        ?>
+                    </select>
+                </div>
+                <div class="col-md-{{$condition->select_type == 'user' ? 4 : 2 }}">
+                    <select class="form-control" id="" name="Segment[operator][]">
+                        <?php
+                        if(property_exists($condition, 'operators')){
+                            $operators = $condition->operators;
+                        }
+                        foreach ($operators as $operator):
+                        ?>
+                        <option value="{{$operator->code}}" <?= $operator->code == $condition->operator ? 'selected=""' : '' ?>>
+                            {{$operator->name}}
+                        </option>
+                        <?php
+                        endforeach;
+                        ?>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control " name="Segment[value][]" required="" value="{{$condition->value}}"/>
+                </div>
+                <div class="col-md-1 col-add-filter add">
+                    <a class="" href="javascript:void(0);" onclick="addFilter(this)">+ Add</a>
+                </div>
+                <div class="col-md-1 col-add-filter delete">
+                    <a class="" href="javascript:void(0);" onclick="deleteFilter(this)">- Del</a>
+                </div>
+            </div>
+            <?php
+            endforeach;
+            ?>
+            <div class="row">
+                <div class="col-sm-push-2 col-sm-2">
+                    <button type="submit" class="btn btn-success btn-fill ">
+                        <i class="pe-7s-diskette mr5" style="font-size:19px; vertical-align: middle"></i>
+                        <span class="" style="vertical-align: middle">Create</span>
+                    </button>
+                </div>
+
+            </div>
+        </form>
     </div>
-  </div>
+</div>
+@endsection
+
+@section('additional')
+<script src="{{asset('js/select2.min.js')}}"></script>
+<script type="text/javascript">
+//    $('select').select2();
+    
+    // change type
+    $('select[name="Segment[type][]"]').on('change', function(){
+        var that = $(this);
+        
+        
+        
+//        $.ajax({
+//            type: 'GET',
+//            dataType: 'JSON',
+//            url: '{{ URL::to('segment/htmlcondition') }}',
+//            data: {
+//                'type': that.val(),
+//                'select_type': that.find(':selected').attr('data-select-type'),
+//            },
+//            success: function(data){
+//                if(data.success && data.html_condition_item){
+//                    that.parent().parent().html(data.html_condition_item);
+//                    //$('#outputs_table').html(data.html_outputs);
+//                }
+//            },
+//        });
+//        return false;
+    });
+    
+    function typeChange(e){
+        var that = $(e);
+        var containter = that.parent().parent();
+        $.each(type_options, function(i,v){
+            if(v.value == that.val()){
+                if(v.select_type == 'user'){
+                    containter.find('select[name="Segment[operator][]"]').html('');
+                    containter.find('select[name="Segment[operator][]"]').parent().removeClass('col-md-2');
+                    containter.find('select[name="Segment[operator][]"]').parent().addClass('col-md-4');
+                    containter.find('select[name="Segment[type][]"]').parent().removeClass('col-md-2');
+                    containter.find('select[name="Segment[type][]"]').parent().addClass('col-md-4');
+                    containter.find('select[name="Segment[f][]"]').parent().hide();
+                    containter.find('select[name="Segment[field][]"]').parent().hide();
+                    if(v.operators.length){
+                        $.each(v.operators, function(oi, ov){
+                            containter.find('select[name="Segment[operator][]"]').append('<option value="'+ov.code+'">'+ov.name+'</option>');
+                        });
+                    }
+                }
+                else{
+                    containter.find('select[name="Segment[operator][]"]').parent().removeClass('col-md-4');
+                    containter.find('select[name="Segment[operator][]"]').parent().addClass('col-md-2');
+                    containter.find('select[name="Segment[type][]"]').parent().removeClass('col-md-4');
+                    containter.find('select[name="Segment[type][]"]').parent().addClass('col-md-2');
+                    containter.find('select[name="Segment[f][]"]').parent().show();
+                    containter.find('select[name="Segment[field][]"]').parent().show();
+                    containter.find('select[name="Segment[operator][]"]').html('');
+                    
+                    $.each(operator_behavior, function(obi, obv){
+                        containter.find('select[name="Segment[operator][]"]').append('<option value="'+obv.code+'">'+obv.name+'</option>');
+                    });
+                    $.each(f_behavior, function(fi, fv){
+                        containter.find('select[name="Segment[f][]"]').append('<option value="'+fv.code+'">'+fv.name+'</option>');
+                    });
+                    if(v.fields.length){
+                        $.each(v.fields, function(fieldi, fieldv){
+                            $('select[name="Segment[field][]"]').append('<option value="'+fieldv.pcode+'">'+fieldv.pname+'</option>');
+                        });
+                    }
+                }
+                containter.find('input[name="Segment[value][]"]').val('');
+            }
+        });
+    }
+    
+    function addFilter(e){
+        var that = $(e).parent().parent();
+        var clone = that.clone();
+        clone.find('select[name="Segment[type][]"]').val(that.find('select[name="Segment[type][]"]').val());
+        clone.find('input[name="Segment[value][]"]').val('');
+        that.after(clone);
+        checkDisableDelete();
+    };
+    
+    function deleteFilter(e){
+        var that = $(e).parent().parent();
+        that.remove();
+        checkDisableDelete();
+    };
+    
+    function checkDisableDelete(){
+        var count = $('.add').length;
+        if(count == 1){
+            $('.delete').hide();
+        }
+        else{
+            $('.delete').show();
+        }
+    }
+    checkDisableDelete();
+</script>
 @endsection
 
