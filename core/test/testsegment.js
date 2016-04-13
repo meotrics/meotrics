@@ -10,7 +10,7 @@ converter = new converter.IdManager();
 
 MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get('mongod.port') + '/' + config.get('mongod.database'), function(err, db) {
 	if (err) throw err;
-	var seg = new SegmentExr(db, mongodb, converter, async, config, config.get('mongod.prefix'));
+	var seg = new SegmentExr(db, mongodb, async, converter, config, config.get('mongod.prefix'));
 
 
 	var testJson2 = [{

@@ -1,13 +1,21 @@
-"use strict";
-
-exports.SegmentExr = function (db, mongodb, converter, async, config, prefix) {
+exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 	var me = this;
+	var segRet = new require('../segmentresult.js').SegmentResult(db, mongodb, converter, async, prefix);
+
+	this.querySegment = function (appid, segmentid, field1, field2, callback) {
+		var type1 = 'string', type2 = 'string';
+		var numberfieldarr = ['age', 'height'];
+
+		if (numberfieldarr.indexOf(field1) !== -1) type1 = 'number';
+		if (numberfieldarr.indexOf(field2) !== -1) type2 = 'number';
+		segRet.groupby(appid, segmentid, field1, type1, field2, type2, callback);
+	};
 
 	//Excute a segment based on segmentid
 	this.excuteSegment = function (segmentid, callback) {
 		db.collection(prefix + 'segments').find({_id: new mongodb.ObjectID(segmentid)}).toArray(function (err, segment) {
 			if (err) throw err;
-			runSegment(segment, callback);
+			runSegment(segment[0], callback);
 		});
 	};
 
