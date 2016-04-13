@@ -17,6 +17,16 @@ MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get(
 		console.log(ret);
 		console.timeEnd('gb');
 	});
+
+	seg.groupby(process.argv[2],"123456789012345678012345","_os","string", undefined, undefined,function(ret){
+		console.log(ret);
+		console.timeEnd('gb');
+	});
+
+	seg.groupby(process.argv[2],"123456789012345678012345","height","number", undefined, undefined,function(ret){
+		console.log(ret);
+		console.timeEnd('gb');
+	});
 });
 
 //testsegmentresult <appid>
