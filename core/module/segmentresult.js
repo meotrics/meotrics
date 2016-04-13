@@ -361,7 +361,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 			mustbeuser[ids._isUser] = true;
 			matchClause['$match']['$and'].push(mustbeuser);
 			var mustbeinsegment = {};
-			mustbeinsegment[ids._segments] = {$in: [new mongodb.ObjectId(segmentid)]};
+			mustbeinsegment[ids._segments] = {$elemMatch: {$eq: new mongodb.ObjectId(segmentid)}};
 			matchClause['$match']['$and'].push(mustbeinsegment);
 
 			//build project clause
@@ -374,11 +374,9 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 			groupClause.$group._id = '$' + ids[field1];
 			groupClause.$group.count = {'$sum': 1};
 
-			var cursor = db.collection(collection).aggregate([matchClause, projectClause, groupClause], {
-				cursor: {batchSize: 20},
-				allowDiskUse: true
-			});
+			var cursor = db.collection(collection).aggregate([matchClause, projectClause, groupClause]);
 
+			// handle result
 			var results = [];
 			doNext();
 			function doNext(){
@@ -390,6 +388,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 					element.key = doc._id;
 					element.count = doc.count;
 					results.push(element);
+					doNext();
 				});
 			}
 		});
