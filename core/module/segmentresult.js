@@ -4,36 +4,21 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 	me.groupby = function (appid, segmentid, field1, type1, field2, type2, callback) {
 		var collection = prefix + appid;
 		if (field2 == undefined) {
-			if ((type1 == 'string') || (type1 == 'array')) {
-				oneFieldString(collection, segmentid, field1, function (results) {
-					callback(results);
-				});
-			} else {
-				oneFieldNumber(collection, segmentid, field1, function (err, results) {
-					callback(err, results);
-				});
-			}
+			if ((type1 == 'string') || (type1 == 'array'))
+				oneFieldString(collection, segmentid, field1, callback);
+			else
+				oneFieldNumber(collection, segmentid, field1, callback);
 		} else {
 			if (type1 == 'string' && type2 == 'string') {
-				stringstring(collection, segmentid, field1, field2, function (err, results) {
-					callback(err, results);
-				});
+				stringstring(collection, segmentid, field1, field2, callback);
 			} else {
-				if (type1 == 'number') {
-					if (type2 == 'number') {
-						numbernumber(collection, segmentid, field1, field2, function (err, results) {
-							callback(err, results);
-						});
-					} else {
-						numberstring(collection, segmentid, field1, field2, function (err, results) {
-							callback(err, results);
-						});
-					}
-				} else {
-					stringnumber(collection, segmentid, field1, field2, function (err, results) {
-						callback(err, results);
-					});
-				}
+				if (type1 == 'number')
+					if (type2 == 'number')
+						numbernumber(collection, segmentid, field1, field2, callback);
+					else
+						numberstring(collection, segmentid, field1, field2, callback);
+				else
+					stringnumber(collection, segmentid, field1, field2, callback);
 			}
 		}
 	};
@@ -304,109 +289,96 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 
 	function stringstring(collection, segmentid, field1, field2, callback) {
 		converter.toIDs(['_isUser', '_segments', field1, field2], function (ids) {
-			var matchClause = {"$match": {}};
-			matchClause['$match'][ids['_isUser']] = true;
-			//matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segmentid);
+			var matchClause = getMatchClause(ids, segmentid);
 
-			var projectClause = {"$project": {}};
-			projectClause['$project']['_id'] = 0;
-			projectClause['$project'][ids[field1]] = 1;
-			projectClause['$project'][ids[field2]] = 1;
+			// build project clause
+			var projectClause = {$project: {_id: 0}};
+			projectClause.$project[ids[field1]] = 1;
+			projectClause.$project[ids[field2]] = 1;
 
-			var groupClause1 = {"$group": {}};
-			groupClause1["$group"]["_id"] = {
-				"field1": "$" + field1,
-				"field2": "$" + field2
-			};
-			groupClause1["$group"]["count"] = {"$sum": 1};
-
-			var groupClause2 = {"$group": {}};
-			groupClause2["$group"]["_id"] = "$_id.field1";
-
-			groupClause2["$group"]["values"] = {
-				"$push": {
-					"key": "$_id.field2",
-					"count": "$count"
+			var groupClause1 = {
+				$group: {
+					_id: {
+						field1: "$" + ids[field1],
+						field2: "$" + ids[field2]
+					},
+					count: {$sum: 1}
 				}
-			}
-			groupClause2["$group"]["count"] = {"$sum": "$count"};
+			};
 
-			var cursor = db.collection(collection).aggregate([
-				matchClause,
-				projectClause,
-				groupClause1,
-				groupClause2
-			], {
-				cursor: {batchSize: 20},
-				allowDiskUse: true
-			}).toArray().then(function (r) {
-				callback(null, r);
-			}).catch(function (e) {
-				callback(e);
+			var groupClause2 = {
+				$group: {
+					_id: "$_id.field1",
+					count: {$sum: '$count'},
+					values: {
+						$push: {
+							key: "$_id.field2",
+							count: '$count'
+						}
+					}
+				}
+			};
+
+			db.collection(collection).aggregate([matchClause, projectClause, groupClause1, groupClause2]).toArray(function (err, docs) {
+				if (err) throw err;
+				for (var i in docs) if (docs.hasOwnProperty(i)) {
+					docs[i].key = docs[i]._id;
+					delete docs[i]._id;
+				}
+				callback(docs);
 			});
 		});
 	}
 
+	// purpose: build match clause of user in a segment
+	function getMatchClause(ids, segmentid) {
+		var matchClause = {$match: {$and: []}};
+
+		// must be a user condition
+		var mustbeuser = {};
+		mustbeuser[ids._isUser] = true;
+		matchClause.$match.$and.push(mustbeuser);
+
+		// must be in the segmetn condition
+		var mustbeinsegment = {};
+		mustbeinsegment[ids._segments] = {$elemMatch: {$eq: new mongodb.ObjectId(segmentid)}};
+		matchClause.$match.$and.push(mustbeinsegment);
+
+		return matchClause;
+	}
+
 	function oneFieldString(collection, segmentid, field1, callback) {
 		converter.toIDs(['_isUser', '_segments', field1], function (ids) {
-
 			//build match clause
-			var matchClause = {
-				"$match": {
-					"$and": []
-				}
-			};
-			var mustbeuser = {};
-			mustbeuser[ids._isUser] = true;
-			matchClause['$match']['$and'].push(mustbeuser);
-			var mustbeinsegment = {};
-			mustbeinsegment[ids._segments] = {$elemMatch: {$eq: new mongodb.ObjectId(segmentid)}};
-			matchClause['$match']['$and'].push(mustbeinsegment);
+			var matchClause = getMatchClause(ids, segmentid);
 
 			//build project clause
-			var projectClause = {"$project": {}};
-			projectClause.$project._id = 0;
+			var projectClause = {$project: {_id: 0}};
 			projectClause.$project[ids[field1]] = 1;
 
-			//build group clause
-			var groupClause = {"$group": {}};
-			groupClause.$group._id = '$' + ids[field1];
-			groupClause.$group.count = {'$sum': 1};
-
-			var cursor = db.collection(collection).aggregate([matchClause, projectClause, groupClause]);
-
-			// handle result
-			var results = [];
-			doNext();
-			function doNext() {
-				cursor.next(function (err, doc) {
-					if (doc === null)
-						return callback(results);
-
-					var element = {};
-					element.key = doc._id;
-					element.count = doc.count;
-					results.push(element);
-					doNext();
-				});
-			}
+			var groupClause = {
+				$group: {
+					_id: '$' + ids[field1],
+					count: {
+						$sum: 1
+					}
+				}
+			};
+			var cursor = db.collection(collection).aggregate([matchClause, projectClause, groupClause]).toArray(function (err, docs) {
+				if (err) throw err;
+				for (var i in docs) if (docs.hasOwnProperty(i)) {
+					docs[i].key = docs[i]._id;
+					delete docs[i]._id;
+				}
+				callback(docs);
+			});
 		});
 	}
 
 	function oneFieldNumber(collection, segmentid, field1, callback) {
 		converter.toIDs(['_isUser', '_segments', field1], function (ids) {
 			// build match clause
-			var matchClause = {
-				$match: {
-					$and: []
-				}
-			};
-			var mustbeuser = {};
-			mustbeuser[ids._isUser] = true;
-			matchClause.$match.$and.push(mustbeuser);
-			var mustbeinsegment = {};
-			mustbeinsegment[ids._segments] = {$elemMatch: {$eq: new mongodb.ObjectId(segmentid)}};
-			matchClause.$match.$and.push(mustbeinsegment);
+			var matchClause = getMatchClause(ids, segmentid);
 
 			//build min max group
 			var mmgroupclause = {
@@ -429,8 +401,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 				var projectClause = projectRange(results, field1, prefix);
 
 				// build group clause
-				var groupClause = {'$group': {}};
-				groupClause.$group._id = null;
+				var groupClause = {'$group': {_id: null}};
 
 				var length = results.length;
 				for (var i = 0; i < length; i++) {
@@ -458,46 +429,12 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 		var results = [];
 		//if field is age then split into [18, 24, 24, 44, 54, 54+]
 		if (field == 'age') {
-			results[0] = {
-				count: 0,
-				key: {
-					to: 18
-				}
-			};
-			results[1] = {
-				count: 0,
-				key: {
-					from: 18,
-					to: 24
-				}
-			};
-			results[2] = {
-				count: 0,
-				key: {
-					from: 24,
-					to: 34
-				}
-			};
-			results[3] = {
-				count: 0,
-				key: {
-					from: 34,
-					to: 44
-				}
-			};
-			results[4] = {
-				count: 0,
-				key: {
-					from: 44,
-					to: 54
-				}
-			};
-			results[5] = {
-				count: 0,
-				key: {
-					from: 54
-				}
-			};
+			results[0] = {count: 0, key: {to: 18}};
+			results[1] = {count: 0, key: {from: 18, to: 24}};
+			results[2] = {count: 0, key: {from: 24, to: 34}};
+			results[3] = {count: 0, key: {from: 34, to: 44}};
+			results[4] = {count: 0, key: {from: 44, to: 54}};
+			results[5] = {count: 0, key: {from: 54}};
 		} else {
 			//else split in to 5 equal space using min, max
 			var spaces = 1;
@@ -557,5 +494,4 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 		}
 		return projectClause;
 	}
-
 };
