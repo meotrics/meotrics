@@ -1,4 +1,3 @@
-
 exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 	var me = this;
 
@@ -7,7 +6,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 		if (field2 == undefined) {
 			if ((type1 == 'string') || (type1 == 'array')) {
 				oneFieldString(collection, segmentid, field1, function (results) {
-					callback( results);
+					callback(results);
 				});
 			} else {
 				oneFieldNumber(collection, segmentid, field1, function (err, results) {
@@ -379,9 +378,9 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 			// handle result
 			var results = [];
 			doNext();
-			function doNext(){
-				cursor.next(function(err, doc){
-					if(doc === null)
+			function doNext() {
+				cursor.next(function (err, doc) {
+					if (doc === null)
 						return callback(results);
 
 					var element = {};
@@ -396,63 +395,59 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 
 	function oneFieldNumber(collection, segmentid, field1, callback) {
 		converter.toIDs(['_isUser', '_segments', field1], function (ids) {
-			var maxfield1;
-			var minfield1;
-
-			var query = {};
-			var sort = {};
-			query[ids['_isUser']] = true;
-
-			sort[ids[field1]] = -1;
-			db.collection(collection).find(query).sort(sort).limit(1).toArray().then(function (r) {
-				maxfield1 = r[0][ids[field1]];
-				sort[ids[field1]] = 1;
-				return db.collection(collection).find(query).sort(sort).limit(1).toArray();
-			}).then(function (r) {
-				minfield1 = r[0][ids[field1]];
-
-				if ((typeof minfield1 == typeof maxfield1) && (typeof minfield1 == 'number')) {
-					var matchClause = {"$match": {}};
-					matchClause['$match'][ids['_isUser']] = true;
-					//matchClause['$match'][ids['_segments']] = new mongodb.ObjectID(segmentid);
-
-					var results = range(minfield1, maxfield1, field1);
-
-					var prefix = "range_"
-					var projectClause = projectRange(results, field1, prefix);
-
-					var groupClause = {'$group': {}};
-					groupClause['$group']['_id'] = null;
-					var length = results.length;
-
-					for (var i = 0; i < length; i++) {
-						var fieldName = "range_" + i;
-						groupClause['$group'][fieldName] = {'$sum': '$' + fieldName};
-					}
-
-					var cursor = db.collection(collection).aggregate([
-						matchClause,
-						projectClause,
-						groupClause
-					], {
-						cursor: {batchSize: 20},
-						allowDiskUse: true
-					}).toArray().then(function (r) {
-						var temp = r[0];
-						console.log(temp);
-						for (var i = 0; i < length; i++) {
-							var fileName = prefix + i;
-							results[i].count = temp[fileName];
-						}
-						callback(null, results);
-					}).catch(function (e) {
-						callback(e);
-					});
-
-
-				} else {
-					callback(new Error('Type data is wrong'));
+			// build match clause
+			var matchClause = {
+				$match: {
+					$and: []
 				}
+			};
+			var mustbeuser = {};
+			mustbeuser[ids._isUser] = true;
+			matchClause.$match.$and.push(mustbeuser);
+			var mustbeinsegment = {};
+			mustbeinsegment[ids._segments] = {$elemMatch: {$eq: new mongodb.ObjectId(segmentid)}};
+			matchClause.$match.$and.push(mustbeinsegment);
+
+			//build min max group
+			var mmgroupclause = {
+				$group: {
+					_id: "$" + ids._isUser,
+					min: {$min: "$" + ids[field1]},
+					max: {$max: "$" + ids[field1]}
+				}
+			};
+
+			//find min, max
+			db.collection(collection).aggregate([matchClause, mmgroupclause]).toArray(function (err, minmax) {
+				if (err)throw err;
+				var max = parseFloat(minmax[0].max);
+				var min = parseFloat(minmax[0].min);
+				var prefix = "range_";
+
+				// make the range in project clause
+				var results = range(min, max, field1);
+				var projectClause = projectRange(results, field1, prefix);
+
+				// build group clause
+				var groupClause = {'$group': {}};
+				groupClause.$group._id = null;
+
+				var length = results.length;
+				for (var i = 0; i < length; i++) {
+					var fieldName = prefix + i;
+					groupClause.$group[fieldName] = {$sum: '$' + fieldName};
+				}
+
+				db.collection(collection).aggregate([matchClause, projectClause, groupClause]).toArray(function (err, r) {
+					if (err) throw err;
+					var temp = r[0];
+					for (var i = 0; i < length; i++) {
+						var fieldName = prefix + i;
+						results[i].count = temp[fieldName];
+					}
+					callback(results);
+				});
+
 			});
 		});
 	}
@@ -531,48 +526,36 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 
 // purpose: get project clause from field and value domains
 // output: a mongodb project clause
+	// params:
+	// + domains: list of domain
+	// + field: string contains name of field
 	function projectRange(domains, field, prefix) {
-		var projectClause = {'$project': {}};
-		var length = domains.length;
+		var projectClause = {$project: {}};
+		projectClause.$project._id = 0;
 
-		projectClause['$project']['_id'] = 0;
-		for (var i = 0; i < length; i++) {
+		for (var i = 0; i < domains.length; i++) {
 			var temp = domains[i];
 			var fieldName = prefix + i;
 			var element = {'$cond': []};
-			var booleanExpression = {};
-			if (temp.key.from != undefined) {
-				booleanExpression['$gt'] = [];
-				booleanExpression['$gt'].push('$' + field);
-				booleanExpression['$gt'].push(temp.key.from);
+			var boolexp = {};
+
+			if (temp.key.from !== undefined) {
+				boolexp.$gt = ['$' + field, temp.key.from];
 				if (i == 0) {
-					booleanExpression['$gte'] = booleanExpression['$gt'];
-					delete booleanExpression['$gt'];
+					boolexp.$gte = boolexp.$gt;
+					delete boolexp.$gt;
 				}
 			}
 
-			if (temp.key.to != undefined) {
-				var bool2 = {};
-				bool2['$lte'] = [];
-				bool2['$lte'].push('$' + field);
-				bool2['$lte'].push(temp.key.to);
-
-				if ((booleanExpression['$gt'] != undefined) || (booleanExpression['$gte'] != undefined)) {
-					var bool1 = booleanExpression;
-					booleanExpression = {"$and": []};
-					booleanExpression["$and"].push(bool1);
-					booleanExpression["$and"].push(bool2);
-				} else {
-					booleanExpression = bool2;
-				}
+			if (temp.key.to !== undefined) {
+				var bool2 = {$lte: ['$' + field, temp.key.to]};
+				boolexp = boolexp.$gt == undefined && boolexp.$gte == undefined ? boolexp = bool2 : {$and: [boolexp, bool2]};
 			}
 
-			element['$cond'].push(booleanExpression);
-			element['$cond'].push(1);
-			element['$cond'].push(0);
-			projectClause['$project'][fieldName] = element;
+			element.$cond.push(boolexp, 1, 0);
+			projectClause.$project[fieldName] = element;
 		}
 		return projectClause;
 	}
 
-}
+};
