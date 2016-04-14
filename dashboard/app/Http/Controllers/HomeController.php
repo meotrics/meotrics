@@ -12,6 +12,7 @@ use UAParser\Parser;
 class HomeController extends Controller
 {
 	private static $code;
+	private $parser;
 
 	private function loadCode($appid = null)
 	{
@@ -25,7 +26,6 @@ class HomeController extends Controller
 		if ($appid != null) {
 			$code = str_replace('$APPID$', $appid, $code);
 		}
-
 		return $code;
 	}
 
@@ -44,24 +44,6 @@ class HomeController extends Controller
 			return redirect('auth/login');
 	}
 
-	public function pageView(Request $request)
-	{
-		$appid = $request->input('_appid');
-		$req = $this->trackBasic($request);
-		$req['_type'] = 'pageview';
-		MtHttp::post('r/' . $appid, json_encode($req));
-		return;
-	}
-
-	public function pageQuit(Request $request)
-	{
-		$appid = $request->input('_appid');
-		$req = $this->trackBasic($request);
-		$req['_type'] = 'pageview';
-		MtHttp::post('r/' . $appid, json_encode($req));
-		return;
-	}
-
 	private function getRemoteIPAddress(Request $request)
 	{
 		if (null != $request->ip()) return $request->ip();
@@ -75,8 +57,8 @@ class HomeController extends Controller
 		$screenres = $request->input('_screenres', '');
 		$referrer = $request->input('_referrer', '');
 		$ip = $this->getRemoteIPAddress($request);
-
-		$type = $request->input('_type');
+		$deltat = $request->input('_deltat', 0);
+		$type = $request->input('_typeid');
 
 		//browser, platform
 		$uas = $request->header('User-Agent');
@@ -93,55 +75,49 @@ class HomeController extends Controller
 
 		//copy all $input prop that dont startwith _ into $data
 		$input = $request->all();
-		$data = [];
+
+		$req = [
+			'_typeid' => $type,
+			'_ip' => $ip,
+			'_browserid' => $ua->ua->family,
+			'_browserversion' => $ua->ua->major . "." . $ua->os->minor,
+			'_osid' => $ua->os->family,
+			'_osversion' => $ua->os->major . '.' . $ua->os->minor,
+			'_deviceid' => $ua->device->family,
+			'_devicetype' => $devicetype,
+			'_referrer' => $referrer,
+			'_screenres' => $screenres,
+			'_url' => $request->server('HTTP_REFERER'),
+			'_language' => $request->server('HTTP_ACCEPT_LANGUAGE'),
+			'_deltat' => $deltat
+		];
+
 		foreach ($input as $k => $v) {
 			if (substr($k, 0, 1) != '_')
-				$data[$k] = $v;
+				$req[$k] = $v;
 		}
-
-
-		//get mtid
-		$mtid = $request->input('_mtid');
-		if ($mtid == null) $mtid = $request->cookie('mtid');
-		if ($mtid == null) throw new Exception("mtid is wrong");
-
-		$userid = $request->input('_userid');
-
-		return [
-			'type' => $type,
-			'ip' => $ip,
-			'browserid' => $ua->ua->family,
-			'browserversion' => $ua->ua->major . "." . $ua->os->minor,
-			'osid' => $ua->os->family,
-			'osversion' => $ua->os->major . '.' . $ua->os->minor,
-			'deviceid' => $ua->device->family,
-			'devicetype' => $devicetype,
-			'referrer' => $referrer,
-			'data' => $data,
-			'screenres' => $screenres,
-			'url' => $request->server('HTTP_REFERER'),
-			'language' => $request->server('HTTP_ACCEPT_LANGUAGE'),
-			'time' => Carbon::now()->toIso8601String(),
-			'mtid' => $request->cookie('mtid'),
-			'userid' => $userid
-		];
+		return $req;
 	}
 
 	public function track(Request $request, $appid)
 	{
+		$response = new Response();
 		$req = $this->trackBasic($request);
-		MtHttp::post('r/' . $appid, json_encode($req));
-		return $req;
-	}
-
-	private function userSetUp()
-	{
-
+		$req['_mtid'] = $this->getMtid($request, $appid, $response);
+		MtHttp::post('r/' . $appid, $req);
+		return $response;
 	}
 
 	public function code(Request $request, $appid)
 	{
 		$res = new Response($this->loadCode($appid));
+
+		// record an pageview
+		$req = $this->trackBasic($request);
+		$req['_mtid'] = $this->getMtid($request, $appid, $res);
+		$req['_typeid'] = 'pageview';
+		MtHttp::post('r/' . $appid, $req);
+
 		$res->header('Content-Type', 'application/javascript');
 		return $res;
 	}
@@ -161,7 +137,7 @@ class HomeController extends Controller
 	{
 		$response = new Response();
 		$input = $request->input('_userid');
-		$mtid = getMtid($request, $appid, $response);
+		$mtid = $this->getMtid($request, $appid, $response);
 
 		//copy all $input prop that dont startwith _ into $data
 		$data = [];
@@ -186,6 +162,4 @@ class HomeController extends Controller
 		$response->withCookie(Cookie::forget('mtid', '/api/' . $appid));
 		return $response;
 	}
-
-
 }
