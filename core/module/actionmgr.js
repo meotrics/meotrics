@@ -30,6 +30,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		var mtid = new mongodb.ObjectID(data._mtid);
 
 		// extract campaign
+		if (data._url == null) data._url = "";
 		var query = url.parse(data._url, true).query;
 		var utm_source = query.utm_source;
 		var utm_campaign = query.utm_campaign;
@@ -50,58 +51,61 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 					console.log(r.insertedId);
 					res.status(200).end();
 				});
-			});
 
-			//get user infomation
-			db.collection(collection).find({_id: mtid}).limit(1).toArray(function (err, ret) {
-				if (err) throw err;
-				var user = ret[0];
-				var typeid = data._typeid;
-				converter.toIDs('_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_segment', '_url', '_typeid', '_referer', '_totalsec', function (ids) {
-					// increase revenue
-					var simpleprop = {};
 
-					if (typeid == 'purchase') {
-						if (user[ids._revenue] == undefined) user[ids._revenue] = 0;
-						simpleprop[ids._revenue] = user[ids._revenue] + data.amount;
-					}
+				//get user infomation
+				db.collection(collection).find({_id: mtid}).limit(1).toArray(function (err, ret) {
+					if (err) throw err;
+					var user = ret[0];
+					var typeid = data._typeid;
+					converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_segment', '_url', '_typeid', '_referer', '_totalsec'], function (ids) {
+						// increase revenue
+						var simpleprop = {};
 
-					if (typeid == 'pageview') {
-						// record campaign
-						if (utm_campaign) {
-							if (user[ids._firstcampaign] == undefined) {
-								simpleprop[ids._firstcampaign] = utm_campaign;
-							}
-
-							simpleprop[ids._lastcampaign] = utm_campaign;
-							datax[ids._campaign] = utm_campaign;
+						if (typeid == 'purchase') {
+							if (user[ids._revenue] == undefined) user[ids._revenue] = 0;
+							simpleprop[ids._revenue] = user[ids._revenue] + data.amount;
 						}
-					}
 
-					// update user
-					db.collection(collection).updateOne({_id: mtid}, {"$set": simpleprop}, function (err, r) {
-						if (err) throw err;
-						if (callback) callback();
+						if (typeid == 'pageview') {
+							// record campaign
+							if (utm_campaign) {
+								if (user[ids._firstcampaign] == undefined) {
+									simpleprop[ids._firstcampaign] = utm_campaign;
+								}
+
+								simpleprop[ids._lastcampaign] = utm_campaign;
+								datax[ids._campaign] = utm_campaign;
+							}
+						}
+
+						// update user
+						if (Object.keys(simpleprop).length != 0)
+							db.collection(collection).updateOne({_id: mtid}, {"$set": simpleprop}, function (err, r) {
+								if (err) throw err;
+								if (callback) callback();
+							});
+
+						// filter out unneeded array prop
+						var arrayprop = {};
+						for (var p in datax) if (datax.hasOwnProperty(p))
+							if (p.startsWith('_'))
+								arrayprop[p] = datax[p];
+						delete arrayprop[ids._mtid];
+						delete arrayprop[ids._ctime];
+						delete arrayprop[ids._segment];
+						delete arrayprop[ids._url];
+						delete arrayprop[ids._typeid];
+						delete arrayprop[ids._referer];
+						delete arrayprop[ids._totalsec];
+						delete arrayprop[ids._revenue];
+						delete arrayprop[ids._firstcampaign];
+						delete arrayprop[ids._lastcampaign];
+						delete arrayprop[ids._totalsec];
+
+						if (Object.keys(arrayprop).length != 0)
+							updateArrayBasedUserInfo(collection, mtid, user, arrayprop);
 					});
-
-					// filter out unneeded array prop
-					var arrayprop = {};
-					for (var p in datax) if (datax.hasOwnProperty(p))
-						if (p.startsWith('_'))
-							arrayprop[p] = datax[p];
-					delete arrayprop[ids._mtid];
-					delete arrayprop[ids._ctime];
-					delete arrayprop[ids._segment];
-					delete arrayprop[ids._url];
-					delete arrayprop[ids._typeid];
-					delete arrayprop[ids._referer];
-					delete arrayprop[ids._totalsec];
-					delete arrayprop[ids._revenue];
-					delete arrayprop[ids._firstcampaign];
-					delete arrayprop[ids._lastcampaign];
-					delete arrayprop[ids._totalsec];
-
-					updateArrayBasedUserInfo(collection, mtid, user, arrayprop);
 				});
 			});
 		});

@@ -36,9 +36,10 @@ mt.track = function (event, data, time, callback) {
 	if (!mt.ir) return mt.rq2.push(['t', event, data, new Date()]);
 	var deltat = (new Date() - time) / 1000;
 	data._referrer = document.referrer;
-	data._type = event;
+	data._typeid = event;
 	data._deltat = deltat;
 	data._screenres = navigator.availWidth + "x" + navigator.availHeight;
+
 	mt.ajax('track', data, callback);
 };
 
