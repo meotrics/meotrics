@@ -1,8 +1,4 @@
 exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
-	//CLIENT------------------------------------------------------------------------
-	var Util = require('./util');
-	var util = new Util(db, mongodb, async, converter, prefix);
-
 	var url = require('url');
 
 	// purpose: record an action
@@ -25,25 +21,18 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 	// + data1
 	// + data2
 	// + data3
-	// }
-	////
+	//
 	this.save = function (req, res, callback) {
 		var data = req.body;
-		var query = url.parse(data.url, true).query;
-
-		// extract campaign
-		var utm_source = query.utm_source;
-		var utm_campaign = query.utm_campaign;
-
-
 		var appid = req.params.appid;
-
-		var mtid = new mongodb.ObjectID(data._mtid);
-		var temp = data.user;
-		delete data.user;
 		var collection = prefix + appid;
 		var collectionmapping = prefix + mapping;
+		var mtid = new mongodb.ObjectID(data._mtid);
 
+		// extract campaign
+		var query = url.parse(data._url, true).query;
+		var utm_source = query.utm_source;
+		var utm_campaign = query.utm_campaign;
 		data._segments = [];
 
 		// correct timming
@@ -55,58 +44,75 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 			if (err) throw err;
 			if (r.length != 0) mtid = r[0].idemtid;
 
-			converter.toObject(data, function (results) {
-				db.collection(collection).insertOne(results, function (err, r) {
+			converter.toObject(data, function (datax) {
+				db.collection(collection).insertOne(datax, function (err, r) {
 					if (err) throw err;
 					console.log(r.insertedId);
 					res.status(200).end();
-					if (callback) callback();
 				});
 			});
 
 			//get user infomation
-			db.collection(collection).find({_id: data._mtid}).limit(1).toArray(function (err, ret) {
+			db.collection(collection).find({_id: mtid}).limit(1).toArray(function (err, ret) {
+				if (err) throw err;
 				var user = ret[0];
 				var typeid = data._typeid;
-				converter.toIds('_revenue', '_firstcampaign', '_lastcampaign', '_campaign', function (ids) {
+				converter.toIDs('_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_segment', '_url', '_typeid', '_referer', '_totalsec', function (ids) {
 					// increase revenue
+					var simpleprop = {};
+
 					if (typeid == 'purchase') {
 						if (user[ids._revenue] == undefined) user[ids._revenue] = 0;
-						user[ids._revenue] += data.data.amount;
+						simpleprop[ids._revenue] = user[ids._revenue] + data.amount;
 					}
 
 					if (typeid == 'pageview') {
 						// record campaign
 						if (utm_campaign) {
 							if (user[ids._firstcampaign] == undefined) {
-								user[ids._firstcampaign] = utm_campaign;
+								simpleprop[ids._firstcampaign] = utm_campaign;
 							}
 
-							user[ids._lastcampaign] = utm_campaign;
-							if (user[ids.campaign] == undefined) user[ids.campaign] = [];
-							if (user[ids.campaign].indexOf(utm_campaign) == -1)
-								user[ids.campaign] = user[ids.campaign].concat(utm_campaign).sort();
+							simpleprop[ids._lastcampaign] = utm_campaign;
+							datax[ids._campaign] = utm_campaign;
 						}
 					}
 
-					updateArrayBasedUserInfo(collection, _mtid, temp);
+					// update user
+					db.collection(collection).updateOne({_id: mtid}, {"$set": simpleprop}, function (err, r) {
+						if (err) throw err;
+						if (callback) callback();
+					});
+
+					// filter out unneeded array prop
+					var arrayprop = {};
+					for (var p in datax) if (datax.hasOwnProperty(p))
+						if (p.startsWith('_'))
+							arrayprop[p] = datax[p];
+					delete arrayprop[ids._mtid];
+					delete arrayprop[ids._ctime];
+					delete arrayprop[ids._segment];
+					delete arrayprop[ids._url];
+					delete arrayprop[ids._typeid];
+					delete arrayprop[ids._referer];
+					delete arrayprop[ids._totalsec];
+					delete arrayprop[ids._revenue];
+					delete arrayprop[ids._firstcampaign];
+					delete arrayprop[ids._lastcampaign];
+					delete arrayprop[ids._totalsec];
+
+					updateArrayBasedUserInfo(collection, mtid, user, arrayprop);
 				});
 			});
 		});
-	};
 
-	// purpose: add new data to arrays in user
-	// param:
-	// + collection: collection to query user information
-	// + mtid: mongodb.ObjectID mtid of user
-	// + data: data to be append to user
-	function updateArrayBasedUserInfo(collection, mtid, data) {
-		converter.toObject(data, function (datax) {
-			// get the user record
-			db.collection(collection).find({_id: mtid}).limit(1).toArray(function (err, r) {
-				if (err) throw err;
-				if (r.length == 0) throw "user not found mtid=" + mtid;
-				var user = r[0];
+		// purpose: add new data to arrays in user
+		// param:
+		// + collection: collection to query user information
+		// + mtid: mongodb.ObjectID mtid of user
+		// + data: data to be append to user
+		function updateArrayBasedUserInfo(collection, mtid, user, data) {
+			converter.toObject(data, function (datax) {
 
 				// append new element to the array or create one
 				var arr = [];
@@ -123,8 +129,8 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 					if (err) throw err;
 				});
 			});
-		});
-	}
+		}
+	};
 
 	// purposer: phương thức này dùng để báo cho hệ thống biết một anonymous
 	// user thực ra là một user đã tồn tại. Xem thêm ở http://pasteboard.co/1WAK4HYz.png

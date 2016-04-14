@@ -146,14 +146,22 @@ class HomeController extends Controller
 		return $res;
 	}
 
+	private function getMtid(Request $request, $appid, Response $response)
+	{
+		$mtid = $request->cookie('mtid');
+		if ($mtid == null) {
+			// get new mtid
+			$mtid = MtHttp::get('s/' . $appid);
+			$response->withCookie(cookie()->forever('mtid', $mtid, '/api/' . $appid));
+		}
+		return $mtid;
+	}
+
 	public function identify(Request $request, $appid)
 	{
+		$response = new Response();
 		$input = $request->input('_userid');
-		$mtid = $request->input('_mtid');
-
-		//get mtid
-		if ($mtid == null) $mtid = $request->cookie('mtid');
-		if ($mtid == null) throw new Exception("mtid is wrong");
+		$mtid = getMtid($request, $appid, $response);
 
 		//copy all $input prop that dont startwith _ into $data
 		$data = [];
@@ -163,14 +171,13 @@ class HomeController extends Controller
 		}
 
 		$req = [
-			'userid' => $data['userid'],
 			'mtid' => $mtid,
-			'data' => $data
+			'user' => $data
 		];
 
-		$mtid = MtHttp::post('i/' . $appid, json_encode($req));
-		$response = new Response($mtid);
-		return $response->withCookie($mtid);
+		$mtid = MtHttp::post('i/' . $appid, $req);
+		$response->setContent($mtid);
+		return $response->withCookie(cookie()->forever('mtid', $mtid, '/api/' . $appid));
 	}
 
 	public function clear(Request $request, $appid)
@@ -180,12 +187,5 @@ class HomeController extends Controller
 		return $response;
 	}
 
-	public function setup(Request $request, $appid)
-	{
-		$mtid = MtHttp::get('s/' . $appid);
-		$response = new Response($request->cookie('mtid'));
-		$response->withCookie(cookie()->forever('mtid', $mtid, '/api/' . $appid));
-		return $response;
-	}
 
 }
