@@ -5,25 +5,28 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 
 	var url = require('url');
 
-	/* Ghi nhận một action mới
-	 Tham số: {
-	 _mtid : number
-	 _typeid: number // type of action, eg: "purchase", "pageview"
-	 osid: number // os information, eg: "window", "linux",
-	 browserid : number // eg, "chrome", "firefox", "opera",
-	 locationid : number // location code, eg: Hanoi, Vietnam
-	 referer: string
-	 deviceid : number
-	 _ctime: date // created time
-	 ip: string // public ip address
-	 screenres: string // screen resolution of the device
-	 totalsec: number // total number of sec to finish the action
-	 url: string
-	 browserversion : number
-	 osversion : number
-	 _data: data
-	 }
-	 */
+	// purpose: record an action
+	// url: {appid}/r
+	// param:
+	// + _deltat: number of delayed second before request sent
+	// + _mtid : number
+	// + _typeid: string // type of action, eg: "purchase", "pageview"
+	// + _osid: number // os information, eg: "window", "linux",
+	// + _browserid : number // eg, "chrome", "firefox", "opera",
+	// + _locationid : number // location code, eg: Hanoi, Vietnam
+	// + _referer: string
+	// + _deviceid : number
+	// + _ip: string // public ip address
+	// + _screenres: string // screen resolution of the device
+	// + _totalsec: number // total number of sec to finish the action
+	// + _url: string
+	// + _browserversion : number
+	// + _osversion : number
+	// + data1
+	// + data2
+	// + data3
+	// }
+	////
 	this.save = function (req, res, callback) {
 		var data = req.body;
 		var query = url.parse(data.url, true).query;
@@ -35,25 +38,27 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 
 		var appid = req.params.appid;
 
-		var mtid = data._mtid;
+		var mtid = new mongodb.ObjectID(data._mtid);
 		var temp = data.user;
 		delete data.user;
 		var collection = prefix + appid;
 		var collectionmapping = prefix + mapping;
 
-		data._mtid = new mongodb.ObjectID(data._mtid);
 		data._segments = [];
-		// Add created time
-		data._ctime = Math.round(new Date() / 1000);
+
+		// correct timming
+		data._ctime = Math.round(new Date() / 1000) + (data._deltat ? data._deltat : 0);
+		delete data._deltat;
 
 		// retrive real mtid because user can still use old mtid
-		db.collection(collectionmapping).find({key: data._mtid}, {key: 1, value: 1}).limit(1).toArray(function (err, r) {
+		db.collection(collectionmapping).find({anomtid: mtid}).limit(1).toArray(function (err, r) {
 			if (err) throw err;
-			if (r.length != 0) data._mtid = r[0].value;
+			if (r.length != 0) mtid = r[0].idemtid;
 
 			converter.toObject(data, function (results) {
 				db.collection(collection).insertOne(results, function (err, r) {
 					if (err) throw err;
+					console.log(r.insertedId);
 					res.status(200).end();
 					if (callback) callback();
 				});
@@ -84,8 +89,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 						}
 					}
 
-					util.updateUserInf(appid, _mtid, temp);
-
+					updateArrayBasedUserInfo(collection, _mtid, temp);
 				});
 			});
 		});
