@@ -234,3 +234,8 @@ select {
 #guideline .meotrics_script textarea:focus{
 	overflow: auto;
 }
+
+.form-segment .col-add-filter{
+    text-align: right;
+    margin-top: 12px;
+}
