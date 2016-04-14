@@ -1,6 +1,7 @@
+"use strict";
 exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 	var me = this;
-	var segRet = new require('../segmentresult.js').SegmentResult(db, mongodb, converter, async, prefix);
+	var segRet = new require('./segmentresult.js').SegmentResult(db, mongodb, converter, async, prefix);
 
 	this.querySegment = function (appid, segmentid, field1, field2, callback) {
 		var type1 = 'string', type2 = 'string';
@@ -88,56 +89,6 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 		});
 	}
 
-	function updateDB(actionC, reduceC, segmentID, callback) {
-		var _mtid = '';
-		var _segments = '';
-		converter.toIDs(['_mtid', '_segments'], function (ids) {
-			_mtid = ids['_mtid'];
-			_segments = ids['_segments'];
-
-			var cursor = db.collection(reduceC).find({isIn: true}, {_id: 1}).batchSize(100);
-			var _mtids = [];
-			var done = false;
-
-			async.whilst(function () {
-				return done == false;
-			}, function (callback) {
-				cursor.next(function (err, r) {
-					if (err) return callback(err);
-
-					var query = {};
-					var update = {
-						'$addToSet': {}
-					};
-					if (r) {
-						_mtids.push(r._id);
-						if (_mtids.length == 100) {
-
-							query[_mtid] = {
-								'$in': _mtids
-							};
-							update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
-							db.collection(actionC).updateMany(query, update);
-							db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
-							_mtids = [];
-						}
-					} else {
-						if (_mtids.length != 0) {
-							query[_mtid] = {
-								'$in': _mtids
-							};
-							update['$addToSet'][_segments] = new mongodb.ObjectID(segmentID);
-							db.collection(actionC).updateMany(query, update);
-							db.collection(actionC).updateMany({_id: {'$in': _mtids}}, update);
-						}
-						done = true;
-					}
-					callback(null);
-				});
-			}, callback);
-		});
-	}
-
 // ----------------------------------------------------
 	function handleInput(object, callback) {
 		var counti = 0;
@@ -193,41 +144,34 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 	function queryFilter(object, callback) {
 		var length = object.length;
 		var query = {};
+		if (length == 0) return callback({});
 
-		if (length != 0) {
-			query['$or'] = [];
-			let c = 0;
-			for (let i = 0; i < length; i += 2) {
-				c++;
-				conditionToQuery(object[i], function (r) {
-					query['$or'].push(r);
-					c--;
-					if (c == 0) {
-						var hasUser = false;
-						for (var i = 0; i < length; i += 2) {
-							if (object[i].type == 'user') {
-								hasUser = true;
-								break;
-							}
-						}
-
-						if (hasUser) {
-							callback(query);
-						} else {
-							converter.toID('_isUser', function (r) {
-								var temp = {};
-								temp[r] = true;
-								query['$or'].push(temp);
-								callback(query);
-							});
-						}
+		query['$or'] = [];
+		let c = 0;
+		for (var i = 0; i < length; i += 2) {
+			c++;
+			conditionToQuery(object[i], function (r) {
+				query['$or'].push(r);
+				c--;
+				if (c != 0) return;
+				var hasUser = false;
+				for (var i = 0; i < length; i += 2) {
+					if (object[i].type == 'user') {
+						hasUser = true;
+						break;
 					}
-				});
-			}
-		} else {
-			callback({});
-		}
+				}
 
+				if (hasUser) return callback(query);
+
+				converter.toID('_isUser', function (r) {
+					var temp = {};
+					temp[r] = true;
+					query['$or'].push(temp);
+					callback(query);
+				});
+			});
+		}
 	}
 
 	function conditionToQuery(element, callback) {
@@ -483,5 +427,4 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 				});
 		});
 	}
-}
-;
+};
