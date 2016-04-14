@@ -1,11 +1,13 @@
 var mt = mt || {
-    appid: "<MT_APP_ID>",
-    host : '//meotrics.dev',
     track: function(event, data){
-        mt.__requestQueue.push({action: 'track', event: event, data: data, time: new Date()});
+        mt.rq.push({action: 'track', event: event, data: data, time: new Date()});
     },
     identify: function(data){
-        mt._requestQueue.push({action: 'identify', data:data});
+        mt.rq.push({action: 'identify', data:data});
+    },
+    clear: function(){
+        mt.rq.push({action: 'clear'});
     }
 };
-mt.__requestQueue = mt.__requestQueue || [];
+
+mt.rq = mt.rq || [];

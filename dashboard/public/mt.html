@@ -1,4 +1,4 @@
 <script>
-	var mt=mt||{appid:"PATSEAPPIDHERE!!",host:"//meotrics.dev",track:function(t,e){mt.__requestQueue.push({action:"track",event:t,data:e,time:new Date})},identify:function(t){mt._requestQueue.push({action:"identify",data:t})}};mt.__requestQueue=mt.__requestQueue||[];
+	var mt=mt||{track:function(t,a){mt.rq.push({action:"track",event:t,data:a,time:new Date})},identify:function(t){mt.rq.push({action:"identify",data:t})},clear:function(){mt.rq.push({action:"clear"})}};mt.rq=mt.rq||[];
 </script>
-<script src="//meotrics.com/mt.js" defer></script>);
+<script src="//meotrics.com/REPLACEWITHYOUAPPID/code" defer></script>);

@@ -1,83 +1,80 @@
 //THIS FILE IS CALLED AFTER MT.CODE IS CALLED
-if (mt == undefined) var mt = {};
-mt.__requestQueue = mt.__requestQueue || [];
-mt.appid = mt.appid || -8;
+var mt = mt || {};
+mt.host = '//meotrics.dev';
+mt.appid = "APPID";
+mt.rq2 = [];
+mt.rq = mt.rq || [];
+mt.isready = false;
 
-mt.__getCookie = function (name) {
-	var value = "; " + document.cookie;
-	var parts = value.split("; " + name + "=");
-	if (parts.length == 2) return parts.pop().split(";").shift();
-	return undefined;
-};
-
-mt.__serialize = function (obj, prefix) {
-	var str = [];
-	for (var p in obj) {
-		if (obj.hasOwnProperty(p)) {
+mt.ajax = function (url, data, callback) {
+	function serialize(obj, prefix) {
+		if (obj == undefined) return "";
+		var str = [];
+		for (var p in obj) if (obj.hasOwnProperty(p)) {
 			var k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
-			str.push(typeof v == "object" ?
-					serialize(v, k) :
-			encodeURIComponent(k) + "=" + encodeURIComponent(v));
+			str.push(typeof v == "object" ? serialize(v, k) : encodeURIComponent(k) + "=" + encodeURIComponent(v));
 		}
+		return str.join("&");
 	}
-	return str.join("&");
-};
 
-mt.__ajax = function (url, data, callback) {
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
-	script.src = mt.host + "/" + url + "?" + mt.__serialize(data);
+	script.src = mt.host  + url + "?" + serialize(data);
 	script.style.display = 'none';
-	script.onreadystatechange = callback;//for IE
-	script.onload = callback; //for other browsers
-	document.body.appendChild(script)
+	if (callback) {
+		script.onreadystatechange = callback;//for IE
+		script.onload = callback; //for other browsers
+	}
+	document.body.appendChild(script);
 };
 
-mt.identify = function (data) {
-	if (mt.__isready != true) {
-		mt.__requestQueue.push({action: 'identify', data: data});
-		return;
-	}
-	mt.__ajax('identify/' + mt.appid, data)
+mt.identify = function (data, callback) {
+	if (!mt.isready) return mt.rq2.push({action: 'identify', data: data});
+	mt.ajax('api/' + mt.appid + '/identify', data, callback)
 };
 
-mt.track = function (event, data, time) {
-	if (mt.__isready != true) {
-		mt.__requestQueue.push({action: 'track', event: event, data: data, time: new Date()});
-		return;
-	}
+mt.clear = function (callback) {
+	if (!mt.isready) return mt.rq2.push({action: 'clear'});
+	mt.ajax('api/' + mt.appid + '/clear', undefined, callback);
+};
 
+mt.track = function (event, data, time, callback) {
+	if (!mt.isready) return mt.rq2.push({action: 'track', event: event, data: data, time: new Date()});
 	var deltat = (new Date() - time) / 1000;
 	data._referrer = document.referrer;
 	data._type = event;
 	data._deltat = deltat;
 	data._screenres = navigator.availWidth + "x" + navigator.availHeight;
-	mt.__ajax('track/' + mt.appid, data);
+	mt.ajax('api/' + mt.appid + '/track', data, callback);
 };
 
-//ENTRY POINT
+mt.i = 0;
+extract();// excute delayed request in queue
 
-mt.mtid = mt.__getCookie("mtid");
-mt.__isready = false;
-if (mt.mtid === undefined) {
-	mt.__ajax('setup/' + mt.appid, undefined, function () {
-		mt.mtid = mt.__getCookie("mtid");
-		mt.__isready = true;
-		mt.__finishqueue();
-	}); //what about if we failed
-}
-else mt.__finishqueue();
-
-mt.__finishqueue = function () {
-	//finish the queue
-	for (var rq in mt.__requestQueue) if (mt.__requestQueue.hasOwnProperty(rq)) {
-		if (rq.action == 'track')
-			mt.track(rq.event, rq.data);
-		else if (rq.action == 'identify')
-			mt.identify(rq.data);
+function extract() {
+	// clean queue number 2 when out of element in queue number 1
+	if ((mt.i + 1) >= mt.rq.length) {
+		mt.i = 0;
+		cleanRequestQueue2();
 	}
-	delete mt.__requestQueue;
-};
 
+	var rq = mt.rq[mt.i];
+	mt.i++;
+	if (rq.action == 'track') mt.track(rq.event, rq.data, extract);
+	else if (rq.action == 'identify') mt.identify(rq.data, extract);
+	else if (rq.action == 'clear') mt.clear(extract);
+}
 
-
+function cleanRequestQueue2() {
+	if ((mt.i + 1) >= mt.rq2.length) { // clean the state when done
+		delete mt.rq;
+		delete mt.rq2;
+		mt.isready = true;
+		return;
+	}
+	var rq = mt.rq2[mt.i];
+	mt.i++;
+	if (rq.action == 'track') mt.track(rq.event, rq.data, cleanRequestQueue2);
+	else if (rq.action == 'identify') mt.identify(rq.data, cleanRequestQueue2);
+	else if (rq.action == 'clear') mt.clear(cleanRequestQueue2);
+}
