@@ -4,15 +4,27 @@ use App\Util\MtHttp;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 use \Mobile_Detect;
 use PhpSpec\Exception\Exception;
 use UAParser\Parser;
 
 class HomeController extends Controller
 {
+	private static $code;
+
+	private function loadCode(){
+		if( HomeController::$code == null)
+		{
+			return HomeController::$code = Storage::disk('resouce')->get('mt.js');
+		}
+		return HomeController::$code;
+	}
+
 	public function __construct()
 	{
 		$this->parser = Parser::create();
+		$this->loadCode();
 		//$this->middleware('auth');
 	}
 
@@ -107,17 +119,25 @@ class HomeController extends Controller
 		];
 	}
 
-	public function track(Request $request)
+	public function track(Request $request, $appid)
 	{
 		$req = $this->trackBasic($request);
-		$appid = $request->input('_appid');
-		//MtHttp::post('r/' . $appid, json_encode($req));
+		MtHttp::post('r/' . $appid, json_encode($req));
 		return $req;
 	}
 
-	public function identify(Request $request)
+	private function userSetUp(){
+
+	}
+
+	public function code(Request $request, $appid)
 	{
-		$appid = $request->input('_appid');
+		$res = new Response($this->loadCode());
+		return $res;
+	}
+
+	public function identify(Request $request, $appid)
+	{
 		$input = $request->input('_userid');
 		$mtid = $request->input('_mtid');
 
@@ -143,12 +163,18 @@ class HomeController extends Controller
 		return $response->withCookie($mtid);
 	}
 
-	public function setup(Request $request)
+	public function clear(Request $request, $appid)
 	{
 		$response = new Response();
-		$appid = $request->input('_appid');
+		$response->withCookie(Cookie::forget('mtid', '/api/' . $appid));
+		return $response;
+	}
+
+	public function setup(Request $request, $appid)
+	{
 		$mtid = MtHttp::get('s/' . $appid);
-		$response->withCookie(cookie()->forever('mtid', $mtid));
+		$response = new Response($request->cookie('mtid'));
+		$response->withCookie(cookie()->forever('mtid', $mtid, '/api/' . $appid));
 		return $response;
 	}
 
