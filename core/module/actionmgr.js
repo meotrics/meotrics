@@ -93,111 +93,124 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		});
 	};
 
-	/* Phương thức này dùng để báo cho hệ thống biết một anonymous user thực ra là
-	 một user đã tồn tại. Xem thêm ở http://pasteboard.co/1WAK4HYz.png
-
-	 Tham số:
-	 {
-	 cookie: string, //mtid của anonymous user
-	 user: {userid, name, email, age, birth, gender, ...}
-	 }
-
-	 Điều kiện:
-	 1. Toàn bộ actions thuộc anonymous user được sang tên cho user, thông tin về
-	 user được cập nhập
-	 Chú ý: nếu userid không tồn tại trong hệ thống, thì cập nhật luôn userid của anonymous
-	 user thành userid ở tham số.
-	 2. Toàn bộ thông tin về user được cập nhật mới.
-	 */
-	this.identify = function (req, res, next) {
+	// purposer: phương thức này dùng để báo cho hệ thống biết một anonymous
+	// user thực ra là một user đã tồn tại. Xem thêm ở http://pasteboard.co/1WAK4HYz.png
+	// url: {appid}
+	// param:
+	// + mtid: string, //mtid của anonymous user
+	// + user: {[userid], name, email, age, birth, gender, ...}
+	// condition:
+	// + case 1 : userid exist, iden-mtid is equal mtid
+	//         client want to update info of an existing user
+	//         just update the info based on mtid.
+	// + case 2: user.userid exist, iden-mtid (mtid found by user.userid) is not equals to mtid
+	//         mtid is now an ano-mtid (mtid for an anonymous visitor)
+	//         add a mapping beetwen ano-mtid and ide-mtid, after this
+	//         all action done by ano-mtid is converted to ide-mtid
+	//         update info, delete ano-mtid user record if existed
+	// + case 3: user.userid doesn't exist
+	//         client want identify ano-mtid into registed user
+	//         in this case, create new user with ide-mtid equal ano-mtid.
+	//         just simply add userid field to old ano-mtid record, and
+	//         udpate new info
+	// + case 4: user.userid does not present
+	//         client want to update info of an user
+	//         do exactly as case 1.
+	// output: return mtid of identified visitor
+	this.identify = function (req, res, callback) {
 		var data = req.body;
 		var collection = prefix + req.params.appid;
 		var collectionmapping = prefix + mapping;
-		var userConverted;
+		var user = data.user;
+		var userid = user.userid;
 
-		async.waterfall([function (callback) {
-			var query;
-			converter.toObject({_isUser: true, userid: data.user.userid}).then(function (r) {
-				query = r;
-				return converter.toObject(data.user);
-			}).then(function (r) {
-				userConverted = r;
-				return db.collection(collection).findOneAndUpdate(query, {$set: userConverted}, {projection: {_id: 1}});
-			}).then(function (r) {
-				if (r.value != null) {
-					var _mtid = r.value._id;
+		// protect system properties, allow working only on user-based props
+		// user-based prop is not started with an underscore '_' character
+		var userex = {};
+		for (var p in user) if (user.hasOwnProperty(p))
+			if (p.startsWith('_') == false)
+				userex[p] = user[p];
+		user = userex;
+
+		var themtid = new mongodb.ObjectID(data.mtid);
+		converter.toIDs(['_isUser', 'userid', '_mtid'], function (ids) {
+			converter.toObject(user, function (userx) {
+				// check for case 4
+				if (userid == undefined) return updateUserInfo(themtid, userx, callback);
+
+				var query = {};
+				query[ids._isUser] = true;
+				query[ids.userid] = userid;
+				db.collection(collection).findOneAndUpdate(query, {$set: userx}, {projection: {_id: 1}}, function (err, r) {
+					if (err) throw err;
+
+					// case 3 : user doesn't exist
+					if (r.value == null) return updateUserInfo(themtid, userx, callback);
+
+					// user exist
+					var ide_mtid = r.value._id;
+					// check for case 1
+					if (themtid == ide_mtid) return updateUserInfo(themtid, userx, callback);
+
+					// case 2
+					// add to mapping collection
 					db.collection(collectionmapping).insertOne({
-						key: new mongodb.ObjectID(data.cookie),
-						value: new mongodb.ObjectID(_mtid),
-						created_at: new Date()
+						anomtid: themtid,
+						idemtid: ide_mtid,
+						ctime: new Date()
+					}, function (err) {
+						if (err) throw err;
 					});
-					res.send(_mtid);
-					callback(null, true, _mtid);
-				} else {
-					res.send(data.cookie);
-					callback(null, false, data.cookie);
-				}
-			}).catch(function (err) {
-				// [ERROR]
-				res.status(500).end(err.message);
-				callback(err);
+
+					//convert all ano-mtid to ide-mtid
+					var query = {};
+					var update = {};
+					query[ids._mtid] = themtid;
+					update[ids._mtid] = ide_mtid;
+					db.collection(collection).updateMany(query, {$set: update}, function (err) {
+						if (err) throw err;
+					});
+
+					// delete ano-mtid record IF EXISTED
+					db.collection(collection).deleteOne({_id: themtid}, function () {
+					});
+
+					return updateUserInfo(ide_mtid, userx, callback)
+				});
 			});
-		}, function (isCreated, _mtid, callback) {
-			if (isCreated) {
-				callback(null, true, _mtid);
-			} else {
-				db.collection(collection).updateOne({_id: new mongodb.ObjectID(data.cookie)}, {$set: userConverted}, function (err, result) {
-					if (err) callback(err);
-					else callback(null, false, _mtid);
-				});
-			}
-		}, function (needUpdate, _mtid, callback) {
-			if (needUpdate) {
-				converter.toID('_mtid')
-						.then(function (id) {
-							var query = {};
-							var update = {};
-							query[id] = new mongodb.ObjectID(data.cookie);
-							update[id] = new mongodb.ObjectID(_mtid);
-							return db.collection(collection).updateMany(query, {$set: update});
-						}).then(function (r) {
-					return db.collection(collection).deleteOne({_id: new mongodb.ObjectID(data.cookie)});
-				}).then(function (r) {
-					callback(null, _mtid);
-				}).catch(function (err) {
-					callback(err);
-				});
-			} else {
-				callback(null, _mtid);
-			}
-		}
-		], function (err, _mtid) {
-			if (err) {
-				// TODO:
-			}
 		});
+
+		// purpose: update info which mtid is mtid
+		function updateUserInfo(mtid, userx, callback) {
+			res.send(mtid);
+			db.collection(collection).updateOne({_id: mtid}, {$set: userx}, function (err, result) {
+				if (err) throw err;
+				callback(mtid);
+			});
+		}
+
 	};
 
-	// Purpose: set up new record for anonymous user
+	// purpose: set up new record for anonymous user
 	// Url /{appid}/?deltatime=20
-	// Param:
+	// param:
 	// + appid: id of the app
 	// + deltatime: number of second had elapsed before the request sent
-	// Output: new mtid
+	// output: new mtid
 	this.setup = function (req, res, callback) {
 		var deltatime = req.body._deltatime || 0;
 		var collection = prefix + req.params.appid;
 		var user = {
 			_isUser: true,
 			_segments: [],
-			_stime : Math.round(new Date() / 1000) - deltatime
+			_stime: Math.round(new Date() / 1000) - deltatime
 		};
 		converter.toObject(user, function (user) {
 			db.collection(collection).insertOne(user, function (err, results) {
-				if(err) throw err;
+				if (err) throw err;
 				var mtid = results.insertedId;
 				res.send(mtid);
-				if(callback) callback(mtid);
+				if (callback) callback(mtid);
 			});
 		});
 	};
