@@ -1,80 +1,72 @@
 //THIS FILE IS CALLED AFTER MT.CODE IS CALLED
 var mt = mt || {};
-mt.host = '//meotrics.dev';
-mt.appid = "APPID";
+mt.base = '//meotrics.dev/api/$APPID$/';
 mt.rq2 = [];
 mt.rq = mt.rq || [];
-mt.isready = false;
+mt.ir = false; // is ready flag
 
 mt.ajax = function (url, data, callback) {
 	function serialize(obj, prefix) {
-		if (obj == undefined) return "";
+		var encodeFunction = encodeURIComponent;
 		var str = [];
 		for (var p in obj) if (obj.hasOwnProperty(p)) {
 			var k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
-			str.push(typeof v == "object" ? serialize(v, k) : encodeURIComponent(k) + "=" + encodeURIComponent(v));
+			str.push(typeof v == "object" ? serialize(v, k) : encodeFunction(k) + "=" + encodeFunction(v));
 		}
 		return str.join("&");
 	}
 
 	var script = document.createElement('script');
-	script.type = 'text/javascript';
-	script.src = mt.host  + url + "?" + serialize(data);
-	script.style.display = 'none';
-	if (callback) {
-		script.onreadystatechange = callback;//for IE
-		script.onload = callback; //for other browsers
-	}
+	// script.type = 'text/javascript'; comment this because we dont need to excute the script
+	script.src = mt.base + url + (data ? '?' + serialize(data) : '');
+	// script.style.display = 'none';
+	if (callback) script.onreadystatechange = script.onload = callback;//for IE
 	document.body.appendChild(script);
 };
 
 mt.identify = function (data, callback) {
-	if (!mt.isready) return mt.rq2.push({action: 'identify', data: data});
-	mt.ajax('api/' + mt.appid + '/identify', data, callback)
+	return mt.ir ? mt.ajax('identify', data, callback) : mt.rq2.push(['i', data]);
 };
 
 mt.clear = function (callback) {
-	if (!mt.isready) return mt.rq2.push({action: 'clear'});
-	mt.ajax('api/' + mt.appid + '/clear', undefined, callback);
+	return mt.ir ? mt.ajax('clear', undefined, callback) : mt.rq2.push(['c']);
 };
 
 mt.track = function (event, data, time, callback) {
-	if (!mt.isready) return mt.rq2.push({action: 'track', event: event, data: data, time: new Date()});
+	if (!mt.ir) return mt.rq2.push(['t', event, data, new Date()]);
 	var deltat = (new Date() - time) / 1000;
 	data._referrer = document.referrer;
 	data._type = event;
 	data._deltat = deltat;
 	data._screenres = navigator.availWidth + "x" + navigator.availHeight;
-	mt.ajax('api/' + mt.appid + '/track', data, callback);
+	mt.ajax('track', data, callback);
 };
 
-mt.i = 0;
-extract();// excute delayed request in queue
-
-function extract() {
+// clean request queue
+mt.crq = function () {
 	// clean queue number 2 when out of element in queue number 1
-	if ((mt.i + 1) >= mt.rq.length) {
-		mt.i = 0;
-		cleanRequestQueue2();
-	}
+	if (mt.i + 1 >= mt.rq.length) return mt.crq2();
 
 	var rq = mt.rq[mt.i];
 	mt.i++;
-	if (rq.action == 'track') mt.track(rq.event, rq.data, extract);
-	else if (rq.action == 'identify') mt.identify(rq.data, extract);
-	else if (rq.action == 'clear') mt.clear(extract);
-}
+	var action = rq.action;
+	if (action == 't') mt.track(rq[1], rq[2], rq[3], mt.crq);
+	if (action == 'i') mt.identify(rq[1], mt.crq);
+	if (action == 'c') mt.clear(mt.crq);
+};
 
-function cleanRequestQueue2() {
-	if ((mt.i + 1) >= mt.rq2.length) { // clean the state when done
-		delete mt.rq;
-		delete mt.rq2;
-		mt.isready = true;
-		return;
-	}
-	var rq = mt.rq2[mt.i];
-	mt.i++;
-	if (rq.action == 'track') mt.track(rq.event, rq.data, cleanRequestQueue2);
-	else if (rq.action == 'identify') mt.identify(rq.data, cleanRequestQueue2);
-	else if (rq.action == 'clear') mt.clear(cleanRequestQueue2);
-}
+// clean request queue step 2
+mt.crq2 = function () {
+	if (mt.j + 1 >= mt.rq2.length) // clean the state when done
+		return mt.ir = true;
+
+	var rq = mt.rq2[mt.j];
+	mt.j++;
+	var action = rq.action;
+	if (action == 't') mt.track(rq[1], rq[2], rq[3], mt.crq2);
+	if (action == 'i') mt.identify(rq[1], mt.crq2);
+	if (action == 'c') mt.clear(mt.crq2);
+};
+
+mt.i = mt.j = 0;
+mt.crq();// excute delayed request in queue

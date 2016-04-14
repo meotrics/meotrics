@@ -13,12 +13,20 @@ class HomeController extends Controller
 {
 	private static $code;
 
-	private function loadCode(){
-		if( HomeController::$code == null)
-		{
-			return HomeController::$code = Storage::disk('resouce')->get('mt.js');
+	private function loadCode($appid = null)
+	{
+		// cache mt.min.js in ::$code
+		if (HomeController::$code == null) {
+			$code = HomeController::$code = Storage::disk('resouce')->get('mt.min.js');
+		} else {
+			$code = HomeController::$code;
 		}
-		return HomeController::$code;
+
+		if ($appid != null) {
+			$code = str_replace('$APPID$', $appid, $code);
+		}
+
+		return $code;
 	}
 
 	public function __construct()
@@ -126,13 +134,15 @@ class HomeController extends Controller
 		return $req;
 	}
 
-	private function userSetUp(){
+	private function userSetUp()
+	{
 
 	}
 
 	public function code(Request $request, $appid)
 	{
-		$res = new Response($this->loadCode());
+		$res = new Response($this->loadCode($appid));
+		$res->header('Content-Type', 'application/javascript');
 		return $res;
 	}
 
