@@ -21,16 +21,14 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 	 url: string
 	 browserversion : number
 	 osversion : number
-	 userfields = {field1:10, field2: 345};
 	 _data: data
 	 }
 	 */
-
 	this.save = function (req, res, callback) {
 		var data = req.body;
 		var query = url.parse(data.url, true).query;
-		// extract campaign
 
+		// extract campaign
 		var utm_source = query.utm_source;
 		var utm_campaign = query.utm_campaign;
 
@@ -42,7 +40,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		delete data.user;
 		var collection = prefix + appid;
 		var collectionmapping = prefix + mapping;
-		// Convert string to ObjectID in mongodgodb
+
 		data._mtid = new mongodb.ObjectID(data._mtid);
 		data._segments = [];
 		// Add created time
@@ -92,6 +90,37 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 			});
 		});
 	};
+
+	// purpose: add new data to arrays in user
+	// param:
+	// + collection: collection to query user information
+	// + mtid: mongodb.ObjectID mtid of user
+	// + data: data to be append to user
+	function updateArrayBasedUserInfo(collection, mtid, data) {
+		converter.toObject(data, function (datax) {
+			// get the user record
+			db.collection(collection).find({_id: mtid}).limit(1).toArray(function (err, r) {
+				if (err) throw err;
+				if (r.length == 0) throw "user not found mtid=" + mtid;
+				var user = r[0];
+
+				// append new element to the array or create one
+				var arr = [];
+				for (var p in datax) if (datax.hasOwnProperty(p)) {
+					if (user[p] != undefined) {
+						arr = user[p];
+					}
+					if (arr instanceof Array == false)
+						arr = [arr];
+
+					arr = arr.concat(datax[p]).sort();
+				}
+				db.collection(collection).updateOne({_id: mtid}, {"$set": user}, function (err, r) {
+					if (err) throw err;
+				});
+			});
+		});
+	}
 
 	// purposer: phương thức này dùng để báo cho hệ thống biết một anonymous
 	// user thực ra là một user đã tồn tại. Xem thêm ở http://pasteboard.co/1WAK4HYz.png
