@@ -77,7 +77,7 @@ class HomeController extends Controller
 		//copy all $input prop that dont startwith _ into $data
 		$input = $request->all();
 
-		if($url == '' || strpost($url, $request->server('HTTP_REFERER')) !==0) $url = $request->server('HTTP_REFERER');
+		if($url == '' || strpos($url, $request->server('HTTP_REFERER')) !==0) $url = $request->server('HTTP_REFERER');
 
 		$req = [
 			'_typeid' => $type,
@@ -128,7 +128,7 @@ class HomeController extends Controller
 		return $res;
 	}
 
-	private function fix(Request $request, $appid, $actionid)
+	public function fix(Request $request, $appid, $actionid)
 	{
 		$response = new Response();
 		$req = $this->trackBasic($request);

@@ -56,6 +56,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 				db.collection(collection).find({_id: mtid}).limit(1).toArray(function (err, ret) {
 					if (err) throw err;
 					var user = ret[0];
+					if (user == undefined) throw "mtid " + mtid + " did not match any user";
 					var typeid = data._typeid;
 					converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_segment', '_url', '_typeid', '_referer', '_totalsec'], function (ids) {
 						// increase revenue
@@ -139,21 +140,15 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		var data = req.body;
 		var actionid = new mongodb.ObjectID(req.params.actionid);
 		var collection = prefix + req.params.appid;
-		var collectionmapping = prefix + mapping;
 
-		// retrive real mtid because user can still use old mtid
-		db.collection(collectionmapping).find({anomtid: mtid}).limit(1).toArray(function (err, r) {
-			if (err) throw err;
-			if (r.length != 0) data._mtid = r[0].idemtid;
+		if (data._mtid) data._mtid = new mongodb.ObjectID(data._mtid);
 
-			converter.toObject(data, function (datax) {
+		converter.toObject(data, function (datax) {
+			//TODO : insert campaign here
 
-				//TODO : insert campaign here
-
-				db.collection(collection).updateOne({_id: actionid}, {"$set": datax}, function (err, r) {
-					if (err) throw err;
-					res.status(200).end()
-				});
+			db.collection(collection).updateOne({_id: actionid}, {"$set": datax}, function (err, r) {
+				if (err) throw err;
+				res.status(200).end()
 			});
 		});
 	};

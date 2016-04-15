@@ -73,6 +73,8 @@ function route(app, com) {
 	// set up a new cookie
 	app.getEx('/s/:appid', actionMgr.setup);
 
+	app.postEx('/f/:appid/:actionid', actionMgr.fix);
+
 	app.get('/app/init/:appid', function (req, res) {
 		appmgr.initApp(req.params.appid, function () {
 			res.status(200).end();
