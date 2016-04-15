@@ -168,36 +168,34 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		var actionid = new mongodb.ObjectID(req.params.actionid);
 		me.fixRaw(req.params.appid, actionid, data, function () {
 			res.status(200).end();
+			callback();
 		});
 	};
 
-// purposer: phương thức này dùng để báo cho hệ thống biết một anonymous
-// user thực ra là một user đã tồn tại. Xem thêm ở http://pasteboard.co/1WAK4HYz.png
-// url: {appid}
-// param:
-// + mtid: string, //mtid của anonymous user
-// + user: {[userid], name, email, age, birth, gender, ...}
-// condition:
-// + case 1 : userid exist, iden-mtid is equal mtid
-//         client want to update info of an existing user
-//         just update the info based on mtid.
-// + case 2: user.userid exist, iden-mtid (mtid found by user.userid) is not equals to mtid
-//         mtid is now an ano-mtid (mtid for an anonymous visitor)
-//         add a mapping beetwen ano-mtid and ide-mtid, after this
-//         all action done by ano-mtid is converted to ide-mtid
-//         update info, delete ano-mtid user record if existed
-// + case 3: user.userid doesn't exist
-//         client want identify ano-mtid into registed user
-//         in this case, create new user with ide-mtid equal ano-mtid.
-//         just simply add userid field to old ano-mtid record, and
-//         udpate new info
-// + case 4: user.userid does not present
-//         client want to update info of an user
-//         do exactly as case 1.
-// output: return mtid of identified visitor
-	this.identify = function (req, res, callback) {
-		var data = req.body;
-		var collection = prefix + req.params.appid;
+	// purpose: identify or update info of an visitor
+	// param:
+	//  data.mtid: string, //mtid của anonymous user
+	//  data.user: {[userid], name, email, age, birth, gender, ...}
+	// condition:
+	// + case 1 : userid exist, iden-mtid is equal mtid
+	//         client want to update info of an existing user
+	//         just update the info based on mtid.
+	// + case 2: user.userid exist, iden-mtid (mtid found by user.userid) is not equals to mtid
+	//         mtid is now an ano-mtid (mtid for an anonymous visitor)
+	//         add a mapping beetwen ano-mtid and ide-mtid, after this
+	//         all action done by ano-mtid is converted to ide-mtid
+	//         update info, delete ano-mtid user record if existed
+	// + case 3: user.userid doesn't exist
+	//         client want identify ano-mtid into registed user
+	//         in this case, create new user with ide-mtid equal ano-mtid.
+	//         just simply add userid field to old ano-mtid record, and
+	//         udpate new info
+	// + case 4: user.userid does not present
+	//         client want to update info of an user
+	//         do exactly as case 1.
+	// output: return mtid of identified visitor
+	this.identifyRaw = function (appid, data, callback) {
+		var collection = prefix + appid;
 		var collectionmapping = prefix + mapping;
 		var user = data.user;
 		var userid = user.userid;
@@ -260,13 +258,24 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 
 		// purpose: update info which mtid is mtid
 		function updateUserInfo(mtid, userx, callback) {
-			res.send(mtid);
+			callback(mtid);
 			db.collection(collection).updateOne({_id: mtid}, {$set: userx}, function (err, result) {
 				if (err) throw err;
-				callback(mtid);
 			});
 		}
+	};
 
+	// purposer: phương thức này dùng để báo cho hệ thống biết một anonymous
+	// user thực ra là một user đã tồn tại. Xem thêm ở http://pasteboard.co/1WAK4HYz.png
+	// url: {appid}
+	// param:
+	//  mtid: string, //mtid của anonymous user
+	//  user: {[userid], name, email, age, birth, gender, ...}
+	this.identify = function (req, res, callback) {
+		me.identifyRaw(req.params.appid, req.body, function (mtid) {
+			res.send(mtid);
+			callback(mtid);
+		});
 	};
 
 // purpose: set up new record for anonymous user
