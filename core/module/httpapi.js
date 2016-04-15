@@ -84,8 +84,7 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD) {
 			data._mtid = mtid;
 			actionmgr.saveRaw(appid, data, function (actionid) {
 				res.setHeader('Content-Type', 'text/plain');
-				res.write(actionid);
-				res.end();
+				res.end(actionid);
 			});
 		});
 	};
@@ -100,8 +99,7 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD) {
 
 			actionmgr.identifyRaw(appid, {mtid: mtid, user: data}, function (mtid) {
 				res.setHeader('Content-Type', 'text/plain');
-				res.write(mtid);
-				res.end();
+				res.end(mtid);
 
 				//set new mtid if need
 				setCookie(res, "mtid", mtid, 'api/' + appid)
@@ -146,8 +144,7 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD) {
 				// return code
 				loadCode(appid, actionid, function (code) {
 					res.setHeader('Content-Type', 'application/javascript');
-					res.write(code);
-					res.end();
+					res.end(code);
 				});
 			});
 		});

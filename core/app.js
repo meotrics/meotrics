@@ -166,7 +166,7 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 	var server = http.createServer(function (req, res) {
 		var qs = require('querystring');
 		var url = require('url');
-
+		console.log('e');
 		var url_parts = url.parse(req.url, true);
 		if (req.method == 'POST') {
 			var body = '';
@@ -175,6 +175,7 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 			});
 			req.on('end', function () {
 				req.params = qs.parse(body);
+				console.log('d');
 				handle(req, res, url_parts.pathname);
 			});
 		}
@@ -184,27 +185,33 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 		}
 
 		function handle(req, res, path) {
+			console.log(path.split('/'));
 			//split path
 			var parts = path.split('/');
-			req.appid = parts[1];
-			var action = parts[2];
-			if (action == 'track') {
-				httpapi.track(req, res);
+			if (parts[1] == 'api') {
+				req.appid = parts[2];
+				var action = parts[3];
+				if (action == 'track') {
+					httpapi.track(req, res);
+				}
+				else if (action = 'code') {
+					httpapi.code(req, res);
+				}
+				else if (action == 'clear') {
+					httpapi.clear(req, res);
+				} else if (action = 'info') {
+					httpapi.info(req, res);
+				} else if (action = 'fix') {
+					req.actionid = parts[4];
+					httpapi.fix(req, res);
+				} else {
+					res.statusCode = 404;
+					res.end('action must be one of [code, clear, ingo, fix, track]');
+				}
 			}
-			else if (action = 'code') {
-				httpapi.code(req, res);
-			}
-			else if (action == 'clear') {
-				httpapi.clear(req, res);
-			} else if (action = 'info') {
-				httpapi.info(req, res);
-			} else if (action = 'fix') {
-				req.actionid = parts[3];
-				httpapi.fix(req, res);
-			} else {
-				req.statusCode = 404;
-				req.write('action must be one of [code, clear, ingo, fix, track]');
-				req.end();
+			else {
+				res.statusCode = 404;
+				res.end('path must be [api]');
 			}
 		}
 	});
