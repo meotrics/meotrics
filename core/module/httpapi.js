@@ -87,7 +87,9 @@ exports.HttpApi = function (codepath, actionmgr) {
 		getMtid(req, appid, res, function (mtid) {
 			data._mtid = mtid;
 			actionmgr.saveRaw(appid, data, function (actionid) {
-				res.send(actionid);
+				res.setHeader('Content-Type', 'text/plain');
+				res.write(actionid);
+				res.end();
 			});
 		});
 	};
@@ -101,7 +103,7 @@ exports.HttpApi = function (codepath, actionmgr) {
 			}
 
 			actionmgr.identifyRaw(appid, {mtid: mtid, user: data}, function (mtid) {
-				res.setHeader('Content-Type', 'plain/text');
+				res.setHeader('Content-Type', 'text/plain');
 				res.write(mtid);
 				res.end();
 
