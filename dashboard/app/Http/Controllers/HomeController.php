@@ -122,6 +122,15 @@ class HomeController extends Controller
 		return $res;
 	}
 
+	private function fix(Request $request, $appid, $actionid)
+	{
+		$response = new Response();
+		$req = $this->trackBasic($request);
+		$req['_mtid'] = $this->getMtid($request, $appid, $response);
+		MtHttp::post('f/' . $appid . '/' . $actionid, $req);
+		return $response;
+	}
+
 	private function getMtid(Request $request, $appid, Response $response)
 	{
 		$mtid = $request->cookie('mtid');
