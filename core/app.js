@@ -133,6 +133,7 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 	var AppMgr = require('./module/appmgr.js').AppMgr;
 	var SegMgr = require('./module/segment.js').SegmentExr;
 
+
 	var async = require('async');
 	var component = {};
 	component.trendMgr = new TrendMgr(db, mongodb, async, converter, prefix, "trend");
@@ -154,57 +155,65 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 	app.listen(port, function () {
 		console.log('Meotrics CORE API is listening at port ' + port);
 	});
-});
 
+	var http = require('http');
+	var ua = require('ua-parser');
+	var MD = require('mobile-detect');
+	var fs = require('fs');
+	var httpport = config.get('apiserver.port') || 1711;
+	var HttpApi = require('./module/httpapi.js').HttpApi;
+	var httpapi = new HttpApi(config.get('apiserver.codepath'), component.actionMgr, fs, ua, MD);
+	var server = http.createServer(function (req, res) {
+		var qs = require('querystring');
+		var url = require('url');
 
-var http = require('http');
-var httpport = config.get('apiserver.port') || 1711;
-var server = http.createServer(function (req, response) {
-	var qs = require('querystring');
-	var url = require('url');
-
-	var url_parts = url.parse(req.url, true);
-	if (req.method == 'POST') {
-		var body = '';
-		req.on('data', function (data) {
-			body += data;
-		});
-		req.on('end', function () {
-			req.params = qs.parse(body);
+		var url_parts = url.parse(req.url, true);
+		if (req.method == 'POST') {
+			var body = '';
+			req.on('data', function (data) {
+				body += data;
+			});
+			req.on('end', function () {
+				req.params = qs.parse(body);
+				handle(req, res, url_parts.pathname);
+			});
+		}
+		else if (req.method == 'GET') {
+			req.params = url_parts.query;
 			handle(req, res, url_parts.pathname);
-		});
-	}
-	else if (req.method == 'GET') {
-		req.params = url_parts.query;
-		handle(req, res, url_parts.pathname);
-	}
+		}
 
-	function handle(req, res, path) {
-		//split path
-		var parts = path.split('/');
-		req.appid = parts[1];
-		var action = parts[2];
-		if (action == 'track') {
-			httpapi.track(req, res);
+		function handle(req, res, path) {
+			//split path
+			var parts = path.split('/');
+			req.appid = parts[1];
+			var action = parts[2];
+			if (action == 'track') {
+				httpapi.track(req, res);
+			}
+			else if (action = 'code') {
+				httpapi.code(req, res);
+			}
+			else if (action == 'clear') {
+				httpapi.clear(req, res);
+			} else if (action = 'info') {
+				httpapi.info(req, res);
+			} else if (action = 'fix') {
+				req.actionid = parts[3];
+				httpapi.fix(req, res);
+			} else {
+				req.statusCode = 404;
+				req.write('action must be one of [code, clear, ingo, fix, track]');
+				req.end();
+			}
 		}
-		else if (action = 'code') {
-			httpapi.code(req, res);
-		}
-		else if (action == 'clear') {
-			httpapi.clear(req, res);
-		} else if (action = 'info') {
-			httpapi.info(req, res);
-		} else if (action = 'fix') {
-			req.actionid = parts[3];
-			httpapi.fix(req, res);
-		} else {
-			req.statusCode = 404;
-			req.write('action must be one of [code, clear, ingo, fix, track]');
-			req.end();
-		}
-	}
+	});
+
+	server.listen(httpport, function () {
+		console.log("HTTP API SERVER is running at port " + httpport);
+	});
+
 });
 
-server.listen(httpport, function () {
-	console.log("HTTP API SERVER is running at port " + httpport);
-});
+
+

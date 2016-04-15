@@ -1,13 +1,9 @@
-exports.HttpApi = function (codepath, actionmgr) {
-	var fs = require('fs');
+exports.HttpApi = function (codepath, actionmgr, fs, ua, MD) {
 	var code = undefined;
-	var ua = require('ua-parser');
-	var MD = require('mobile-detect');
-
 	function loadCode(appid, actionid, callback) {
 		// cache mtcode in code for minimize disk usage, lazy load
 		if (code == undefined)
-			fs.readFile(codepath, function (err, data) {
+			fs.readFile(codepath,'ascii', function (err, data) {
 				code = data;
 				replaceParam();
 			});
@@ -156,5 +152,4 @@ exports.HttpApi = function (codepath, actionmgr) {
 			});
 		});
 	};
-
 };

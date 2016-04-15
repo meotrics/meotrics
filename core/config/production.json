@@ -1,7 +1,8 @@
 {
 	"port": 2108,
 	"apiserver": {
-		"port": 1711
+		"port": 1711,
+		"codepath": "../dashboard/public/mt.min.js"
 	},
 	"mongod": {
 		"host": "127.0.0.1",
