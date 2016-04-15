@@ -1,6 +1,6 @@
 <script>
-var mt=mt||{track:function(t,r){mt.rq.push(["t",t,r,new Date])},
-identify:function(t){mt.rq.push(["i",t])},clear:function(){
-mt.rq.push(["c"])}};mt.rq=mt.rq||[];
+	var mt=mt||{track:function(t,r){mt.rq.push(["track",t,r,new Date])},
+						identify:function(t){mt.rq.push(["identify",t])},
+						clear:function(){mt.rq.push(["clear"])}};mt.rq=mt.rq||[];
 </script>
-<script src="//meotrics.com/REPLACEWITHYOUAPPID/code" defer></script>);
+<script src="//meotrics.com/REPLACEWITHYOUAPPID/code" defer></script>

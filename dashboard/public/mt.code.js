@@ -1,12 +1,12 @@
 var mt = mt || {
 			track: function (event, data) {
-				mt.rq.push(['t', event, data, new Date()]);
+				mt.rq.push(['track', event, data, new Date()]);
 			},
 			identify: function (data) {
-				mt.rq.push(['i', data]);
+				mt.rq.push(['identify', data]);
 			},
 			clear: function () {
-				mt.rq.push(['c']);
+				mt.rq.push(['clear']);
 			}
 		};
 

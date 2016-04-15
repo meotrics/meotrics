@@ -1,73 +1,64 @@
 //THIS FILE IS CALLED AFTER MT.CODE IS CALLED
-var mt = mt || {};
-mt.base = '//meotrics.dev/api/$APPID$/';
-mt.rq2 = [];
-mt.rq = mt.rq || [];
-mt.ir = false; // is ready flag
+(function () {
 
-mt.ajax = function (url, data, callback) {
+	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document;
+
+	function ajax(url, data, callback) {
+		var script = doc.createElement('script');
+		// script.type = 'text/javascript'; comment this because we dont need to excute the script
+		script.src = '//meotrics.dev/api/$APPID$/' + url + (data ? '?' + serialize(data) : '');
+		// script.style.display = 'none';
+		script.onreadystatechange = script.onload = callback;//for IE
+		doc.body.appendChild(script);
+	}
+
 	function serialize(obj, prefix) {
-		var encodeFunction = encodeURIComponent;
 		var str = [];
-		for (var p in obj) if (obj.hasOwnProperty(p)) {
+		for (var p in obj)/* if (obj.hasOwnProperty(p)) */{
 			var k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
-			str.push(typeof v == "object" ? serialize(v, k) : encodeFunction(k) + "=" + encodeFunction(v));
+			str.push(v instanceof Object ? serialize(v, k) : encodeFunction(k) + "=" + encodeFunction(v));
 		}
 		return str.join("&");
 	}
 
-	var script = document.createElement('script');
-	// script.type = 'text/javascript'; comment this because we dont need to excute the script
-	script.src = mt.base + url + (data ? '?' + serialize(data) : '');
-	// script.style.display = 'none';
-	if (callback) script.onreadystatechange = script.onload = callback;//for IE
-	document.body.appendChild(script);
-};
+	mt.identify = function (data, callback, callback2, callback3) {
+		return isready ? ajax('identify', data, callback || callback3) : request_queue2.push(['identify', data]);
+	};
 
-mt.identify = function (data, callback) {
-	return mt.ir ? mt.ajax('identify', data, callback) : mt.rq2.push(['i', data]);
-};
+	mt.clear = function (callback, callback2, callback3, callback4) {
+		return isready ? ajax('clear', callback3 /*alway undefined, use callback3 for better minify*/, callback || callback4) : request_queue2.push(['clear']);
+	};
 
-mt.clear = function (callback) {
-	return mt.ir ? mt.ajax('clear', undefined, callback) : mt.rq2.push(['c']);
-};
+	mt.track = function (event, data, time, callback) {
+		if (!isready) return request_queue2.push(['track', event, data, new Date()]);
+		data._deltat = (new Date() - time) / 1000;
+		data._typeid = event;
+		ajax('track', addVisitorPlatform(data), callback);
+	};
 
-mt.track = function (event, data, time, callback) {
-	if (!mt.ir) return mt.rq2.push(['t', event, data, new Date()]);
-	var deltat = (new Date() - time) / 1000;
-	data._referrer = document.referrer;
-	data._typeid = event;
-	data._deltat = deltat;
-	data._screenres = navigator.availWidth + "x" + navigator.availHeight;
+	function addVisitorPlatform (data) {
+		data._ref = doc.referrer;
+		data._scr = screen.width + "x" + screen.height;
+		data._url = location.href;
+		return data;
+	}
 
-	mt.ajax('track', data, callback);
-};
+	// clean request queue
+	function cleanRequest() {
+		// clean queue number 2 when out of element in queue number 1
+		if (i + 1 >= mt.rq.length) return cleanRequest2();
+		var rq = mt.rq[i++];
+		mt[rq[0]](rq[1], rq[2], rq[3], cleanRequest);
+	}
 
-// clean request queue
-mt.crq = function () {
-	// clean queue number 2 when out of element in queue number 1
-	if (mt.i + 1 >= mt.rq.length) return mt.crq2();
+	// clean request queue step 2
+	function cleanRequest2() {
+		if (j + 1 >= request_queue2.length) // clean the state when done
+			return isready = 1;
+		var rq = request_queue2[j++];
+		mt[rq[0]](rq[1], rq[2], rq[3], cleanRequest2);
+	}
 
-	var rq = mt.rq[mt.i];
-	mt.i++;
-	var action = rq.action;
-	if (action == 't') mt.track(rq[1], rq[2], rq[3], mt.crq);
-	if (action == 'i') mt.identify(rq[1], mt.crq);
-	if (action == 'c') mt.clear(mt.crq);
-};
-
-// clean request queue step 2
-mt.crq2 = function () {
-	if (mt.j + 1 >= mt.rq2.length) // clean the state when done
-		return mt.ir = true;
-
-	var rq = mt.rq2[mt.j];
-	mt.j++;
-	var action = rq.action;
-	if (action == 't') mt.track(rq[1], rq[2], rq[3], mt.crq2);
-	if (action == 'i') mt.identify(rq[1], mt.crq2);
-	if (action == 'c') mt.clear(mt.crq2);
-};
-
-mt.i = mt.j = 0;
-mt.crq();// excute delayed request in queue
+	ajax('fix/$ACTIONID$', addVisitorPlatform({}));//update the pageview first
+	cleanRequest();// excute delayed request in queue
+})();
