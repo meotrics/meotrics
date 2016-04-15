@@ -78,7 +78,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 
 						// update user
 						if (Object.keys(simpleprop).length != 0)
-							db.collection(collection).updateOne({_id: mtid}, {"$set": simpleprop}, function (err, r) {
+							db.collection(collection).updateOne({_id: mtid}, {$set: simpleprop}, function (err, r) {
 								if (err) throw err;
 							});
 
@@ -278,27 +278,44 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		});
 	};
 
-// purpose: set up new record for anonymous user
-// Url /{appid}/?deltatime=20
-// param:
-// + appid: id of the app
-// + deltatime: number of second had elapsed before the request sent
-// output: new mtid
-	this.setup = function (req, res, callback) {
-		var deltatime = req.body._deltatime || 0;
-		var collection = prefix + req.params.appid;
+	// purpose: set up new record for anonymous user
+	// param: appid: id of the app
+	this.setupRaw = function (appid, callback) {
+		var collection = prefix + appid;
 		var user = {
 			_isUser: true,
 			_segments: [],
-			_stime: Math.round(new Date() / 1000) - deltatime
+			_stime: Math.round(new Date() / 1000),
+			_mtid: 2910
 		};
 		converter.toObject(user, function (user) {
 			db.collection(collection).insertOne(user, function (err, results) {
 				if (err) throw err;
 				var mtid = results.insertedId;
-				res.send(mtid);
-				if (callback) callback(mtid);
+				callback(mtid);
+
+				// update mtid equal id
+				for (var p in user) if (user.hasOwnProperty(p))
+					if (user[p] == 2910) {
+						user[p] = mtid;
+						break;
+					}
+					else delete user[p];
+				db.collection(collection).updateOne({_id: mtid}, {$set: user}, function (err, r) {
+					if (err) throw err;
+				});
 			});
 		});
+	};
+
+	// purpose: set up new record for anonymous user
+	// url /{appid}/?deltatime=20
+	// param:
+	// + appid: id of the app
+	// output: new mtid
+	this.setup = function (req, res, callback) {
+		me.setupRaw(req.params.appid, function (mtid) {
+			res.send(mtid);
+		})
 	};
 };
