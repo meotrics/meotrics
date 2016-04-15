@@ -54,8 +54,9 @@ class HomeController extends Controller
 
 	private function trackBasic(Request $request)
 	{
-		$screenres = $request->input('_screenres', '');
-		$referrer = $request->input('_referrer', '');
+		$url = $request->input('_url', '');
+		$screenres = $request->input('_scr', '');
+		$referrer = $request->input('_ref', '');
 		$ip = $this->getRemoteIPAddress($request);
 		$deltat = $request->input('_deltat', 0);
 		$type = $request->input('_typeid');
@@ -76,6 +77,8 @@ class HomeController extends Controller
 		//copy all $input prop that dont startwith _ into $data
 		$input = $request->all();
 
+		if($url == '' || strpost($url, $request->server('HTTP_REFERER')) !==0) $url = $request->server('HTTP_REFERER');
+
 		$req = [
 			'_typeid' => $type,
 			'_ip' => $ip,
@@ -87,7 +90,7 @@ class HomeController extends Controller
 			'_devicetype' => $devicetype,
 			'_referrer' => $referrer,
 			'_screenres' => $screenres,
-			'_url' => $request->server('HTTP_REFERER'),
+			'_url' => $url,
 			'_language' => $request->server('HTTP_ACCEPT_LANGUAGE'),
 			'_deltat' => $deltat
 		];
