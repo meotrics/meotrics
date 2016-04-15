@@ -2,6 +2,28 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 	var url = require('url');
 	var me = this;
 
+	// purpose: check if an mtid is valid
+	// a mtid is valid if there is one user record based on mtid
+	// if a mtid is ano-mtid, convert it to iden-mtid
+	this.ismtidValid = function (appid, mtid, callback) {
+		var collection = prefix + appid;
+		var collectionmapping = prefix + mapping;
+
+		mtid = new mongodb.ObjectId(mtid);
+		converter.toID('_isUser', function (isUser) {
+			db.collection(collectionmapping).find({anomtid: mtid}).limit(1).toArray(function (err, r) {
+				if (r.length != 0) mtid = r[0].idemtid;
+				// check if user existed
+				var query = {_id: mtid};
+				query[isUser] = true;
+				db.collection(collection).find(query).limit(1).toArray(function (err, ret) {
+					if (ret.length == 0) callback(false);
+					else callback(true);
+				});
+			});
+		});
+	};
+
 	// purpose: record an action rawly
 	// param:
 	// + _deltat: number of delayed second before request sent

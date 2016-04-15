@@ -194,15 +194,15 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 				if (action == 'track') {
 					httpapi.track(req, res);
 				}
-				else if (action = 'code') {
+				else if (action == 'code.js') {
 					httpapi.code(req, res);
 				}
 				else if (action == 'clear') {
 					httpapi.clear(req, res);
-				} else if (action = 'info') {
+				} else if (action == 'info') {
 					httpapi.info(req, res);
-				} else if (action = 'fix') {
-					req.actionid = parts[4];
+				} else if (action == 'fix') {
+					req.actionid == parts[4];
 					httpapi.fix(req, res);
 				} else {
 					res.statusCode = 404;

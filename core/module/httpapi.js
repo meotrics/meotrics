@@ -57,23 +57,37 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD) {
 	}
 
 	function getMtid(req, appid, res, callback) {
+		console.log(req.headers.cookie)
 		var mtid = getCookie(req, "mtid");
-		if (mtid == undefined) {
+	console.log('mtid:'+ mtid);
+		if(mtid == undefined)
+		{
 			return actionmgr.setupRaw(appid, function (mtid) {
 				setCookie(res, "mtid", mtid, 'api/' + appid);
 				callback(mtid);
 			});
 		}
-		callback(mtid);
+
+		// check if mtid is valid
+		actionmgr.ismtidValid(appid, mtid, function(ret){
+			if(ret) callback(mtid);
+			else {
+				eraseCookie(res, "mtid", 'api/' + appid);
+				actionmgr.setupRaw(appid, function (mtid) {
+					setCookie(res, "mtid", mtid, 'api/' + appid);
+					callback(mtid);
+				});
+			}
+		});
 	}
 
-	function eraseCookie(name, path) {
-		res.setHeader('Set-Cookie', name + '=' + encodeURIComponent(value) + "; expires=Wed, 21 Aug 1995 11:11:11 GMT; path=/" + path);
+	function eraseCookie(res, name, path) {
+		res.setHeader('Set-Cookie', name + "=x; expires=Wed, 21 Aug 1995 11:11:11 GMT; path=/" + path);
 	}
 
 	this.clear = function (req, res) {
 		// delete the cookie
-		eraseCookie('mtid', 'api/' + req.appid);
+		eraseCookie(res, 'mtid', 'api/' + req.appid);
 		res.end();
 	};
 
@@ -98,11 +112,10 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD) {
 			}
 
 			actionmgr.identifyRaw(appid, {mtid: mtid, user: data}, function (mtid) {
-				res.setHeader('Content-Type', 'text/plain');
-				res.end(mtid);
-
 				//set new mtid if need
 				setCookie(res, "mtid", mtid, 'api/' + appid)
+				res.setHeader('Content-Type', 'text/plain');
+				res.end(""+ mtid);
 			});
 		});
 	};
@@ -117,7 +130,7 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD) {
 	}
 
 	function setCookie(res, name, value, path) {
-		var tenyearlater = new Date().getYear() + 10;
+		var tenyearlater = new Date().getYear() + 10 + 1900;
 		res.setHeader('Set-Cookie', name + '=' + encodeURIComponent(value) + "; expires=Wed, 21 Aug " + tenyearlater + " 11:11:11 GMT; path=/" + path);
 	}
 
