@@ -144,21 +144,30 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		});
 	};
 
-
-	this.fix = function (req, res, callback) {
-		var data = req.body;
-		var actionid = new mongodb.ObjectID(req.params.actionid);
-		var collection = prefix + req.params.appid;
-
+	// purpose: fix an existing action
+	// param:
+	// + appid: id of the app
+	// + actionid: ObjectID, id of action
+	// + data: action data
+	this.fixRaw = function (appid, actionid, data, callback) {
 		if (data._mtid) data._mtid = new mongodb.ObjectID(data._mtid);
-
+		var collection = prefix + appid;
 		converter.toObject(data, function (datax) {
 			//TODO : insert campaign here
 
 			db.collection(collection).updateOne({_id: actionid}, {"$set": datax}, function (err, r) {
 				if (err) throw err;
-				res.status(200).end()
+				callback();
+
 			});
+		});
+	};
+
+	this.fix = function (req, res, callback) {
+		var data = req.body;
+		var actionid = new mongodb.ObjectID(req.params.actionid);
+		me.fixRaw(req.params.appid, actionid, data, function () {
+			res.status(200).end();
 		});
 	};
 
