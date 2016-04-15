@@ -110,14 +110,17 @@ class HomeController extends Controller
 
 	public function code(Request $request, $appid)
 	{
-		$res = new Response($this->loadCode($appid));
+		$res = new Response();
 
 		// record an pageview
 		$req = $this->trackBasic($request);
 		$req['_mtid'] = $this->getMtid($request, $appid, $res);
 		$req['_typeid'] = 'pageview';
-		MtHttp::post('r/' . $appid, $req);
 
+		$code = $this->loadCode($appid);
+		$actionid = MtHttp::post('r/' . $appid, $req);
+		$code = str_replace('$ACTIONID$', $actionid, $code);
+		$res->setContent($code);
 		$res->header('Content-Type', 'application/javascript');
 		return $res;
 	}
