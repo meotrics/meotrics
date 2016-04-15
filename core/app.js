@@ -164,56 +164,65 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 	var HttpApi = require('./module/httpapi.js').HttpApi;
 	var httpapi = new HttpApi(config.get('apiserver.codepath'), component.actionMgr, fs, ua, MD);
 	var server = http.createServer(function (req, res) {
-		var qs = require('querystring');
-		var url = require('url');
-		console.log('e');
-		var url_parts = url.parse(req.url, true);
-		if (req.method == 'POST') {
-			var body = '';
-			req.on('data', function (data) {
-				body += data;
-			});
-			req.on('end', function () {
-				req.params = qs.parse(body);
-				console.log('d');
-				handle(req, res, url_parts.pathname);
-			});
-		}
-		else if (req.method == 'GET') {
-			req.params = url_parts.query;
-			handle(req, res, url_parts.pathname);
-		}
+		trycatch(function () {
 
-		function handle(req, res, path) {
-			console.log(path.split('/'));
-			//split path
-			var parts = path.split('/');
-			if (parts[1] == 'api') {
-				req.appid = parts[2];
-				var action = parts[3];
-				if (action == 'track') {
-					httpapi.track(req, res);
+
+			var qs = require('querystring');
+			var url = require('url');
+			console.log('e');
+			var url_parts = url.parse(req.url, true);
+			if (req.method == 'POST') {
+				var body = '';
+				req.on('data', function (data) {
+					body += data;
+				});
+				req.on('end', function () {
+					req.params = qs.parse(body);
+					console.log('d');
+					handle(req, res, url_parts.pathname);
+				});
+			}
+			else if (req.method == 'GET') {
+				req.params = url_parts.query;
+				handle(req, res, url_parts.pathname);
+			}
+
+			function handle(req, res, path) {
+				console.log(path.split('/'));
+				//split path
+				var parts = path.split('/');
+				if (parts[1] == 'api') {
+					res.statusCode = 200;
+					req.appid = parts[2];
+					var action = parts[3];
+					if (action == 'track') {
+						httpapi.track(req, res);
+					}
+					else if (action == 'code.js') {
+						httpapi.code(req, res);
+					}
+					else if (action == 'clear') {
+						httpapi.clear(req, res);
+					} else if (action == 'info') {
+						httpapi.info(req, res);
+					} else if (action == 'fix') {
+						req.actionid = parts[4];
+						httpapi.fix(req, res);
+					} else {
+						res.statusCode = 404;
+						res.end('action must be one of [code, clear, ingo, fix, track]');
+					}
 				}
-				else if (action == 'code.js') {
-					httpapi.code(req, res);
-				}
-				else if (action == 'clear') {
-					httpapi.clear(req, res);
-				} else if (action == 'info') {
-					httpapi.info(req, res);
-				} else if (action == 'fix') {
-					req.actionid == parts[4];
-					httpapi.fix(req, res);
-				} else {
+				else {
 					res.statusCode = 404;
-					res.end('action must be one of [code, clear, ingo, fix, track]');
+					res.end('path must be [api]');
 				}
 			}
-			else {
-				res.statusCode = 404;
-				res.end('path must be [api]');
-			}
-		}
+		}, function (err) {
+			res.statusCode = 500;
+			res.end();
+			console.log(err);
+		});
 	});
 
 	server.listen(httpport, function () {

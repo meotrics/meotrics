@@ -57,7 +57,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		data._segments = [];
 
 		// correct timming
-		data._ctime = Math.round(new Date() / 1000) + (data._deltat ? data._deltat : 0);
+		data._ctime = Math.round(new Date() / 1000) + (parseInt(data._deltat) ? parseInt(data._deltat) : 0);
 		delete data._deltat;
 
 		// retrive real mtid because user can still use old mtid
