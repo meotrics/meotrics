@@ -77,7 +77,7 @@ class HomeController extends Controller
 		//copy all $input prop that dont startwith _ into $data
 		$input = $request->all();
 
-		if($url == '' || strpos($url, $request->server('HTTP_REFERER')) !==0) $url = $request->server('HTTP_REFERER');
+		if ($url == '' || strpos($url, $request->server('HTTP_REFERER')) !== 0) $url = $request->server('HTTP_REFERER');
 
 		$req = [
 			'_typeid' => $type,
@@ -106,7 +106,7 @@ class HomeController extends Controller
 	{
 		$response = new Response();
 		$req = $this->trackBasic($request);
-		$req['_mtid'] = $this->getMtid($request, $appid, $response);
+		$req['_mtid'] = $this->getMtid($appid);
 		MtHttp::post('r/' . $appid, $req);
 		return $response;
 	}
@@ -114,15 +114,19 @@ class HomeController extends Controller
 	public function code(Request $request, $appid)
 	{
 		$res = new Response();
-
+		$t = round(microtime(true) * 1000);
+		var_dump($t);
 		// record an pageview
 		$req = $this->trackBasic($request);
-		$req['_mtid'] = $this->getMtid($request, $appid, $res);
+		$req['_mtid'] = $this->getMtid($appid);
 		$req['_typeid'] = 'pageview';
 
 		$code = $this->loadCode($appid);
+
 		$actionid = MtHttp::post('r/' . $appid, $req);
+
 		$code = str_replace('$ACTIONID$', $actionid, $code);
+		//var_dump($code); die;
 		$res->setContent($code);
 		$res->header('Content-Type', 'application/javascript');
 		return $res;
@@ -132,18 +136,20 @@ class HomeController extends Controller
 	{
 		$response = new Response();
 		$req = $this->trackBasic($request);
-		$req['_mtid'] = $this->getMtid($request, $appid, $response);
+		$req['_mtid'] = $this->getMtid($appid);
 		MtHttp::post('f/' . $appid . '/' . $actionid, $req);
 		return $response;
 	}
 
-	private function getMtid(Request $request, $appid, Response $response)
+	private function getMtid($appid)
 	{
-		$mtid = $request->cookie('mtid');
-		if ($mtid == null) {
+		if ( !isset($_COOKIE['mtid'])) {
 			// get new mtid
 			$mtid = MtHttp::get('s/' . $appid);
-			$response->withCookie(cookie()->forever('mtid', $mtid, '/api/' . $appid));
+			setrawcookie('mtid', $mtid, 2147483647, '/api/' . $appid);
+		} else
+		{
+			$mtid = $_COOKIE['mtid'];
 		}
 		return $mtid;
 	}
@@ -152,7 +158,7 @@ class HomeController extends Controller
 	{
 		$response = new Response();
 		$input = $request->input('_userid');
-		$mtid = $this->getMtid($request, $appid, $response);
+		$mtid = $this->getMtid($appid);
 
 		//copy all $input prop that dont startwith _ into $data
 		$data = [];
@@ -168,13 +174,14 @@ class HomeController extends Controller
 
 		$mtid = MtHttp::post('i/' . $appid, $req);
 		$response->setContent($mtid);
-		return $response->withCookie(cookie()->forever('mtid', $mtid, '/api/' . $appid));
+		setrawcookie('mtid', $mtid, 2147483647 ,  $mtid, '/api/' . $appid);
+		return $response;
 	}
 
 	public function clear(Request $request, $appid)
 	{
-		$response = new Response();
-		$response->withCookie(Cookie::forget('mtid', '/api/' . $appid));
-		return $response;
+		// delete the cookie
+		setrawcookie('mtid', "", time() - 3600 , '/api/' . $appid);
+		return new Response();
 	}
 }
