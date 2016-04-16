@@ -25,7 +25,7 @@ Route::get('api/{appid}/track', 'HomeController@track');
 
 Route::get('api/{appid}/clear', 'HomeController@clear');
 
-//Route::get('api/{appid}/setup', 'HomeController@setup');
+Route::get('api/{appid}/fix/{actionid}', 'HomeController@fix');
 
 Route::post('/actiontype/create', 'TypeController@create');
 

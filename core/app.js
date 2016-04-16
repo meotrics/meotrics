@@ -73,6 +73,8 @@ function route(app, com) {
 	// set up a new cookie
 	app.getEx('/s/:appid', actionMgr.setup);
 
+	app.postEx('/f/:appid/:actionid', actionMgr.fix);
+
 	app.get('/app/init/:appid', function (req, res) {
 		appmgr.initApp(req.params.appid, function () {
 			res.status(200).end();
@@ -131,6 +133,7 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 	var AppMgr = require('./module/appmgr.js').AppMgr;
 	var SegMgr = require('./module/segment.js').SegmentExr;
 
+
 	var async = require('async');
 	var component = {};
 	component.trendMgr = new TrendMgr(db, mongodb, async, converter, prefix, "trend");
@@ -152,5 +155,81 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 	app.listen(port, function () {
 		console.log('Meotrics CORE API is listening at port ' + port);
 	});
+
+	var http = require('http');
+	var ua = require('ua-parser');
+	var MD = require('mobile-detect');
+	var fs = require('fs');
+	var httpport = config.get('apiserver.port') || 1711;
+	var HttpApi = require('./module/httpapi.js').HttpApi;
+	var httpapi = new HttpApi(config.get('apiserver.codepath'), component.actionMgr, fs, ua, MD);
+	var server = http.createServer(function (req, res) {
+		trycatch(function () {
+
+
+			var qs = require('querystring');
+			var url = require('url');
+			console.log('e');
+			var url_parts = url.parse(req.url, true);
+			if (req.method == 'POST') {
+				var body = '';
+				req.on('data', function (data) {
+					body += data;
+				});
+				req.on('end', function () {
+					req.params = qs.parse(body);
+					console.log('d');
+					handle(req, res, url_parts.pathname);
+				});
+			}
+			else if (req.method == 'GET') {
+				req.params = url_parts.query;
+				handle(req, res, url_parts.pathname);
+			}
+
+			function handle(req, res, path) {
+				console.log(path.split('/'));
+				//split path
+				var parts = path.split('/');
+				if (parts[1] == 'api') {
+					res.statusCode = 200;
+					req.appid = parts[2];
+					var action = parts[3];
+					if (action == 'track') {
+						httpapi.track(req, res);
+					}
+					else if (action == 'code.js') {
+						httpapi.code(req, res);
+					}
+					else if (action == 'clear') {
+						httpapi.clear(req, res);
+					} else if (action == 'info') {
+						httpapi.info(req, res);
+					} else if (action == 'fix') {
+						req.actionid = parts[4];
+						httpapi.fix(req, res);
+					} else {
+						res.statusCode = 404;
+						res.end('action must be one of [code, clear, ingo, fix, track]');
+					}
+				}
+				else {
+					res.statusCode = 404;
+					res.end('path must be [api]');
+				}
+			}
+		}, function (err) {
+			res.statusCode = 500;
+			res.end();
+			console.log(err);
+		});
+	});
+
+	server.listen(httpport, function () {
+		console.log("HTTP API SERVER is running at port " + httpport);
+	});
+
 });
+
+
 
