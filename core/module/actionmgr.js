@@ -8,7 +8,6 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 	this.ismtidValid = function (appid, mtid, callback) {
 		var collection = prefix + appid;
 		var collectionmapping = prefix + mapping;
-
 		mtid = new mongodb.ObjectId(mtid);
 		converter.toID('_isUser', function (isUser) {
 			db.collection(collectionmapping).find({anomtid: mtid}).limit(1).toArray(function (err, r) {

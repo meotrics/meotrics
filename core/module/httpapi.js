@@ -57,9 +57,7 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD) {
 	}
 
 	function getMtid(req, appid, res, callback) {
-		console.log(req.headers.cookie)
 		var mtid = getCookie(req, "mtid");
-	console.log('mtid:'+ mtid);
 		if(mtid == undefined)
 		{
 			return actionmgr.setupRaw(appid, function (mtid) {

@@ -126,6 +126,7 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 	var converter = require('./utils/fakeidmanager.js');
 	converter = new converter.IdManager();
 	var prefix = config.get("mongod.prefix") || "meotrics_";
+	var trycatch = require('trycatch');
 
 	var TrendMgr = require('./module/trendmgr.js').TrendMgr;
 	var ActionMgr = require('./module/actionmgr.js').ActionMgr;
@@ -165,11 +166,8 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 	var httpapi = new HttpApi(config.get('apiserver.codepath'), component.actionMgr, fs, ua, MD);
 	var server = http.createServer(function (req, res) {
 		trycatch(function () {
-
-
 			var qs = require('querystring');
 			var url = require('url');
-			console.log('e');
 			var url_parts = url.parse(req.url, true);
 			if (req.method == 'POST') {
 				var body = '';
@@ -188,24 +186,16 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 			}
 
 			function handle(req, res, path) {
-				console.log(path.split('/'));
-				//split path
 				var parts = path.split('/');
 				if (parts[1] == 'api') {
 					res.statusCode = 200;
 					req.appid = parts[2];
 					var action = parts[3];
-					if (action == 'track') {
-						httpapi.track(req, res);
-					}
-					else if (action == 'code.js') {
-						httpapi.code(req, res);
-					}
-					else if (action == 'clear') {
-						httpapi.clear(req, res);
-					} else if (action == 'info') {
-						httpapi.info(req, res);
-					} else if (action == 'fix') {
+					if (action == 'track') httpapi.track(req, res);
+					else if (action == 'code.js') httpapi.code(req, res);
+					else if (action == 'clear') httpapi.clear(req, res);
+					else if (action == 'info') httpapi.info(req, res);
+					else if (action == 'fix') {
 						req.actionid = parts[4];
 						httpapi.fix(req, res);
 					} else {
@@ -221,7 +211,7 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 		}, function (err) {
 			res.statusCode = 500;
 			res.end();
-			console.log(err);
+			console.log(err, err.stack);
 		});
 	});
 
