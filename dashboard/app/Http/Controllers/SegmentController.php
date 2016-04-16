@@ -61,13 +61,21 @@ class SegmentController extends Controller
                     'f' => '',
                     'field' => '',
                     'fields' => [],
+                    'conditions' => [],
                 ];
-//                var_dump($props[1]); exit;
+                
+                $html_sub_condition = View::make('segment/partials/condition-sub-item');
+                $html_sub_condition = preg_replace( "/\r|\n/", "", $html_sub_condition->render() );
+                $html_condition_item = View::make('segment/partials/condition_item');
+                $html_condition_item = preg_replace( "/\r|\n/", "", $html_condition_item->render() );;
 		return view('segment/create', [
+                    'segment' => (object)['_id' => ''],
                     'actions' => $actions,
                     'props' => $props,
                     'conditions' => $conditions,
                     'operators' => $operators,
+                    'html_sub_condition' => $html_sub_condition,
+                    'html_condition_item' => $html_condition_item,
 		]);
 	}
         
@@ -97,6 +105,7 @@ class SegmentController extends Controller
                         'field' => '',
                         'fields' => [],
                         'operators' => $operators,
+                        'conditions' => [],
                     ];
                 }
                 else{
@@ -104,6 +113,33 @@ class SegmentController extends Controller
                     foreach ($actions as $action) {
                         if($action->codename == $tmp_condition->type){
                             $fields = $action->fields ? $action->fields : [];
+                        }
+                    }
+                    $conditions_sub = [];
+                    if(property_exists($tmp_condition, 'conditions') && is_array($tmp_condition->conditions)){
+                        foreach ($tmp_condition->conditions as $tcc_key => $tcc_value) {
+                            if($tcc_key % 4 == 0){
+                                if(!isset($conditions_sub[$tcc_key / 4])){
+                                    $conditions_sub[$tcc_key / 4] = (object)[
+                                        'cs_field' => '',
+                                        'cs_operator' => '',
+                                        'cs_value' => '',
+                                    ];
+                                }
+                                $tmp_sub = $conditions_sub[$tcc_key / 4];
+                                $tmp_sub->cs_field = $tcc_value;
+                                $conditions_sub[$tcc_key / 4] = $tmp_sub;
+                            }
+                            elseif($tcc_key % 4 == 1){
+                                $tmp_sub = $conditions_sub[$tcc_key / 4];
+                                $tmp_sub->cs_operator = $tcc_value;
+                                $conditions_sub[$tcc_key / 4] = $tmp_sub;
+                            }
+                            elseif($tcc_key % 4 == 2){
+                                $tmp_sub = $conditions_sub[$tcc_key / 4];
+                                $tmp_sub->cs_value = $tcc_value;
+                                $conditions_sub[$tcc_key / 4] = $tmp_sub;
+                            }
                         }
                     }
                     $conditions[] = (object)[
@@ -121,15 +157,24 @@ class SegmentController extends Controller
                             (object)['code' => '<', 'name' => '<'],
                             (object)['code' => '<=', 'name' => '<='],
                         ],
+                        'conditions' => $conditions_sub,
                     ];
                 }
             }
         }
+        $html_sub_condition = View::make('segment/partials/condition-sub-item');
+        $html_sub_condition = preg_replace( "/\r|\n/", "", $html_sub_condition->render() );
+        
+        $html_condition_item = View::make('segment/partials/condition_item');
+        $html_condition_item = preg_replace( "/\r|\n/", "", $html_condition_item->render() );;
         return view('segment/create', [
+            'segment' => $segment,
             'actions' => $actions,
             'props' => $props,
             'conditions' => $conditions,
             'operators' => [],
+            'html_sub_condition' => $html_sub_condition,
+            'html_condition_item' => $html_condition_item,
         ]);
     }
         
@@ -142,6 +187,62 @@ class SegmentController extends Controller
         else{
             App::abort(404, 'Segment not found');
         }
+    }
+    
+    public function postWrite(Request $request){
+        if(isset($_POST['Segment']) && is_array($_POST['Segment'])){
+            $query = [];
+            $data_post = $_POST['Segment'];
+            $user_query = (object)[
+                'type' => 'user',
+                'conditions' => [],
+            ];
+            foreach ($data_post as $data) {
+                if(isset($data['select_type']) && $data['select_type'] == 'user'){
+                    $user_conditions = [
+                        isset($data['type']) ? $data['type'] : '',
+                        isset($data['operator']) ? $data['operator'] : '',
+                        isset($data['value']) ? ((int)$data['value'] ? (int)$data['value'] : $data['value']) : '',
+                        'and',
+                    ];
+                    $user_query->conditions = array_merge($user_query->conditions, $user_conditions);
+                }
+                elseif(isset($data['select_type']) && $data['select_type'] != 'user'){
+                    $conditions = [];
+                    if(isset($data['conditions']) && is_array($data['conditions'])){
+                        foreach ($data['conditions'] as $c_value) {
+                            $conditions[] = isset($c_value['cs_field']) ? $c_value['cs_field'] : '';
+                            $conditions[] = isset($c_value['cs_operator']) ? $c_value['cs_operator'] : '';
+                            $conditions[] = isset($c_value['cs_value']) ? ((int)$c_value['cs_value'] ? (int)$c_value['cs_value'] : $c_value['cs_value']) : '';
+                            $conditions[] = "and";
+                        }
+                        array_pop($conditions);
+                    }
+                    $query[] = (object)[
+                        'type' => isset($data['type']) ? $data['type'] : '',
+                        'f' => isset($data['f']) ? $data['f'] : '',
+                        'field' => isset($data['field']) ? $data['field'] : '',
+                        'operator' => isset($data['operator']) ? $data['operator'] : '',
+                        'value' => isset($data['value']) ? ((int)$data['value'] ? (int)$data['value'] : $data['value']) : '',
+                        'conditions' => $conditions,
+                        
+                    ];
+                    $query[] = 'and';
+                }
+            }
+            array_pop($user_query->conditions);
+            $query[] = $user_query;
+            
+            $app_id = \Auth::user()->id;
+            $id = isset($_POST['id']) && $_POST['id'] ? $_POST['id'] : 0;
+            if (!$id) {
+                $id_new = MtHttp::post('segment/' . $app_id, ['condition' => $query, 'name' => 'New']);
+            }
+            else{
+                $id = MtHttp::put('segment/' . $app_id .'/' .$id, ['condition' => $query, 'name' => 'Update']);
+            }
+        }
+        return redirect('segment');
     }
         
 }
