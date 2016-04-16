@@ -21,8 +21,8 @@
 		return str.join("&");
 	}
 
-	mt.identify = function (data, callback, callback2, callback3) {
-		return isready ? ajax('identify', data, callback || callback3) : request_queue2.push(['identify', data]);
+	mt.info = function (data, callback, callback2, callback3) {
+		return isready ? ajax('info', data, callback || callback3) : request_queue2.push(['info', data]);
 	};
 
 	mt.clear = function (callback, callback2, callback3, callback4) {
@@ -30,13 +30,12 @@
 	};
 
 	mt.track = function (event, data, time, callback) {
-		if (!isready) return request_queue2.push(['track', event, data, new Date()]);
 		data._deltat = (new Date() - time) / 1000;
 		data._typeid = event;
-		ajax('track', addVisitorPlatform(data), callback);
+		return isready ? ajax('track', addVisitorPlatform(data), callback) : request_queue2.push(['track', event, data, new Date()]);
 	};
 
-	function addVisitorPlatform (data) {
+	function addVisitorPlatform(data) {
 		data._ref = doc.referrer;
 		data._scr = screen.width + "x" + screen.height;
 		data._url = location.href;
@@ -53,8 +52,10 @@
 
 	// clean request queue step 2
 	function cleanRequest2() {
+		console.log(j, request_queue2);
 		if (j + 1 >= request_queue2.length) // clean the state when done
 			return isready = 1;
+		alert('how');
 		var rq = request_queue2[j++];
 		mt[rq[0]](rq[1], rq[2], rq[3], cleanRequest2);
 	}
