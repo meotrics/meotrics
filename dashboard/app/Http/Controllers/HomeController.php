@@ -39,9 +39,9 @@ class HomeController extends Controller
 	public function index(Request $request)
 	{
 		if ($request->user())
-			return view('home');
+			return view('home')->withCookie(cookie()->forget('mtid'));
 		else
-			return redirect('auth/login');
+			return redirect('auth/login')->withCookie(cookie()->forget('mtid'));
 	}
 
 	private function getRemoteIPAddress(Request $request)
@@ -70,7 +70,7 @@ class HomeController extends Controller
 		if ($detect->isTablet($uas))
 			$devicetype = 'tablet';
 		else if ($detect->isMobile($uas))
-			$devicetype = 'tablet';
+			$devicetype = 'phone';
 		else
 			$devicetype = 'desktop';
 
@@ -83,7 +83,7 @@ class HomeController extends Controller
 			'_typeid' => $type,
 			'_ip' => $ip,
 			'_browserid' => $ua->ua->family,
-			'_browserversion' => $ua->ua->major . "." . $ua->os->minor,
+			'_browserversion' => $ua->ua->major . "." . $ua->ua->minor,
 			'_osid' => $ua->os->family,
 			'_osversion' => $ua->os->major . '.' . $ua->os->minor,
 			'_deviceid' => $ua->device->family,
@@ -114,8 +114,6 @@ class HomeController extends Controller
 	public function code(Request $request, $appid)
 	{
 		$res = new Response();
-		$t = round(microtime(true) * 1000);
-		var_dump($t);
 		// record an pageview
 		$req = $this->trackBasic($request);
 		$req['_mtid'] = $this->getMtid($appid);
@@ -157,7 +155,7 @@ class HomeController extends Controller
 	public function identify(Request $request, $appid)
 	{
 		$response = new Response();
-		$input = $request->input('_userid');
+		$input = $request->input('user');
 		$mtid = $this->getMtid($appid);
 
 		//copy all $input prop that dont startwith _ into $data
