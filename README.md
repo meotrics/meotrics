@@ -9,19 +9,18 @@ Cài đặt môi trường DEV
 
 #### Trỏ tên miền
 
-Trỏ danh sách tên miền sau để tiện phát triển hệ thống
+Trỏ danh sách tên miền sau để tiện phát triển hệ thống:
 
 | Tên miền              | Địa chỉ           |
 |-----------------------|-------------------|
 |`meotrics.dev`           | `127.0.0.1`         |
 |`client.meotrics.dev`		| `127.0.0.1`		|
 
-[window: `Windows\\System32\\drivers\\etc\\host`]
-[linux: ]
-[mac: ]
+Trong hệ thống Window, sửa file, `Windows\\System32\\drivers\\etc\\host`, trong Linux hoặc Mac, sửa file `/etc/hosts` (`/private/etc/hosts`)
 
 #### config file
 * Front-end
+
   *Trong thư mục `/dashboard` tạo một file .env có nội dung giống với `.env.example`, sửa config csdl ở đây*
 
   Đặt `DB_USERNAME/DB_PASSWORD` là `meotrics/meotrics123`
@@ -159,7 +158,9 @@ LoadModule proxy_connect_module modules/mod_proxy_connect.so
 			</Directory>
   </VirtualHost>
   ```
+
 #### Nginx
+
 ```nginx
 server {
 	  charset utf-8;
@@ -240,9 +241,9 @@ Chạy chương trình
   ```bash
   cd core
   node app.js
-  ``
-  Backend sẽ lắng nghe ở 2 cổng `2108` và `1711`
+  ```
+  Backend sẽ lắng nghe ở 2 cổng `2108` và `1711`.
 
-* Truy cập vào địa chỉ [meotrics.dev/auth/login](http://meotrics.dev/auth/login) để đăng nhập
+* Truy cập vào địa chỉ [meotrics.dev/auth/login](http://meotrics.dev/auth/login) để đăng nhập.
 
-* Truy cập vào địa chỉ [client.meotrics.dev](client.meotrics.dev) để chạy web site client
+* Truy cập vào địa chỉ [client.meotrics.dev](client.meotrics.dev) để chạy web site client.
