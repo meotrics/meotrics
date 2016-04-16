@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
 use stdClass;
-use function redirect;
-use function response;
-use function view;
+//use function redirect;
+//use function response;
+//use function view;
 use App\Enum\TrendEnum;
 
 class TrendController extends Controller
@@ -51,7 +51,6 @@ class TrendController extends Controller
             $trends = MtHttp::get('trend/' . $app_id);
             $trend = reset($trends);
             $outputs = MtHttp::get('trend/query/' . $app_id .'/'. $trend->_id);
-            
             return view('trend/index', [
                 'types' => json_encode($actiontypes),
                 'trends' => $trends,

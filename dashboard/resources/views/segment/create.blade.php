@@ -82,7 +82,7 @@ $f_behaviors = [
     (object)['code' => 'sum', 'name' =>'Sum'],
     (object)['code' => 'avg', 'name' =>'Avg'],
     (object)['code' => 'count', 'name' =>'Count']
-]
+];
 ?>
     var f_behavior = [
         {code: 'sum', name: 'Sum'},
@@ -96,6 +96,9 @@ $f_behaviors = [
         {code: '<', name: '<'},
         {code: '<=', name: '<='},
     ];
+<?php
+$condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators();
+?>
 </script>
 @endsection
 
@@ -106,79 +109,24 @@ $f_behaviors = [
 @section('content')
 <div class="card row">
     <div class="header col-md-12">
-        <form class="form-horizontal form-segment" method="post" action="{{URL::to('trend/write')}}">
-            <?php
-            foreach($conditions as $condition):
-            ?>
-            <div class="form-group col-md-12">
-                <!--<label class="col-md-2" style="margin-top: 10px">List top</label>-->
-                <div class="col-md-{{$condition->select_type == 'user' ? 4 : 2 }}">
-                    <select class="form-control" id="" name="Segment[type][]" onchange="typeChange(this)">
-                        <?php
-                        foreach ($type_options as $type_option):
-                        ?>
-                        <option value="{{$type_option->value}}" 
-                            <?= $type_option->value == $condition->type ? 'selected=""' : '' ?> 
-                            <?= $type_option->value == '[disabled]' ? 'disabled' : ''?> 
-                            data-select-type="<?= $type_option->select_type ?>"    >
-                            {{$type_option->name}}
-                        </option>
-                        <?php
-                        endforeach;
-                        ?>
-                    </select>
-                </div>
-                <div class="col-md-2" <?= $condition->select_type == 'user' ? 'style="display: none"' : '' ?>>
-                    <select class="form-control" id="" name="Segment[f][]" value="{{$condition->f}}">
-                        <?php
-                        foreach($f_behaviors as $f_behavior):
-                        ?>
-                        <option value="{{$f_behavior->code}}">{{$f_behavior->name}}</option>
-                        <?php
-                        endforeach;
-                        ?>
-                    </select>
-                </div>
-                <div class="col-md-2" <?= $condition->select_type == 'user' ? 'style="display: none"' : '' ?>>
-                    <select class="form-control" id="" name="Segment[field][]" value="{{$condition->field}}">
-                        <?php
-                        foreach ($condition->fields as $c_field):
-                        ?>
-                        <option value="{{$c_field->pcode}}">{{$c_field->pname}}</option>
-                        <?php
-                        endforeach;
-                        ?>
-                    </select>
-                </div>
-                <div class="col-md-{{$condition->select_type == 'user' ? 4 : 2 }}">
-                    <select class="form-control" id="" name="Segment[operator][]">
-                        <?php
-                        if(property_exists($condition, 'operators')){
-                            $operators = $condition->operators;
-                        }
-                        foreach ($operators as $operator):
-                        ?>
-                        <option value="{{$operator->code}}" <?= $operator->code == $condition->operator ? 'selected=""' : '' ?>>
-                            {{$operator->name}}
-                        </option>
-                        <?php
-                        endforeach;
-                        ?>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <input type="text" class="form-control " name="Segment[value][]" required="" value="{{$condition->value}}"/>
-                </div>
-                <div class="col-md-1 col-add-filter add">
-                    <a class="" href="javascript:void(0);" onclick="addFilter(this)">+ Add</a>
-                </div>
-                <div class="col-md-1 col-add-filter delete">
-                    <a class="" href="javascript:void(0);" onclick="deleteFilter(this)">- Del</a>
-                </div>
+        <form id='segment-form' class="form-horizontal form-segment" method="post" action="{{URL::to('segment/write')}}">
+            <input type="hidden" value="<?= $segment->_id ?>" name="id">
+            <div data-name="condition-group" data-i-condition-max="<?= count($conditions) ?>">
+                <?php
+                $i_condition = 0;
+                foreach($conditions as $condition):
+                ?>
+                @include('segment.partials.condition_item', [
+                    'condition' => $condition,
+                    'type_options' => $type_options,
+                    'i_condition' => $i_condition,
+                ])
+
+                <?php
+                    $i_condition ++;
+                endforeach;
+                ?>
             </div>
-            <?php
-            endforeach;
-            ?>
             <div class="row">
                 <div class="col-sm-push-2 col-sm-2">
                     <button type="submit" class="btn btn-success btn-fill ">
@@ -198,81 +146,95 @@ $f_behaviors = [
 <script type="text/javascript">
 //    $('select').select2();
     
-    // change type
-    $('select[name="Segment[type][]"]').on('change', function(){
-        var that = $(this);
-        
-        
-        
-//        $.ajax({
-//            type: 'GET',
-//            dataType: 'JSON',
-//            url: '{{ URL::to('segment/htmlcondition') }}',
-//            data: {
-//                'type': that.val(),
-//                'select_type': that.find(':selected').attr('data-select-type'),
-//            },
-//            success: function(data){
-//                if(data.success && data.html_condition_item){
-//                    that.parent().parent().html(data.html_condition_item);
-//                    //$('#outputs_table').html(data.html_outputs);
-//                }
-//            },
-//        });
-//        return false;
-    });
-    
     function typeChange(e){
         var that = $(e);
         var containter = that.parent().parent();
+        var condition_item = that.closest('div[data-name="condition-item"]');
+        var i_condition = condition_item.attr('data-i-condition');
         $.each(type_options, function(i,v){
             if(v.value == that.val()){
                 if(v.select_type == 'user'){
-                    containter.find('select[name="Segment[operator][]"]').html('');
-                    containter.find('select[name="Segment[operator][]"]').parent().removeClass('col-md-2');
-                    containter.find('select[name="Segment[operator][]"]').parent().addClass('col-md-4');
-                    containter.find('select[name="Segment[type][]"]').parent().removeClass('col-md-2');
-                    containter.find('select[name="Segment[type][]"]').parent().addClass('col-md-4');
-                    containter.find('select[name="Segment[f][]"]').parent().hide();
-                    containter.find('select[name="Segment[field][]"]').parent().hide();
+                    containter.find('input[name="Segment['+i_condition+'][select_type]"]').val('user');
+                    containter.find('select[name="Segment['+i_condition+'][operator]"]').html('');
+                    containter.find('select[name="Segment['+i_condition+'][operator]"]').parent().removeClass('col-md-2');
+                    containter.find('select[name="Segment['+i_condition+'][operator]"]').parent().addClass('col-md-4');
+                    containter.find('select[name="Segment['+i_condition+'][type]"]').parent().removeClass('col-md-2');
+                    containter.find('select[name="Segment['+i_condition+'][type]"]').parent().addClass('col-md-4');
+                    containter.find('select[name="Segment['+i_condition+'][f]"]').parent().hide();
+                    containter.find('select[name="Segment['+i_condition+'][field]"]').parent().hide();
                     if(v.operators.length){
+                        containter.find('select[name="Segment['+i_condition+'][operator]"]').html('');
                         $.each(v.operators, function(oi, ov){
-                            containter.find('select[name="Segment[operator][]"]').append('<option value="'+ov.code+'">'+ov.name+'</option>');
+                            containter.find('select[name="Segment['+i_condition+'][operator]"]').append('<option value="'+ov.code+'">'+ov.name+'</option>');
                         });
                     }
                 }
                 else{
-                    containter.find('select[name="Segment[operator][]"]').parent().removeClass('col-md-4');
-                    containter.find('select[name="Segment[operator][]"]').parent().addClass('col-md-2');
-                    containter.find('select[name="Segment[type][]"]').parent().removeClass('col-md-4');
-                    containter.find('select[name="Segment[type][]"]').parent().addClass('col-md-2');
-                    containter.find('select[name="Segment[f][]"]').parent().show();
-                    containter.find('select[name="Segment[field][]"]').parent().show();
-                    containter.find('select[name="Segment[operator][]"]').html('');
+                    containter.find('input[name="Segment['+i_condition+'][select_type]"]').val('behavior');
+                    containter.find('select[name="Segment['+i_condition+'][operator]"]').parent().removeClass('col-md-4');
+                    containter.find('select[name="Segment['+i_condition+'][operator]"]').parent().addClass('col-md-2');
+                    containter.find('select[name="Segment['+i_condition+'][type]"]').parent().removeClass('col-md-4');
+                    containter.find('select[name="Segment['+i_condition+'][type]"]').parent().addClass('col-md-2');
+                    containter.find('select[name="Segment['+i_condition+'][f]"]').parent().show();
+                    containter.find('select[name="Segment['+i_condition+'][field]"]').parent().show();
+                    containter.find('select[name="Segment['+i_condition+'][operator]"]').html('');
                     
                     $.each(operator_behavior, function(obi, obv){
-                        containter.find('select[name="Segment[operator][]"]').append('<option value="'+obv.code+'">'+obv.name+'</option>');
+                        containter.find('select[name="Segment['+i_condition+'][operator]"]').append('<option value="'+obv.code+'">'+obv.name+'</option>');
                     });
                     $.each(f_behavior, function(fi, fv){
-                        containter.find('select[name="Segment[f][]"]').append('<option value="'+fv.code+'">'+fv.name+'</option>');
+                        containter.find('select[name="Segment['+i_condition+'][f]"]').append('<option value="'+fv.code+'">'+fv.name+'</option>');
                     });
                     if(v.fields.length){
+                        $('select[name="Segment['+i_condition+'][field]"]').html('');
                         $.each(v.fields, function(fieldi, fieldv){
-                            $('select[name="Segment[field][]"]').append('<option value="'+fieldv.pcode+'">'+fieldv.pname+'</option>');
+                            $('select[name="Segment['+i_condition+'][field]"]').append('<option value="'+fieldv.pcode+'">'+fieldv.pname+'</option>');
                         });
                     }
+                    var add_condition = containter.find('div[data-name="add-condition"]');
+                    add_condition.show();
                 }
-                containter.find('input[name="Segment[value][]"]').val('');
+                containter.find('input[name="Segment['+i_condition+'][value]"]').val('');
+                
             }
         });
+        /*
+        * delete condition sub
+        */
+        var condition_item = that.closest('div[data-name="condition-item"]');
+        condition_item.find('div[data-name="condition-sub-group"]').html('');
+    }
+    
+    function changeField(e){
+        console.log('here');
     }
     
     function addFilter(e){
-        var that = $(e).parent().parent();
-        var clone = that.clone();
-        clone.find('select[name="Segment[type][]"]').val(that.find('select[name="Segment[type][]"]').val());
-        clone.find('input[name="Segment[value][]"]').val('');
-        that.after(clone);
+        var that = $(e);
+        var condition_item = that.closest('div[data-name="condition-item"]');
+        var html = '<?= $html_condition_item ?>';
+        condition_item.after(html);
+        /*
+         * fill select type, select operator
+         */
+        condition_item.next().find('select[name="Segment[i_condition_replace][type]"]').html('');
+        $.each(type_options, function(i, v){
+            var disabled = v.value == '[disabled]' ? 'disabled' : '';
+            condition_item.next().find('select[name="Segment[i_condition_replace][type]"]')
+                    .append('<option value="'+v.value+'" '+disabled+'>'+v.name+'</option>');
+            if(i == 0){
+                var vos = v.operators;
+                condition_item.next().find('select[name="Segment[i_condition_replace][operator]"]').html('');
+                $.each(vos, function(vos_i, vos_v){
+                    condition_item.next().find('select[name="Segment[i_condition_replace][operator]"]').append('<option value="'+vos_v.code+'">'+vos_v.name+'</option>');
+                });
+            }
+        });
+        var condition_group = condition_item.closest('div[data-name="condition-group"]');
+        var html = condition_item.next().html().replace(/i_condition_replace/g, condition_group.attr('data-i-condition-max'));
+        condition_item.next().attr('data-i-condition', condition_group.attr('data-i-condition-max'));
+        condition_group.attr('data-i-condition-max', parseInt(condition_group.attr('data-i-condition-max')) + 1);
+        condition_item.next().html(html);
         checkDisableDelete();
     };
     
@@ -292,6 +254,68 @@ $f_behaviors = [
         }
     }
     checkDisableDelete();
+    
+    function addCondition(e){
+        var that = $(e);
+        var condition_item = that.closest('div[data-name="condition-item"]');
+        var i_condition = condition_item.attr('data-i-condition');
+        var selected_type = that.closest('div[data-name="condition-item"]').find('select[name="Segment['+i_condition+'][type]"]').val();
+        var html = '<?= $html_sub_condition ?>';
+        var condition_sub_group = that.closest('div[data-name="condition-item"]').find('div[data-name="condition-sub-group"]');
+        
+        var condition_sub_item = that.closest('div[data-name="condition-sub-item"]');
+        if(condition_sub_item.length){
+            condition_sub_item.after(html);
+            /* 
+            * fill files for item
+            */
+            $.each(type_options, function(i,v){
+                if(v.value == selected_type){
+                    if(v.fields.length){
+                        $.each(v.fields, function(vf_i, vf_v){
+                            condition_sub_item.next().find("select[name*='cs_field']").append('<option value="'+vf_v.pcode+'">'+vf_v.pname+'</option>');
+                        });
+                    }
+                }
+            });
+            var html = condition_sub_item.next().html().replace(/i_condition_sub_replace/g, condition_sub_group.attr('data-i-condition-sub-max'));
+            var html = html.replace(/i_condition_replace/g, condition_item.attr('data-i-condition'));
+            condition_sub_group.attr('data-i-condition-sub-max', parseInt(condition_sub_group.attr('data-i-condition-sub-max'))+1);
+            condition_sub_item.next().html(html);
+        }
+        else{
+            condition_item.find('div[data-name="condition-sub-group"]').append(html);
+            /* 
+            * fill files for item
+            */
+            $.each(type_options, function(i,v){
+                if(v.value == selected_type){
+                    if(v.fields.length){
+                        $.each(v.fields, function(vf_i, vf_v){
+                            condition_item.find('div[data-name="condition-sub-group"]')
+                                    .find('div[data-name="condition-sub-item"]')
+                                    .last()
+                                    .find('select[name*="cs_field"]')
+                                    .append('<option value="'+vf_v.pcode+'">'+vf_v.pname+'</option>');
+                        });
+                    }
+                }
+            });
+            var html = condition_item.find('div[data-name="condition-sub-item"]').last().html().replace(/i_condition_sub_replace/g, condition_item
+                .find('div[data-name="condition-sub-item"]').length-1);
+            var html = html.replace(/i_condition_replace/g, condition_item.attr('data-i-condition'));
+            condition_item.find('div[data-name="condition-sub-item"]').last().html(html);
+        }
+        return false;
+    }
+    
+    function deleteCondition(e){
+        var that = $(e);
+        var condition_sub_item = that.closest('div[data-name="condition-sub-item"]');
+        if(condition_sub_item.length){
+            condition_sub_item.remove();
+        }
+    }
 </script>
 @endsection
 
