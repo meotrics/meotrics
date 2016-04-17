@@ -19,17 +19,11 @@ Route::controller('trend', 'TrendController');
 
 Route::resource('actiontype', 'TypeController');
 
-Route::get('api/{appid}/identify', 'HomeController@identify');
-
-Route::get('api/{appid}/track', 'HomeController@track');
-
-Route::get('api/{appid}/clear', 'HomeController@clear');
-
-Route::get('api/{appid}/fix/{actionid}', 'HomeController@fix');
-
 Route::post('/actiontype/create', 'TypeController@create');
 
-Route::get('api/{appid}/code', 'HomeController@code');
+Route::get('/home/setup_status', 'HomeController@setup_status');
+
+Route::get('/home/counter', 'HomeController@counter');
 
 Route::controller('segment', 'SegmentController');
 

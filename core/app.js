@@ -81,10 +81,17 @@ function route(app, com) {
 		})
 	});
 
+	// count number of action in app
+	app.getEx('/api/counter/:appid', function(req, res){
+		appmgr.countAction(req.params.appid, function(ret){
+			res.send(ret + "");
+		});
+	});
+
 	//check whether user has setup tracking code
 	app.get('/api/status/:appid', function (req, res) {
 		appmgr.isSetup(req.params.appid, function (ret) {
-			res.send(ret);
+			res.send(ret + "");
 			res.status(200).end();
 		});
 	});

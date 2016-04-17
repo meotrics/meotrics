@@ -1,8 +1,19 @@
 exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segmentCrud) {
+	var me = this;
 	this.isSetup = function (appid, callback) {
-		db.collection(prefix + appid).count({_isUser: {$exists: false}}, function (err, count) {
-			if (err) throw err;
-			return callback(count > 1);
+		me.countAction(appid, function (count) {
+			callback(count > 1);
+		});
+	};
+
+	this.countAction = function (appid, callback) {
+		converter.toIDs(['_isUser'], function (ids) {
+			var query = {};
+			query[ids._isUser] = {$exists: false};
+			db.collection(prefix + appid).count(query, function (err, count) {
+				if (err) throw err;
+				return callback(count);
+			});
 		});
 	};
 
@@ -143,4 +154,5 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 			});
 		});
 	}
-};
+}
+;

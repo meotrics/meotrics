@@ -14,6 +14,19 @@ class HomeController extends Controller
 	private static $code;
 	private $parser;
 
+
+	public function setup_status(Request $request)
+	{
+		$res = MtHttp::get('api/status/' . \Auth::user()->id);
+		return $res . '';
+	}
+
+	public function counter(Request $request)
+	{
+		$res = MtHttp::get('api/counter/' . \Auth::user()->id);
+		return $res . '';
+	}
+
 	private function loadCode($appid = null)
 	{
 		// cache mt.min.js in ::$code
@@ -33,15 +46,15 @@ class HomeController extends Controller
 	{
 		$this->parser = Parser::create();
 		$this->loadCode();
-		//$this->middleware('auth');
+		$this->middleware('auth');
 	}
 
 	public function index(Request $request)
 	{
 		if ($request->user())
-			return view('home')->withCookie(cookie()->forget('mtid'));
+			return view('home');//->withCookie(cookie()->forget('mtid'));
 		else
-			return redirect('auth/login')->withCookie(cookie()->forget('mtid'));
+			return redirect('auth/login');//->withCookie(cookie()->forget('mtid'));
 	}
 
 	private function getRemoteIPAddress(Request $request)
@@ -141,12 +154,11 @@ class HomeController extends Controller
 
 	private function getMtid($appid)
 	{
-		if ( !isset($_COOKIE['mtid'])) {
+		if (!isset($_COOKIE['mtid'])) {
 			// get new mtid
 			$mtid = MtHttp::get('s/' . $appid);
 			setrawcookie('mtid', $mtid, 2147483647, '/api/' . $appid);
-		} else
-		{
+		} else {
 			$mtid = $_COOKIE['mtid'];
 		}
 		return $mtid;
@@ -172,14 +184,14 @@ class HomeController extends Controller
 
 		$mtid = MtHttp::post('i/' . $appid, $req);
 		$response->setContent($mtid);
-		setrawcookie('mtid', $mtid, 2147483647 ,  $mtid, '/api/' . $appid);
+		setrawcookie('mtid', $mtid, 2147483647, $mtid, '/api/' . $appid);
 		return $response;
 	}
 
 	public function clear(Request $request, $appid)
 	{
 		// delete the cookie
-		setrawcookie('mtid', "", time() - 3600 , '/api/' . $appid);
+		setrawcookie('mtid', "", time() - 3600, '/api/' . $appid);
 		return new Response();
 	}
 }
