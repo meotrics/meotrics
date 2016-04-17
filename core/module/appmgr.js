@@ -1,4 +1,4 @@
-exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segmentCrud) {
+exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segmentCrud, trendCrud) {
 	var me = this;
 	this.isSetup = function (appid, callback) {
 		me.countAction(appid, function (count) {
@@ -115,9 +115,18 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 			fields: []
 		};
 
+		var trend1 = {
+			name: "Top purchase",
+			typeid: "purchase",
+			operation: "sum",
+			object: "pid", //code of properties
+			param: "price",
+			order: 1 // small to large
+		};
 
 		var segment1 = {
 			name: "Active user",
+			desc: "Active user in the app",
 			condition: [{
 				type: "pageview", f: "count", field: "", operator: ">", value: 5,
 				conditions: ["url", "eq", "http://google.com"]
@@ -143,7 +152,9 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 								typeCrud.createRaw(appid, register, function () {
 									typeCrud.createRaw(appid, login, function () {
 										typeCrud.createRaw(appid, quit, function () {
-											segmentCrud.createRaw(appid, segment1, callback);
+											trendCrud.createRaw(appid, trend1, function(){
+												segmentCrud.createRaw(appid, segment1, callback);
+											});
 										});
 									});
 								});

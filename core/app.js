@@ -150,7 +150,7 @@ mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
 	component.typeCrud = new CRUD(db, mongodb, async, converter, prefix, "actiontype");
 	component.trendCrud = new CRUD(db, mongodb, async, converter, prefix, "trend");
 	component.segCrud = new CRUD(db, mongodb, async, converter, prefix, "segment");
-	component.appmgr = new AppMgr(db, mongodb, async, converter, prefix, component.typeCrud, component.segCrud);
+	component.appmgr = new AppMgr(db, mongodb, async, converter, prefix, component.typeCrud, component.segCrud, component.trendCrud);
 	component.propCrud = new CRUD(db, mongodb, async, converter, prefix, "userprop");
 	component.camCrud = new CRUD(db, mongodb, async, converter, prefix, "campaign");
 	component.segMgr = new SegMgr(db, mongodb, async, converter, prefix);
