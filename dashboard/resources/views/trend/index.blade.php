@@ -37,7 +37,7 @@ each $types have fields in it
 				</select>
                                 <a id="action_update" data-href="{{URL::to('trend/update')}}" href="{{URL::to('trend/update', [
                                     'id' => $trend_first ? $trend_first->_id : ''
-                                ])}}" class="btn btn-primary" role="button">Update</a>
+                                ])}}" class="button action blue" role="button"><span class="label">Update</span></a>
                                 <a id="action_delete" href="javascript:void(0)" class="btn btn-danger" role="button">Delete</a>
 				&nbsp; or &nbsp;<a href="{{ URL::to('trend/create') }}">+ CREATE NEW TREND</a>
 			</form>
