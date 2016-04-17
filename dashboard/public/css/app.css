@@ -246,11 +246,12 @@ select {
 
 .navbar .navbar-nav > li > a {
 	/* padding: 10px 13px; */
+	vertical-align: middle;
 	margin: 7px 3px;
 }
 
 .form-control {
-	height: 33px;
+	height: 37px;
 	font-size: 16px;
 }
 
@@ -261,5 +262,9 @@ select {
 
 .navbar-default .navbar-nav > li > a:not(.btn)
 {
-	color: black;
+	color: #565656;
+}
+
+.vam{
+	vertical-align: middle;
 }

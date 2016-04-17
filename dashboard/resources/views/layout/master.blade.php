@@ -189,7 +189,7 @@
 							<a style="padding: 0px">
 								<div class="input-group" style="width: 250px;">
                   <span class="input-group-addon">
-	                  <i class="pe-7s-date" style="font-size:26px"></i>
+	                  <i class="pe-7s-date" style="font-size:26px; padding-left:26px;"></i>
                   </span>
 									<input type="text" class="form-control" id="date-range">
 
@@ -219,12 +219,15 @@
 
 					<ul class="nav navbar-nav navbar-right">
 						<li>
-							<a href="#"> Action count: <span id="odometer" class="id_counter odometer"></span></a>
+							<a href="#">
+								<span class="vam" >Action count:</span>
+								<span id="odometer" class="vam id_counter odometer"></span>
+							</a>
 
 						</li>
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-								{{ Auth::user()->name }}
+							<span class="vam">	{{ Auth::user()->name }}</span>
 								<b class="caret"></b>
 							</a>
 							<ul class="dropdown-menu">

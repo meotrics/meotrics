@@ -1,7 +1,7 @@
 
 <li class="dropdown">
 	<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-		<i class="pe-7s-user" style="vertical-align: middle; font-size: 28px"></i>
+		<span style="vertical-align: middle">Segmentation: </span>
 		<span class="segment-label" style="vertical-align: middle"> All users</span>
 		<b class="caret"></b>
 	</a>

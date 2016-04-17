@@ -83,23 +83,21 @@
   function getIntegrationCode(){
     $.ajax({
       method: 'GET',
-      url: '/mt.code',
+      url: '/mt.min.html',
       success: function(response){
-        $('#guideline').find('textarea').html(response.replace(RegExp('<MT_APP_ID>', 'g'), APP_ID));
+	      var html = $('<div/>').text(response).html();
+        $('#guideline').find('textarea').html(html.replace('$APPID$', APP_ID));
       },
       error: function(err){ _helper.notification.error(err.statusText) }
-    })
+    });
   }
   $(document).ready(function(){
     $.ajax({
       method: 'GET',
-      url: '{{ URL::to("/") }}/helper/setup_status', // TODO: replaceurl to setup_check API
-      data: {
-        app_id: APP_ID
-      },
+      url: '{{ URL::to("/") }}/home/setup_status', // TODO: replaceurl to setup_check API
       success: function(response){
         console.log(response);
-        if(response == "true"){
+        if(response == "true" || response == 1){
           console.log('Integrated !');
         } else {
           $('#guideline').modal('show');
