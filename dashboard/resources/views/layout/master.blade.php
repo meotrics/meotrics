@@ -21,10 +21,11 @@
 	<link href="{{asset('css/fg.menu.css')}}" rel="stylesheet"/>
 	<link href="{{asset('css/daterangepicker.css')}}" rel="stylesheet"/>
 	<link href="{{asset('css/sweetalert.css')}}"/>
+	@yield('style')
 	<!-- App's styles -->
 	<link href="{{asset('css/app.css')}}" rel="stylesheet"/>
 
-	@yield('style')
+
 
 	<script src="{{asset('js/he.js')}}" type="text/javascript"></script>
 	<script src="{{asset('js/jquery-1.12.1.min.js')}}" type="text/javascript"></script>
@@ -64,50 +65,70 @@
 
 		var _helper = {
 			notification: {
-				error: function(err, options){
+				error: function (err, options) {
 					$.notify({
-	          icon: "pe-7s-attention",
-	          message: err
-	        }, _.merge({
-	          timer: 3000,
-	          placement: {
-	            from: 'top',
-	            align: 'right'
-	          }
-	        }, _.merge(options || {}, { type: 'danger' })));
+						icon: "pe-7s-attention",
+						message: err
+					}, _.merge({
+						timer: 3000,
+						placement: {
+							from: 'top',
+							align: 'right'
+						}
+					}, _.merge(options || {}, {type: 'danger'})));
 				},
-				success: function(message, options){
+				success: function (message, options) {
 					$.notify({
-	          icon: "pe-7s-check",
-	          message: message
-	        }, _.merge({
-	          timer: 3000,
-	          placement: {
-	            from: 'top',
-	            align: 'right'
-	          }
-	        }, _.merge(options || {}, { type: 'success' })));
+						icon: "pe-7s-check",
+						message: message
+					}, _.merge({
+						timer: 3000,
+						placement: {
+							from: 'top',
+							align: 'right'
+						}
+					}, _.merge(options || {}, {type: 'success'})));
 				}
 			}
 		}
 	</script>
+	<link rel="stylesheet" href="{{asset('css/odometer-theme-minimal.css')}}"/>
+	<script src="{{asset('js/odometer.min.js')}}"></script>
 
 
+	<script>
+		onPageLoad(function () {
+			function bg_refresh_counter() {
+				setTimeout(function () {
+					$.get('/home/counter', {}, function (data) {
+						if (odometer.length !== undefined) {
+							for (var i in odometer) if (odometer.hasOwnProperty(i))odometer[i].innerHTML = data;
+						}
+						else odometer.innerHTML = parseInt(data);
+						bg_refresh_counter();
+					});
+				}, 2000);
+			}
+
+			bg_refresh_counter();
+		});
+	</script>
 	@yield('header-script')
 </head>
 <body>
 
 <div class="wrapper">
-  <div class="sidebar main_sidebar" data-color="blue" data-image="/img/sidebar-4.jpg">
-    <!--   you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple" --><div class="sidebar-wrapper">
-	    <div class="logo">
-	    	<a class="simple-text" href="{{ URL::to('/') }}">
-	    		<img src="{{ asset('img/logo.png') }}" width="30px"/>
+	<div class="sidebar main_sidebar" data-color="blue" data-image="/img/sidebar-4.jpg">
+		<!--   you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple" -->
+		<div class="sidebar-wrapper">
+			<div class="logo">
+				<a class="simple-text" href="{{ URL::to('/') }}">
+					<img src="{{ asset('img/logo.png') }}" width="30px"/>
 					<span class="logo-text">Meotrics</span>
-	  		</a>
-	    </div>
-	    <ul class="nav">
-	    	<li class="{{ Route::getCurrentRoute()->getPath() == 'home' ? 'active' : '' }}">
+				</a>
+			</div>
+			<ul class="nav">
+				<li class="{{ Route::getCurrentRoute()->getPath() == 'home' ? 'active' : '' }}">
 					<a href="{{ URL::to('/home') }}">
 						<i class="pe-7s-graph"></i>
 						<p>Dashboard</p>
@@ -143,28 +164,28 @@
 						</li>
 					</ul>
 				</li> -->
-	    </ul>
-	  </div>
+			</ul>
+		</div>
 	</div>
 
 	<div class="main-panel">
-	  <nav class="navbar navbar-default navbar-fixed">
-	    <div class="container-fluid">
-	      <div class="navbar-header">
-	        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
-	          <span class="sr-only">Toggle navigation</span>
-	          <span class="icon-bar"></span>
-	          <span class="icon-bar"></span>
-	          <span class="icon-bar"></span>
-	        </button>
-	        <!-- <a class="navbar-brand" href="#">{{ Auth::user()->name }}</a> -->
-	      </div>
-	      <div class="collapse navbar-collapse">
-	        <ul class="nav navbar-nav navbar-left">
-	          <li>
-	            @include('segment/select')
-	          </li>
-	          <li>
+		<nav class="navbar navbar-default navbar-fixed">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<!-- <a class="navbar-brand" href="#">{{ Auth::user()->name }}</a> -->
+				</div>
+				<div class="collapse navbar-collapse">
+					<ul class="nav navbar-nav navbar-left">
+						<li>
+							@include('segment/select')
+						</li>
+						<li>
 							<a style="padding: 0px">
 								<div class="input-group" style="width: 250px;">
                   <span class="input-group-addon">
@@ -175,83 +196,87 @@
 								</div>
 							</a>
 						</li>
-	          <!-- <li class="dropdown">
-	            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-	              <i class="fa fa-globe"></i>
-	              <b class="caret"></b>
-	              <span class="notification">5</span>
-	            </a>
-	            <ul class="dropdown-menu">
-	              <li><a href="#">Notification 1</a></li>
-	              <li><a href="#">Notification 2</a></li>
-	              <li><a href="#">Notification 3</a></li>
-	              <li><a href="#">Notification 4</a></li>
-	              <li><a href="#">Another notification</a></li>
-	            </ul>
-	          </li>
-	          <li>
-	           	<a href="">
-		            <i class="fa fa-search"></i>
-		          </a>
-		        </li> -->
-		      </ul>
+						<!-- <li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+								<i class="fa fa-globe"></i>
+								<b class="caret"></b>
+								<span class="notification">5</span>
+							</a>
+							<ul class="dropdown-menu">
+								<li><a href="#">Notification 1</a></li>
+								<li><a href="#">Notification 2</a></li>
+								<li><a href="#">Notification 3</a></li>
+								<li><a href="#">Notification 4</a></li>
+								<li><a href="#">Another notification</a></li>
+							</ul>
+						</li>
+						<li>
+							 <a href="">
+								<i class="fa fa-search"></i>
+							</a>
+						</li> -->
+					</ul>
 
-		      <ul class="nav navbar-nav navbar-right">
-			      <li class="dropdown">
-			        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-			          {{ Auth::user()->name }}
-			          <b class="caret"></b>
-			        </a>
-			        <ul class="dropdown-menu">
-			        	<li><a href="{{ URL::to('/user/profile') }}">Profile</a></li>
-			          <li><a href="{{ URL::to('/actiontype') }}">Action types</a></li>
-			          <li class="divider"></li>
-			          <li><a href="{{ URL::to('/auth/logout') }}">Logout</a></li>
-			        </ul>
-			      </li>
-			    </ul>
-			  </div>
+					<ul class="nav navbar-nav navbar-right">
+						<li>
+							<a href="#"> Action count: <span id="odometer" class="id_counter odometer"></span></a>
+
+						</li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+								{{ Auth::user()->name }}
+								<b class="caret"></b>
+							</a>
+							<ul class="dropdown-menu">
+								<li><a href="{{ URL::to('/user/profile') }}">Profile</a></li>
+								<li><a href="{{ URL::to('/actiontype') }}">Action types</a></li>
+								<li class="divider"></li>
+								<li><a href="{{ URL::to('/auth/logout') }}">Logout</a></li>
+							</ul>
+						</li>
+					</ul>
+				</div>
 			</div>
 		</nav>
 
 
 		<div class="content">
-		  <div class="container-fluid">
-	    	@yield('content')
-		  </div>
+			<div class="container-fluid">
+				@yield('content')
+			</div>
 		</div>
 
 
 		<footer class="footer">
-		  <div class="container-fluid">
-		    <nav class="pull-left">
-		      <ul>
-		        <li>
-		          <a href="#">
-		            Home
-		          </a>
-		        </li>
-		        <li>
-		          <a href="#">
-		            Company
-		          </a>
-		        </li>
-		        <li>
-		          <a href="#">
-		            Portfolio
-		          </a>
-		        </li>
-		        <li>
-		          <a href="#">
-		           Blog
-		         </a>
-		       </li>
-		     </ul>
-		   </nav>
-		   <p class="copyright pull-right">
-			    &copy; 2016 <a href="{{ URL::to('/') }}">Meotrics</a>,
-			    made with <big class="text-danger">&hearts;</big> for a better analyze
-			  </p>
+			<div class="container-fluid">
+				<nav class="pull-left">
+					<ul>
+						<li>
+							<a href="#">
+								Home
+							</a>
+						</li>
+						<li>
+							<a href="#">
+								Company
+							</a>
+						</li>
+						<li>
+							<a href="#">
+								Portfolio
+							</a>
+						</li>
+						<li>
+							<a href="#">
+								Blog
+							</a>
+						</li>
+					</ul>
+				</nav>
+				<p class="copyright pull-right">
+					&copy; 2016 <a href="{{ URL::to('/') }}">Meotrics</a>,
+					made with <big class="text-danger">&hearts;</big> for a better analyze
+				</p>
 			</div>
 		</footer>
 	</div>
