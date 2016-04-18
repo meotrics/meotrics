@@ -37,7 +37,7 @@ select {
 .fmonospaced {
 	color: #2C629A;
 	text-transform: uppercase;
-	background-color: rgba(189, 189, 189, 0.08);
+	background-color: rgba(0, 0, 0, 0.05);
 	font-family: 'consolas', 'Monaco', monospace;
 }
 
@@ -301,4 +301,8 @@ a {
 
 a:hover, a:focus {
 	color: #4A8BF6;
+}
+
+.card label {
+	font-size: 14px;
 }
