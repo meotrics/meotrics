@@ -38,6 +38,13 @@ function route(app, com) {
 	app.putEx('/segment/:appid/:id', com.segCRUD.update);
 	app.deleteEx('/segment/:appid/:id', com.segCRUD.delete);
 
+	//update or
+	app.get('/segment/query/:appid/:id/:field1/:field2', function (req, res) {
+		com.segMgr.querySegment(req.params.appid, req.params.id, req.params.field1, req.param.field2, function (results) {
+			res.json(results);
+		});
+	});
+
 	// CRUD user
 	app.postEx('/userprop/:appid', com.propCRUD.create);
 	app.getEx('/userprop/:appid', com.propCRUD.list);
@@ -84,12 +91,7 @@ function route(app, com) {
 		});
 	});
 
-	//update or
-	app.get('segment/query/:appid/:id/:field1/:field2', function (req, res) {
-		com.segMgr.querySegment(req.params.appid, req.params.id, req.params.field1, req.param.field2, function (results) {
-			res.json(results);
-		});
-	});
+
 }
 function buildconnstr(config) {
 	var host = config.get("mongod.host") || "127.0.0.1";
