@@ -3,7 +3,8 @@
 use App\Util\MtHttp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
-use function view;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Input;
 
 class SegmentController extends Controller
 {
@@ -69,7 +70,7 @@ class SegmentController extends Controller
                 $html_condition_item = View::make('segment/partials/condition_item');
                 $html_condition_item = preg_replace( "/\r|\n/", "", $html_condition_item->render() );;
 		return view('segment/create', [
-                    'segment' => (object)['_id' => ''],
+                    'segment' => (object)['_id' => '', 'name' => '', 'description' => ''],
                     'actions' => $actions,
                     'props' => $props,
                     'conditions' => $conditions,
@@ -190,15 +191,46 @@ class SegmentController extends Controller
     }
     
     public function postWrite(Request $request){
-        if(isset($_POST['Segment']) && is_array($_POST['Segment'])){
+        if(isset($_POST['Segment']) && is_array($_POST['Segment']) && isset($_POST['name'])){
             $query = [];
             $data_post = $_POST['Segment'];
+            /*
+             * validate here
+             */
+            $validator = Validator::make(
+                [
+                    'name' => $_POST['name'],
+                    'conditions' => '',
+                ],
+                [
+                    'name' => 'required',
+                    'conditions' => 'sometimes',
+                ],
+                [
+                    'conditions.required' => 'At least one condition is completed',
+                ]
+            );
+            $validator->sometimes('conditions', 'required', function($input) use($data_post){
+                $result = false;
+                foreach ($data_post as $condition) {
+                    if(!isset($condition['value']) || !$condition['value']){
+                        $result = true;
+                    }
+                }
+//                var_dump($data_post);
+//                var_dump($result); exit;
+                return $result;
+            });
+            if ($validator->fails()){
+                return redirect()->back()->withInput(Input::old())->withErrors($validator);
+            }
             $user_query = (object)[
                 'type' => 'user',
                 'conditions' => [],
             ];
             foreach ($data_post as $data) {
-                if(isset($data['select_type']) && $data['select_type'] == 'user'){
+                if(isset($data['select_type']) && $data['select_type'] == 'user' 
+                        && isset($data['value']) && $data['value']){
                     $user_conditions = [
                         isset($data['type']) ? $data['type'] : '',
                         isset($data['operator']) ? $data['operator'] : '',
@@ -207,14 +239,17 @@ class SegmentController extends Controller
                     ];
                     $user_query->conditions = array_merge($user_query->conditions, $user_conditions);
                 }
-                elseif(isset($data['select_type']) && $data['select_type'] != 'user'){
+                elseif(isset($data['select_type']) && $data['select_type'] != 'user'
+                        && isset($data['value']) && $data['value']){
                     $conditions = [];
                     if(isset($data['conditions']) && is_array($data['conditions'])){
                         foreach ($data['conditions'] as $c_value) {
-                            $conditions[] = isset($c_value['cs_field']) ? $c_value['cs_field'] : '';
-                            $conditions[] = isset($c_value['cs_operator']) ? $c_value['cs_operator'] : '';
-                            $conditions[] = isset($c_value['cs_value']) ? ((int)$c_value['cs_value'] ? (int)$c_value['cs_value'] : $c_value['cs_value']) : '';
-                            $conditions[] = "and";
+                            if(isset($c_value['cs_value']) && $c_value['cs_value']){
+                                $conditions[] = isset($c_value['cs_field']) ? $c_value['cs_field'] : '';
+                                $conditions[] = isset($c_value['cs_operator']) ? $c_value['cs_operator'] : '';
+                                $conditions[] = isset($c_value['cs_value']) ? ((int)$c_value['cs_value'] ? (int)$c_value['cs_value'] : $c_value['cs_value']) : '';
+                                $conditions[] = "and";
+                            }
                         }
                         array_pop($conditions);
                     }
@@ -236,13 +271,31 @@ class SegmentController extends Controller
             $app_id = \Auth::user()->id;
             $id = isset($_POST['id']) && $_POST['id'] ? $_POST['id'] : 0;
             if (!$id) {
-                $id_new = MtHttp::post('segment/' . $app_id, ['condition' => $query, 'name' => 'New']);
+                $id_new = MtHttp::post('segment/' . $app_id, [
+                    'condition' => $query, 
+                    'name' => $_POST['name'],
+                    'description' => isset($_POST['description']) ? $_POST['description'] : '', 
+                ]);
             }
             else{
-                $id = MtHttp::put('segment/' . $app_id .'/' .$id, ['condition' => $query, 'name' => 'Update']);
+                $id = MtHttp::put('segment/' . $app_id .'/' .$id, [
+                    'condition' => $query, 
+                    'name' => $_POST['name'],
+                    'description' => isset($_POST['description']) ? $_POST['description'] : '', 
+                ]);
             }
         }
         return redirect('segment');
+    }
+    
+    public function deleteRemove($id){
+        $result = ['success' => false];
+        $app_id = \Auth::user()->id;
+        $segment = $this->loadModel($id);
+        $result = MtHttp::delete('segment/'.$app_id.'/' . $id, null);  
+        //check result overhere
+        $result['success'] = true;
+        return $result;
     }
         
 }

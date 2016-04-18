@@ -49,13 +49,18 @@ class TrendController extends Controller
             $app_id = \Auth::user()->id;
             $actiontypes = MtHttp::get('actiontype/' . $app_id);
             $trends = MtHttp::get('trend/' . $app_id);
-            $trend = reset($trends);
-            $outputs = MtHttp::get('trend/query/' . $app_id .'/'. $trend->_id);
+            if($trends){
+                $trend = reset($trends);
+                $outputs = MtHttp::get('trend/query/' . $app_id .'/'. $trend->_id);
+            }
+            else{
+                $outputs = [];
+            }
             return view('trend/index', [
                 'types' => json_encode($actiontypes),
                 'trends' => $trends,
                 'outputs' => $outputs,
-                'actiontypes' => $actiontypes,
+//                'actiontypes' => $actiontypes,
             ]);
 	}
 

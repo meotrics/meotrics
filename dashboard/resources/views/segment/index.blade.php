@@ -1,227 +1,162 @@
-@extends('../layout/master')
+<?php
+use App\Enum\TrendEnum;
 
-@section('style')
-	<style>
-		#segment_index select{
-			width: auto;
-			min-width: 150px;
-		}
-		#segment_index .selections > div > *{
-			display: inline-block;
-			vertical-align: middle;
-			margin-right: 5px;
-		}
-		#segment_index .selections label, #segment_index .segment_filters label{
-			width: 16.66666667%;
-		}
-		#addition_filter{
-			margin-right: 0px;
-		}
-		#addition_filter .filter_wrapper{
-			margin-bottom: 5px;
-		}
-		#addition_filter .filter_wrapper > * {
-	    width: auto;
-	    display: inline-block;
-	    margin-right: 10px;
-		}
-		#addition_filter .condition_value input{
-			display: inline-block;
-			vertical-align: middle;
-			width: auto;
-		}
-		#addition_filter .condition_value input.string{
-			width: 200px;
-		}
-		#addition_filter .condition_value input.range{
-			width: 98px;
-		}
-		#addition_filter .remove-btn{
-    	padding: 10px;
-		}
-		.form-group{
-			overflow: auto;
-		}
-	</style>
+$segments = isset($segments) ? $segments : [];
+$props = isset($props) ? $props : [];
+?>
+@extends('../layout/master', ['sidebarselect' => 'segment'])
+@section('title', 'Segment')
+@section('script')
+<script type="text/javascript">
+var segments = {};
+<?php
+if($segments):
+    $segment_first = null;
+    foreach ($segments as $key => $segment):
+        if($key == 0){
+            $segment_first = $segment;
+        }
+?>
+    segments['<?= $segment->_id ?>'] = {
+    name: '<?= property_exists($segment, 'name') ? $segment->name : '' ?>',
+    description: '<?= property_exists($segment, 'description') ? $segment->description : '' ?>'
+    }
+<?php
+    endforeach;
+endif;
+?>
+</script>
 @endsection
 
-@section('script')
-	<script src="{{asset('js/cs.segmentop.js')}}"></script>
-	<script src="{{asset('js/cs.segment.query.js')}}"></script>
-	<script>
-
-		$(document).ready(function(){
-
-			var props 	 = {!! json_encode($props)    !!};
-			var segments = {!! json_encode($segments) !!};
-
-			var additionFilterElement = $('#addition_filter')
-
-			var dispatchChangeEvent = function(el){
-				// Dispatch change event
-				var evt = document.createEvent('HTMLEvents');
-		    evt.initEvent('change', false, true);
-		    el.dispatchEvent(evt);
-			}
-			var onSelectSegment = function(){
-				console.log('onSegment selected !');
-			}
-			var appendAdditionFilter = function(){
-				// Filter type selection
-				var wrapper = document.createElement('div');
-				wrapper.setAttribute('class', 'filter_wrapper');
-				var filterType = document.createElement('select');
-				filterType.setAttribute('class', 'filter_type form-control');
-				filterType.addEventListener('change', function(ev){
-					// Refresh filter operators
-					var typeCode = $(this).val();
-					var type = _.find(props, function(prop){ return prop.code == typeCode });
-					$(this).next().empty(); // Clear current options
-					for(var i = 0; i < type.operators.length; i++){
-						var op = document.createElement('option');
-						op.setAttribute('value', type.operators[i].code);
-						op.innerHTML = type.operators[i].name;
-						$(this).next().append(op);
-					}
-					dispatchChangeEvent($(this).next()[0]);
-				});
-				for(var i = 0; i < props.length; i++){
-					var option = document.createElement('option');
-					option.setAttribute('value', props[i].code);
-					option.innerHTML = props[i].name;
-					filterType.appendChild(option);
-				}
-				wrapper.appendChild(filterType);
-				// Filter Operator selection
-				var filterOperator = document.createElement('select');
-				filterOperator.setAttribute('class', 'filter_operator form-control');
-				filterOperator.addEventListener('change', function(ev){
-					// Refresh operator input
-					var typeCode = $(this).prev().val();
-					var type = _.find(props, function(prop){ return prop.code == typeCode });
-					var operatorCode = $(this).val();
-					var conditionValue = $(this).next();
-					if(conditionValue.length > 0) conditionValue.remove(); // Remove old element
-					conditionValue = document.createElement('div');
-					conditionValue.setAttribute('class', 'condition_value');
-					if(operatorCode == 'in'){
-						// Range
-						conditionValue.innerHTML = '\
-							<input class="form-control range" name="fromValue" placeholder="From">\
-							<input class="form-control range" name="toValue"  placeholder="To">\
-						';
-					} else {
-						// String
-						conditionValue.innerHTML = '<input class="form-control string" name="conditionValue">';
-					}
-					$(this).parent().append(conditionValue);
-				})
-				wrapper.appendChild(filterOperator);
-				additionFilterElement.append(wrapper);
-				// Remove filter button
-				var filterRemoveBtn = document.createElement('a');
-				filterRemoveBtn.setAttribute('href', 'javascript:void(0)');
-				filterRemoveBtn.setAttribute('class', 'remove-btn');
-				filterRemoveBtn.innerHTML = '<i class="fa fa-trash"></i>';
-				filterRemoveBtn.addEventListener('click', function(ev){
-					$(wrapper).remove();
-				});
-				wrapper.insertBefore(filterRemoveBtn, filterType);
-
-				dispatchChangeEvent(filterType);
-			}
-			var removeAdditionFilter = function(){
-
-			}
-
-			appendAdditionFilter();
-			window.appendAdditionFilter = appendAdditionFilter;
-		})
-
-		// var sq;
-		// var data = [];
-
-		// for (var i in actions) {
-		// 	var action = actions[i];
-		// 	var fis = [];
-		// 	for (var f in action.fields)
-		// 		fis.push({name: action.fields[f].pname, code: action.fields[f].pcode});
-
-		// 	data.push({type: 'action', id: action._id, name: action.name, fields: fis});
-		// }
-
-		// for (var i in props) {
-		// 	var prop = props[i];
-		// 	data.push({type: 'prop', name: prop.name, dpname: prop.dpname});
-		// }
-
-		// onPageLoad(function () {
-		// 	sq = new SegmentQuery();
-
-		// 	sq.produce(function ($query) {
-		// 		$('.id_query').append($query);
-
-		// 	}, data);
-		// });
-
-
-		// $('.id_exebtn').click(function () {
-		// 	$(this).attr('disabled', true);
-
-
-		// 	var $field1 = $('.id_field1-43');
-		// 	var $field2 = $('.id_field1-54');
-
-		// 	$.get('/segment/execute', {
-		// 		id: -1,
-		// 		name: 'Draf',
-		// 		query: sq.query(),
-		// 		f1: $field1.val(),
-		// 		f2: $field2.val()
-		// 	}, function (data) {
-		// 		console.log(data);
-		// 	});
-
-		// });
-
-
-	</script>
+@section('style')
+    <link rel="stylesheet" href="{{asset('css/select2.min.css')}}"/>
 @endsection
 
 @section('content')
-	<div class="card row" id="segment_index">
-		<div class="content col-sm-12">
-			<div class="form-group selections">
-				<label class="col-lg-2 text-muted uppercase"><b>Segmentation</b></label>
-				<div class="col-lg-10">
-					<select class="form-control" id="selectSegment" onchange="onSelectSegment()">
-						@foreach($segments as $s)
-							<option value="">New segment</option>
-	          	<option value="{{ $s->_id }}">{{ $s->name }}</option>
-	          @endforeach
-	        </select>
-	        <span>or</span>
-	        <a href="{{ URL::to('/segment/create') }}" class="uppercase">Create new segment</a>
+
+<div class="card row">
+    <div class="header col-md-12">
+        <!--<form class="col-md-12">-->
+            <label class="col-md-2">Select Segmentation</label>&nbsp;&nbsp;
+            <div class="col-md-4">
+                <select id="segment" class="form-control input-sm" style="display:inline-block">
+                    @foreach($segments as $segment)
+                    <option value="{{$segment->_id}}" <?= $segment->_id == $segment_first->_id?'selected=""':'' ?>>{{$segment->name ? $segment->name : TrendEnum::EMPTY_NAME}}</option>
+                    @endforeach
+                </select>
+            </div>
+            
+            <a id="action_update" data-href="{{URL::to('segment/update')}}" href="{{URL::to('segment/update', [
+                'id' => $segment_first ? $segment_first->_id : ''
+            ])}}" class="btn btn-primary" role="button">Update</a>
+            <a id="action_delete" href="javascript:void(0)" class="btn btn-danger" role="button">Delete</a>
+            &nbsp; or &nbsp;<a href="{{ URL::to('segment/create') }}">+ CREATE NEW SEGMENTATION</a>
+        <!--</form>-->
+    </div>
+
+    <div class="content col-md-12" data-name="name">
+        <label class="col-md-2" style="margin-top: 4px">Segment name: </label>
+        <p class="col-md-10"><?= property_exists($segment_first, 'name') ? $segment_first->name : ''?></p>
+    </div>
+    <div class="content col-md-12" data-name="description">
+        <label class="col-md-2" style="margin-top: 4px">Segment description: </label>
+        <p class="col-md-10"><?= property_exists($segment_first, 'description') ? $segment_first->description : ''?></p>
+    </div>
+</div>
+<div class="card row">
+    <div class="header col-md-12">
+        <div class="content col-md-2">
+            <label>Filter to execute:</label>
         </div>
-			</div>
-			<div class="form-group segment_filters">
-	      <label class="text-muted uppercase col-lg-2"><b>Filter</b></label>
-	      <div class="col-lg-10" id="addition_filter">
-	        <!-- Segment addition filter -->
-	      </div>
-	    </div>
-	    <div class="form-group segment_filters">
-	      <label class="text-muted uppercase col-lg-2"><b></b></label>
-	      <div class="col-lg-10" id="addition_filter">
-	        <a class="" href="javascript:void(0);" onclick="appendAdditionFilter()">+ Add filter</a>
-	      </div>
-	    </div>
-	    <div class="form-group segment_buttons">
-	    	<label class="text-muted uppercase col-lg-2">
-	    		<button class="btn btn-fill btn-primary">Excute</button>
-    		</label>
-	    </div>
-		</div>
-	</div>
+        <div class="col-md-4">
+            <select name="Prop[one]" class="form-control">
+                <?php
+                foreach ($props as $prop):
+                ?>
+                <option value="<?= property_exists($prop, 'code') ? $prop->code : '' ?>">
+                    <?= property_exists($prop, 'name') ? $prop->name : '' ?>
+                </option>
+                <?php
+                endforeach;
+                ?>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <select name="Prop[one]" class="form-control">
+                <?php
+                foreach ($props as $prop):
+                ?>
+                <option value="<?= property_exists($prop, 'code') ? $prop->code : '' ?>">
+                    <?= property_exists($prop, 'name') ? $prop->name : '' ?>
+                </option>
+                <?php
+                endforeach;
+                ?>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <button type="submit" class="btn btn-success btn-fill ">
+                <span class="" style="vertical-align: middle">Execute chart</span>
+            </button>
+        </div>
+    </div>
+    <div class="col-md-12">
+        
+
+    </div>
+</div>
+
 @endsection
 
+@section('additional')
+<script src="{{asset('js/select2.min.js')}}"></script>
+<script type="text/javascript">
+    $('select').select2();
+    
+    $('#segment').on('change', function(){
+        var that = $(this);
+        /*
+         * set name and description
+         */
+        var name_div = $('div[data-name="name"]').find('p');
+        if(name_div.length){
+            name_div.text(segments[that.val()] ? segments[that.val()]['name'] : '');
+        }
+        var description_div = $('div[data-name="description"]').find('p');
+        if(description_div.length){
+            description_div.text(segments[that.val()] ? segments[that.val()]['description'] : '');
+        }
+        $('#action_update').attr('href', $('#action_update').attr('data-href')+'/'+that.val());
+//        $.ajax({
+//            type: 'GET',
+//            dataType: 'JSON',
+//            url: '{{ URL::to('trend/htmloutputs') }}',
+//            data: {
+//                '_id' : that.val(),
+//            },
+//            success: function(data){
+//                if(data.success && data.html_outputs){
+//                    $('#outputs_table').html(data.html_outputs);
+//                }
+//            },
+//        });
+    return false;
+    });
+    
+    $('#action_delete').on('click', function(){
+        var cf = confirm('This segment will be removed. Are you sure?');
+        if(cf){
+            $.ajax({
+            type: 'DELETE',
+            dataType: 'JSON',
+            url: '{{ URL::to('segment/remove') }}'+'/'+$('#segment').val(),
+            success: function(data){
+                if(data.success){
+                    location.reload();
+                }
+            },
+        });
+        }
+    });
+</script>    
+@endsection

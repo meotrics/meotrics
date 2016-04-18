@@ -1,4 +1,6 @@
 <?php
+use Illuminate\Support\Facades\Input;
+
 $is_new = isset($condition) ? false : true;
 
 $condition = isset($condition) ? $condition : (object)[
@@ -94,7 +96,7 @@ $operators_default = [
             </select>
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control " name="Segment[<?= $i_condition ?>][value]"  value="<?= $condition->value ?>"/>
+            <input type="text" class="form-control " name="Segment[<?= $i_condition ?>][value]"  value="<?= Input::old('Segment['.$i_condition.'][value]', $condition->value)?>"/>
         </div>
         <div class="col-md-1 col-add-condition add" data-name="add-condition" <?= $condition->select_type == 'user' ? 'style="display: none"' : '' ?>>
             <i class="fa fa-plus fa-2" aria-hidden="true" onclick="addCondition(this)"></i>
