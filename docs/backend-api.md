@@ -34,14 +34,15 @@
   
 2. Supported actions
 
-|Action|Method|URL|Param Json|Output
-|---|---|--|--|--|
-|Create a segment|POST| http://localhost:2108/segment/:appid |An action type|number, id of created segmentation|
-|List all segmentation in app|GET| http://localhost:2108/segment/:appid |-| JSON array of segmentations |
-|Get a segmentation|GET| http://localhost:2108/segment/:appid/:segmentid |-|an segmentation|
-|Update a segmentation|PUT| http://localhost:2108/segment/:appid/:segmentid |-|-|
-|Delete a segmentation|DELETE| http://localhost:2108/segment/:appid/:segmentid |-|-|
-|Excute an segmentation | GET | http://locaolhost:2108/segment/query/:appid/:segmentid|-|TODO|
+|Action|Method|URL|Param Json|Output|
+|--------|--------|-----|------------|--------|
+| Create a segment|POST| http://localhost:2108/segment/:appid |An action type|number, id of created segmentation|
+| List all segmentation in app|GET| http://localhost:2108/segment/:appid |-| JSON array of segmentations |
+| Get a segmentation|GET| http://localhost:2108/segment/:appid/:segmentid |-|an segmentation|
+| Update a segmentation|PUT| http://localhost:2108/segment/:appid/:segmentid |-|-|
+| Delete a segmentation|DELETE| http://localhost:2108/segment/:appid/:segmentid |-|-|
+| Excute an segmentation | GET | http://locaolhost:2108/segment/query/:appid/:segmentid|-|TODO|
+
 3. Example
 
   ```php
@@ -61,8 +62,8 @@
 
 2. Supported actions
 
-|Action|Method|URL|Param Json|Output
-|---|---|--|--|--|
+|Action|Method|URL|Param Json|Output|
+|------|-----|---|----|----|
 |Create a prop|POST| http://localhost:2108/prop/:appid |An action type|number, id of created prop|
 |List all prop in app|GET| http://localhost:2108/prop/:appid |-| Json array of properties |
 |Get a property|GET| http://localhost:2108/prop/:appid/:propid |-|an property|
@@ -94,8 +95,8 @@
   
 2. Supported actions
 
-|Action|Method|URL|Param Json|Output
-|---|---|--|--|--|
+|Action|Method|URL|Param Json|Output|
+|---|---|---|---|---|
 |Create an action type|POST|http://localhost:2108/actiontype/:appid |An action type|number, id of created action type|
 |List all action type in app|GET|http://localhost:2108/actiontype/:appid |-| Array of Action type |
 |Get an action type|GET|http://localhost:2108/actiontype/:appid/:actiontypeid |-|an action type|
