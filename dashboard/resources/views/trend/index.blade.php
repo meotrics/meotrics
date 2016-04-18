@@ -45,9 +45,15 @@ each $types have fields in it
 
 
                 <div class="content col-md-12" id="outputs_table">
+                    <?php
+                    if($outputs):
+                    ?>
                     @include('trend.partials.outputs', [
                         'outputs' => $outputs,
                     ])
+                    <?php
+                    endif;
+                    ?>
 		</div>
 	</div>
 

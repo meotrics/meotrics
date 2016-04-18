@@ -1,4 +1,7 @@
 
+<?php
+use Illuminate\Support\Facades\Input;
+?>
 @extends('../layout/master')
 @section('script')
 <script type="text/javascript">
@@ -111,6 +114,31 @@ $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators();
     <div class="header col-md-12">
         <form id='segment-form' class="form-horizontal form-segment" method="post" action="{{URL::to('segment/write')}}">
             <input type="hidden" value="<?= $segment->_id ?>" name="id">
+            <div class="form-group col-md-12">
+                <div class="form-group col-md-6">
+                    <!--<label class="col-md-12" style="margin-top: 10px">Enter segment name and description</label>-->
+                    <div class="col-md-12">
+                        <input type="text" class="form-control " name="name" 
+                               
+                               value="<?= Input::old('name', $segment->name)  ?>"
+                               placeholder="Enter segment name"/>
+                        @if($errors->any())
+                        <p class="errror">{{$errors->first('name')}}</p>
+                        <p class="errror">{{$errors->first('conditions')}}</p>
+                        @endif
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    <!--<label class="col-md-12" style="margin-top: 10px">Segment description</label>-->
+                    <div class="col-md-12">
+                        <textarea type="text" rows="5" class="form-control " 
+                                  name="description"
+                                  placeholder="Enter segment description"
+                                  ><?= property_exists($segment, 'description')?$segment->description:'' ?></textarea>
+                    </div>
+                </div>
+            </div>
+            
             <div data-name="condition-group" data-i-condition-max="<?= count($conditions) ?>">
                 <?php
                 $i_condition = 0;
@@ -131,7 +159,7 @@ $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators();
                 <div class="col-sm-push-2 col-sm-2">
                     <button type="submit" class="btn btn-success btn-fill ">
                         <i class="pe-7s-diskette mr5" style="font-size:19px; vertical-align: middle"></i>
-                        <span class="" style="vertical-align: middle">Create</span>
+                        <span class="" style="vertical-align: middle">{{$segment->_id ? 'Update' : 'Create'}}</span>
                     </button>
                 </div>
 
