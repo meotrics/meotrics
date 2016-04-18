@@ -12,12 +12,9 @@ class Kernel extends HttpKernel {
 	protected $middleware = [
 
 		'Illuminate\Foundation\Http\Middleware\CheckForMaintenanceMode',
-
 		'Illuminate\Cookie\Middleware\EncryptCookies',
 		'Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse',
-		'App\Http\Middleware\NoLaravelCookie',
 		'Illuminate\Session\Middleware\StartSession',
-
 		'Illuminate\View\Middleware\ShareErrorsFromSession',
 		//'App\Http\Middleware\VerifyCsrfToken',
 	];

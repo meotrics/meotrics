@@ -37,7 +37,7 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 			object.param = ids[object.param];
 
 			var match = {$match: {}};
-			match['$match'][ids["_typeid"]] = object.typeid;
+			match.$match[ids._typeid] = object.typeid;
 			// -- START MATCH CLAUSE
 			query.push(match);
 			if (object._segment !== undefined) {
@@ -47,16 +47,16 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 			}
 
 			if (object.startTime !== undefined) {
-				match[ids['_ctime']] = {
+				match[ids._ctime``] = {
 					$gte: object.startTime
 				};
 			}
 
 			if (object.endTime !== undefined) {
-				if (match[ids['_ctime']] !== undefined) {
-					match[ids['_ctime']]['$lte'] = object.endTime;
+				if (match[ids._ctime] !== undefined) {
+					match[ids._ctime]['$lte'] = object.endTime;
 				} else {
-					match[ids['_ctime']] = {
+					match[ids._ctime] = {
 						$lte: object.endTime
 					};
 				}

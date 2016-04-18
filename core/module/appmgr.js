@@ -1,8 +1,19 @@
-exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segmentCrud) {
+exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segmentCrud, trendCrud) {
+	var me = this;
 	this.isSetup = function (appid, callback) {
-		db.collection(prefix + appid).count({_isUser: {$exists: false}}, function (err, count) {
-			if (err) throw err;
-			return callback(count > 1);
+		me.countAction(appid, function (count) {
+			callback(count > 1);
+		});
+	};
+
+	this.countAction = function (appid, callback) {
+		converter.toIDs(['_isUser'], function (ids) {
+			var query = {};
+			query[ids._isUser] = {$exists: false};
+			db.collection(prefix + appid).count(query, function (err, count) {
+				if (err) throw err;
+				return callback(count);
+			});
 		});
 	};
 
@@ -104,9 +115,18 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 			fields: []
 		};
 
+		var trend1 = {
+			name: "Top purchase",
+			typeid: "purchase",
+			operation: "sum",
+			object: "pid", //code of properties
+			param: "price",
+			order: 1 // small to large
+		};
 
 		var segment1 = {
 			name: "Active user",
+			desc: "Active user in the app",
 			condition: [{
 				type: "pageview", f: "count", field: "", operator: ">", value: 5,
 				conditions: ["url", "eq", "http://google.com"]
@@ -132,7 +152,9 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 								typeCrud.createRaw(appid, register, function () {
 									typeCrud.createRaw(appid, login, function () {
 										typeCrud.createRaw(appid, quit, function () {
-											segmentCrud.createRaw(appid, segment1, callback);
+											trendCrud.createRaw(appid, trend1, function(){
+												segmentCrud.createRaw(appid, segment1, callback);
+											});
 										});
 									});
 								});
@@ -143,4 +165,5 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 			});
 		});
 	}
-};
+}
+;
