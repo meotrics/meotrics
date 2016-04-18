@@ -1,8 +1,51 @@
 
 ## Segmentation
-1. List segmentations of an `$appid`
+1. Type definition
+  ```json
+  { 
+    "_id" : ObjectId("5703e1ac00f3fd78159e64f0"), 
+    "name" : "Active user", 
+    "condition" : [
+        {
+            "type" : "pageview",  "f" : "count",  "field" : "", "operator" : ">", "value" : 5, 
+            "conditions" : [
+                "url", "eq",  "http://google.com"
+            ]
+        }, 
+        "and", 
+        {
+            "type" : "purchase",  "f" : "avg", "field" : "price",  "operator" : ">",  "value" : 5, 
+            "conditions" : [
+                "amount", "gt", 500, "and", "quantity", "gt", 5
+            ]
+        }, 
+        "and", 
+        {
+            "type" : "user", 
+            "conditions" : [
+                "age",  "eq",  15
+            ]
+        }
+    ], 
+    "_appid" : 1, 
+    "_ctime" : 1459872173
+  }
+  ```
+  
+2. Supported actions
+
+|Action|Method|URL|Param Json|Output
+|---|---|--|--|--|
+|Create a segment|POST| http://localhost:2108/segment/:appid |An action type|number, id of created segmentation|
+|List all segmentation in app|GET| http://localhost:2108/segment/:appid |-| JSON array of segmentations |
+|Get a segmentation|GET| http://localhost:2108/segment/:appid/:segmentid |-|an segmentation|
+|Update a segmentation|PUT| http://localhost:2108/segment/:appid/:segmentid |-|-|
+|Delete a segmentation|DELETE| http://localhost:2108/segment/:appid/:segmentid |-|-|
+|Excute an segmentation | GET | http://locaolhost:2108/segment/query/:appid/:segmentid|-|TODO|
+3. Example
 
   ```php
+  // List segmentations of an `$appid`
   $segments = MtHttp::get('segment/' . $appid);
   ```
 
@@ -16,12 +59,16 @@
   }
   ```
 
-1. List properties
-  1. How to call
-    
-    ```
-    $props = MtHttp::get('prop/' . $appid);
-    ```
+2. Supported actions
+
+|Action|Method|URL|Param Json|Output
+|---|---|--|--|--|
+|Create a prop|POST| http://localhost:2108/prop/:appid |An action type|number, id of created prop|
+|List all prop in app|GET| http://localhost:2108/prop/:appid |-| Json array of properties |
+|Get a property|GET| http://localhost:2108/prop/:appid/:propid |-|an property|
+|Update a property|PUT| http://localhost:2108/prop/:appid/:propidid |-|-|
+|Delete a property|DELETE| http://localhost:2108/prop/:appid/:propid |-|-|
+
 
 ## Action Type
 1. Type definition
@@ -44,102 +91,18 @@
       ]
    }
   ```
-1. List action type
-  1. URL
   
-    ```javascript
-    GET /actiontype/$appid
-    ```
-  2. Output
-    
-    ```js
-    [type1, type1]
-    ```
-2. Delete a action type
-  1. URL
+2. Supported actions
 
-    ```php
-    MtHttp::delete('actiontype/' . $appid . '/' .$actiontypeid);
-    ```
-//get a action type
-MtHttp::get('actiontype/' . $appid . '/' .$actiontypeid);
-//update action type
-MtHttp::put('actiontype/' . $appid . '/' .$actiontypeid);
+|Action|Method|URL|Param Json|Output
+|---|---|--|--|--|
+|Create an action type|POST|http://localhost:2108/actiontype/:appid |An action type|number, id of created action type|
+|List all action type in app|GET|http://localhost:2108/actiontype/:appid |-| Array of Action type |
+|Get an action type|GET|http://localhost:2108/actiontype/:appid/:actiontypeid |-|an action type|
+|Update an action type|PUT|http://localhost:2108/actiontype/:appid/:actiontypeid |-|-|
+|Delete an action type|DELETE|http://localhost:2108/actiontype/:appid/:actiontypeid |-|-|
 
 
-//SEGMENT---------------------------------
-
-type:
-
-{ 
-    "_id" : ObjectId("5703e1ac00f3fd78159e64f0"), 
-    "name" : "Active user", 
-    "condition" : [
-        {
-            "type" : "pageview", 
-            "f" : "count", 
-            "field" : "", 
-            "operator" : ">", 
-            "value" : 5, 
-            "conditions" : [
-                "url", 
-                "eq", 
-                "http://google.com"
-            ]
-        }, 
-        "and", 
-        {
-            "type" : "purchase", 
-            "f" : "avg", 
-            "field" : "price", 
-            "operator" : ">", 
-            "value" : 5, 
-            "conditions" : [
-                "amount", 
-                "gt", 
-                500, 
-                "and", 
-                "quantity", 
-                "gt", 
-                5
-            ]
-        }, 
-        "and", 
-        {
-            "type" : "user", 
-            "conditions" : [
-                "age", 
-                "eq", 
-                15
-            ]
-        }
-    ], 
-    "_appid" : 1, 
-    "_ctime" : 1459872173
-}
-
-//create
-post /segment/$appid
-//list all segment
-get /segment/$appid
-//get segment
-get /segment/$appid/$id
-//update segment
-put /segment/$appid/$id
-//delete segment
-delete /segment/$appid/$id
-
-//CAMPAIGN----------------------------
-//create
-post /campaign/$appid
-//list all campaign in app
-get /campaign/$appid'
-//get a campaign
-get /campaign/$appid/$id
-//edit
-put /campaign/$appid/$id 
-//delete
-delete /campaign/$appid/$id 
 
 //TREND
 
@@ -222,4 +185,3 @@ output:
       }
    }, ...
 ]
-
