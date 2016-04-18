@@ -1,7 +1,8 @@
 "use strict";
 exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 	var me = this;
-	var segRet = new require('./segmentresult.js').SegmentResult(db, mongodb, converter, async, prefix);
+	var SegRet = require('./segmentresult.js').SegmentResult;
+	var segRet = new SegRet(db, mongodb, converter, async, prefix);
 
 	this.querySegment = function (appid, segmentid, field1, field2, callback) {
 		var type1 = 'string', type2 = 'string';
@@ -14,9 +15,9 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 
 	//Excute a segment based on segmentid
 	this.excuteSegment = function (segmentid, callback) {
-		db.collection(prefix + 'segments').find({_id: new mongodb.ObjectID(segmentid)}).toArray(function (err, segment) {
+		db.collection(prefix + 'segment').find({_id: new mongodb.ObjectID(segmentid)}).toArray(function (err, segment) {
 			if (err) throw err;
-			runSegment(segment[0], callback);
+			me.runSegment(segment[0], callback);
 		});
 	};
 
