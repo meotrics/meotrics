@@ -84,6 +84,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 			queryFilter(r, function (r) {
 				buildMapReduce(json, function (ret) {
 					ret.option = r;
+					console.log(JSON.stringify(ret));
 					callback(ret);
 				});
 			});
@@ -96,12 +97,12 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 		var countj = 0;
 		for (let i = 0; i < object.length; i += 2) {
 			counti++;
-			console.log(object);
 			if (object[i].type === 'user') {
 				counti--;
 				if (object[i].conditions != undefined) {
 					for (let j = 0; j < object[i].conditions.length; j += 4) {
 						countj++;
+
 						converter.toID(object[i].conditions[j], function (r) {
 							object[i].conditions[j] = r;
 							countj--;
@@ -151,6 +152,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 		let c = 0;
 		for (var i = 0; i < length; i += 2) {
 			c++;
+
 			conditionToQuery(object[i], function (r) {
 				query['$or'].push(r);
 				c--;
@@ -419,7 +421,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 			var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true){userid=this["' + ids._mtid + '"];value._hasUser=true;}else{userid=this["' + ids._mtid + '"];';
 			mapfunccode = mapinitcode + mapfunccode + "}emit(userid,value);}";
 			var reducefunccode = "function(key,values){var returnObject={};" + reduceinitcode + "for(var i in values){var value=values[i];if(value._hasUser!==undefined)returnObject._hasUser=true;" + reduceaggcode + "};return returnObject;}";
-			finalizecode = 'function(key, value){' + finalizeinitcode + 'return' + finalizecode + '&&value._hasUser?1:0}';
+			finalizecode = 'function(key, value){' + finalizeinitcode + 'return ' + finalizecode + (finalizecode.length > 0 ? "&&" : "") + 'value._hasUser?1:0}';
 			if (callback !== undefined)
 				callback({
 					map: mapfunccode,
