@@ -60,7 +60,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 
 						// the last docs
 						if (null == doc) return updateUser(function () {
-							callback(outcollection);
+							if(callback) callback(outcollection);
 						});
 						arr.push(doc._id);
 
@@ -84,7 +84,6 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 			queryFilter(r, function (r) {
 				buildMapReduce(json, function (ret) {
 					ret.option = r;
-					console.log(JSON.stringify(ret));
 					callback(ret);
 				});
 			});
