@@ -21,8 +21,7 @@ th {
 	margin-right: 20px;
 }
 
-.ml
-{
+.ml {
 	margin-left: 20px;
 }
 
@@ -38,7 +37,7 @@ select {
 .fmonospaced {
 	color: #2C629A;
 	text-transform: uppercase;
-	background-color: rgba(0, 0, 0, 0.08);
+	background-color: rgba(189, 189, 189, 0.08);
 	font-family: 'consolas', 'Monaco', monospace;
 }
 
@@ -78,28 +77,31 @@ select {
 	border-bottom: none;
 }
 
-.close{
+.close {
 	color: white;
 }
-.close:focus, .close:hover
-{
+
+.close:focus, .close:hover {
 	color: #FFF;
 }
 
 /* Override bootstrap styles */
 
-.modal-backdrop{
+.modal-backdrop {
 	z-index: 989;
 }
-.modal-backdrop.in{
+
+.modal-backdrop.in {
 	opacity: .3;
 }
-.modal{
+
+.modal {
 	z-index: 999;
 }
-.modal .modal-content{
+
+.modal .modal-content {
 	border: none;
-	box-shadow: 0 3px 1px -2px rgba(0,0,0,.14),0 2px 2px 0 rgba(0,0,0,.098),0 1px 5px 0 rgba(0,0,0,.084);
+	box-shadow: 0 3px 1px -2px rgba(0, 0, 0, .14), 0 2px 2px 0 rgba(0, 0, 0, .098), 0 1px 5px 0 rgba(0, 0, 0, .084);
 }
 
 /* Addition Bootstrap callout */
@@ -111,61 +113,78 @@ select {
 	border-left-width: 3px;
 	border-radius: 2px;
 }
+
 .bs-callout h4 {
 	margin-top: 0;
 	margin-bottom: 5px;
 }
+
 .bs-callout p:last-child {
 	margin-bottom: 0;
 }
+
 .bs-callout code {
 	border-radius: 3px;
 }
-.bs-callout+.bs-callout {
+
+.bs-callout + .bs-callout {
 	margin-top: -5px;
 }
+
 .bs-callout-default {
 	border-left-color: #777;
 }
+
 .bs-callout-default h4 {
 	color: #777;
 }
+
 .bs-callout-primary {
 	border-left-color: #1D62F0;
 }
+
 .bs-callout-primary h4 {
 	color: #1D62F0;
 }
+
 .bs-callout-success {
 	border-left-color: #87CB16;
 }
+
 .bs-callout-success h4 {
 	color: #87CB16;
 }
+
 .bs-callout-danger {
 	border-left-color: #FF4A55;
 }
+
 .bs-callout-danger h4 {
 	color: #FF4A55;
 }
+
 .bs-callout-warning {
 	border-left-color: #FF9500;
 }
+
 .bs-callout-warning h4 {
 	color: #FF9500;
 }
+
 .bs-callout-info {
 	border-left-color: #1DC7EA;
 }
+
 .bs-callout-info h4 {
 	color: #1DC7EA;
 }
 
 /* Main styles */
 
-.main_sidebar .logo a{
+.main_sidebar .logo a {
 	text-align: left !important;
 }
+
 .main_sidebar .logo-text {
 	color: #FFFFFF;
 	font-size: 16px;
@@ -175,19 +194,21 @@ select {
 
 /* App main styles */
 
-.uppercase{
+.uppercase {
 	text-transform: uppercase;
 }
 
 /* Guidline styles */
 
-#guideline .modal-content{
+#guideline .modal-content {
 	overflow: hidden;
 }
-#guideline .modal-content .bs-callout:first-child{
+
+#guideline .modal-content .bs-callout:first-child {
 	margin-top: 0;
 }
-#guideline .step .step-title .step-number{
+
+#guideline .step .step-title .step-number {
 	display: inline-block;
 	vertical-align: middle;
 	width: 30px;
@@ -199,12 +220,14 @@ select {
 	color: #FFF;
 	text-align: center;
 }
-#guideline .step .step-title .step-text{
+
+#guideline .step .step-title .step-text {
 	display: inline-block;
 	vertical-align: middle;
 	margin-left: 5px;
 }
-#guideline .meotrics_script{
+
+#guideline .meotrics_script {
 	width: 100%;
 	height: auto;
 	width: 100%;
@@ -212,13 +235,15 @@ select {
 	position: relative;
 	margin: 5px 0px;
 }
-#guideline .meotrics_script .copy-btn{
+
+#guideline .meotrics_script .copy-btn {
 	position: absolute;
 	top: 5px;
 	right: 5px;
 	z-index: +1;
 }
-#guideline .meotrics_script textarea{
+
+#guideline .meotrics_script textarea {
 	position: absolute;
 	padding: 9px;
 	top: 0;
@@ -233,11 +258,12 @@ select {
 	outline: none !important;
 	overflow: hidden;
 }
-#guideline .meotrics_script textarea:focus{
+
+#guideline .meotrics_script textarea:focus {
 	overflow: auto;
 }
 
-.form-segment .col-add-filter{
+.form-segment .col-add-filter {
 	text-align: right;
 	margin-top: 12px;
 }
@@ -261,12 +287,18 @@ select {
 	padding: 1px;
 }
 
-
-.navbar-default .navbar-nav > li > a:not(.btn)
-{
+.navbar-default .navbar-nav > li > a:not(.btn) {
 	color: #565656;
 }
 
-.vam{
+.vam {
 	vertical-align: middle;
+}
+
+a {
+	color: #2B5AAE;
+}
+
+a:hover, a:focus {
+	color: #4A8BF6;
 }

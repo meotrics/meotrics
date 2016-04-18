@@ -11,17 +11,17 @@
 @section('content')
 	<div class="card row">
 		<div class="header col-sm-12">
-			<h3>Action type</h3>
+			<h3>Action type </h3>
+			<a href="/actiontype/create" class="button action blue"><span class="label">Add new</span></a>
+
 		</div>
 		<div class="content col-sm-12">
 			<div class="content table-responsive table-full-width col-sm-12">
-				<div class="pull-right">
-					<a href="/actiontype/create" class="btn btn-success btn-sm btn-fill">+ Add new</a>
-				</div>
+
 				<table class="table table-hover table-striped">
 					<thead>
 					<tr>
-						<th>CodeName</th>
+						<th>Code</th>
 						<th>Name</th>
 						<th>Description</th>
 						<th>Properties</th>
@@ -40,10 +40,8 @@
 								@endforeach
 							</td>
 							<td class="row">
-								<a class="btn btn-primary btn-sm btn-fill"
-									 href="/actiontype/{{$type->_id}}"><i class="fa fa-edit"></i></a>
-								<form method="POST" action="/actiontype/{{$type->_id}}" style="display: inline-block"
-											onsubmit="return confirmDelete('{{ $type->codename }}')">
+								<a class="btn btn-primary btn-sm btn-fill" href="/actiontype/{{$type->_id}}"><i class="fa fa-edit"></i></a>
+								<form method="POST" action="/actiontype/{{$type->_id}}" style="display: inline-block" onsubmit="return confirmDelete('{{ $type->codename }}')">
 									<input type="hidden" name="_method" value="DELETE">
 									<button type="submit" class="btn btn-danger  btn-sm btn-fill">
 										<i class="fa fa-trash"></i>

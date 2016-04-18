@@ -41,7 +41,7 @@
 			<form action="/actiontype" method="POST">
 				<div class="row">
 					<div class="form-group col-sm-2 ">
-						<h6 class="pull-right " style="margin-top: 11px">Code Name</h6>
+						<h6 class="pull-right " style="margin-top: 13px; font-size: 13px">Code</h6>
 					</div>
 					<div class="form-group col-sm-5">
 						<input type="text" class="form-control fmonospaced" name="codename" placeholder="Name" required>
@@ -49,7 +49,7 @@
 				</div>
 				<div class="row">
 					<div class="form-group col-sm-2">
-						<h6 class="pull-right" style="margin-top: 11px">Display Name</h6>
+						<h6 class="pull-right" style="margin-top: 13px; font-size: 13px">Display Name</h6>
 					</div>
 					<div class="col-sm-5">
 						<input type="text" name="name" class="form-control" id="exampleInputEmail1"
@@ -58,7 +58,7 @@
 				</div>
 				<div class="row">
 					<div class="form-group col-sm-2">
-						<h6 class="pull-right" style="margin-top: 11px">Description</h6>
+						<h6 class="pull-right" style="margin-top: 13px; font-size: 13px">Description</h6>
 					</div>
 					<div class="col-sm-5">
 						<input type="text" name="desc" class="form-control" id="exampleInputEmail1"
@@ -90,10 +90,7 @@
 				</div>
 				<div class="row">
 					<div class="col-sm-push-2 col-sm-2">
-						<button class="btn btn-success btn-fill ">
-							<i class="pe-7s-diskette mr5" style="font-size:19px; vertical-align: middle"></i>
-							<span class="" style="vertical-align: middle">Create</span>
-						</button>
+						<button class="action button blue"><span class="label" >Create</span></button>
 					</div>
 
 				</div>
@@ -111,7 +108,7 @@
 						<input type="text" name="pnames[]" class="form-control" placeholder="Properties Display Name" required>
 					</div>
 					<div class="col-sm-3">
-						<a class="id_remprop btn  "><i class="fa fa-trash"></i></a>
+						<a class="id_remprop action button  "><span class="label"> <i class="fa fa-trash"></i></span></a>
 					</div>
 
 				</div>
