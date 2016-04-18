@@ -22,9 +22,8 @@
 	<link href="{{asset('css/daterangepicker.css')}}" rel="stylesheet"/>
 	<link href="{{asset('css/sweetalert.css')}}"/>
 	@yield('style')
-	<!-- App's styles -->
+					<!-- App's styles -->
 	<link href="{{asset('css/app.css')}}" rel="stylesheet"/>
-
 
 
 	<script src="{{asset('js/he.js')}}" type="text/javascript"></script>
@@ -93,26 +92,34 @@
 		}
 	</script>
 	<link rel="stylesheet" href="{{asset('css/odometer-theme-minimal.css')}}"/>
+
+<script>window.odometerOptions = {
+		duration: 350
+	};</script>
 	<script src="{{asset('js/odometer.min.js')}}"></script>
-
-
 	<script>
+
 		onPageLoad(function () {
+
+
+
 			function bg_refresh_counter() {
-				setTimeout(function () {
-					$.get('/home/counter', {}, function (data) {
-						if (odometer.length !== undefined) {
-							for (var i in odometer) if (odometer.hasOwnProperty(i))odometer[i].innerHTML = data;
-						}
-						else odometer.innerHTML = parseInt(data);
+				$.get('/home/counter', {}, function (data) {
+					if (odometer.length !== undefined) {
+						for (var i in odometer) if (odometer.hasOwnProperty(i))odometer[i].innerHTML = data;
+					}
+					else odometer.innerHTML = parseInt(data);
+					setTimeout(function () {
 						bg_refresh_counter();
-					});
-				}, 2000);
+					}, 2000);
+				});
 			}
 
 			bg_refresh_counter();
 		});
 	</script>
+
+
 	@yield('header-script')
 </head>
 <body>
@@ -189,7 +196,7 @@
 							<a style="padding: 0px">
 								<div class="input-group" style="width: 250px;">
                   <span class="input-group-addon">
-	                  <i class="pe-7s-date" style="font-size:26px; padding-left:26px;"></i>
+	                  <i class="pe-7s-date" style="font-size:26px; padding-left:6px;"></i>
                   </span>
 									<input type="text" class="form-control" id="date-range">
 
@@ -220,14 +227,14 @@
 					<ul class="nav navbar-nav navbar-right">
 						<li>
 							<a href="#">
-								<span class="vam" >Action count:</span>
+								<span class="vam">Action count:</span>
 								<span id="odometer" class="vam id_counter odometer"></span>
 							</a>
 
 						</li>
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-							<span class="vam">	{{ Auth::user()->name }}</span>
+								<span class="vam">	{{ Auth::user()->name }}</span>
 								<b class="caret"></b>
 							</a>
 							<ul class="dropdown-menu">
