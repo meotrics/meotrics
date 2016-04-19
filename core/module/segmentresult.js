@@ -13,6 +13,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 				stringstring(collection, segmentid, field1, field2, callback);
 			} else {
 				if (type1 == 'number')
+
 					if (type2 == 'number')
 						numbernumber(collection, segmentid, field1, field2, callback);
 					else
@@ -88,6 +89,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 
 			//find min, max
 			db.collection(collection).aggregate([matchClause, mmgroupclause]).toArray(function (err, minmax) {
+
 				if (err) throw err;
 				var minfield1 = parseFloat(minmax[0].min);
 				var maxfield1 = parseFloat(minmax[0].max);
@@ -111,7 +113,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 				var groupClause2 = {$group: {}};
 				temp = {};
 				for (var i = 0; i < spaces1; i++)
-					temp["prefix1_" + i] = "$_id.prefix1_" + i
+					temp["prefix1_" + i] = "$_id.prefix_" + i
 				groupClause2.$group._id = temp;
 				groupClause2.$group.values = {
 					$push: {
@@ -119,14 +121,16 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 						count: "$count"
 					}
 				};
-
 				db.collection(collection).aggregate([matchClause, projectClause1, groupClause1, groupClause2]).toArray(function (err, r) {
 					if (err) throw err;
+
 					for (var i = 0; i < r.length; i++)
 						for (j = 0; j < spaces1; j++) {
-							if (r[i]._id["prefix_" + j] == 1) {
+							if (r[i]._id["prefix1_" + j] == 1) {
 								results1[j].values = r[i].values;
-								results1[j].count = r[i].count;
+								results1[j].count =0;
+								for(var t in r[i].values)
+									results1[j].count+=r[i].values[t].count;
 							}
 						}
 					callback(results1);
