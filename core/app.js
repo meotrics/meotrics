@@ -39,8 +39,15 @@ function route(app, com) {
 	app.deleteEx('/segment/:appid/:id', com.segCRUD.delete);
 
 	//update or
-	app.get('/segment/query/:appid/:id/:field1/:field2', function (req, res) {
-		com.segMgr.querySegment(req.params.appid, req.params.id, req.params.field1, req.param.field2, function (results) {
+	app.get('/segment/query1/:appid/:id/:field1/', function (req, res) {
+		com.segMgr.querySegment(req.params.appid, req.params.id, req.params.field1, function (results) {
+			res.json(results);
+		});
+	});
+
+	//update or
+	app.get('/segment/query2/:appid/:id/:field1/:field2', function (req, res) {
+		com.segMgr.querySegment(req.params.appid, req.params.id, req.params.field1, req.params.field2, function (results) {
 			res.json(results);
 		});
 	});
