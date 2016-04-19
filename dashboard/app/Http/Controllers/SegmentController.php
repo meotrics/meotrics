@@ -298,4 +298,257 @@ class SegmentController extends Controller
         return $result;
     }
         
+    public function getCharts(Request $request){
+        $result = ['success' => false];
+        if ($request->input('segment_id') && $request->input('field1') && $request->input('field2')) {
+            $app_id = \Auth::user()->id;
+//            $charts = MtHtml::get('segment/query/'.$app_id.'/'.$request->input('field1').'/'.$request->input('field2'));
+            $tmp_charts = [
+                (object)[
+                    'count' => 0,
+                    'key' => (object)[
+                        'to' => 18, 
+                    ],
+                ],
+                (object)[
+                    'count' => 122,
+                    'key' => (object)[ 
+                        'from' => 18,
+                        'to' => 24,
+                        ],
+                ],
+                (object)[
+                    'count' => 385,
+                    'key' => (object)[ 
+                        'from' => 24,
+                        'to' => 34,
+                        ],
+                ],
+                (object)[
+                    'count' => 255,
+                    'key' => (object)[ 
+                        'from' => 34,
+                        ],
+                ],
+            ];
+            $labels = [];
+            $datasets = [];
+            $flag = '';
+            if($tmp_charts){
+                $tmp_charts_first = $tmp_charts[0];
+                if(property_exists($tmp_charts_first, 'key')){// 1 field
+                    if(is_string($tmp_charts_first->key)){
+                        $flag = 'one_string';
+                        $tmp_data = [];
+                        foreach ($tmp_charts as $tmp_chart) {
+                            $labels[] = $tmp_chart->key;
+                            $tmp_data[] = $tmp_chart->count;
+                        }
+                        $datasets[0] = (object)[
+                            'data' => $tmp_data,
+                        ];
+                    }
+                    elseif(is_array($tmp_charts_first->key)){
+                        $flag = 'one_array';
+                        $tmp_data = [];
+                        foreach ($tmp_charts as $tmp_chart) {
+                            foreach ($tmp_chart->key as $tmp_label) {
+                                if(!in_array($tmp_label, $labels)){
+                                    $labels[] = $tmp_label;
+                                    $tmp_data[$tmp_label] = 0;
+                                }
+                                $tmp_data[$tmp_label] += (int)$tmp_chart->count;
+                            }
+                        }
+                        $chart_data = [];
+                        foreach ($labels as $label) {
+                            $chart_data[] = $tmp_data[$label];
+                        }
+                        $datasets[0] = (object)[
+                            'data' => $chart_data,
+                        ];
+                    }
+                    else{
+                        $flag = 'one_object';
+                        foreach ($tmp_charts as $tmp_chart) {
+                            $tmp_label = '';
+                            $tmp_label = property_exists($tmp_chart->key, 'from') ? ('from '.$tmp_chart->key->from) : '';
+                            $tmp_label .= property_exists($tmp_chart->key, 'to') ? (' to '.$tmp_chart->key->to) : '';
+                            $labels[] = trim($tmp_label);
+                            $tmp_data[] = $tmp_chart->count;
+                        }
+                        $datasets[0] = (object)[
+                            'data' => $tmp_data,
+                        ];
+                    }
+                }
+                else{// 2 fields
+
+                }
+                
+                if($flag == 'one_string'){
+                    
+                }
+                else{
+                    
+                }
+                
+            }
+            
+            $result['labels'] = $labels;
+            $result['datasets'] = $datasets;
+            $result['success'] = true;
+        }
+        return $result;
+    }
+    
+    public function getChartonefield(Request $request){
+        $result = ['success' => false];
+        if ($request->input('segment_id') && $request->input('field')) {
+            $app_id = \Auth::user()->id;
+            $tmp_charts = MtHttp::get('segment/query1/'.$app_id.'/'.$request->input('segment_id').'/'.$request->input('field'));
+            $convert_data = $this->convertData($tmp_charts);
+            
+            $result['labels'] = isset($convert_data['labels']) ? $convert_data['labels'] : [];
+            $result['datasets'] = isset($convert_data['datasets']) ? $convert_data['datasets'] : [];
+            $result['success'] = true;
+        }
+        return $result;
+    }
+
+    public function getCharttwofields(Request $request){
+        $result = ['success' => false];
+        if ($request->input('segment_id') && $request->input('field1') && $request->input('field2')) {
+            $app_id = \Auth::user()->id;
+            $tmp_charts = MtHttp::get('segment/query2/'.$app_id.'/'.$request->input('segment_id').'/'.$request->input('field2').'/'.$request->input('field1'));
+            $labels = [];
+            $datasets = [];
+            $datasets_labels = [];
+            if($tmp_charts && is_array($tmp_charts)){
+                $tmp_charts_first = $tmp_charts[0];
+                if(property_exists($tmp_charts_first, 'key') && (is_string($tmp_charts_first->key) || $tmp_charts_first->key == null)){
+                    foreach ($tmp_charts as $tmp_chart) {
+                        if(property_exists($tmp_chart, 'values')){
+                            $convert_data = $this->convertData($tmp_chart->values);
+                            $labels = isset($convert_data['labels']) ? $convert_data['labels'] : [];
+                            $datasets = array_merge($datasets, (isset($convert_data['datasets']) ? $convert_data['datasets'] : []));
+                            $datasets_labels[] = $tmp_chart->key;
+                        }
+                    }
+                }
+                elseif(property_exists($tmp_charts_first, 'key') && is_array($tmp_charts_first->key)){
+                    $tmp_datasets = [];
+                    foreach ($tmp_charts as $tmp_chart) {
+                        if(property_exists($tmp_chart, 'values')){
+                            $convert_data = $this->convertData($tmp_chart->values);
+                            $labels = isset($convert_data['labels']) ? $convert_data['labels'] : [];
+                            foreach ($tmp_chart->key as $tc_key => $tc_value) {
+                                $tmp_datasets[$tc_value][] = $convert_data['datasets'][0];
+                            }
+                        }
+                    }
+                    foreach ($tmp_datasets as $td_label => $td_value) {
+                        $datasets_labels[] = $td_label;
+                        
+                        $tmp_data = [];
+                        foreach ($td_value as $tdv_value) {
+                            foreach ($tdv_value as $tv_key => $tv_data) {
+                                $tmp_data[$tv_key] = isset($tmp_data[$tv_key]) ? $tmp_data[$tv_key] + $tv_data : $tv_data;
+                            }
+                        }
+                        $datasets[] = (object)[
+                            'data' => $tmp_data,
+                        ];
+                    }
+                }
+                else{
+                    foreach ($tmp_charts as $tmp_chart) {
+                        if(property_exists($tmp_chart, 'values')){
+                            $convert_data = $this->convertData($tmp_chart->values);
+                            $labels = isset($convert_data['labels']) ? $convert_data['labels'] : [];
+                            $datasets = array_merge($datasets, (isset($convert_data['datasets']) ? $convert_data['datasets'] : []));
+                            $tmp_label = '';
+                            $tmp_label = property_exists($tmp_chart->key, 'from') ? ('from '.$tmp_chart->key->from) : '';
+                            $tmp_label .= property_exists($tmp_chart->key, 'to') ? (' to '.$tmp_chart->key->to) : '';
+                            $datasets_labels[] = $tmp_label;
+                        }
+                    }
+                }
+            }
+            
+            
+            
+//            foreach ($tmp_charts as $tmp_chart) {
+//                if(property_exists($tmp_chart, 'values')){
+//                    $convert_data = $this->convertData($tmp_chart->values);
+//                    $labels = isset($convert_data['labels']) ? $convert_data['labels'] : [];
+//                    $datasets = array_merge($datasets, (isset($convert_data['datasets']) ? $convert_data['datasets'] : []));
+//                    $datasets_labels[] = $tmp_chart->key;
+//                }
+//            }
+            $result['labels'] = $labels;
+            $result['datasets'] = $datasets;
+            $result['datasets_labels'] = $datasets_labels;
+            $result['success'] = true;
+        }
+        return $result;
+    }
+
+
+    public function convertData($charts){
+        $result = ['datasets' => [], 'labels' => []];
+        $labels = [];
+        $datasets = [];
+        $dataset_labels = [];
+        if(is_array($charts) && $charts){
+            $tmp_charts_first = $charts[0];
+            if(property_exists($tmp_charts_first, 'key') && is_string($tmp_charts_first->key)){
+                $flag = 'one_string';
+                $tmp_data = [];
+                foreach ($charts as $tmp_chart) {
+                    $labels[] = $tmp_chart->key;
+                    $tmp_data[] = $tmp_chart->count;
+                }
+                $datasets[] = (object)[
+                    'data' => $tmp_data,
+                ];
+            }
+            elseif(property_exists($tmp_charts_first, 'key') && is_array($tmp_charts_first->key)){
+                $flag = 'one_array';
+                $tmp_data = [];
+                foreach ($charts as $tmp_chart) {
+                    foreach ($tmp_chart->key as $tmp_label) {
+                        if(!in_array($tmp_label, $labels)){
+                            $labels[] = $tmp_label;
+                            $tmp_data[$tmp_label] = 0;
+                        }
+                        $tmp_data[$tmp_label] += (int)$tmp_chart->count;
+                    }
+                }
+                $chart_data = [];
+                foreach ($labels as $label) {
+                    $chart_data[] = $tmp_data[$label];
+                }
+                $datasets[] = (object)[
+                    'data' => $chart_data,
+                ];
+            }
+            else{
+                $flag = 'one_object';
+                foreach ($charts as $tmp_chart) {
+                    $tmp_label = '';
+                    $tmp_label = property_exists($tmp_chart, 'key') && property_exists($tmp_chart->key, 'from') ? ('from '.$tmp_chart->key->from) : '';
+                    $tmp_label .= property_exists($tmp_chart, 'key') && property_exists($tmp_chart->key, 'to') ? (' to '.$tmp_chart->key->to) : '';
+                    $labels[] = trim($tmp_label);
+                    $tmp_data[] = $tmp_chart->count;
+                }
+                $datasets[] = (object)[
+                    'data' => $tmp_data,
+                ];
+            }
+        }
+        $result['datasets'] = $datasets;
+        $result['labels'] = $labels;
+        return $result;
+    }
 }

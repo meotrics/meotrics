@@ -54,13 +54,13 @@ endif;
         <!--</form>-->
     </div>
 
-    <div class="content col-md-12" data-name="name">
+<!--    <div class="content col-md-12" data-name="name">
         <label class="col-md-2" style="margin-top: 4px">Segment name: </label>
         <p class="col-md-10"><?= property_exists($segment_first, 'name') ? $segment_first->name : ''?></p>
-    </div>
+    </div>-->
     <div class="content col-md-12" data-name="description">
-        <label class="col-md-2" style="margin-top: 4px">Segment description: </label>
-        <p class="col-md-10"><?= property_exists($segment_first, 'description') ? $segment_first->description : ''?></p>
+        <!--<label class="col-md-2" style="margin-top: 4px">Segment description: </label>-->
+        <p class="col-md-12"><?= property_exists($segment_first, 'description') ? $segment_first->description : ''?></p>
     </div>
 </div>
 <div class="card row">
@@ -70,6 +70,7 @@ endif;
         </div>
         <div class="col-md-4">
             <select name="Prop[one]" class="form-control">
+                <option value="">Select prop 1</option>
                 <?php
                 foreach ($props as $prop):
                 ?>
@@ -82,7 +83,8 @@ endif;
             </select>
         </div>
         <div class="col-md-4">
-            <select name="Prop[one]" class="form-control">
+            <select name="Prop[two]" class="form-control">
+                <option value="">Select prop 2</option>
                 <?php
                 foreach ($props as $prop):
                 ?>
@@ -95,14 +97,13 @@ endif;
             </select>
         </div>
         <div class="col-sm-2">
-            <button type="submit" class="btn btn-success btn-fill ">
+            <button type="button" class="btn btn-success btn-fill " onclick="execute()">
                 <span class="" style="vertical-align: middle">Execute chart</span>
             </button>
         </div>
     </div>
-    <div class="col-md-12">
-        
-
+    <div class="col-md-12" data-name="canvas-chart">
+<!--        <canvas id="myChart" width="400" height="100" style="display: none"></canvas>-->
     </div>
 </div>
 
@@ -110,6 +111,7 @@ endif;
 
 @section('additional')
 <script src="{{asset('js/select2.min.js')}}"></script>
+<script src="{{asset('js/Chart.js')}}"></script>
 <script type="text/javascript">
     $('select').select2();
     
@@ -158,5 +160,165 @@ endif;
         });
         }
     });
+    
+    /*
+     * chart
+     */
+    var chart_colors = [];
+    <?php
+    foreach (App\Enum\SegmentEnum::chartColor() as $color):
+    ?>
+    chart_colors.push('<?= $color ?>');
+    <?php
+    endforeach;
+    ?>
+    function execute(){
+        var segment_id = $('#segment').val();
+        var field1 = $('select[name="Prop[one]"]').val();
+        var field2 = $('select[name="Prop[two]"]').val();
+        var url = '';
+        var data_get = {};
+        var label_field = '';
+        var demonstrate = '';
+        if(field1 && field2 && field1 != field2){
+            url = '{{ URL::to('segment/charttwofields') }}';
+            data_get = {
+                'segment_id' : segment_id,
+                'field1': field1,
+                'field2': field2,
+            };
+            demonstrate = $('select[name="Prop[one]"]').find(':selected').text().toUpperCase() + ' and '+$('select[name="Prop[two]"]').find(':selected').text().toUpperCase();
+        }
+        else if(field1 || field2){
+            url = '{{ URL::to('segment/chartonefield') }}';
+            data_get = {
+                'segment_id' : segment_id,
+            };
+            data_get.field = field1 ? field1 : field2;
+            label_field = field1 ? $('select[name="Prop[one]"]').find(':selected').text() : $('select[name="Prop[two]"]').find(':selected').text()
+            demonstrate = field1 ? $('select[name="Prop[one]"]').find(':selected').text().toUpperCase() : $('select[name="Prop[two]"]').find(':selected').text().toUpperCase()
+        }
+        if(url){
+            $.ajax({
+                type: 'GET',
+                dataType: 'JSON',
+                url: url,
+                data: data_get,
+                success: function(data){
+                    if(data.success && data.labels && data.datasets){
+//                        if($('#segment_chart').length){
+//                            $('#segment_chart').remove();
+//                        }
+                        $('div[data-name="canvas-chart"]').html('');
+                        $('div[data-name="canvas-chart"]')
+                                .append('<p>This chart demonstrates that the filter by '+demonstrate+'</p>');
+                        $('div[data-name="canvas-chart"]')
+                                .append('<canvas id="segment_chart" width="400" height="100"></canvas>');
+                        var ctx = $("#segment_chart").get(0).getContext("2d");
+                        var data_chart = {
+                            labels: [],
+                            datasets: [],
+                        };
+                        var options = {
+                            scales: {
+                                yAxes: [{
+                                    stacked: true,
+                                    ticks: {
+                                        beginAtZero:true
+                                    }
+                                }],
+                                xAxes: [{
+                                    stacked: true,
+                                }],
+                            },
+                            stacked: true,
+                        }
+                        data_chart.labels = data.labels;
+                        data_chart.datasets = [];
+                        var datasets_labels = data.datasets_labels ? data.datasets_labels : [];
+                        $.each(data.datasets, function(di, dv){
+                            
+                            data_chart.datasets.push({
+                                'label': datasets_labels[di] ? datasets_labels[di]: (label_field ? label_field : ''),
+                                'data': dv['data'],
+                                'backgroundColor': chart_colors[di] ? chart_colors[di] : '',
+                                'hoverBackgroundColor': chart_colors[di] ? chart_colors[di] : '',
+                            });
+//                            data_chart.datasets[di]['data'] = dv['data'];
+                        });
+                        $('#myChart').show();
+                        $('#myChart').html('');
+                        var myBarChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: data_chart,
+                            options: options
+                        });
+                    }
+                },
+            });
+        }
+    }
+    
+    // Get context with jQuery - using jQuery's .get() method.
+//    var ctx = $("#myChart").get(0).getContext("2d");
+    // This will get the first returned node in the jQuery collection.
+//    var data = {
+//        labels: ["Female", "Male"],
+//        datasets: [
+////            {
+////                label: "My First dataset",
+////
+////                // The properties below allow an array to be specified to change the value of the item at the given index
+////                // String  or array - the bar color
+////                backgroundColor: "red",
+////
+////                // String or array - bar stroke color
+////                borderColor: "rgba(220,220,220,1)",
+////
+////                // Number or array - bar border width
+////                borderWidth: 1,
+////
+////                // String or array - fill color when hovered
+////                hoverBackgroundColor: "rgba(220,220,220,0.2)",
+////
+////                // String or array - border color when hovered
+////                hoverBorderColor: "rgba(220,220,220,1)",
+////
+////                // The actual data
+////                data: [65, 59, 80, 81, 56, 55, 40],
+////
+////                // String - If specified, binds the dataset to a certain y-axis. If not specified, the first y-axis is used.
+////                yAxisID: "y-axis-0",
+////            },
+//            {
+//                label: "Gender",
+//                backgroundColor: "rgba(220,220,220,0.2)",
+//                borderColor: "rgba(220,220,220,1)",
+//                borderWidth: 1,
+//                hoverBackgroundColor: "rgba(220,220,220,0.2)",
+//                hoverBorderColor: "rgba(220,220,220,1)",
+//                data: [1250, 257]
+//            }
+//        ]
+//    };
+//    var options = {
+//        scales: {
+//            yAxes: [{
+//                stacked: true,
+//                ticks: {
+//                    beginAtZero:true
+//                }
+//            }],
+//            xAxes: [{
+//                stacked: true,
+//            }],
+//        },
+//        stacked: true,
+//    }
+//    var myBarChart = new Chart(ctx, {
+//        type: 'bar',
+//        data: data,
+//        options: options
+//    });
 </script>    
 @endsection
