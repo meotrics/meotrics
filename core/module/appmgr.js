@@ -23,10 +23,20 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 			codename: "purchase",
 			name: "Purchase",
 			desc: "A purchase action",
+			deftrendfields: [
+				{pname: "Category", pcode: "cid"},
+				{pname: "Product", pcode: "pid"},
+				{pname: "Payment type", pcode: "paymentype"}
+			],
+			deftrendobjects: [
+				{desc: "Number of time purchased", operation: "count", param: "_id"},
+				{desc: "Number of people purchased", operation: "count", param: "_mtid"},
+				{desc: "Total ammount of purchasing", operation: "sum", param: "amount"},
+			],
 			fields: [
 				{pname: "Product ID", pcode: "pid"},
 				{pname: "Product's Name", pcode: "pname"},
-				{pname: "Category's Name", pcode: "cid"},
+				{pname: "Category", pcode: "cid"},
 				{pname: "Category ID", pcode: "cname"},
 				{pname: "Price of product", pcode: "price"},
 				{pname: "Total amount", pcode: "amount"},
@@ -39,7 +49,15 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 			codename: "pageview",
 			name: "Pageview",
 			desc: "User view a page",
-			fields: []
+			fields: [],
+			deftrendfields: [
+				{pname: "URL", pcode: "_url"},
+			],
+			deftrendobjects: [
+				{desc: "Number of pageview", operation: "count", param: "_id"},
+				{desc: "Number of unique visitor", operation: "count", param: "_mtid"},
+				{desc: "Time on page", operation: "sum", param: "timeonpage"},
+			],
 		};
 
 		var click =
@@ -50,7 +68,15 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 			fields: [
 				{pname: "Object ID", pcode: "oid"},
 				{pname: "Object Type", pcode: "type"}
-			]
+			],
+			deftrendfields: [
+				{pname: "Object ID", pcode: "oid"},
+				{pname: "Object Type", pcode: "type"}
+			],
+			deftrendobjects: [
+				{desc: "Number of time clicked", operation: "count", param: "_id"},
+				{desc: "Number of unique people clicked", operation: "count", param: "_mtid"},
+			],
 		};
 
 		var rate =
@@ -64,7 +90,14 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 				{pname: "Category ID", pcode: "cid"},
 				{pname: "Category Name", pcode: "cname"},
 				{pname: "Level", pcode: "level"}
-			]
+			],
+			deftrendfields: [
+				{pname: "Product", pcode: "pid"},
+			],
+			deftrendobjects: [
+				{desc: "Number of time rated", operation: "count", param: "_id"},
+				{desc: "Number of unique people rated", operation: "count", param: "_mtid"},
+			],
 		};
 
 		var like =
