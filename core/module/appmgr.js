@@ -51,7 +51,7 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 			desc: "User view a page",
 			fields: [],
 			deftrendfields: [
-				{pname: "URL", pcode: "_url"},
+				{pname: "URL", pcode: "url"},
 			],
 			deftrendobjects: [
 				{desc: "Number of pageview", operation: "count", param: "_id"},

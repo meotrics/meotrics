@@ -30,6 +30,21 @@ MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get(
 		console.log(data);
 		trend.queryRaw(appid, data, function ( results) {
 			console.log(results);
+
+			var t2 = {
+				operation: 'count',
+				param: '_mtid',
+				object: 'url',
+				typeid: 'pageview',
+				order: -1
+			};
+			console.time('t2');
+			trendCrud.createRaw(appid, t2, function (data) {
+				trend.queryRaw(appid, data, function ( results) {
+					console.timeEnd('t2');
+					console.log(results);
+				});
+			});
 		});
 	});
 });
