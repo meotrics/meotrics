@@ -1,6 +1,7 @@
 (function () {
 	"use strict";
 	exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
+		var locksegment = [];
 		var me = this,
 				SegRet = require('./segmentresult.js').SegmentResult,
 				segRet = new SegRet(db, mongodb, converter, async, prefix);
@@ -26,56 +27,74 @@
 		this.runSegment = function runSegment(segment, callback) {
 			var outcollection = prefix + "segment" + segment._id.toString();
 			var col = db.collection(prefix + segment._appid);
+
+			// check the lock first
+			if(locksegment[segment._id.toString()] !== undefined) callback(outcollection);
+			locksegment[segment._id.toString()] = true;
 			getQuery(segment.condition, function (out) {
 				col.mapReduce(out.map, out.reduce, {
-					out: outcollection,
+					out: outcollection ,
 					query: out.option,
 					finalize: out.finalize,
 					sort: {_mtid: 1}
 				}, function (err) {
 					if (err) throw err;
-					var cursor = db.collection(outcollection).find({value: 1.0});
-					doNext();
+					converter.toIDs(['_isUser'], function(ids)
+					{
+						var matchquery = {};
+						matchquery[ids._isUser] = true;
+						
+						var cursor = col.find(matchquery);
+						var arr = []; //array of userid Object (not string)
+						doNext();
 
-					// inject segment into user
-					var arr = []; //array of userid Object (not string)
-					function updateUser(next) {
-						var bulk = col.initializeUnorderedBulkOp();
-						for (var i in arr) if (arr.hasOwnProperty(i))
-							bulk.find({_id: arr[i]}).update({$addToSet: {_segments: segment._id}});
+						function doNext()
+						{
+							cursor.next(function (err, doc) {
+								// the last docs
+								if (null === doc) return updateUser(function () {
+									// unlock
+									delete locksegment[segment._id.toString()];
+									if (callback) callback(outcollection);
+								});
 
-						// clean the array first
-						arr = [];
+								//check if is in segment
+								db.collection(outcollection ).find({_id: doc._id}).toArray(function(err, docs)
+								{
+									if(err) throw err;
+									arr.push({pp: docs[0] && docs[0].value == 1.0 ? 1: -1, id: doc._id});
 
-						bulk.execute(function (err, res) {
-							if (err) throw err;
-							//console.log(err, res);
-							next();
-						});
-					}
-
-					// parse next document, split docs in to bunchs of 100 docs + n last docs
-					// update bunch of 100 users
-					function doNext() {
-						cursor.next(function (err, doc) {
-
-							// the last docs
-							if (null === doc) return updateUser(function () {
-								if (callback) callback(outcollection);
+									if (arr.length === 100) {
+										// clean the stack by calling setTimeout
+										setTimeout(function () {
+											updateUser(doNext);
+										}, 1);
+									}
+									else {
+										return doNext();
+									}
+								});
 							});
-							arr.push(doc._id);
+						}
 
-							if (arr.length === 100) {
-								// clean the stack by calling setTimeout
-								setTimeout(function () {
-									updateUser(doNext);
-								}, 1);
-							}
-							else {
-								return doNext();
-							}
-						});
-					}
+						function updateUser(next) {
+							if(arr.length===0) return next();
+							var bulk = col.initializeUnorderedBulkOp();
+							for (var i in arr) if (arr.hasOwnProperty(i))
+								if(arr[i].pp === 1)
+									bulk.find({_id: arr[i].id}).update({$addToSet: {_segments: segment._id}});
+								else
+									bulk.find({_id: arr[i].id}).update({$pull: {_segments: segment._id}});
+							// clean the array first
+							arr = [];
+
+							bulk.execute(function (err, res) {
+								if (err) throw err;
+								//console.log(err, res);
+								next();
+							});
+						}
+					});
 				});
 			});
 		};

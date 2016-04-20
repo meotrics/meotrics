@@ -76,7 +76,7 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 				{
 					query.push({$group: {_id: '$' + object.object, result: {$sum: 1}, temp: {$first: "$$ROOT"}}});
 				}
-				//query.push({$sort: {result: object.order}});
+				query.push({$sort: {result: object.order}});
 
 				object.limit = object.limit || 10;
 				query.push({$limit: object.limit});
