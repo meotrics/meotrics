@@ -57,16 +57,16 @@
           <br><br>
         @endif
 				<div class="row">
-					<div class="form-group col-sm-2 ">
+					<div class="col-sm-2 ">
 						<h6 class="pull-right " style="margin-top: 11px">Code Name</h6>
 					</div>
-					<div class="form-group col-sm-5">
+					<div class="col-sm-5">
 						<input type="text" class="form-control fmonospaced" name="codename" placeholder="Name" required
 									 value="{{ $type->codename }}">
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-sm-2">
+					<div class="col-sm-2">
 						<h6 class="pull-right" style="margin-top: 11px">Display Name</h6>
 					</div>
 					<div class="col-sm-5">
@@ -76,7 +76,7 @@
           </div>
 				</div>
 				<div class="row">
-					<div class="form-group col-sm-2">
+					<div class="col-sm-2">
 						<h6 class="pull-right" style="margin-top: 11px">Description</h6>
 					</div>
 					<div class="col-sm-5">

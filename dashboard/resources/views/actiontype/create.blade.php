@@ -40,15 +40,15 @@
 		<div class="content col-sm-12">
 			<form action="/actiontype" method="POST">
 				<div class="row">
-					<div class="form-group col-sm-2 ">
+					<div class="col-sm-2 ">
 						<h6 class="pull-right " style="margin-top: 13px; font-size: 13px">Code</h6>
 					</div>
-					<div class="form-group col-sm-5">
+					<div class="col-sm-5">
 						<input type="text" class="form-control fmonospaced" name="codename" placeholder="Name" required>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-sm-2">
+					<div class="col-sm-2">
 						<h6 class="pull-right" style="margin-top: 13px; font-size: 13px">Display Name</h6>
 					</div>
 					<div class="col-sm-5">
@@ -57,7 +57,7 @@
           </div>
 				</div>
 				<div class="row">
-					<div class="form-group col-sm-2">
+					<div class="col-sm-2">
 						<h6 class="pull-right" style="margin-top: 13px; font-size: 13px">Description</h6>
 					</div>
 					<div class="col-sm-5">

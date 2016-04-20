@@ -31,7 +31,8 @@ th {
 }
 
 select {
-	box-shadow: inset 0px -3px 10px -8px #717171 !important;
+	/* box-shadow: inset 0px -3px 10px -8px #717171 !important; */
+	padding-top: 5px !important;
 }
 
 .fmonospaced {
@@ -305,4 +306,18 @@ a:hover, a:focus {
 
 .card label {
 	font-size: 14px;
+}
+
+.card h6 {
+	font-weight: normal;
+	font-size: 14px;
+}
+
+.mt
+{
+	margin-top: 20px;
+}
+
+.pb10{
+	padding-bottom: 10px;
 }

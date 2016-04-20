@@ -51,7 +51,7 @@ button,
 	transition: border-color .20s;
 }
 button {
-	height: 29px !important;
+	/* height: 29px !important; */
 	cursor: pointer;
 }
 

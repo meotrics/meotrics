@@ -150,6 +150,7 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 
 		var trend1 = {
 			name: "Top purchase",
+			desc: "Top purchased product",
 			typeid: "purchase",
 			operation: "sum",
 			object: "pid", //code of properties
