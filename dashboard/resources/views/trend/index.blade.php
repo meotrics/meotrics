@@ -45,7 +45,12 @@
 			if($outputs):
 			?>
 			@include('trend.partials.outputs', [
+					'actiontypes' => $types,
+					'typeid' => $trend->typeid,
+					'object' => $trend->object,
 					'outputs' => $outputs,
+					'op' => $trend->operation,
+					'param' => $trend->param
 			])
 			<?php
 			endif;

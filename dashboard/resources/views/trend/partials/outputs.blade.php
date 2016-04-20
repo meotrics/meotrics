@@ -1,58 +1,67 @@
-<?php
-use App\Util\MtHttp;
-
-$app_id = \Auth::user()->id;
-$actiontypes = MtHttp::get('actiontype/' . $app_id);
-$list_fields = [];
-if($actiontypes){
-    foreach ($actiontypes as $actiontype) {
-        if(property_exists($actiontype, 'codename') && property_exists($actiontype, 'fields')
-                && is_array($actiontype->fields)){
-            foreach ($actiontype->fields as $a_field) {
-                $list_fields[$a_field->pcode] = $a_field->pname;
-            }
-        }
-    }
-}
-?>
 <table class="table table-hover table-striped">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Result</th>
-            <?php
-            if($list_fields):
-            foreach ($list_fields as $pcode => $pname):
-            ?>
-            <th><?= $pname ?></th>
-            <?php
-            endforeach;
-            endif;
-            ?>
-        </tr>
-    </thead>
-    <tbody>
-        @if($outputs)
-            <?php
-            foreach($outputs as $output):
-                $temp_value = $output->temp;
-            ?>
-            <tr>
-                <td>{{$output->_id}}</td>
-                <td>{{$output->result}}</td>
-                <?php
-                if($list_fields):
-                foreach ($list_fields as $pcode => $pname):
-                ?>
-                <td><?= property_exists($temp_value, $pcode) && $temp_value->$pcode ? $temp_value->$pcode : '-' ?></td>
-                <?php
-                endforeach;
-                endif;
-                ?>
-            </tr>
-            <?php
-            endforeach;
-            ?>
-        @endif
-    </tbody>
+	<thead class="tbhead">
+	</thead>
+	<tbody class="tbbody">
+	</tbody>
 </table>
+<script>
+	var objcode = "{{$object}}";
+	var types ={!!   $actiontypes !!};
+	var op = "{{$op}}";
+	var param = "{{$param}}";
+
+	var typeid = "{{$typeid}}";
+	var data = JSON.parse('{!! json_encode($outputs) !!}');
+	$body = $('.tbbody');
+	$head = $('.tbhead');
+	$body.empty();
+	var head;
+	//data = JSON.parse(data);
+	var stt = 0;
+	for (var i in data) {
+		stt++;
+		var row = data[i];
+		var rowstr = "<td class='text-muted'>" + stt + "</td>";
+		head = "<th class='text-muted'>#</th>";
+		head += '<th> ' + he.encode(matchFieldName(objcode, typeid)) + ' </th>';
+		rowstr += '<td>' + he.encode(row.temp[objcode]) + '</td>';
+		head += '<th> ' + getLabel(op, param, typeid) + ' </th>';
+		rowstr += '<td>' + he.encode(row.result) + '</td>';
+		for (var j in row.temp) if (row.temp.hasOwnProperty(j) && j.toString().startsWith('_') == false && j.toString() !== objcode) {
+			head += '<th> ' + he.encode(matchFieldName(j, typeid)) + ' </th>';
+			rowstr += '<td>' + he.encode(row.temp[j]) + '</td>';
+		}
+		rowstr = '<tr>' + rowstr + '</tr>';
+		head = '<tr>' + head + '</tr>';
+		$body.append(rowstr);
+	}
+	$head.empty();
+	$head.append(head);
+
+	function getLabel(op, objd, typeid) {
+		var label = {
+			count: "Total occurs",
+			sum: "Total of ",
+			avg: "Avg of "
+		};
+		if (op == 'count') {
+			return label[op];
+		}
+		else {
+			return label[op] + he.encode(matchFieldName(objd, typeid))
+		}
+	}
+
+	function matchFieldName(code, actionid) {
+		for (var i in types) {
+			if (types[i].codename == actionid) {
+				for (var j in types[i].fields) {
+					var f = types[i].fields[j];
+					if (f.pcode == code) return f.pname;
+				}
+			}
+		}
+		return null;
+	}
+</script>
+
