@@ -117,7 +117,6 @@ function dataapiroot(req, res, qs, url) {
 			});
 			req.on('end', function () {
 				req.params = qs.parse(body);
-				console.log('d');
 				handle(req, res, url_parts.pathname);
 			});
 		}

@@ -87,7 +87,6 @@ function handleInput(object, callback) {
 	var countj = 0;
 	for (let i = 0; i < object.length; i += 2) {
 		counti++;
-		console.log(object);
 		if (object[i].type === 'user') {
 			counti--;
 			if (object[i].conditions != undefined) {
@@ -219,7 +218,6 @@ function conditionToQuery(element, callback) {
 
 		if (element.type == 'user') {
 			converter.toID('_isUser', function (r) {
-				console.log("USER");
 				if (query['$or'] != undefined) {
 					var temp = {};
 					temp[r] = true;
@@ -231,7 +229,6 @@ function conditionToQuery(element, callback) {
 			});
 		} else {
 			converter.toID('_typeid', function (r) {
-				console.log("NOT USER");
 				if (query['$or'] != undefined) {
 					var temp = {};
 					temp[r] = new mongodb.ObjectID(element.type);
@@ -350,7 +347,7 @@ function buildChunk(ind, element, _typeid, element_field) {
 	var defvalcode = "";
 	//var aggcode = "";
 	//get the condition code
-	if (element.conditions === undefined) console.log(element);
+	if (element.conditions === undefined) throw "wrong condition, element: " + JSON.parse(element);
 	var inlineconditions = true;//buildConditionsCode(element.conditions);
 
 	//if the query is to count then just map 1, but if the query is to sum
