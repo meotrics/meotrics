@@ -9,16 +9,18 @@
 		<div class="header col-md-12">
 			<form class="form-horizontal" method="post" action="{{URL::to('trend/write')}}">
 				<input type="hidden" name="Trend[_id]" value="{{$trend->_id}}"/>
+				<div class="row">
 				<div class="form-group col-md-12">
 					<label class="col-md-2" style="margin-top: 10px">Trend name</label>
 					<div class="col-md-4">
-						<input type="text" class="form-control " name="Trend[name]" required="" value="{{$trend->name}}"/>
+						<input type="text" class="form-control " name="Trend[name]" required="" value="{{isset($trend->name) ? $trend->name: ""}}"/>
 						@if($errors->any())
 							<p class="errror">{{$errors->first('name')}}</p>
 						@endif
 					</div>
 				</div>
-
+				</div>
+				<div class="row">
 				<div class="form-group col-md-12">
 					<label class="col-md-2" style="margin-top: 10px">List top</label>
 					<div class="col-md-4">
@@ -37,13 +39,15 @@
 							@endif
 						</select>
 					</div>
+				</div>
+
 					<div class="col-md-4">
 						<select class="form-control" id="object" name="Trend[object]">
 							<option value="">Object list</option>
 						</select>
 					</div>
 				</div>
-
+				<div class="row">
 				<div class="form-group col-md-12">
 					<label class="col-md-2" style="margin-top: 10px">Which has</label>
 					<div class="col-md-4">
@@ -54,7 +58,7 @@
 						<input type="hidden" id="param" name="Trend[param]" value="{{$trend->param}}"/>
 					</div>
 				</div>
-
+				</div>
 				<div class="form-group col-md-12">
 					<label class="col-md-2" style="margin-top: 10px">Order</label>
 					<div class="col-md-4">

@@ -1,12 +1,6 @@
-<?php
-?>
 @extends('../layout/master', ['sidebarselect' => 'trend'])
 @section('title', 'Trend')
-{{--
-$types: list of action type in the system
-each $types have fields in it
 
---}}
 @section('script')
 
 @endsection
@@ -16,7 +10,6 @@ each $types have fields in it
 @endsection
 
 @section('content')
-
 	<div class="card row">
 		<div class="header col-md-12">
 			<form class="">
@@ -27,9 +20,13 @@ each $types have fields in it
 					if($trends):
 					$trend_first = $trends[0];
 					?>
+
+					<?php var_dump($trends);?>
 					@foreach($trends as $trend)
-						<option value="{{$trend->_id}}">{{$trend->name ? $trend->name : TrendEnum::EMPTY_NAME}}</option>
+
+						 <option value="{{$trend->_id}}">{{ isset($trend->name) ? $trend->name : "unnamed"}}</option>
 					@endforeach
+
 					<?php
 					endif;
 					?>
