@@ -19,7 +19,7 @@
 		this.excuteSegment = function (segmentid, callback) {
 			db.collection(prefix + 'segment').find({_id: new mongodb.ObjectID(segmentid)}).toArray(function (err, segment) {
 				if (err) throw err;
-				setTimeout(function(){me.runSegment(segment[0], callback)}, 1);
+				me.runSegment(segment[0], callback);
 			});
 		};
 
@@ -51,12 +51,10 @@
 						var cursor = col.find(matchquery);
 						var arr = []; //array of userid Object (not string)
 						doNext();
-						var o = 0;
 						function doNext()
 						{
 							cursor.next(function (err, doc) {
-								o++;
-								console.log(o);
+								
 								// the last docs
 								if (null === doc) {
 									console.log('callone'); return;
