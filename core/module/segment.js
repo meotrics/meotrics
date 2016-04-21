@@ -56,17 +56,17 @@
 								// the last docs
 								if (null === doc) {
 									return updateUser(function () {
-									// unlock
-									delete locksegment[segment._id.toString()];
-									if (callback) callback(outcollection);
-								});}
-								return doNext();
+										// unlock
+										delete locksegment[segment._id.toString()];
+										if (callback) callback(outcollection);
+									});
+								}
+
 								//check if is in segment
 								db.collection(outcollection ).find({_id: doc._id}).toArray(function(err, docs)
 								{
 									if(err) throw err;
 									arr.push({pp: docs[0] && docs[0].value == 1.0 ? 1: -1, id: doc._id});
-
 									if (arr.length === 100) {
 										// clean the stack by calling setTimeout
 										setTimeout(function () {
