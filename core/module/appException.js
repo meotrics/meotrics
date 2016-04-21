@@ -4,7 +4,7 @@ module.exports = function (app) {
 	function next(res, err)
 	{
 		res.status(500).end(err.message);
-		console.err(err, err.stack);
+		console.log(err, err.stack);
 	}
 
 	app.postEx = function (route, handle) {
