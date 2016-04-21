@@ -33,7 +33,6 @@
 			// check the lock first
 			if(locksegment[segment._id.toString()] !== undefined) callback(outcollection);
 			locksegment[segment._id.toString()] = true;
-			console.log('locked');
 			getQuery(segment.condition, function (out) {
 				col.mapReduce(out.map, out.reduce, {
 					out: outcollection ,
@@ -44,7 +43,6 @@
 					if (err) throw err;
 					converter.toIDs(['_isUser'], function(ids)
 					{
-						console.log('fuck')
 						var matchquery = {};
 						matchquery[ids._isUser] = true;
 						
@@ -57,11 +55,9 @@
 								
 								// the last docs
 								if (null === doc) {
-									console.log('callone'); return;
 									return updateUser(function () {
 									// unlock
 									delete locksegment[segment._id.toString()];
-									console.log('unlocked');
 									if (callback) callback(outcollection);
 								});}
 								return doNext();
@@ -97,7 +93,6 @@
 
 							bulk.execute(function (err, res) {
 								if (err) throw err;
-								console.log("excute");
 								next();
 							});
 						}
