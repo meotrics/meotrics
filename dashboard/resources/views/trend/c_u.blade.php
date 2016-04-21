@@ -4,100 +4,100 @@
 @section('title', 'Trend')
 
 @section('content')
+	<div class="row">
+		<div class="card col-sm-12">
+			<div class="row">
+				<div class="header col-md-12">
+					<form class="form-horizontal pb10" method="post" action="{{URL::to('trend/write')}}">
+						<input type="hidden" name="Trend[_id]" value="{{$trend->_id}}"/>
+						<div class="row">
+							<div class="col-sm-2">
+								<h6 class="pull-right" style="margin-top: 11px">Display Name</h6>
+							</div>
+							<div class="col-sm-2">
+								<input type="text" class="form-control " name="Trend[name]" required=""
+								       value="{{isset($trend->name) ? $trend->name: ""}}"/>
+								@if($errors->any())
+									<p class="errror">{{$errors->first('name')}}</p>
+								@endif
+							</div>
+						</div>
 
-	<div class="card row">
-		<div class="header col-md-12">
-			<form class="form-horizontal pb10" method="post" action="{{URL::to('trend/write')}}">
-				<input type="hidden" name="Trend[_id]" value="{{$trend->_id}}"/>
-				<div class="row">
-					<div class="col-sm-2">
-						<h6 class="pull-right" style="margin-top: 11px">Display Name</h6>
-					</div>
-					<div class="col-sm-2">
-						<input type="text" class="form-control " name="Trend[name]" required=""
-						       value="{{isset($trend->name) ? $trend->name: ""}}"/>
-						@if($errors->any())
-							<p class="errror">{{$errors->first('name')}}</p>
-						@endif
-					</div>
-				</div>
+						<div class="row">
+							<div class="col-sm-2">
+								<h6 class="pull-right" style="margin-top: 11px">Description</h6>
+							</div>
+							<div class="col-sm-6">
+								<input type="text" class="form-control " name="Trend[desc]"
+								       value="{{isset($trend->desc) ? $trend->desc: ""}}"/>
+							</div>
+						</div>
 
-				<div class="row">
-					<div class="col-sm-2">
-						<h6 class="pull-right" style="margin-top: 11px">Description</h6>
-					</div>
-					<div class="col-sm-6">
-						<input type="text" class="form-control " name="Trend[desc]"
-						       value="{{isset($trend->desc) ? $trend->desc: ""}}"/>
-					</div>
-				</div>
-
-				<div class="row mt">
-					<div class="col-sm-2">
-						<h6 class="pull-right" style="margin-top: 11px">LIST</h6>
-					</div>
-					<div class="col-sm-2">
-						<select class="form-control" id="order" name="Trend[order]">
-							<option value="1" {{$trend->order == 1 ? 'selected=""' : ''}}>TOP</option>
-							<option value="-1" {{$trend->order == -1 ? 'selected=""' : ''}}>LEAST</option>
-						</select>
-					</div>
-					<div class="col-sm-2">
-						<select class="form-control" id="typeid" name="Trend[typeid]">
-							@if($actiontypes)
-								$objects = [];
-								@foreach($actiontypes as $actiontype)
-									@if($actiontype->codename && $actiontype->name)
-										$objects[$actiontype->codename] = $actiontype->fields;
-										<option value="{{$actiontype->codename}}"
-														{{$trend->typeid == $actiontype->codename ? 'selected=""' : ''}}>
-											{{$actiontype->name}}
-										</option>
+						<div class="row mt">
+							<div class="col-sm-2">
+								<h6 class="pull-right" style="margin-top: 11px">LIST</h6>
+							</div>
+							<div class="col-sm-2">
+								<select class="form-control" id="order" name="Trend[order]">
+									<option value="1" {{$trend->order == 1 ? 'selected=""' : ''}}>TOP</option>
+									<option value="-1" {{$trend->order == -1 ? 'selected=""' : ''}}>LEAST</option>
+								</select>
+							</div>
+							<div class="col-sm-2">
+								<select class="form-control" id="typeid" name="Trend[typeid]">
+									@if($actiontypes)
+										$objects = [];
+										@foreach($actiontypes as $actiontype)
+											@if($actiontype->codename && $actiontype->name)
+												$objects[$actiontype->codename] = $actiontype->fields;
+												<option value="{{$actiontype->codename}}"
+																{{$trend->typeid == $actiontype->codename ? 'selected=""' : ''}}>
+													{{$actiontype->name}}
+												</option>
+											@endif
+										@endforeach
 									@endif
-								@endforeach
-							@endif
-						</select>
-					</div>
-					<div class="col-md-2">
-						<select class="form-control" id="object" name="Trend[object]">
-							<option value="">Object list</option>
-						</select>
-					</div>
+								</select>
+							</div>
+							<div class="col-md-2">
+								<select class="form-control" id="object" name="Trend[object]">
+									<option value="">Object list</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-sm-2">
+								<h6 class="pull-right" style="margin-top: 11px">Sort by</h6>
+							</div>
+							<div class="col-sm-5">
+								<select class="form-control" id="meotrics" name="Trend[meotrics]">
+								</select>
+								<input type="hidden" id="operation" name="Trend[operation]" value="{{$trend->operation}}"/>
+								<input type="hidden" id="param" name="Trend[param]" value="{{$trend->param}}"/>
+							</div>
+						</div>
+
+						<div class="row mt">
+							<div class="col-sm-2">
+
+							</div>
+
+							<div class="col-sm-5">
+								<button type="submit" class="action button blue">
+									<span class="label">{{$trend->_id ? 'Update' : 'Create'}}</span>
+								</button>
+
+								<a href="/trend" class="action button">
+									<span class="label">Back</span>
+								</a>
+							</div>
+						</div>
+					</form>
 				</div>
-
-				<div class="row">
-					<div class="col-sm-2">
-						<h6 class="pull-right" style="margin-top: 11px">Sort by</h6>
-					</div>
-					<div class="col-sm-5">
-							<select class="form-control" id="meotrics" name="Trend[meotrics]">
-							</select>
-							<input type="hidden" id="operation" name="Trend[operation]" value="{{$trend->operation}}"/>
-							<input type="hidden" id="param" name="Trend[param]" value="{{$trend->param}}"/>
-					</div>
-				</div>
-
-				<div class="row mt">
-					<div class="col-sm-2">
-
-					</div>
-
-					<div class="col-sm-5">
-						<button type="submit" class="action button blue">
-							<span class="label">{{$trend->_id ? 'Update' : 'Create'}}</span>
-						</button>
-
-						<a href="/trend" class="action button">
-							<span class="label">Back</span>
-						</a>
-					</div>
-				</div>
-			</form>
+			</div>
 		</div>
-
 	</div>
-
-
 @endsection
 
 @section('additional')
@@ -188,7 +188,7 @@ actionChange($('#typeid').val());
 			if (!selected_value) {
 				selected_value = op[typeid][0];
 				selected_key = 0;
-				console.log(selected_value,selected_key)
+				console.log(selected_value, selected_key)
 			}
 			$('#meotrics').val(selected_key);
 			meotricsChange(selected_value.operation, selected_value.param);
@@ -198,7 +198,7 @@ actionChange($('#typeid').val());
 		}
 
 		$('#meotrics').on('change', function () {
-			var $me = $(this).find('[value='+ $(this).val()+']');
+			var $me = $(this).find('[value=' + $(this).val() + ']');
 			meotricsChange($me.attr('data-operation'), $me.attr('data-param'));
 		});
 
