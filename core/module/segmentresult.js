@@ -42,7 +42,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 
 			db.collection(collection).aggregate([matchClause, mmgroupclause]).toArray(function (err, minmax) {
 				if (err) throw err;
-				if(!minmax) return callback(undefined);
+				if(!minmax[0]) return callback(undefined);
 				var minfield2 = parseFloat(minmax[0].min);
 				var maxfield2 = parseFloat(minmax[0].max);
 				var results2 = range(minfield2, maxfield2, field2);
@@ -92,7 +92,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 			//find min, max
 			db.collection(collection).aggregate([matchClause, mmgroupclause]).toArray(function (err, minmax) {
 				if (err) throw err;
-				if(!minmax) return callback(undefined);
+				if(!minmax[0]) return callback(undefined);
 				var minfield1 = parseFloat(minmax[0].min);
 				var maxfield1 = parseFloat(minmax[0].max);
 				var results1 = range(minfield1, maxfield1, field1);
@@ -161,7 +161,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 			//find min, max
 			db.collection(collection).aggregate([matchClause, mmgroupclause]).toArray(function (err, minmax) {
 				if(err) throw err;
-				if(!minmax) return callback(undefined);
+				if(!minmax[0]) return callback(undefined);
 				//build range and project clause
 				var maxfield1 = parseFloat(minmax[0].max1);
 				var minfield1 = parseFloat(minmax[0].min1);
@@ -323,7 +323,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 			//find min, max
 			db.collection(collection).aggregate([matchClause, mmgroupclause]).toArray(function (err, minmax) {
 				if (err)throw err;
-				if(!minmax) return callback(undefined);
+				if(!minmax[0]) return callback(undefined);
 				var max = parseFloat(minmax[0].max);
 				var min = parseFloat(minmax[0].min);
 				var prefix = "range_";

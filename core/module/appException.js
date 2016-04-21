@@ -1,7 +1,7 @@
 var trycatch = require('trycatch');
 
 module.exports = function (app) {
-	function next(err)
+	function next(res, err)
 	{
 		res.status(500).end(err.message);
 		console.err(err, err.stack);
