@@ -15,21 +15,15 @@
 			<form class="">
 				<label class="">Select trend</label>&nbsp;&nbsp;
 				<select id="trend" class="form-control input-sm " style="width: 250px; display:inline-block">
-					<?php
-					$trend_first = null;
-					if($trends):
-					$trend_first = $trends[0];
-					?>
-
-					<?php var_dump($trends);?>
+					<?php $trend_first = $trends[0]; ?>
 					@foreach($trends as $trend)
-
-						 <option value="{{$trend->_id}}">{{ isset($trend->name) ? $trend->name : "unnamed"}}</option>
+						@if(isset($trendid) && $trendid == $trend->_id)
+							<?php $trend_first = $trend; ?>
+							<option selected value="{{$trend->_id}}">{{ isset($trend->name) ? $trend->name : "unnamed"}}</option>
+						@else
+							<option value="{{$trend->_id}}">{{ isset($trend->name) ? $trend->name : "unnamed"}}</option>
+						@endif
 					@endforeach
-
-					<?php
-					endif;
-					?>
 				</select>
 				<a id="action_update" data-href="{{URL::to('trend/update')}}" href="{{URL::to('trend/update', [
                                     'id' => $trend_first ? $trend_first->_id : ''
@@ -39,22 +33,17 @@
 			</form>
 		</div>
 
-
 		<div class="content col-md-12" id="outputs_table">
-			<?php
-			if($outputs):
-			?>
-			@include('trend.partials.outputs', [
-					'actiontypes' => $types,
-					'typeid' => $trend->typeid,
-					'object' => $trend->object,
-					'outputs' => $outputs,
-					'op' => $trend->operation,
-					'param' => $trend->param
-			])
-			<?php
-			endif;
-			?>
+			@if(isset($outputs))
+				@include('trend.partials.outputs', [
+							'actiontypes' => $types,
+							'typeid' => $trend_first->typeid,
+							'object' => $trend_first->object,
+							'outputs' => $outputs,
+							'op' => $trend_first->operation,
+							'param' => $trend_first->param
+					]);
+			@endif
 		</div>
 	</div>
 
@@ -68,21 +57,10 @@
 
 		$('#trend').on('change', function () {
 			var that = $(this);
-			$('#action_update').attr('href', $('#action_update').attr('data-href') + '/' + that.val());
-			$.ajax({
-				type: 'GET',
-				dataType: 'JSON',
-				url: '{{ URL::to('trend/htmloutputs') }}',
-				data: {
-					'_id': that.val(),
-				},
-				success: function (data) {
-					if (data.success && data.html_outputs) {
-						$('#outputs_table').html(data.html_outputs);
-					}
-				},
+			$.post('/trend/currenttrend/' + that.val(), function(){
+				location.reload();
 			});
-			return false;
+
 		});
 
 		$('#action_delete').on('click', function () {

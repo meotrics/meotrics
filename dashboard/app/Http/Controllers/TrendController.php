@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Util\MtHttp;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
@@ -17,8 +18,9 @@ class TrendController extends Controller
 {
 
 
-	public function __construct()
+	public function __construct(Request $request)
 	{
+		$this->request = $request;
 		$this->middleware('auth');
 	}
 
@@ -45,18 +47,35 @@ class TrendController extends Controller
 
 	}
 
+	public function postCurrenttrend($trendid)
+	{
+		$response = new Response();
+		return $response->withCookie(cookie('currenttrendid', $trendid));
+	}
+
 	public function getIndex()
 	{
+		$t1 = time();
 		$app_id = \Auth::user()->id;
 		$actiontypes = MtHttp::get('actiontype/' . $app_id);
+
 		$trends = MtHttp::get('trend/' . $app_id);
+
 		if ($trends) {
-			$trend = reset($trends);
-			$outputs = MtHttp::get('trend/query/' . $app_id . '/' . $trend->_id);
+			if ($this->request->cookie('currenttrendid')) {
+				$trendid = $this->request->cookie('currenttrendid');
+				$outputs = MtHttp::get('trend/query/' . $app_id . '/' . $trendid);
+			} else {
+				$trend = reset($trends);
+				$outputs = MtHttp::get('trend/query/' . $app_id . '/' . $trend->_id);
+			}
 		} else {
 			$outputs = [];
 		}
+
+
 		return view('trend/index', [
+			'trendid' => $this->request->cookie('currenttrendid'),
 			'types' => json_encode($actiontypes),
 			'trends' => $trends,
 			'outputs' => $outputs,
@@ -153,7 +172,6 @@ class TrendController extends Controller
 			} else {
 				$trendid = MtHttp::post('trend/' . $app_id, $data);
 			}
-			var_dump($trendid);die;
 			return redirect('trend');
 		}
 		var_dump('fuck');
