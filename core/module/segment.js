@@ -19,18 +19,21 @@
 		this.excuteSegment = function (segmentid, callback) {
 			db.collection(prefix + 'segment').find({_id: new mongodb.ObjectID(segmentid)}).toArray(function (err, segment) {
 				if (err) throw err;
-				me.runSegment(segment[0], callback);
+				setTimeout(function(){me.runSegment(segment[0], callback)}, 1);
 			});
 		};
 
 		//Excute segment based on segment data
 		this.runSegment = function runSegment(segment, callback) {
+
+			if(callback == undefined) callback =function(){};
 			var outcollection = prefix + "segment" + segment._id.toString();
 			var col = db.collection(prefix + segment._appid);
 
 			// check the lock first
 			if(locksegment[segment._id.toString()] !== undefined) callback(outcollection);
 			locksegment[segment._id.toString()] = true;
+			console.log('locked');
 			getQuery(segment.condition, function (out) {
 				col.mapReduce(out.map, out.reduce, {
 					out: outcollection ,
@@ -41,23 +44,29 @@
 					if (err) throw err;
 					converter.toIDs(['_isUser'], function(ids)
 					{
+						console.log('fuck')
 						var matchquery = {};
 						matchquery[ids._isUser] = true;
 						
 						var cursor = col.find(matchquery);
 						var arr = []; //array of userid Object (not string)
 						doNext();
-
+						var o = 0;
 						function doNext()
 						{
 							cursor.next(function (err, doc) {
+								o++;
+								console.log(o);
 								// the last docs
-								if (null === doc) return updateUser(function () {
+								if (null === doc) {
+									console.log('callone'); return;
+									return updateUser(function () {
 									// unlock
 									delete locksegment[segment._id.toString()];
+									console.log('unlocked');
 									if (callback) callback(outcollection);
-								});
-
+								});}
+								return doNext();
 								//check if is in segment
 								db.collection(outcollection ).find({_id: doc._id}).toArray(function(err, docs)
 								{
@@ -90,7 +99,7 @@
 
 							bulk.execute(function (err, res) {
 								if (err) throw err;
-								//console.log(err, res);
+								console.log("excute");
 								next();
 							});
 						}
@@ -111,52 +120,51 @@
 		}
 
 // ----------------------------------------------------
+		// purpose: convert all field in query to zipped field in db
 		function handleInput(object, callback) {
 			var counti = 0;
-			var countj = 0;
 
+			function canweend(s)
+			{
+				counti--;
+				if (counti === 0) return callback(object);
+			}
+
+			for (let i = 0; i < object.length; i += 2) counti++;
 			for (let i = 0; i < object.length; i += 2) {
-				counti++;
 				if (object[i].type === 'user') {
-					counti--;
 					if (object[i].conditions !== undefined) {
+						var countj = 0;
+						for (let j = 0; j < object[i].conditions.length; j += 4) countj++;
 						for (let j = 0; j < object[i].conditions.length; j += 4) {
-							countj++;
-
 							converter.toID(object[i].conditions[j], function (r) {
 								object[i].conditions[j] = r;
 								countj--;
-								if (counti === 0 && countj === 0) {
-									callback(object);
-								}
+								if(countj === 0) return canweend();
 							});
 						}
-						if (object[i].conditions.length === 0) {
-							callback(object);
-						}
+						if (object[i].conditions.length === 0) return canweend();
 					} else if (counti === 0) {
-						callback(object);
+						return canweend();
 					}
 				} else {
 					converter.toID(object[i].field, function (r) {
-						counti--;
 						object[i].field = r;
 						if (object[i].conditions !== undefined) {
+							var countj = 0;
+							for (let j = 0; j < object[i].conditions.length; j += 4) countj++;
 							for (let j = 0; j < object[i].conditions.length; j += 4) {
-								countj++;
 								converter.toID(object[i].conditions[j], function (r) {
 									object[i].conditions[j] = r;
 									countj--;
-									if (counti === 0 && countj === 0) {
-										callback(object);
-									}
+									if(countj === 0) return canweend();
 								});
 							}
 							if (object[i].conditions.length === 0) {
-								callback(object);
+								return canweend();
 							}
 						} else if (counti === 0) {
-							callback(object);
+							return canweend();
 						}
 					});
 				}
@@ -170,8 +178,8 @@
 
 			query.$or = [];
 			let c = 0;
+			for (var i = 0; i < length; i += 2) c++;
 			for (var i = 0; i < length; i += 2) {
-				c++;
 				conditionToQuery(object[i], function (r) {
 					query.$or.push(r);
 					c--;
