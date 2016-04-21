@@ -40,7 +40,7 @@ function route(app, com) {
 
 	//update or
 	app.get('/segment/query1/:appid/:id/:field1/', function (req, res) {
-		com.segMgr.querySegment(req.params.appid, req.params.id, req.params.field1, function (results) {
+		com.segMgr.querySegment(req.params.appid, req.params.id, req.params.field1, undefined, function (results) {
 			res.json(results);
 		});
 	});
@@ -161,7 +161,7 @@ var config = require('config');
 //<<<<<<<<<<<<THE ENTRY POINT
 
 //Using connection pool. Initialize mongodb once
-mongodb.MongoClient.connect(buildconnstr(config), function (err, db) {
+mongodb.MongoClient.connect(buildconnstr(config),{ server: {auto_reconnect: true, poolSize : 40}}, function (err, db) {
 	if (err) throw err;
 
 	//set up new express application
