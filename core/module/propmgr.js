@@ -1,7 +1,6 @@
 exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 	var me = this;
-	this.list = function (req, res) {
-		var props = [{
+	var props = [{
 			name: "Age", code: "age",
 			operators: [{name: "Less than", code: "lt"},
 				{name: "Greater than", code: "gt"},
@@ -71,6 +70,9 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 				{name: "Equal", code: "eq"},
 				{name: "From .. to ..", code: "in"}]
 		}];
+		
+	this.list = function (req, res) {
+		
 		res.json(props);
 	};
 };
