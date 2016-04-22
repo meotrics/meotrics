@@ -100,6 +100,10 @@
 
 		$('#segment-date-range').dateRangePicker(config);
 
+
+		//load segment time range
+
+		$('#segment-date-range').data('dateRangePicker').setDateRange('2013-11-20','2013-11-25');
 	</script>
 @endsection
 
@@ -134,7 +138,7 @@
                   <span class="input-group-addon">
 	                  <i class="pe-7s-date" style="font-size:26px; padding-left:6px;"></i>
                   </span>
-								<input type="text" class="form-control" id="segment-date-range">
+								<input type="text" class="form-control" id="segment-date-range" name="timerange">
 							</div>
 						</div>
 					</div>
@@ -159,7 +163,6 @@
 													'type_options' => $type_options,
 													'i_condition' => $i_condition,
 											])
-
 											<?php
 											$i_condition++;
 											endforeach;

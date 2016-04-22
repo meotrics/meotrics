@@ -2,6 +2,7 @@
 
 use App\Util\MtHttp;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
@@ -90,11 +91,7 @@ class SegmentController extends Controller
 	{
 		$t = time();
 		$segment = $this->loadModel($id);
-
-
 		$app_id = \Auth::user()->id;
-		var_dump("[total " . (time() - $t) . "]");
-		die;
 		$props = MtHttp::get('prop/' . $app_id);
 		$actions = MtHttp::get('actiontype/' . $app_id);
 		$tmp_conditions = $segment->condition ? $segment->condition : [];
@@ -251,8 +248,7 @@ class SegmentController extends Controller
 						'and',
 					];
 					$user_query->conditions = array_merge($user_query->conditions, $user_conditions);
-				} elseif (isset($data['select_type']) && $data['select_type'] != 'user'
-					&& isset($data['value']) && $data['value']
+				} elseif (isset($data['select_type']) && $data['select_type'] != 'user' && isset($data['value']) && $data['value']
 				) {
 					$conditions = [];
 					if (isset($data['conditions']) && is_array($data['conditions'])) {
@@ -281,18 +277,26 @@ class SegmentController extends Controller
 			array_pop($user_query->conditions);
 			$query[] = $user_query;
 
-			$app_id = \Auth::user()->id;
+			$app_id = Auth::user()->id;
 			$id = isset($_POST['id']) && $_POST['id'] ? $_POST['id'] : 0;
+
+			$times = explode(" ", $_POST['timerange']);
+			$startTime = $times[0];
+			$endTime = $times[2];
 			if (!$id) {
 				$id_new = MtHttp::post('segment/' . $app_id, [
 					'condition' => $query,
 					'name' => $_POST['name'],
+					'startTime' => $startTime,
+					'endTime' => $endTime,
 					'description' => isset($_POST['description']) ? $_POST['description'] : '',
 				]);
 			} else {
 				$id = MtHttp::put('segment/' . $app_id . '/' . $id, [
 					'condition' => $query,
 					'name' => $_POST['name'],
+					'startTime' => $startTime,
+					'endTime' => $endTime,
 					'description' => isset($_POST['description']) ? $_POST['description'] : '',
 				]);
 			}

@@ -16,10 +16,11 @@ $props = isset($props) ? $props : [];
 							$segment_first = $segment;
 						}
 						?>
-						segments['<?= $segment->_id ?>'] = {
-			name: '<?= property_exists($segment, 'name') ? $segment->name : '' ?>',
-			description: '<?= property_exists($segment, 'description') ? $segment->description : '' ?>'
-		}
+						segments['{{ $segment->_id }}'] = {
+			name: '{{ property_exists($segment, 'name') ? $segment->name : '' }}',
+			description: '{{property_exists($segment, 'description') ? $segment->description : '' }}',
+			count:'{{ property_exists($segment, 'count') ? $segment->count : '' }}'
+		};
 		<?php
 		endforeach;
 		endif;
@@ -48,7 +49,8 @@ $props = isset($props) ? $props : [];
 				<a id="action_update" data-href="{{URL::to('segment/update')}}" href="{{URL::to('segment/update', [
                 'id' => $segment_first ? $segment_first->_id : ''
             ])}}" class="action button blue" role="button"><span class="label">Update</span> </a>
-				<a id="action_delete" href="javascript:void(0)" class="action button red" role="button"> <span class="label">Delete</span></a>
+				<a id="action_delete" href="javascript:void(0)" class="action button red" role="button"> <span
+									class="label">Delete</span></a>
 				&nbsp; or &nbsp;<a href="{{ URL::to('segment/create') }}">+ CREATE NEW SEGMENTATION</a>
 				<!--</form>-->
 			</div>
@@ -62,7 +64,12 @@ $props = isset($props) ? $props : [];
 					<h6>Description</h6>
 				</div>
 				<!--<label class="col-md-2" style="margin-top: 4px">Segment description: </label>-->
-				<p class="col-md-10"><?= property_exists($segment_first, 'description') ? $segment_first->description : ''?></p>
+				<p class="col-md-10" id="desc"><?= property_exists($segment_first, 'description') ? $segment_first->description : ''?></p>
+				<p> @if(isset($segment_first->startTime ))
+						Time range: <span id="startTime">{{$segment_first->startTime}}</span> to {{$segment_first->endTime}},
+					@endif
+					<span id="count">@if(isset($segment_first->count)){{$segment_first->count}}@endif</span>
+				</p>
 			</div>
 
 			<div class=" content row">
@@ -127,24 +134,13 @@ $props = isset($props) ? $props : [];
 			if (name_div.length) {
 				name_div.text(segments[that.val()] ? segments[that.val()]['name'] : '');
 			}
-			var description_div = $('div[data-name="description"]').find('p');
-			if (description_div.length) {
-				description_div.text(segments[that.val()] ? segments[that.val()]['description'] : '');
-			}
+
 			$('#action_update').attr('href', $('#action_update').attr('data-href') + '/' + that.val());
-//        $.ajax({
-//            type: 'GET',
-//            dataType: 'JSON',
-//            url: '{{ URL::to('trend/htmloutputs') }}',
-//            data: {
-//                '_id' : that.val(),
-//            },
-//            success: function(data){
-//                if(data.success && data.html_outputs){
-//                    $('#outputs_table').html(data.html_outputs);
-//                }
-//            },
-//        });
+
+			$('#desc').html(segments[that.val()].description);
+			$('#count').html(segments[that.val()].count);
+
+
 			return false;
 		});
 
