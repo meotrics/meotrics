@@ -29,7 +29,6 @@
   <script src="{{asset('js/bootstrap.min.js')}}" type="text/javascript"></script>
 
   <!-- App's dependencies -->
-  <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.6.1/lodash.js"></script>
   <script src="{{asset('js/moment.js')}}"></script>
   <script src="{{asset('js/fg.menu.js')}}"></script>
   <script src="{{asset('js/jquery.daterangepicker.js')}}"></script>
@@ -38,30 +37,34 @@
   <script>
     var _helper = {
       notification: {
-        error: function(err, options){
-          $.notify({
-            icon: "pe-7s-attention",
-            message: err
-          }, _.merge({
-            timer: 3000,
-            placement: {
-              from: 'top',
-              align: 'right'
-            }
-          }, _.merge(options || {}, { type: 'danger' })));
-        },
-        success: function(message, options){
-          $.notify({
-            icon: "pe-7s-check",
-            message: message
-          }, _.merge({
-            timer: 3000,
-            placement: {
-              from: 'top',
-              align: 'right'
-            }
-          }, _.merge(options || {}, { type: 'success' })));
-        }
+	      error: function (err, options) {
+		      options = options || {};
+		      options.type = 'danger';
+		      option.timer = 3000;
+		      option.placement = {
+			      from: 'top',
+			      align: 'right'
+		      };
+
+		      $.notify({
+			      icon: "pe-7s-attention",
+			      message: err
+		      }, options);
+	      },
+	      success: function (message, options) {
+		      options = options || {};
+		      options.type = 'success';
+		      option.timer = 3000;
+		      option.placement = {
+			      from: 'top',
+			      align: 'right'
+		      };
+
+		      $.notify({
+			      icon: "pe-7s-check",
+			      message: message
+		      }, options);
+	      }
       }
     }
   </script>

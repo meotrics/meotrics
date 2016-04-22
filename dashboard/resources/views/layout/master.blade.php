@@ -37,7 +37,6 @@
 	<script src="{{asset('/js/chartist.min.js')}}"></script>
 	<script src="{{asset('/js/light-bootstrap-dashboard.js')}}"></script>
 	<!-- App's dependencies -->
-	<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.6.1/lodash.js"></script>
 	<script src="{{asset('js/moment.js')}}"></script>
 	<script src="{{asset('js/fg.menu.js')}}"></script>
 	<script src="{{asset('js/jquery.daterangepicker.js')}}"></script>
@@ -65,42 +64,46 @@
 		var _helper = {
 			notification: {
 				error: function (err, options) {
+
+					options = options || {};
+					options.type = 'danger';
+					option.timer = 3000;
+					option.placement = {
+						from: 'top',
+						align: 'right'
+					};
+
 					$.notify({
 						icon: "pe-7s-attention",
 						message: err
-					}, _.merge({
-						timer: 3000,
-						placement: {
-							from: 'top',
-							align: 'right'
-						}
-					}, _.merge(options || {}, {type: 'danger'})));
+					}, options);
 				},
 				success: function (message, options) {
+					options = options || {};
+					options.type = 'success';
+					option.timer = 3000;
+					option.placement = {
+						from: 'top',
+						align: 'right'
+					};
+
 					$.notify({
 						icon: "pe-7s-check",
 						message: message
-					}, _.merge({
-						timer: 3000,
-						placement: {
-							from: 'top',
-							align: 'right'
-						}
-					}, _.merge(options || {}, {type: 'success'})));
+					}, options);
 				}
 			}
 		}
 	</script>
 	<link rel="stylesheet" href="{{asset('css/odometer-theme-minimal.css')}}"/>
 
-<script>window.odometerOptions = {
-		duration: 350
-	};</script>
+	<script>window.odometerOptions = {
+			duration: 350
+		};</script>
 	<script src="{{asset('js/odometer.min.js')}}"></script>
 	<script>
 
 		onPageLoad(function () {
-
 
 
 			function bg_refresh_counter() {
