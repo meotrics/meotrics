@@ -67,7 +67,7 @@ $props = isset($props) ? $props : [];
 
 			<div class=" content row">
 				<div class=" col-md-2">
-					<h6>Filter to execute:</h6>
+					<h6>Filter By:</h6>
 				</div>
 				<div class="col-md-2">
 					<select name="Prop[one]" class="form-control">

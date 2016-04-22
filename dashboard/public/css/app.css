@@ -266,7 +266,8 @@ select {
 
 .form-segment .col-add-filter {
 	text-align: right;
-	margin-top: 12px;
+	/* margin-top: 12px; */
+	/* padding: 0px; */
 }
 
 .navbar .navbar-nav > li > a {
@@ -313,6 +314,7 @@ a:hover, a:focus {
 	font-weight: normal;
 	font-size: 14px;
 	margin-top: 10px;
+	margin-bottom: 5px;
 }
 
 .mt {
