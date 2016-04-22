@@ -14,7 +14,7 @@
 							<div class="col-sm-2">
 								<h6 class="pull-right" style="margin-top: 11px">Display Name</h6>
 							</div>
-							<div class="col-sm-2">
+							<div class="col-sm-6">
 								<input type="text" class="form-control " name="Trend[name]" required=""
 								       value="{{isset($trend->name) ? $trend->name: ""}}"/>
 								@if($errors->any())
@@ -68,9 +68,9 @@
 
 						<div class="row">
 							<div class="col-sm-2">
-								<h6 class="pull-right" style="margin-top: 11px">Sort by</h6>
+								<h6 class="pull-right" style="margin-top: 11px">by</h6>
 							</div>
-							<div class="col-sm-5">
+							<div class="col-sm-6">
 								<select class="form-control" id="meotrics" name="Trend[meotrics]">
 								</select>
 								<input type="hidden" id="operation" name="Trend[operation]" value="{{$trend->operation}}"/>

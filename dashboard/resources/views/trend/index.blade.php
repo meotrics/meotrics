@@ -15,7 +15,7 @@
 			<div class="row">
 				<div class="header col-md-12">
 					<form class="">
-						<label class="">Select trend</label>&nbsp;&nbsp;
+						<label style="vertical-align: bottom; margin-right: 10px" >Select trend</label>
 						<select id="trend" class="form-control input-sm " style="width: 250px; display:inline-block">
 							<?php $trend_first = $trends[0]; ?>
 							@foreach($trends as $trend)
@@ -45,7 +45,7 @@
 									'outputs' => $outputs,
 									'op' => $trend_first->operation,
 									'param' => $trend_first->param
-							]);
+							])
 					@endif
 				</div>
 			</div>

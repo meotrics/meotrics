@@ -13,6 +13,7 @@
 	var typeid = "{{$typeid}}";
 	var data = JSON.parse('{!! json_encode($outputs) !!}');
 	$body = $('.tbbody');
+	$body.css('text-align', 'center');
 	$head = $('.tbhead');
 	$body.empty();
 	var head;
@@ -22,13 +23,13 @@
 		stt++;
 		var row = data[i];
 		var rowstr = "<td class='text-muted'>" + stt + "</td>";
-		head = "<th class='text-muted'>#</th>";
-		head += '<th> ' + he.encode(matchFieldName(objcode, typeid)) + ' </th>';
+		head = "<th class='text-muted' style='text-align: center;'>#</th>";
+		head += '<th style="text-align: center;">' + he.encode(matchFieldName(objcode, typeid)) + ' </th>';
 		rowstr += '<td>' + he.encode(row.temp[objcode]) + '</td>';
-		head += '<th> ' + getLabel(op, param, typeid) + ' </th>';
+		head += '<th style="text-align: center;"> ' + getLabel(op, param, typeid) + ' </th>';
 		rowstr += '<td>' + he.encode(row.result) + '</td>';
 		for (var j in row.temp) if (row.temp.hasOwnProperty(j) && j.toString().startsWith('_') == false && j.toString() !== objcode) {
-			head += '<th> ' + he.encode(matchFieldName(j, typeid)) + ' </th>';
+			head += '<th style="text-align: center;"> ' + he.encode(matchFieldName(j, typeid)) + ' </th>';
 			rowstr += '<td>' + he.encode(row.temp[j]) + '</td>';
 		}
 		rowstr = '<tr>' + rowstr + '</tr>';
