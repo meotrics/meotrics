@@ -12,9 +12,8 @@ $i_condition = isset($i_condition) ? $i_condition : 'i_condition_replace';
 $i_condition_sub = isset($i_condition_sub) ? $i_condition_sub : 'i_condition_sub_replace';
 $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators();
 ?>
-<div class="form-group row" data-name="condition-sub-item">
-
-	<div class="col-md-2 col-md-offset-1">
+<div class="row" data-name="condition-sub-item">
+	<div class="col-md-2 col-md-offset-1" style="padding-top: 0; padding-bottom: 0">
 		<select class="form-control "
 		        name="Segment[{{ $i_condition }}][conditions][{{ $i_condition_sub }}][cs_field]"
 		        value="{{ $condition->field }}">

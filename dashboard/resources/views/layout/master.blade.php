@@ -195,17 +195,7 @@
 						<li>
 							@include('segment/select')
 						</li>
-						<li>
-							<a style="padding: 0px">
-								<div class="input-group" style="width: 250px;">
-                  <span class="input-group-addon">
-	                  <i class="pe-7s-date" style="font-size:26px; padding-left:6px;"></i>
-                  </span>
-									<input type="text" class="form-control" id="date-range">
 
-								</div>
-							</a>
-						</li>
 						<!-- <li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 								<i class="fa fa-globe"></i>
@@ -273,8 +263,6 @@
 			$(this).fadeOut(300, cb);
 		}
 	};
-	$('#date-range').dateRangePicker(config);
-
 
 </script>
 

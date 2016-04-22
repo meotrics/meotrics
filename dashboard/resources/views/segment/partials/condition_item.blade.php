@@ -35,13 +35,12 @@ $operators_default = [
 ?>
 
 <div class="condition-item row" data-name="condition-item" data-i-condition="{{$i_condition}}">
-	<div class="col-sm-12">
-		<input class="row hidden" type="hidden" name="Segment[{{$i_condition}}][select_type]"
-						value="{{$condition->select_type}}">
+	<div class="col-sm-12" style="padding-top: 0; padding-bottom: 0">
+		<input class="row hidden" type="hidden" name="Segment[{{$i_condition}}][select_type]" value="{{$condition->select_type}}">
 		<div class="row">
 			<!--<label class="col-md-2" style="margin-top: 10px">List top</label>-->
-			<div class="col-md-{{$condition->select_type == 'user' ? 4 : 2 }}">
-				<select class="form-control" id="" name="Segment[{{$i_condition}}][type]" onchange="typeChange(this)">
+			<div class="col-md-2">
+				<select class="form-control" name="Segment[{{$i_condition}}][type]" onchange="typeChange(this)">
 					<?php
 					foreach ($type_options as $type_option):
 					?>
@@ -56,7 +55,7 @@ $operators_default = [
 					?>
 				</select>
 			</div>
-			<div class="col-md-1" <?= $condition->select_type == 'user' ? 'style="display: none"' : '' ?>>
+			<div class="col-md-2" <?= $condition->select_type == 'user' ? 'style="display: none"' : '' ?>>
 				<select class="form-control" id="" name="Segment[<?= $i_condition ?>][f]" value="<?= $condition->f ?>">
 					<?php
 					foreach($f_behaviors as $f_behavior):
@@ -82,7 +81,7 @@ $operators_default = [
 					?>
 				</select>
 			</div>
-			<div class="col-md-<?= $condition->select_type == 'user' ? 4 : 2  ?>">
+			<div class="col-md-2">
 				<select class="form-control" id="" name="Segment[<?= $i_condition ?>][operator]">
 					<?php
 					if (property_exists($condition, 'operators')) {
@@ -106,15 +105,15 @@ $operators_default = [
 							data-name="add-condition" <?= $condition->select_type == 'user' ? 'style="display: none"' : '' ?>>
 				<i class="fa fa-plus fa-2" aria-hidden="true" onclick="addCondition(this)"></i>
 			</div>
-			<div class="col-md-1 col-add-filter" style="padding-top: 10px;">
-				<a class="button left" href="javascript:void(0);" style="margin: 0; padding: 3px; vertical-align: middle;"
+			<div class="col-md-1 col-add-filter" style="padding-top: 10px;padding-bottom: 0">
+				<a class="button left" href="javascript:void(0);" style="margin: 0; padding: 3px 0px; vertical-align: middle; width: 31px"
 								onclick="addFilter(this)"><span class="icon icon3"></span></a>
-				<a class="button right" href="javascript:void(0);" style="margin: 0; padding: 3px; vertical-align: middle;"
+				<a class="button right" href="javascript:void(0);" style="margin: 0;padding: 3px 0px; vertical-align: middle; width: 31px"
 								onclick="deleteFilter(this)"><span class="icon icon58"></span> </a>
 			</div>
 		</div>
 		<div class="row">
-			<div class="condition-sub-group col-sm-12" data-name="condition-sub-group" data-i-condition-sub-max="<?= count($condition->conditions) ?>">
+			<div class="condition-sub-group col-sm-12" style="padding-bottom: 0" data-name="condition-sub-group" data-i-condition-sub-max="{{count($condition->conditions)}}">
 				<?php
 				$i_condition_sub = 0;
 				if($condition->conditions && is_array($condition->conditions)):

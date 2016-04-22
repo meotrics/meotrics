@@ -50,7 +50,7 @@
 
 						$type_options[] = (object)[
 										'value' => $action->codename,
-										'name' => 'Has done ' . $action->name,
+										'name' => 'Did ' . $action->name,
 										'select_type' => 'behavior',
 						];
 						?>
@@ -90,13 +90,16 @@
 							{code: 'count', name: 'Count'}
 						];
 		var operator_behavior = [
-			{code: '>', name: '>'},
-			{code: '>=', name: '>='},
-			{code: '=', name: '='},
-			{code: '<', name: '<'},
-			{code: '<=', name: '<='}
+			{code: '>', name: 'greater than'},
+			{code: '>=', name: 'less or equal'},
+			{code: '=', name: 'equal'},
+			{code: '<', name: 'less than'},
+			{code: '<=', name: 'greater or equal'}
 		];
 		<?php $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators(); ?>
+
+		$('#segment-date-range').dateRangePicker(config);
+
 	</script>
 @endsection
 
@@ -113,11 +116,9 @@
 				<div class="col-sm-12">
 					<input type="hidden" class="row hidden" value="{{$segment->_id}}" name="id">
 					<div class=" row">
-
 						<div class="col-sm-2">
 							<h6>Name</h6>
-							<input type="text" class="form-control " name="name"
-											value="{{Input::old('name', $segment->name)}}"
+							<input type="text" class="form-control " name="name" value="{{Input::old('name', $segment->name)}}"
 											placeholder="Enter name"/>
 							@if($errors->any())
 								<p class="errror">{{$errors->first('name')}}</p>
@@ -126,29 +127,29 @@
 						</div>
 
 						<div class="col-sm-10">
-							<h6>Description</h6>
+							<h6>Filter date</h6>
 
-							<!--<label class="col-md-12" style="margin-top: 10px">Segment description</label>-->
-							<div class="">
-                        <textarea rows="1" class="form-control" name="description" placeholder="Enter description">
-	                        @if(isset($segment->description)) {{$segment->description}}
-	                        @else {{''}}
-	                        @endif
-                        </textarea>
+
+							<div class="input-group" style="width: 300px;">
+                  <span class="input-group-addon">
+	                  <i class="pe-7s-date" style="font-size:26px; padding-left:6px;"></i>
+                  </span>
+								<input type="text" class="form-control" id="segment-date-range">
 							</div>
 						</div>
-
 					</div>
 					<div class="row">
-						<div class="col-sm-12">
+						<div class="col-sm-12" style="padding-top: 0;padding-bottom: 0">
 							<div class="row">
-								<div class="col-sm-12"><h6>Filter condition</h6></div>
+								<div class="col-sm-12" style="padding-bottom: 0 ;padding-bottom: 0"><h6
+													style="margin-bottom:0px">Filter condition</h6>
+								</div>
 							</div>
 
 							<div class="row">
-								<div class="col-sm-12">
+								<div class="col-sm-12" style="padding-top: 0;padding-bottom: 0">
 									<div data-name="condition-group" class="row" data-i-condition-max="{{count($conditions)}}">
-										<div class="col-sm-12">
+										<div class="col-sm-12" style="padding-top: 0;padding-bottom: 0">
 											<?php
 											$i_condition = 0;
 											foreach($conditions as $condition):
@@ -165,16 +166,28 @@
 											?>
 										</div>
 									</div>
-									<div class="row">
-										<div class="col-sm-push-2 col-sm-2">
-											<button type="submit" class="btn btn-success btn-fill ">
-												<i class="pe-7s-diskette mr5" style="font-size:19px; vertical-align: middle"></i>
-												<span class="" style="vertical-align: middle">{{$segment->_id ? 'Update' : 'Create'}}</span>
-											</button>
-										</div>
-									</div>
+
 								</div>
 							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-sm-12" style="padding-top: 0">
+							<h6>Description</h6>
+							<!--<label class="col-md-12" style="margin-top: 10px">Segment description</label>-->
+
+							<input type="text" class="form-control" name="description" placeholder="Enter description"
+											value="{{isset($segment->description) ? $segment->description : ''}}"/>
+
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-sm-12">
+							<button type="submit" class="action button blue ">
+								<span class="label">{{$segment->_id ? 'Update' : 'Create'}}</span>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -200,8 +213,8 @@
 						containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
 						containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().removeClass('col-md-2');
 						containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().addClass('col-md-4');
-						containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().removeClass('col-md-2');
-						containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().addClass('col-md-4');
+						//containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().removeClass('col-md-2');
+						//containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().addClass('col-md-4');
 						containter.find('select[name="Segment[' + i_condition + '][f]"]').parent().hide();
 						containter.find('select[name="Segment[' + i_condition + '][field]"]').parent().hide();
 						if (v.operators.length) {
@@ -215,8 +228,8 @@
 						containter.find('input[name="Segment[' + i_condition + '][select_type]"]').val('behavior');
 						containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().removeClass('col-md-4');
 						containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().addClass('col-md-2');
-						containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().removeClass('col-md-4');
-						containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().addClass('col-md-2');
+						//containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().removeClass('col-md-4');
+						//containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().addClass('col-md-2');
 						containter.find('select[name="Segment[' + i_condition + '][f]"]').parent().show();
 						containter.find('select[name="Segment[' + i_condition + '][field]"]').parent().show();
 						containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
@@ -237,8 +250,9 @@
 						add_condition.show();
 					}
 					containter.find('input[name="Segment[' + i_condition + '][value]"]').val('');
-
+					return false;
 				}
+
 			});
 			/*
 			 * delete condition sub
