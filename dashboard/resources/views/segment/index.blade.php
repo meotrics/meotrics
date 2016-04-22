@@ -36,8 +36,8 @@ $props = isset($props) ? $props : [];
 		<div class="card col-sm-12">
 			<div class="header row">
 				<!--<form class="col-md-12">-->
-				<label class="col-md-2">Segmentation</label>&nbsp;&nbsp;
-				<div class="col-md-4">
+				<h6 class="col-md-2">Segmentation</h6>&nbsp;&nbsp;
+				<div class="col-md-2">
 					<select id="segment" class="form-control input-sm" style="display:inline-block">
 						@foreach($segments as $segment)
 							<option value="{{$segment->_id}}" <?= $segment->_id == $segment_first->_id ? 'selected=""' : '' ?>>{{$segment->name ? $segment->name : TrendEnum::EMPTY_NAME}}</option>
@@ -59,7 +59,7 @@ $props = isset($props) ? $props : [];
     </div>-->
 			<div class="content row" data-name="description">
 				<div class=" col-md-2">
-					<label>Description</label>
+					<h6>Description</h6>
 				</div>
 				<!--<label class="col-md-2" style="margin-top: 4px">Segment description: </label>-->
 				<p class="col-md-10"><?= property_exists($segment_first, 'description') ? $segment_first->description : ''?></p>
@@ -67,11 +67,11 @@ $props = isset($props) ? $props : [];
 
 			<div class=" content row">
 				<div class=" col-md-2">
-					<label>Filter to execute:</label>
+					<h6>Filter to execute:</h6>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-2">
 					<select name="Prop[one]" class="form-control">
-						<option value="">Select prop 1</option>
+						<option value="">Select property</option>
 						<?php
 						foreach ($props as $prop):
 						?>
@@ -83,9 +83,9 @@ $props = isset($props) ? $props : [];
 						?>
 					</select>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-2">
 					<select name="Prop[two]" class="form-control">
-						<option value="">Select prop 2</option>
+						<option value="">N/A</option>
 						<?php
 						foreach ($props as $prop):
 						?>
@@ -98,8 +98,8 @@ $props = isset($props) ? $props : [];
 					</select>
 				</div>
 				<div class="col-sm-2">
-					<button type="button" class="btn btn-success btn-fill " onclick="execute()">
-						<span class="" style="vertical-align: middle">Execute chart</span>
+					<button type="button" class="action button blue" onclick="execute()">
+						<span class="label">Generate</span>
 					</button>
 				</div>
 

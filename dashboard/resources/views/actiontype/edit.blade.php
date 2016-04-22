@@ -58,7 +58,7 @@
         @endif
 				<div class="row">
 					<div class="col-sm-2 ">
-						<h6 class="pull-right " style="margin-top: 11px">Code Name</h6>
+						<h6 class="pull-right">Code Name</h6>
 					</div>
 					<div class="col-sm-5">
 						<input type="text" class="form-control fmonospaced" name="codename" placeholder="Name" required
@@ -67,7 +67,7 @@
 				</div>
 				<div class="row">
 					<div class="col-sm-2">
-						<h6 class="pull-right" style="margin-top: 11px">Display Name</h6>
+						<h6 class="pull-right" >Display Name</h6>
 					</div>
 					<div class="col-sm-5">
 						<input type="text" name="name" class="form-control" id="exampleInputEmail1"
@@ -77,7 +77,7 @@
 				</div>
 				<div class="row">
 					<div class="col-sm-2">
-						<h6 class="pull-right" style="margin-top: 11px">Description</h6>
+						<h6 class="pull-right">Description</h6>
 					</div>
 					<div class="col-sm-5">
 						<input type="text" name="desc" class="form-control" id="exampleInputEmail1"
