@@ -9,6 +9,7 @@ class TypeController extends Controller
 {
 	public function __construct(Request $request) {
     $this->request = $request;
+		$this->middleware('auth');
   }
 
 	public function index(Request $request)
