@@ -43,6 +43,22 @@
 					if (err) throw err;
 					converter.toIDs(['_isUser'], function(ids)
 					{
+
+						// update segment count
+
+						db.collection(outcollection).count({value: 1}, function(err, ret)
+							{
+								if(err) throw err;
+								console.log(ret);
+								db.collection(prefix + 'segment').update({'_id': new mongodb.ObjectId(segment._id)} ,{$set: {count: ret} }, function(err, ret)
+									{
+										if(err) throw err;
+
+									});
+								
+							});
+
+
 						var matchquery = {};
 						matchquery[ids._isUser] = true;
 						
@@ -185,6 +201,25 @@
 						}
 					}
 
+			console.log(JSON.stringify(query));
+
+					/*if (object.startTime !== undefined) {
+				match[ids._ctime``] = {
+					$gte: object.startTime
+				};
+			}
+
+			if (object.endTime !== undefined) {
+				if (match[ids._ctime] !== undefined) {
+					match[ids._ctime]['$lte'] = object.endTime;
+				} else {
+					match[ids._ctime] = {
+						$lte: object.endTime
+					};
+				}
+			}*/
+
+
 					if (hasUser) return callback(query);
 
 					converter.toID('_isUser', function (r) {
@@ -200,81 +235,82 @@
 		function conditionToQuery(element, callback) {
 			var query = {};
 
-			//you can decrease indenting by putting the else in front of the if
-			if (element.conditions !== undefined) {
-				var conditions = element.conditions;
-				var size = conditions.length;
-				var hasOr = false;
-				// you dont have to check for <or> operator, <or> and <and> operator
-				// are treated same way, just delete the loop and the if
-				for (var i = 3; i < size; i += 4) {
-					if (conditions[i] === 'or') {
-						hasOr = true;
-						break;
-					}
-				}
-				if (hasOr) {
-					query.$or = [];
-					for (i = 0; i < size; i += 4) {
-						if ((conditions[i + 3] === 'or') || (i + 3 === size)) {
-							query.$or.push(translateOperator(conditions, i));
-						} else {
-							for (var j = i + 7; j < size; j += 4) {
-								if (conditions[j] === 'or') {
-									break;
-								}
-							}
-							var andQuery = {
-								'$and': []
-							};
-							for (i; i < j; i += 4) {
-								andQuery.$and.push(translateOperator(conditions, i));
-							}
-							query.$or.push(andQuery);
-						}
-					}
-				} else {
-					query = {};
-					for (i = 0; i < size; i += 4) {
-						var returnValue = translateOperator(conditions, i);
-						var key = Object.keys(returnValue)[0];
-						query[key] = returnValue[key];
-					}
-				}
-
-				if (element.type === 'user') {
-					converter.toID('_isUser', function (r) {
-						if (query.$or !== undefined) {
-							var temp = {};
-							temp[r] = true;
-							query = {
-								"$and": [temp, query]
-							};
-						} else {
-							query[r] = true;
-						}
-						callback(query);
-					});
-				} else {
-					converter.toID('_typeid', function (r) {
-						if (query.$or !== undefined) {
-							var temp = {};
-							temp[r] = element.type;
-							query = {
-								'$and': [temp, query]
-							};
-						} else {
-							query[r] = element.type;
-						}
-						callback(query);
-					});
-				}
-			} else {
+			if (element.conditions === undefined) {
 				converter.toID('_typeid', function (r) {
 					query[r] = element.type;
 					callback(query);
 				});
+				return;
 			}
+
+			var conditions = element.conditions;
+			var size = conditions.length;
+			var hasOr = false;
+
+			for (var i = 3; i < size; i += 4) {
+				if (conditions[i] === 'or') {
+					hasOr = true;
+					break;
+				}
+			}
+			if (hasOr) {
+				query.$or = [];
+				for (i = 0; i < size; i += 4) {
+					if ((conditions[i + 3] === 'or') || (i + 3 === size)) {
+						query.$or.push(translateOperator(conditions, i));
+					} else {
+						for (var j = i + 7; j < size; j += 4) {
+							if (conditions[j] === 'or') {
+								break;
+							}
+						}
+						var andQuery = {
+							'$and': []
+						};
+						for (i; i < j; i += 4) {
+							andQuery.$and.push(translateOperator(conditions, i));
+						}
+						query.$or.push(andQuery);
+					}
+				}
+			} else {
+				query = {};
+				for (i = 0; i < size; i += 4) {
+					var returnValue = translateOperator(conditions, i);
+					var key = Object.keys(returnValue)[0];
+					query[key] = returnValue[key];
+				}
+			}
+
+			if (element.type === 'user') {
+				converter.toID('_isUser', function (r) {
+					console.log(query);
+					if (query.$or !== undefined) {
+						var temp = {};
+						temp[r] = true;
+						query = {
+							"$and": [temp, query]
+						};
+					} else {
+						query[r] = true;
+					}
+					callback(query);
+				});
+			} else {
+				converter.toID('_typeid', function (r) {
+					if (query.$or !== undefined) {
+						var temp = {};
+						temp[r] = element.type;
+						query = {
+							'$and': [temp, query]
+						};
+					} else {
+						query[r] = element.type;
+					}
+					callback(query);
+				});
+			}
+			
 		}
 
 //really, put conditions[i+2] to a variable, its much easier to read
