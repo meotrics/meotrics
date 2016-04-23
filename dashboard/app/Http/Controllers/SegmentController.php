@@ -97,7 +97,6 @@ class SegmentController extends Controller
 		$tmp_conditions = $segment->condition ? $segment->condition : [];
 		$conditions = [];
 
-
 		foreach ($tmp_conditions as $tmp_condition) {
 			if ($tmp_condition != 'and' && is_object($tmp_condition) && property_exists($tmp_condition, 'type')) {
 				if ($tmp_condition->type == 'user') {
@@ -108,17 +107,23 @@ class SegmentController extends Controller
 							$operators = $prop->operators ? $prop->operators : [];
 						}
 					}
-					$conditions[] = (object)[
-						'select_type' => 'user',
-						'type' => isset($con_array[0]) ? $con_array[0] : '',
-						'operator' => isset($con_array[1]) ? $con_array[1] : '',
-						'value' => isset($con_array[2]) ? $con_array[2] : '',
-						'f' => '',
-						'field' => '',
-						'fields' => [],
-						'operators' => $operators,
-						'conditions' => [],
-					];
+                                        for($i_ca = 0; $i_ca <= (count($con_array)/4); $i_ca++){
+                                            if(isset($con_array[$i_ca*4]) && isset($con_array[$i_ca*4+1])
+                                                    && isset($con_array[$i_ca*4+2])){
+                                                $conditions[] = (object)[
+                                                    'select_type' => 'user',
+                                                    'type' => isset($con_array[$i_ca*4]) ? $con_array[$i_ca*4] : '',
+                                                    'operator' => isset($con_array[$i_ca*4+1]) ? $con_array[$i_ca*4+1] : '',
+                                                    'value' => isset($con_array[$i_ca*4+2]) ? $con_array[$i_ca*4+2] : '',
+                                                    'f' => '',
+                                                    'field' => '',
+                                                    'fields' => [],
+                                                    'operators' => $operators,
+                                                    'conditions' => [],
+                                                ];
+                                            }
+                                        }
+                                        
 				} else {
 					$fields = [];
 					foreach ($actions as $action) {
