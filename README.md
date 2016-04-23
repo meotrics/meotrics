@@ -173,7 +173,7 @@ server {
 	  error_log   /home/thanhpk/tmp/meotrics-error.log;
 	
 	  location /api {
-	        proxy_pass http://127.0.0.1:1711/api/;
+	        proxy_pass http://127.0.0.1:1711/api;
 	  }
 	  
 	  location / {
