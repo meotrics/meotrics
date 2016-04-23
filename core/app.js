@@ -107,7 +107,7 @@ function buildconnstr(config) {
 	return "mongodb://" + host + ":" + port + "/" + database;
 }
 
-function dataapiroot(req, res, qs, url) {
+function dataapiroot(trycatch, req, res, qs, url) {
 	trycatch(function () {
 		var url_parts = url.parse(req.url, true);
 		if (req.method == 'POST') {
@@ -221,7 +221,7 @@ mongodb.MongoClient.connect(buildconnstr(config),{ server: {auto_reconnect: true
 	var url = require('url');
 
 	var server = http.createServer(function (req, res) {
-		dataapiroot(req, res, qs, url)
+		dataapiroot(trycatch, req, res, qs, url)
 	});
 
 	server.listen(httpport, function () {
