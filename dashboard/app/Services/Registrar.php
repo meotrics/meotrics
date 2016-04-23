@@ -37,6 +37,7 @@ class Registrar implements RegistrarContract {
 		]);
 
 		MtHttp::get('app/init/' .$user->id );
+		return $user;
 	}
 
 }
