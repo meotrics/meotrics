@@ -53,19 +53,18 @@ Trong hệ thống Window, sửa file, `Windows\\System32\\drivers\\etc\\host`, 
     ```bash
     curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
     ```
-* Với môi trường Mac
-
-  Cài đặt mcrypt trước, sau đó gõ
+  * Với môi trường Mac
+    Cài đặt mcrypt trước, sau đó gõ
    
-  ```bash
-  brew update
-  brew upgrade
-  brew tap homebrew/dupes
-  brew tap josegonzalez/homebrew-php
-  brew install php54-mcrypt
-  php --version // To Test your php 
-  sudo composer update
-  ```
+    ```bash
+    brew update
+    brew upgrade
+    brew tap homebrew/dupes
+    brew tap josegonzalez/homebrew-php
+    brew install php54-mcrypt
+    php --version // To Test your php 
+    sudo composer update
+    ```
    
 2. Khởi tạo Laravel framework
   Chuyển vào thư mục dashboard (`meotrics/dashboard`), tạo thư mục database, gõ
@@ -174,7 +173,7 @@ server {
 	  error_log   /home/thanhpk/tmp/meotrics-error.log;
 	
 	  location /api {
-	        proxy_pass http://127.0.0.1:1711/api/;
+	        proxy_pass http://127.0.0.1:1711/api;
 	  }
 	  
 	  location / {
