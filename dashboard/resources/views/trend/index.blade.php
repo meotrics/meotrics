@@ -1,8 +1,38 @@
 @extends('../layout/master', ['sidebarselect' => 'trend'])
 @section('title', 'Trend')
 
-@section('script')
+@section('header-script')
+	<script>
+		onPageLoad(function () {
 
+			var $tp = $('#timepick');
+			$tp.dateRangePicker();
+			//load segment time range
+
+			@if(isset($starttime))
+			$('#segment-date-range').data('dateRangePicker').setDateRange('{{$starttime}}', '{{$endtime}}');
+			@else
+			// 30 ngay truoc do
+			var today = new Date().toISOString().substr(0, 10);
+			var lastyear = new Date(new Date().getTime() - 31104000000).toISOString();
+			$tp.data('dateRangePicker').setDateRange(lastyear, today);
+			@endif
+			// bind event
+			$('#segpick').on('change', function () {
+				var val = $(this).val();
+				$.post('/trend/currentsegment/', {'segmentid': val}, function () {
+					location.reload();
+				});
+			});
+
+			$tp.on('change', function () {
+				var val = $(this).val();
+				$.post('/trend/currenttime/', {'endTime': val.split(' ')[2], 'startTime': val.split(' ')[0]}, function () {
+					location.reload();
+				});
+			});
+		});
+	</script>
 @endsection
 
 @section('style')
@@ -14,9 +44,26 @@
 		<div class="card col-sm-12">
 			<div class="row">
 				<div class="header col-md-12">
+					<div class="pull-right">
+
+						<input style="width: 220px;display: inline-block;" class="form-control mr" id="timepick">
+
+						<label style="vertical-align: bottom; margin-right: 10px">Segment</label>
+						<select id="segpick" class="form-control input-sm" style="width: 200px; display:inline-block;">
+							@foreach($segments as $segment)
+								@if( $segmentid == $segment->_id)
+									<?php $trend_segment = $segment ?>
+									<option selected value="{{$segment->_id}}">{{ isset($segment->name) ? $segment->name : "unnamed"}}</option>
+								@else
+									<option value="{{$segment->_id}}">{{ isset($segment->name) ? $segment->name : "unnamed"}}</option>
+								@endif
+							@endforeach
+						</select>
+					</div>
+
 					<form class="">
-						<label style="vertical-align: bottom; margin-right: 10px" >Select trend</label>
-						<select id="trend" class="form-control input-sm " style="width: 250px; display:inline-block">
+						<label style="vertical-align: bottom; margin-right: 10px">Select trend</label>
+						<select id="trend" class="form-control input-sm " style="width: 200px; display:inline-block">
 							<?php $trend_first = $trends[0]; ?>
 							@foreach($trends as $trend)
 								@if(isset($trendid) && $trendid == $trend->_id)
@@ -30,7 +77,8 @@
 						<a id="action_update" data-href="{{URL::to('trend/update')}}" href="{{URL::to('trend/update', [
                                     'id' => $trend_first ? $trend_first->_id : ''
                                 ])}}" class="button action blue" role="button"><span class="label">Update</span></a>
-						<a id="action_delete" href="javascript:void(0)" class="button action red" role="button"><span class="label">Delete</span></a>
+						<a id="action_delete" href="javascript:void(0)" class="button action red" role="button"><span
+											class="label">Delete</span></a>
 						&nbsp; or &nbsp;<a href="{{ URL::to('trend/create') }}">+ CREATE NEW TREND</a>
 					</form>
 				</div>

@@ -351,3 +351,7 @@ a:hover, a:focus {
 	font-size: 14px;
 	color: #393939;
 }
+
+.select2-container{
+	vertical-align: bottom;
+}
