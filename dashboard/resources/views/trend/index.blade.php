@@ -69,7 +69,7 @@
 					</div>
 
 					<form class="">
-						<label style="vertical-align: bottom; margin-right: 6px">Select trend</label>
+						<label style="vertical-align: bottom; margin-right: 6px">Trend</label>
 						<select id="trend" class="form-control input-sm " style="width: 200px; display:inline-block">
 							<?php $trend_first = $trends[0]; ?>
 							@foreach($trends as $trend)

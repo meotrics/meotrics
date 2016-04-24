@@ -116,7 +116,7 @@
 				});
 			}
 
-			bg_refresh_counter();
+			//bg_refresh_counter();
 		});
 	</script>
 

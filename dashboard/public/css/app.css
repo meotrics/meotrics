@@ -345,21 +345,29 @@ a:hover, a:focus {
 }
 
 .table-striped > tbody > tr:nth-of-type(odd) {
-	background-color: rgb(232, 239, 248);
+	/* background-color: rgb(232, 239, 248); */
 }
 
-.table>caption+thead>tr:first-child>td, .table>caption+thead>tr:first-child>th, .table>colgroup+thead>tr:first-child>td, .table>colgroup+thead>tr:first-child>th, .table>thead:first-child>tr:first-child>td, .table>thead:first-child>tr:first-child>th{
+.table > caption + thead > tr:first-child > td, .table > caption + thead > tr:first-child > th, .table > colgroup + thead > tr:first-child > td, .table > colgroup + thead > tr:first-child > th, .table > thead:first-child > tr:first-child > td, .table > thead:first-child > tr:first-child > th {
 	/* border-top: 1px solid rgb(147, 176, 214); */
 	font-size: 14px;
 	/* font-weight: 400; */
 	color: #393939;
 }
 
-.select2-container{
+.select2-container {
 	vertical-align: bottom;
 }
 
-body, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6, p, .navbar, .brand, .btn-simple, .alert, a, .td-name, td, button.close{
+body, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6, p, .navbar, .brand, .btn-simple, .alert, a, .td-name, td, button.close {
 	font-weight: 500;
 	font-size: 15px;
+}
+
+.card .header {
+	padding: 20px 20px 0;
+}
+
+.card .content {
+	padding: 20px 20px 0;
 }
