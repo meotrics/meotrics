@@ -1,9 +1,13 @@
 exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 	var me = this;
-	this.queryRaw = function (appid, trid, callback) {
+	this.queryRaw = function (appid, trid, segid, starttime, endtime, callback) {
 		var collection = prefix + col;
 		db.collection(collection).find({_id: new mongodb.ObjectID(trid)}, {_id: 0}).limit(1).next(function (err, trenddoc) {
 			if (err) throw err;
+			if(segid !== undefined && segid !== '' && segid !== '_') trenddoc._segment = segid;
+			if(starttime !== undefined && starttime !== '') trenddoc.startTime = Math.round(new Date(starttime)/1000);
+			if(endtime !== undefined && endtime !== '') trenddoc.endTime = Math.round(new Date(endtime)/1000 + 86400);
+
 			getQueryTrending(trenddoc, converter, function (query) {
 				var collection = prefix + appid;
 				db.collection(collection).aggregate(query).toArray(function (err, results) {
@@ -25,7 +29,11 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 	this.query = function (req, res) {
 		var appid = req.params.appid;
 		var trid = req.params.id;
-		me.queryRaw(appid, trid, function (results) {
+		var segid = req.params.segid;
+		var starttime = req.params.starttime;
+		var endtime = req.params.endtime;
+
+		me.queryRaw(appid, trid, segid, starttime, endtime, function (results) {
 			res.json(results);
 		});
 	};
@@ -42,12 +50,12 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 			query.push(match);
 			if (object._segment !== undefined) {
 				match[ids['_segments']] = {
-					'$in': [object._segment]
+					'$in': [new mongodb.ObjectId(object._segment)]
 				};
 			}
 
 			if (object.startTime !== undefined) {
-				match[ids._ctime``] = {
+				match[ids._ctime] = {
 					$gte: object.startTime
 				};
 			}

@@ -19,7 +19,8 @@ function route(app, com) {
 	app.putEx('/trend/:appid/:id', com.trendCRUD.update);
 	app.deleteEx('/trend/:appid/:id', com.trendCRUD.delete);
 	// Query trend
-	app.get('/trend/query/:appid/:id', com.trendMgr.query);
+
+	app.get('/trend/query/:appid/:id/:segid?/:starttime?/:endtime?', com.trendMgr.query);
 
 	// CRUD segment
 	app.postEx('/segment/:appid', function (req, res) {
