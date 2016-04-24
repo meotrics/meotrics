@@ -164,11 +164,22 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 			condition: [{}]
 		};
 
-		converter.toIDs(['_mtid'], function(ids)
+		converter.toIDs(['_mtid', '_isUser', '_typeid'], function(ids)
 		{
-			db.collection(prefix + 'appid', {ids._mtid : 1}, {sparse: true});
-			db.collection(prefix + 'appid', {ids._id : 1, ids._isUser}, {sparse: true});
-			db.collection(prefix + 'appid', {ids.ctime, ids._segments : 1, ids_typeid: 1}, {sparse: true});
+			var keys = {};
+			keys[ids._mtid] = 1;
+			db.collection(prefix + appid, keys, {sparse: true});
+
+			key = {};
+			key._id = 1;
+			db.collection(prefix + appid, keys, {sparse: true});
+
+			key = {};
+			key[ids.ctime] = 1;
+			key[ids._segments] =  1;
+			key[ids._typeid] = 1;
+
+			db.collection(prefix + appid, keys , {sparse: true});
 		});
 		
 
