@@ -10,12 +10,7 @@ class MasterComposer
 
 	public function compose(View $view)
 	{
-		$appid = \Auth::user()->id;
-		$segments = MtHttp::get('segment/' . $appid);
 
-		$view->with('segments', json_encode($segments));
-
-		$view->with('a', 4);
 	}
 
 }

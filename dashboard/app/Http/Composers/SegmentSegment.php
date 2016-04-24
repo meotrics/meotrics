@@ -12,10 +12,7 @@ class SegmentSegment
 	{
 		$appid = \Auth::user()->id;
 		$segments = MtHttp::get('segment/' . $appid);
-		$segments = [];
 		$view->with('segments', ($segments));
-
-		$view->with('a', 4);
 	}
 
 }

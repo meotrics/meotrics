@@ -98,9 +98,7 @@
 		];
 		<?php $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators(); ?>
 
-		$('#segment-date-range').dateRangePicker(config);
-
-
+		$('#segment-date-range').dateRangePicker();
 		//load segment time range
 
 		$('#segment-date-range').data('dateRangePicker').setDateRange('2013-11-20','2013-11-25');

@@ -12,7 +12,7 @@ class AppServiceProvider extends ServiceProvider
 	 */
 	public function boot()
 	{
-		view()->composer('segment.select', 'App\Http\Composers\SegmentSegment');
+		//view()->composer('segment.select', 'App\Http\Composers\SegmentSegment');
 	}
 
 	/**
