@@ -219,18 +219,19 @@
 					if (v.select_type == 'user') {
 						containter.find('input[name="Segment[' + i_condition + '][select_type]"]').val('user');
 						containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
-						containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().removeClass('col-md-2');
-						containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().addClass('col-md-4');
+//						containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().removeClass('col-md-2');
+//						containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().addClass('col-md-4');
 						//containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().removeClass('col-md-2');
 						//containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().addClass('col-md-4');
 						containter.find('select[name="Segment[' + i_condition + '][f]"]').parent().hide();
 						containter.find('select[name="Segment[' + i_condition + '][field]"]').parent().hide();
+                                                containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
 						if (v.operators.length) {
-							containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
-							$.each(v.operators, function (oi, ov) {
-								containter.find('select[name="Segment[' + i_condition + '][operator]"]').append('<option value="' + ov.code + '">' + ov.name + '</option>');
-							});
+                                                    $.each(v.operators, function (oi, ov) {
+                                                        containter.find('select[name="Segment[' + i_condition + '][operator]"]').append('<option value="' + ov.code + '">' + ov.name + '</option>');
+                                                    });
 						}
+                                                condition_item.find('div[data-name="add-condition"]').hide();
 					}
 					else {
 						containter.find('input[name="Segment[' + i_condition + '][select_type]"]').val('behavior');
@@ -346,7 +347,7 @@
 				 */
 				$.each(type_options, function (i, v) {
 					if (v.value == selected_type) {
-						if (v.fields.length) {
+						if (v.fields && v.fields.length) {
 							$.each(v.fields, function (vf_i, vf_v) {
 								condition_sub_item.next().find("select[name*='cs_field']").append('<option value="' + vf_v.pcode + '">' + vf_v.pname + '</option>');
 							});
