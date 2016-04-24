@@ -1927,7 +1927,7 @@
 						<div class="default-top">default</div>';
 				}
 
-				html += '<input type="button" class="apply-btn btn disabled'+ getApplyBtnClass() +'" value="'+lang('apply')+'" />';
+				html += '<input type="button" class="apply-btn button disabled'+ getApplyBtnClass() +'" value="'+lang('apply')+'" />';
 				html += '</div>'
 			}
 			

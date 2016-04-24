@@ -104,7 +104,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, col) {
 		});
 	};
 
-	this.update = function (req, res, next) {
+	this.update = function (req, res, callback) {
 		var data = req.body;
 		var atid = req.params.id;
 		var collection = prefix + col;

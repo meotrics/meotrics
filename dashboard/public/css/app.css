@@ -19,6 +19,7 @@ th {
 .mr {
 	vertical-align: middle;
 	margin-right: 20px;
+	padding-top: 6px;
 }
 
 .ml {
@@ -283,7 +284,7 @@ select {
 
 .form-control {
 	height: 34px;
-	font-size: 16px;
+	font-size: 15px;
 	padding-bottom: 6px;
 }
 
@@ -332,7 +333,8 @@ a:hover, a:focus {
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
-	padding-top: 4px;
+	padding-top: 2px;
+	font-size: 15px;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow {
@@ -344,16 +346,17 @@ a:hover, a:focus {
 }
 
 .table-striped > tbody > tr:nth-of-type(odd) {
-	background-color: rgb(232, 239, 248);
+	/* background-color: rgb(232, 239, 248); */
 }
 
-.table>caption+thead>tr:first-child>td, .table>caption+thead>tr:first-child>th, .table>colgroup+thead>tr:first-child>td, .table>colgroup+thead>tr:first-child>th, .table>thead:first-child>tr:first-child>td, .table>thead:first-child>tr:first-child>th{
-	border-top: 1px solid rgb(147, 176, 214);
+.table > caption + thead > tr:first-child > td, .table > caption + thead > tr:first-child > th, .table > colgroup + thead > tr:first-child > td, .table > colgroup + thead > tr:first-child > th, .table > thead:first-child > tr:first-child > td, .table > thead:first-child > tr:first-child > th {
+	/* border-top: 1px solid rgb(147, 176, 214); */
 	font-size: 14px;
+	/* font-weight: 400; */
 	color: #393939;
 }
 
-.select2-container{
+.select2-container {
 	vertical-align: bottom;
 }
 
@@ -383,4 +386,16 @@ a:hover, a:focus {
 
 .a-trash-obj span{
     vertical-align: middle;
+}
+body, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6, p, .navbar, .brand, .btn-simple, .alert, a, .td-name, td, button.close {
+	font-weight: 500;
+	font-size: 15px;
+}
+
+.card .header {
+	padding: 20px 20px 0;
+}
+
+.card .content {
+	padding: 20px 20px 0;
 }

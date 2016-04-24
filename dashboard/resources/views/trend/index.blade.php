@@ -39,6 +39,12 @@
 	<link rel="stylesheet" href="{{asset('css/select2.min.css')}}"/>
 @endsection
 
+@section('action')
+	<li>
+		<a href="/trend/create" class="button action blue"><span class="label">New Trend</span></a>
+	</li>
+@endsection
+
 @section('content')
 	<div>
 		<div class="card col-sm-12">
