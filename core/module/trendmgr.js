@@ -94,7 +94,7 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 				query.push({
 					$group: {
 						_id: '$' + object.object,
-						result: {'$avg': '$' + object.param},
+						result: {$avg: '$' + object.param},
 						temp: {$first: "$$ROOT"}
 					}
 				});
@@ -103,7 +103,7 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 				query.push({
 					$group: {
 						_id: '$' + object.object,
-						result: {'$sum': '$' + object.param},
+						result: {$sum: '$' + object.param},
 						temp: {$first: "$$ROOT"}
 					}
 				});

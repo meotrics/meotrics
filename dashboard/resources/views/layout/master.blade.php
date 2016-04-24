@@ -104,8 +104,6 @@
 	<script>
 
 		onPageLoad(function () {
-
-
 			function bg_refresh_counter() {
 				$.get('/home/counter', {}, function (data) {
 					if (odometer.length !== undefined) {
@@ -188,10 +186,10 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-					<!-- <a class="navbar-brand" href="#">{{ Auth::user()->name }}</a> -->
 				</div>
 				<div class="collapse navbar-collapse">
 					<ul class="nav navbar-nav navbar-left">
+						@yield('action')
 						<!-- <li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 								<i class="fa fa-globe"></i>

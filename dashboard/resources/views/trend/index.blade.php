@@ -39,6 +39,12 @@
 	<link rel="stylesheet" href="{{asset('css/select2.min.css')}}"/>
 @endsection
 
+@section('action')
+	<li>
+		<a href="/trend/create" class="button action blue"><span class="label">New Trend</span></a>
+	</li>
+@endsection
+
 @section('content')
 	<div>
 		<div class="card col-sm-12">
@@ -48,12 +54,13 @@
 
 						<input style="width: 220px;display: inline-block;" class="form-control mr" id="timepick">
 
-						<label style="vertical-align: bottom; margin-right: 10px">Segment</label>
+						<label style="vertical-align: bottom; margin-right: 5px">Segment</label>
 						<select id="segpick" class="form-control input-sm" style="width: 200px; display:inline-block;">
 							@foreach($segments as $segment)
 								@if( $segmentid == $segment->_id)
 									<?php $trend_segment = $segment ?>
-									<option selected value="{{$segment->_id}}">{{ isset($segment->name) ? $segment->name : "unnamed"}}</option>
+									<option selected
+													value="{{$segment->_id}}">{{ isset($segment->name) ? $segment->name : "unnamed"}}</option>
 								@else
 									<option value="{{$segment->_id}}">{{ isset($segment->name) ? $segment->name : "unnamed"}}</option>
 								@endif
@@ -62,7 +69,7 @@
 					</div>
 
 					<form class="">
-						<label style="vertical-align: bottom; margin-right: 10px">Select trend</label>
+						<label style="vertical-align: bottom; margin-right: 6px">Select trend</label>
 						<select id="trend" class="form-control input-sm " style="width: 200px; display:inline-block">
 							<?php $trend_first = $trends[0]; ?>
 							@foreach($trends as $trend)
@@ -74,13 +81,19 @@
 								@endif
 							@endforeach
 						</select>
-						<a id="action_update" data-href="{{URL::to('trend/update')}}" href="{{URL::to('trend/update', [
-                                    'id' => $trend_first ? $trend_first->_id : ''
-                                ])}}" class="button action blue" role="button"><span class="label">Update</span></a>
-						<a id="action_delete" href="javascript:void(0)" class="button action red" role="button"><span
-											class="label">Delete</span></a>
-						&nbsp; or &nbsp;<a href="{{ URL::to('trend/create') }}">+ CREATE NEW TREND</a>
-					</form>
+
+						<div class="btn-group " style="margin-left: 5px;">
+							<a id="action_update" type="button" class="button btn" data-href="{{URL::to('trend/update')}}" href="{{URL::to('trend/update', ['id' => $trend_first ? $trend_first->_id : ''])}}"  ><i class="fa fa-pencil"></i></a>
+							<a type="button" class="button btn  dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								<span class="caret"></span>
+								<span class="sr-only">Toggle Dropdown</span>
+							</a>
+							<ul class="dropdown-menu">
+								<li><a href="#" id="action_delete"><i class="fa fa-remove"></i> Delete</a></li>
+							</ul>
+						</div>
+
+											</form>
 				</div>
 			</div>
 			<div class="row">
