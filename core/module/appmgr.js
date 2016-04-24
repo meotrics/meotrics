@@ -159,23 +159,18 @@ exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segm
 		};
 
 		var segment1 = {
-			name: "Active user",
-			desc: "Active user in the app",
-			condition: [{
-				type: "pageview", f: "count", field: "", operator: ">", value: 5,
-				conditions: ["url", "eq", "http://google.com"]
-			},
-				"and",
-				{
-					type: "purchase", f: "avg", field: "price", operator: ">", value: 5,
-					conditions: ["amount", "gt", 500, "and", "quantity", "gt", 5]
-				},
-				"and",
-				{
-					type: 'user',
-					conditions: ['age', 'eq', 15]
-				}]
+			name: "All visitor",
+			description: "All visitor in site",
+			condition: [{}]
 		};
+
+		converter.toIDs(['_mtid'], function(ids)
+		{
+			db.collection(prefix + 'appid', {ids._mtid : 1}, {sparse: true});
+			db.collection(prefix + 'appid', {ids._id : 1, ids._isUser}, {sparse: true});
+			db.collection(prefix + 'appid', {ids.ctime, ids._segments : 1, ids_typeid: 1}, {sparse: true});
+		});
+		
 
 		typeCrud.createRaw(appid, purchase, function () {
 			typeCrud.createRaw(appid, pageview, function () {
