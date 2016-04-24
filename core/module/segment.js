@@ -101,9 +101,9 @@
 							var bulk = col.initializeUnorderedBulkOp();
 							for (var i in arr) if (arr.hasOwnProperty(i))
 								if(arr[i].pp === 1)
-									bulk.find({_id: arr[i].id}).update({$addToSet: {_segments: segment._id}});
+									bulk.find({_mtid: arr[i].id}).update({$addToSet: {_segments: segment._id}});
 								else
-									bulk.find({_id: arr[i].id}).update({$pull: {_segments: segment._id}});
+									bulk.find({_mtid: arr[i].id}).update({$pull: {_segments: segment._id}});
 							// clean the array first
 							arr = [];
 
