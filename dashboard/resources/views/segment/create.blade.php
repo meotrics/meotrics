@@ -186,6 +186,9 @@
 
 					<div class="row">
 						<div class="col-sm-12">
+                                                    <button type="button" class="action button blue " onclick="backFn()">
+                                                        <span class="label">Back</span>
+                                                    </button>
 							<button type="submit" class="action button blue ">
 								<span class="label">{{$segment->_id ? 'Update' : 'Create'}}</span>
 							</button>
@@ -201,7 +204,11 @@
 	<script src="{{asset('js/select2.min.js')}}"></script>
 	<script type="text/javascript">
 		//    $('select').select2();
-
+                function backFn(){
+                    parent.history.back();
+                    return false;
+                }
+                
 		function typeChange(e) {
 			var that = $(e);
 			var containter = that.parent().parent();

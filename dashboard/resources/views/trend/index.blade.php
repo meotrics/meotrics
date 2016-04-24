@@ -42,45 +42,51 @@
 @section('content')
 	<div>
 		<div class="card col-sm-12">
+                    <div class="row">
+                        <div class="header col-sm-12">
+                            <div class="pull-right">
+
+                                    <input style="width: 220px;display: inline-block;" class="form-control mr" id="timepick">
+
+                                    <label style="vertical-align: bottom; margin-right: 10px">Segment</label>
+                                    <select id="segpick" class="form-control input-sm" style="width: 200px; display:inline-block;">
+                                            @foreach($segments as $segment)
+                                                    @if( $segmentid == $segment->_id)
+                                                            <?php $trend_segment = $segment ?>
+                                                            <option selected value="{{$segment->_id}}">{{ isset($segment->name) ? $segment->name : "unnamed"}}</option>
+                                                    @else
+                                                            <option value="{{$segment->_id}}">{{ isset($segment->name) ? $segment->name : "unnamed"}}</option>
+                                                    @endif
+                                            @endforeach
+                                    </select>
+                            </div>
+                        </div>
+                    </div>
 			<div class="row">
 				<div class="header col-md-12">
-					<div class="pull-right">
-
-						<input style="width: 220px;display: inline-block;" class="form-control mr" id="timepick">
-
-						<label style="vertical-align: bottom; margin-right: 10px">Segment</label>
-						<select id="segpick" class="form-control input-sm" style="width: 200px; display:inline-block;">
-							@foreach($segments as $segment)
-								@if( $segmentid == $segment->_id)
-									<?php $trend_segment = $segment ?>
-									<option selected value="{{$segment->_id}}">{{ isset($segment->name) ? $segment->name : "unnamed"}}</option>
-								@else
-									<option value="{{$segment->_id}}">{{ isset($segment->name) ? $segment->name : "unnamed"}}</option>
-								@endif
-							@endforeach
-						</select>
-					</div>
-
-					<form class="">
-						<label style="vertical-align: bottom; margin-right: 10px">Select trend</label>
-						<select id="trend" class="form-control input-sm " style="width: 200px; display:inline-block">
-							<?php $trend_first = $trends[0]; ?>
-							@foreach($trends as $trend)
-								@if(isset($trendid) && $trendid == $trend->_id)
-									<?php $trend_first = $trend; ?>
-									<option selected value="{{$trend->_id}}">{{ isset($trend->name) ? $trend->name : "unnamed"}}</option>
-								@else
-									<option value="{{$trend->_id}}">{{ isset($trend->name) ? $trend->name : "unnamed"}}</option>
-								@endif
-							@endforeach
-						</select>
-						<a id="action_update" data-href="{{URL::to('trend/update')}}" href="{{URL::to('trend/update', [
-                                    'id' => $trend_first ? $trend_first->_id : ''
-                                ])}}" class="button action blue" role="button"><span class="label">Update</span></a>
-						<a id="action_delete" href="javascript:void(0)" class="button action red" role="button"><span
-											class="label">Delete</span></a>
-						&nbsp; or &nbsp;<a href="{{ URL::to('trend/create') }}">+ CREATE NEW TREND</a>
-					</form>
+                                        <form class="">
+                                            <label class="col-md-2" style="vertical-align: bottom; margin-right: 10px">Select trend</label>
+                                            <select id="trend" class="form-control input-sm " style="width: 200px; display:inline-block">
+                                                    <?php $trend_first = $trends[0]; ?>
+                                                    @foreach($trends as $trend)
+                                                            @if(isset($trendid) && $trendid == $trend->_id)
+                                                                    <?php $trend_first = $trend; ?>
+                                                                    <option selected value="{{$trend->_id}}">{{ isset($trend->name) ? $trend->name : "unnamed"}}</option>
+                                                            @else
+                                                                    <option value="{{$trend->_id}}">{{ isset($trend->name) ? $trend->name : "unnamed"}}</option>
+                                                            @endif
+                                                    @endforeach
+                                            </select>
+                                            <a id="action_update" data-href="{{URL::to('trend/update')}}" href="{{URL::to('trend/update', [
+                                                'id' => $trend_first ? $trend_first->_id : ''
+                                            ])}}" class="a-edit-obj" role="button">
+                                                <span class="glyphicon glyphicon-pencil"></span>
+                                            </a>
+                                            <a id="action_delete" href="javascript:void(0)" class="a-trash-obj" role="button">
+                                                <span class="glyphicon glyphicon-trash"></span>
+                                            </a>
+                                            &nbsp; or &nbsp;<a href="{{ URL::to('trend/create') }}">+ CREATE NEW TREND</a>
+                                        </form>
 				</div>
 			</div>
 			<div class="row">
