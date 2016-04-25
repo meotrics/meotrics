@@ -100,7 +100,7 @@
 			</div>
 			<div class="row">
 				<div class="content col-md-12" id="outputs_table">
-					@if(isset($outputs))
+					@if(isset($outputs) && isset($trend_first))
 						@include('trend.partials.outputs', [
 									'actiontypes' => $types,
 									'typeid' => $trend_first->typeid,
