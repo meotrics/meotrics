@@ -1,6 +1,9 @@
 (function () {
 	'use strict';
+	var Lock = require('lock');
+
 	exports.ValueMgr = function (db, prefix) {
+		var lock = Lock();
 		var me = this;
 		this.cineObject = function (appid, typeid, obj) {
 			for (var i in obj) if (obj.hasOwnProperty(i)) {
@@ -15,10 +18,12 @@
 		// guarrenty the order of value
 		this.cineValue = function (appid, typeid, field, value) {
 			// if value is an array then return array of converted value
-			if (value instanceof Array)
+			if (value instanceof Array) {
 				for (var i in value) if (value.hasOwnProperty(i))
 					this.cineValue(appid, typeid, field, value[i]);
-
+				return;
+			}
+			
 			var record = {
 				appid: appid,
 				typeid: typeid,
@@ -26,15 +31,19 @@
 				value: value
 			};
 
-			db.collection(prefix + 'valuedomain').find(record).toArray(function (err, ret) {
-				if (err) throw err;
+			var lockstr = appid + ":" + typeid + ":" + field + ":" + value;
+			lock(lockstr, function (release) {
+				db.collection(prefix + 'valuedomain').find(record).toArray(function (err, ret) {
+					if (err) throw err;
 					if (ret.length === 0) {
 						db.collection(prefix + 'valuedomain').insertOne(record, function (err, ret) {
 							if (err) throw err;
+							release();
 						});
 					}
-
+				});
 			});
+
 		};
 	};
 })();
