@@ -71,7 +71,7 @@
 					<form class="">
 						<label style="vertical-align: bottom; margin-right: 6px">Trend</label>
 						<select id="trend" class="form-control input-sm " style="width: 200px; display:inline-block">
-							<?php $trend_first = $trends[0]; ?>
+							<?php if(isset($trends[0]))  $trend_first = $trends[0]; ?>
 							@foreach($trends as $trend)
 								@if(isset($trendid) && $trendid == $trend->_id)
 									<?php $trend_first = $trend; ?>
@@ -84,7 +84,7 @@
 
 						<div class="btn-group " style="margin-left: 5px;">
 							<a id="action_update" type="button" class="button btn" data-href="{{URL::to('trend/update')}}"
-											href="{{URL::to('trend/update', ['id' => $trend_first ? $trend_first->_id : ''])}}"><i
+											href="{{URL::to('trend/update', ['id' => isset($trend_first) ? $trend_first->_id : ''])}}"><i
 												class="fa fa-pencil"></i></a>
 							<a type="button" class="button btn  dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
 											aria-expanded="false">
@@ -147,3 +147,5 @@
 		});
 	</script>
 @endsection
+
+
