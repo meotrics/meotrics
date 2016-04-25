@@ -61,7 +61,7 @@
 		page[ids._typeid] = codename;
 		page[ids.url] = 'http://' + generateNumber(1, 1000) + '.com';
 		page[ids._segments] = [];
-		page[ids._ctime] = Math.floor(new Date().getTime() / 1000);
+		page[ids.ctime] = Math.floor(new Date().getTime() / 1000);
 		page[ids._mtid] = user._id;
 		return page;
 	}
@@ -71,7 +71,7 @@
 		var pid = generateNumber(1, 1000);
 		var purchase = {};
 		purchase[ids._typeid] = codename;
-		purchase[ids._ctime] = Math.floor(new Date().getTime() / 1000);
+		purchase[ids.ctime] = Math.floor(new Date().getTime() / 1000);
 		purchase[ids._mtid] = user._id;
 		purchase[ids._segments] = [];
 		var cat = genCategory();
@@ -746,7 +746,7 @@
 	function generateDB(appid, actiontype, converter, url, n, collection, typeid, valuemgr, callback) {
 		var count = 0;
 		if (actiontype === 'purchase') {
-			converter.toIDs(['_typeid', '_ctime', 'amount', 'pname', 'cname', 'paymentype', '_mtid', 'cid', 'pid', 'pname', 'cname', 'quantity', 'price', '_segments'], function (ids) {
+			converter.toIDs(['_typeid', 'ctime', 'amount', 'pname', 'cname', 'paymentype', '_mtid', 'cid', 'pid', 'pname', 'cname', 'quantity', 'price', '_segments'], function (ids) {
 				for (var i = 0; i < n; i++) {
 					count++;
 					var r = generatePurchase(ids, typeid);
@@ -766,11 +766,11 @@
 				}
 			});
 		} else {
-			converter.toIDs(['_typeid', 'url', 'camid', '_ctime', '_mtid', '_segments'], function (ids) {
+			converter.toIDs(['_typeid', 'url', 'camid', 'ctime', '_mtid', '_segments'], function (ids) {
 				for (var i = 0; i < n; i++) {
 					count++;
 					var r = generatePageView(ids, typeid);
-					valuemgr.cineObject(appid, "purchase", r);
+					valuemgr.cineObject(appid, "pageview", r);
 					db.collection(collection).insertOne(r).then(function (results) {
 						count--;
 						if (count % 1000 === 0)
