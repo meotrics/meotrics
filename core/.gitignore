@@ -2,3 +2,5 @@ node_modules/
 logs
 npm-debug.log
 .idea
+/**/*.js
+/**/*.js.map

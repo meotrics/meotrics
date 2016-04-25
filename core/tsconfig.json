@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "es6",
+		"sourceMap": true
+	},
+	"exclude": [
+		"node_modules",
+		".gitignore"
+	],
+	"file": ["typings.d.ts"]
+}
