@@ -48,7 +48,7 @@ class TrendController extends Controller
 
 	}
 
-	public function postCurrentTime()
+	public function postCurrenttime()
 	{
 		$response = new Response();
 		$st = $this->request->input('startTime', null);
