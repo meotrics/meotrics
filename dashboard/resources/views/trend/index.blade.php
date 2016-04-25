@@ -6,7 +6,7 @@
 		onPageLoad(function () {
 
 			var $tp = $('#timepick');
-			$tp.dateRangePicker();
+			var tp = $tp.dateRangePicker();
 			//load segment time range
 
 			@if(isset($starttime))
@@ -25,7 +25,9 @@
 				});
 			});
 
-			$tp.on('change', function () {
+
+			tp.bind('datepicker-change',function(event,obj)
+			{
 				var val = $(this).val();
 				$.post('/trend/currenttime/', {'endTime': val.split(' ')[2], 'startTime': val.split(' ')[0]}, function () {
 					location.reload();
