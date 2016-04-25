@@ -21,10 +21,34 @@ export class ValueMgr {
 			});
 	}
 
-	public cineValue(appid: string, field: string, value: string, callback?: (number) => any) {
+	// create if not exist (cine)
+	// value can be array or string, if value is an array, this method do not
+	// guarrenty the order of value
+	public cineValue(appid: string, field: string, value: any, callback?: (number) => any) {
 		var me = this;
+
+		// if value is an array then return array of converted value
+		if (value instanceof Array) {
+			var c = 0;
+			var rets = [];
+			var i = 0;
+
+			function doNext(v: string) {
+				me.cineValue(appid, field, v, function (ret) {
+					rets.push(ret);
+					i++;
+					if (i == value.length) {
+						if (callback) return callback(rets);
+					}
+					return doNext(value[i]);
+				});
+			}
+		}
+
+		// value is a string
 		var prop = this.queryToPattern(appid, field, 'eq', value);
 		this.rdb.get(prop, function (err, ret) {
+			if (err) throw err;
 			if (ret != null) {
 				if (callback) return callback(parseInt(ret));
 				return;
