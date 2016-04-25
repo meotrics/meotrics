@@ -4,48 +4,48 @@ exports.generate = function (converter, url, n, collection, callback) {
 	generateDB(converter, url, n, collection, callback);
 };
 
-function generateDB(converter, url, n, collection, callback) {
-	MongoClient.connect(url)
-			.then(function (db) {
-				console.log('[MongoDB] connected');
-				var count = 0;
-				converter.toIDs(['_isUser', 'name', 'age', "_osid",'iq', 'gender', 'height', '_segments'], function (ids) {
-					for (var i = 0; i < n; i++) {
-						count++;
-						var user = generateUsers(ids);
-						db.collection(collection).insertOne(user)
-								.then(function (results) {
-									var newuser = results.ops[0];
-									newuser._mtid = newuser._id;
-									db.collection(collection).updateOne({_id: newuser._id}, newuser, function () {
-										count--;
-										if (count % 1000 == 0)
-											console.log((n - count) + ' records');
+function generateDB(converter, url, n, collection, valuemgr, callback) {
+	MongoClient.connect(url).then(function (db) {
+		console.log('[MongoDB] connected');
+		var count = 0;
+		converter.toIDs(['_isUser', 'name', 'age', "_os", 'iq', "_device", "_browser", "_lang", "_city", 'gender', 'height', '_segments'], function (ids) {
+			for (var i = 0; i < n; i++) {
+				count++;
+				var user = generateUsers(ids);
+				valuemgr.convert(user, ['_os', '_browser', '_device', '_lang', '_city'], function () {
+					console.log(JSON.stringify(user));
+					db.collection(collection).insertOne(user, function (err, results) {
+						if (err) throw err;
+						var newuser = results.ops[0];
+						newuser._mtid = newuser._id;
+						db.collection(collection).updateOne({ _id: newuser._id }, newuser, function () {
+							count--;
+							if (count % 1000 == 0)
+								console.log((n - count) + ' records');
 
-										if (count == 0) {
-											db.close();
-											console.log('Done');
-											callback();
-										}
-									});
-								}).catch(function (err) {
-									console.log('[MongoDB] insert err', err.message);
-								});
-					}
+							if (count == 0) {
+								db.close();
+								console.log('Done');
+								callback();
+							}
+						});
+					});
 				});
+			}
+		});
 
-				// Listen for some events
-				db.on('reconnect', function (data) {
-					console.log(data);
-					console.log('[MongoDB] reconnect success');
-				});
-				db.on('error', function (err) {
-					console.log('[MongoDB] error', err.message);
-				});
-				db.on('close', function (err) {
-					console.log('[MongoDB] disconnected');
-				});
-			}).catch(function (err) {
+		// Listen for some events
+		db.on('reconnect', function (data) {
+			console.log(data);
+			console.log('[MongoDB] reconnect success');
+		});
+		db.on('error', function (err) {
+			console.log('[MongoDB] error', err.message);
+		});
+		db.on('close', function (err) {
+			console.log('[MongoDB] disconnected');
+		});
+	}).catch(function (err) {
 		console.error("[MongoDB]", err.message);
 		setTimeout(function () {
 			generateDB(url)
@@ -62,10 +62,11 @@ function generateUsers(ids) {
 	users[ids.iq] = generateNumber(30, 40);
 	users[ids._segments] = [];
 	users[ids.age] = generateNumber(20, 60);
-	users[ids._osid] = os[generateNumber(0, 6)];
+	users[ids._os] = os[generateNumber(0, 6)];
+	users[ids._device] = devices[generateNumber(0, 6)];
 	users[ids.gender] = generateNumber(1, 2) == 1 ? 'male' : 'female';
 	users[ids._lang] = generateNumber(1, 2) == 1 ? 'en' : 'vn';
-
+	users[ids._city] = generateNumber(1, 2) == 1 ? 'Hồ Chí Minh' : 'Hà Nội';
 	return users;
 }
 
@@ -81,37 +82,33 @@ function generateName() {
 	return ho[Math.floor(Math.random() * 100) % ho.length] + ' ' + ten[Math.floor(Math.random() * 100) % ten.length]
 }
 
-function randomNumber(a,b)
-{
-	if(b == undefined) {
+function randomNumber(a, b) {
+	if (b == undefined) {
 		b = a;
 		a = 0;
 	}
 	var delta = b - a + 1;
-	return Math.floor(Math.random()*delta) + a
+	return Math.floor(Math.random() * delta) + a
 }
 
 var h = [];
-function generateNumber(a,b)
-{
+function generateNumber(a, b) {
 	var delta = b - a + 1;
-	if(h.length == 0 || h.length < delta)
-	{
+	if (h.length == 0 || h.length < delta) {
 		//init hash
-		
-		for(var i = 0 ; i < delta ; i++)
-		{
-			if(i==0) h[i] = randomNumber(0,20);
-			else h[i] = h[i-1] + randomNumber(0,20);
+
+		for (var i = 0; i < delta; i++) {
+			if (i == 0) h[i] = randomNumber(0, 20);
+			else h[i] = h[i - 1] + randomNumber(0, 20);
 		}
 	}
-	var r = randomNumber(0, h[delta-1]);
+	var r = randomNumber(0, h[delta - 1]);
 
-	for(var i =0; i < delta; i++)
-		if(h[i] >= r) return i + a;
+	for (var i = 0; i < delta; i++)
+		if (h[i] >= r) return i + a;
 	return 'fuck'
 }
 
 var os = [["window"], ["ubuntu"], ["mac"], ["ubuntu", "window"], ["mac", "ubuntu"], ["mac", "window"], ["mac", "ubuntu", "window"]];
-
+var devices = [["phone"], ["desktop"], ["table"], ["phone", "desktop"], ["table", "phone"], ["table", "desktop"], ["table", "phone", "desktop"]]
 //generateDB();
