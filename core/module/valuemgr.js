@@ -17,7 +17,7 @@
 			// if value is an array then return array of converted value
 			if (value instanceof Array)
 				for (var i in value) if (value.hasOwnProperty(i))
-					this.cineValue(appid, field, value[i]);
+					this.cineValue(appid, typeid, field, value[i]);
 
 			var record = {
 				appid: appid,
@@ -26,13 +26,14 @@
 				value: value
 			};
 
-			db.collection(prefix + 'valuedomain').find(record, function (err, ret) {
+			db.collection(prefix + 'valuedomain').find(record).toArray(function (err, ret) {
 				if (err) throw err;
-				if (ret.length === 0) {
-					db.collection(prefix + 'valuedomain').insertOne(record, function (err, ret) {
-						if (err) throw err;
-					});
-				}
+					if (ret.length === 0) {
+						db.collection(prefix + 'valuedomain').insertOne(record, function (err, ret) {
+							if (err) throw err;
+						});
+					}
+
 			});
 		};
 	};
