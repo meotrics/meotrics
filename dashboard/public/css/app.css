@@ -146,7 +146,8 @@ select {
 }
 
 .bs-callout-primary h4 {
-	color: #1D62F0;
+	/*color: #1D62F0;*/
+        color: #2F5EB0;
 }
 
 .bs-callout-success {
@@ -359,6 +360,33 @@ a:hover, a:focus {
 	vertical-align: bottom;
 }
 
+/*
+ * edit icon in profile page
+ */
+.a-edit-username{
+    font-size: 20px;
+}
+
+.a-edit{
+    font-size: 12px;
+}
+
+.a-edit-obj{
+    font-size: 24px;
+    margin-right: 12px;
+}
+
+.a-edit-obj span{
+    vertical-align: middle;
+}
+
+.a-trash-obj{
+    font-size: 24px;
+}
+
+.a-trash-obj span{
+    vertical-align: middle;
+}
 body, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6, p, .navbar, .brand, .btn-simple, .alert, a, .td-name, td, button.close {
 	font-weight: 500;
 	font-size: 15px;

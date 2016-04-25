@@ -117,7 +117,8 @@ h1 .subtitle {
 }
 
 .text-info, .text-info:hover {
-  color: #1DC7EA !important;
+  /*color: #1DC7EA !important;*/
+  color: #2F5EB0 !important;
 }
 
 .text-success, .text-success:hover {

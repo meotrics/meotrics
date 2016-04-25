@@ -1,108 +1,108 @@
 @extends('../layout/master')
 @section('script')
-	<script type="text/javascript">
-		var conditions = [];
-		var type_options = [];
-						<?php
-						$type_options = [];?>
-						@if(isset($props) && is_array($props))
-						@foreach ($props as $prop)
-						<?php $type_options[] = (object)[
-										'value' => $prop->code,
-										'name' => $prop->name,
-										'select_type' => 'user',
-						]
-						?>
-		var operators = [];
-		@foreach($prop->operators as $tmp_operator)
-		operators.push({
-			code: '{{$tmp_operator->code}}',
-			name: '{{$tmp_operator->name}}'
-		});
-						@endforeach
+<script type="text/javascript">
+    var conditions = [];
+    var type_options = [];
+    <?php
+    $type_options = [];?>
+    @if(isset($props) && is_array($props))
+    @foreach ($props as $prop)
+    <?php $type_options[] = (object)[
+                                    'value' => $prop->code,
+                                    'name' => $prop->name,
+                                    'select_type' => 'user',
+    ]
+    ?>
+    var operators = [];
+    @foreach($prop->operators as $tmp_operator)
+    operators.push({
+            code: '{{$tmp_operator->code}}',
+            name: '{{$tmp_operator->name}}'
+    });
+                                    @endforeach
 
-		var tmp_type_option = {
-							value: '{{ $prop->code ? $prop->code : ''}}',
-							name: '{{$prop->code ? $prop->name : ''}}',
-							operators: operators,
-							select_type: 'user'
-						};
-		type_options.push(tmp_type_option);
+    var tmp_type_option = {
+                                            value: '{{ $prop->code ? $prop->code : ''}}',
+                                            name: '{{$prop->code ? $prop->name : ''}}',
+                                            operators: operators,
+                                            select_type: 'user'
+                                    };
+    type_options.push(tmp_type_option);
 
-		@endforeach
-		@endif
-		<?php
-	$type_options[] = (object)[
-			'value' => '[disabled]',
-			'name' => 'OR SELECT',
-			'select_type' => '',
-	]; ?>
+    @endforeach
+    @endif
+    <?php
+    $type_options[] = (object)[
+                    'value' => '[disabled]',
+                    'name' => 'OR SELECT',
+                    'select_type' => '',
+    ]; ?>
 
-	type_options.push({
-			value: '[disabled]',
-			name: 'OR SELECT',
-			select_type: ''
-		});
-						<?php
-						if($actions && is_array($actions)):
+    type_options.push({
+            value: '[disabled]',
+            name: 'OR SELECT',
+            select_type: ''
+    });
+    <?php
+    if($actions && is_array($actions)):
 
-						foreach ($actions as $action):
+    foreach ($actions as $action):
 
-						$type_options[] = (object)[
-										'value' => $action->codename,
-										'name' => 'Did ' . $action->name,
-										'select_type' => 'behavior',
-						];
-						?>
+            $type_options[] = (object)[
+                'value' => $action->codename,
+                'name' => 'Did ' . $action->name,
+                'select_type' => 'behavior',
+            ];
+            ?>
 
-		var fields = [];
-		<?php
-		if($action->fields):
-		foreach($action->fields as $tmp_field):
-		?>
-		fields.push({
-			pcode: '{{$tmp_field->pcode}}',
-			pname: "{{$tmp_field->pname}}"
-		});
-						<?php
-						endforeach;
-						endif;
-						?>
-		var tmp_type_option = {
-							value: '{{$action->codename ? $action->codename : ''}}',
-							name: '{{$action->name ? $action->name : ''}}',
-							fields: fields,
-							select_type: 'behavior'
-						};
-		type_options.push(tmp_type_option);
-						<?php
-						endforeach;
-						endif;
-						$f_behaviors = [
-										(object)['code' => 'sum', 'name' => 'Sum'],
-										(object)['code' => 'avg', 'name' => 'Average'],
-										(object)['code' => 'count', 'name' => 'Count']
-						];
-						?>
-		var f_behavior = [
-							{code: 'sum', name: 'Sum'},
-							{code: 'avg', name: 'Average'},
-							{code: 'count', name: 'Count'}
-						];
-		var operator_behavior = [
-			{code: '>', name: 'greater than'},
-			{code: '>=', name: 'less or equal'},
-			{code: '=', name: 'equal'},
-			{code: '<', name: 'less than'},
-			{code: '<=', name: 'greater or equal'}
-		];
-		<?php $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators(); ?>
+            var fields = [];
+            <?php
+            if($action->fields):
+            foreach($action->fields as $tmp_field):
+            ?>
+            fields.push({
+                    pcode: '{{$tmp_field->pcode}}',
+                    pname: "{{$tmp_field->pname}}"
+            });
+            <?php
+            endforeach;
+            endif;
+            ?>
+            var tmp_type_option = {
+                value: '{{$action->codename ? $action->codename : ''}}',
+                name: 'Did {{$action->name ? $action->name : ''}}',
+                fields: fields,
+                select_type: 'behavior'
+            };
+            type_options.push(tmp_type_option);
+        <?php
+        endforeach;
+        endif;
+        $f_behaviors = [
+                                        (object)['code' => 'sum', 'name' => 'Sum'],
+                                        (object)['code' => 'avg', 'name' => 'Average'],
+                                        (object)['code' => 'count', 'name' => 'Count']
+        ];
+        ?>
+    var f_behavior = [
+                                            {code: 'sum', name: 'Sum'},
+                                            {code: 'avg', name: 'Average'},
+                                            {code: 'count', name: 'Count'}
+                                    ];
+    var operator_behavior = [
+            {code: '>', name: 'greater than'},
+            {code: '>=', name: 'less or equal'},
+            {code: '=', name: 'equal'},
+            {code: '<', name: 'less than'},
+            {code: '<=', name: 'greater or equal'}
+    ];
+    <?php $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators(); ?>
 
-		$('#segment-date-range').dateRangePicker();
-		//load segment time range
+    $('#segment-date-range').dateRangePicker();
+    //load segment time range
 
-		$('#segment-date-range').data('dateRangePicker').setDateRange('2013-11-20','2013-11-25');
-	</script>
+    $('#segment-date-range').data('dateRangePicker').setDateRange('2013-11-20','2013-11-25');
+</script>
 @endsection
 
 @section('style')
@@ -110,98 +110,105 @@
 @endsection
 
 @section('content')
-	<div class="card row">
-		<div class="header col-md-12">
-			<form id='segment-form' class="form-segment row" method="post"
-							action="{{URL::to('segment/write')}}">
+<div class="card row">
+    <div class="header col-md-12">
+        <form id='segment-form' class="form-segment row" method="post"
+              action="{{URL::to('segment/write')}}">
 
-				<div class="col-sm-12">
-					<input type="hidden" class="row hidden" value="{{$segment->_id}}" name="id">
-					<div class=" row">
-						<div class="col-sm-2">
-							<h6>Name</h6>
-							<input type="text" class="form-control " name="name" value="{{Input::old('name', $segment->name)}}"
-											placeholder="Enter name"/>
-							@if($errors->any())
-								<p class="errror">{{$errors->first('name')}}</p>
-								<p class="errror">{{$errors->first('conditions')}}</p>
-							@endif
-						</div>
+            <div class="col-sm-12">
+                <input type="hidden" class="row hidden" value="{{$segment->_id}}" name="id">
+                <div class=" row">
+                    <div class="col-sm-2">
+                        <h6>Name</h6>
+                        <input type="text" class="form-control " name="name" value="{{Input::old('name', $segment->name)}}"
+                               placeholder="Enter name"/>
+                        @if($errors->any())
+                        <p class="errror">{{$errors->first('name')}}</p>
+                        <p class="errror">{{$errors->first('conditions')}}</p>
+                        @endif
+                    </div>
 
-						<div class="col-sm-10">
-							<h6>Filter date</h6>
+                    <div class="col-sm-10">
+                        <h6>Filter date</h6>
 
 
-							<div class="input-group" style="width: 300px;">
-                  <span class="input-group-addon">
-	                  <i class="pe-7s-date" style="font-size:26px; padding-left:6px;"></i>
-                  </span>
-								<input type="text" class="form-control" id="segment-date-range" name="timerange">
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-12" style="padding-top: 0;padding-bottom: 0">
-							<div class="row">
-								<div class="col-sm-12" style="padding-bottom: 0 ;padding-bottom: 0"><h6
-													style="margin-bottom:0px">Filter condition</h6>
-								</div>
-							</div>
+                        <div class="input-group" style="width: 300px;">
+                            <span class="input-group-addon">
+                                <i class="pe-7s-date" style="font-size:26px; padding-left:6px;"></i>
+                            </span>
+                            <input type="text" class="form-control" id="segment-date-range" name="timerange">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12" style="padding-top: 0;padding-bottom: 0">
+                        <div class="row">
+                            <div class="col-sm-12" style="padding-bottom: 0 ;padding-bottom: 0"><h6
+                                    style="margin-bottom:0px">Filter condition</h6>
+                            </div>
+                        </div>
 
-							<div class="row">
-								<div class="col-sm-12" style="padding-top: 0;padding-bottom: 0">
-									<div data-name="condition-group" class="row" data-i-condition-max="{{count($conditions)}}">
-										<div class="col-sm-12" style="padding-top: 0;padding-bottom: 0">
-											<?php
-											$i_condition = 0;
-											foreach($conditions as $condition):
-											?>
-											@include('segment.partials.condition_item', [
-													'condition' => $condition,
-													'type_options' => $type_options,
-													'i_condition' => $i_condition,
-											])
-											<?php
-											$i_condition++;
-											endforeach;
-											?>
-										</div>
-									</div>
+                        <div class="row">
+                            <div class="col-sm-12" style="padding-top: 0;padding-bottom: 0">
+                                <div data-name="condition-group" class="row" data-i-condition-max="{{count($conditions)}}">
+                                    <div class="col-sm-12" style="padding-top: 0;padding-bottom: 0">
+                                        <?php
+                                        $i_condition = 0;
+                                        foreach ($conditions as $condition):
+                                            ?>
+                                            @include('segment.partials.condition_item', [
+                                            'condition' => $condition,
+                                            'type_options' => $type_options,
+                                            'i_condition' => $i_condition,
+                                            ])
+                                            <?php
+                                            $i_condition++;
+                                        endforeach;
+                                        ?>
+                                    </div>
+                                </div>
 
-								</div>
-							</div>
-						</div>
-					</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-					<div class="row">
-						<div class="col-sm-12" style="padding-top: 0">
-							<h6>Description</h6>
-							<!--<label class="col-md-12" style="margin-top: 10px">Segment description</label>-->
+                <div class="row">
+                    <div class="col-sm-12" style="padding-top: 0">
+                        <h6>Description</h6>
+                        <!--<label class="col-md-12" style="margin-top: 10px">Segment description</label>-->
 
-							<input type="text" class="form-control" name="description" placeholder="Enter description"
-											value="{{isset($segment->description) ? $segment->description : ''}}"/>
+                        <input type="text" class="form-control" name="description" placeholder="Enter description"
+                               value="{{isset($segment->description) ? $segment->description : ''}}"/>
 
-						</div>
-					</div>
+                    </div>
+                </div>
 
-					<div class="row">
-						<div class="col-sm-12">
-							<button type="submit" class="action button blue ">
-								<span class="label">{{$segment->_id ? 'Update' : 'Create'}}</span>
-							</button>
-						</div>
-					</div>
-				</div>
-			</form>
-		</div>
-	</div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="action button blue " onclick="backFn()">
+                            <span class="label">Back</span>
+                        </button>
+                        <button type="submit" class="action button blue ">
+                            <span class="label">{{$segment->_id ? 'Update' : 'Create'}}</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 @endsection
 
 @section('additional')
 	<script src="{{asset('js/select2.min.js')}}"></script>
 	<script type="text/javascript">
 		//    $('select').select2();
-
+                function backFn(){
+                    parent.history.back();
+                    return false;
+                }
+                
 		function typeChange(e) {
 			var that = $(e);
 			var containter = that.parent().parent();
@@ -212,18 +219,19 @@
 					if (v.select_type == 'user') {
 						containter.find('input[name="Segment[' + i_condition + '][select_type]"]').val('user');
 						containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
-						containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().removeClass('col-md-2');
-						containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().addClass('col-md-4');
+//						containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().removeClass('col-md-2');
+//						containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().addClass('col-md-4');
 						//containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().removeClass('col-md-2');
 						//containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().addClass('col-md-4');
 						containter.find('select[name="Segment[' + i_condition + '][f]"]').parent().hide();
 						containter.find('select[name="Segment[' + i_condition + '][field]"]').parent().hide();
+                                                containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
 						if (v.operators.length) {
-							containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
-							$.each(v.operators, function (oi, ov) {
-								containter.find('select[name="Segment[' + i_condition + '][operator]"]').append('<option value="' + ov.code + '">' + ov.name + '</option>');
-							});
+                                                    $.each(v.operators, function (oi, ov) {
+                                                        containter.find('select[name="Segment[' + i_condition + '][operator]"]').append('<option value="' + ov.code + '">' + ov.name + '</option>');
+                                                    });
 						}
+                                                condition_item.find('div[data-name="add-condition"]').hide();
 					}
 					else {
 						containter.find('input[name="Segment[' + i_condition + '][select_type]"]').val('behavior');
@@ -234,18 +242,18 @@
 						containter.find('select[name="Segment[' + i_condition + '][f]"]').parent().show();
 						containter.find('select[name="Segment[' + i_condition + '][field]"]').parent().show();
 						containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
-
 						$.each(operator_behavior, function (obi, obv) {
 							containter.find('select[name="Segment[' + i_condition + '][operator]"]').append('<option value="' + obv.code + '">' + obv.name + '</option>');
 						});
+                                                containter.find('select[name="Segment[' + i_condition + '][f]"]').html('');
 						$.each(f_behavior, function (fi, fv) {
 							containter.find('select[name="Segment[' + i_condition + '][f]"]').append('<option value="' + fv.code + '">' + fv.name + '</option>');
 						});
+                                                $('select[name="Segment[' + i_condition + '][field]"]').html('');
 						if (v.fields.length) {
-							$('select[name="Segment[' + i_condition + '][field]"]').html('');
-							$.each(v.fields, function (fieldi, fieldv) {
-								$('select[name="Segment[' + i_condition + '][field]"]').append('<option value="' + fieldv.pcode + '">' + fieldv.pname + '</option>');
-							});
+                                                    $.each(v.fields, function (fieldi, fieldv) {
+                                                            $('select[name="Segment[' + i_condition + '][field]"]').append('<option value="' + fieldv.pcode + '">' + fieldv.pname + '</option>');
+                                                    });
 						}
 						var add_condition = containter.find('div[data-name="add-condition"]');
 						add_condition.show();
@@ -265,7 +273,9 @@
 		function changeField(e) {
 			console.log('here');
 		}
-
+                
+                
+                
 		function addFilter(e) {
 			var that = $(e);
 			var condition_item = that.closest('div[data-name="condition-item"]');
@@ -296,7 +306,7 @@
 		}
 
 		function deleteFilter(e) {
-			var that = that.closest('div[data-name="condition-item"]');
+			var that = $(e).closest('div[data-name="condition-item"]');
 			that.remove();
 			checkDisableDelete();
 		}
@@ -309,6 +319,14 @@
 			else {
 				$('.delete').show();
 			}
+                        
+                        var count_filter = $('a[data-name="a-add-filter"]').length;
+                        if(count_filter == 1){
+                            $('a[data-name="a-delete-filter"]').hide();
+                        }
+                        else{
+                            $('a[data-name="a-delete-filter"]').show();
+                        }
 		}
 		checkDisableDelete();
 
@@ -329,7 +347,7 @@
 				 */
 				$.each(type_options, function (i, v) {
 					if (v.value == selected_type) {
-						if (v.fields.length) {
+						if (v.fields && v.fields.length) {
 							$.each(v.fields, function (vf_i, vf_v) {
 								condition_sub_item.next().find("select[name*='cs_field']").append('<option value="' + vf_v.pcode + '">' + vf_v.pname + '</option>');
 							});

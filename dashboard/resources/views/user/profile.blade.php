@@ -30,6 +30,9 @@
   .avatar .form-group{
     padding: 0;
   }
+  .editable-click{
+      border-bottom: 0px !important;
+  }
   </style>
 @endsection
 
@@ -38,8 +41,16 @@
 
   <script>
     $(document).ready(function(){
-      $('[xeditable]').editable({ url: '/user/profile' });
-    })
+      $('[xeditable]').editable({ 
+          url: '/user/profile',
+        });
+        
+        $('body').on('click', '.a-edit, .a-edit-username ', function(e){
+            e.stopPropagation();
+            var ele_edit = $(this).prev();
+            ele_edit.editable('toggle');
+        });
+    });
   </script>
 @endsection
 
@@ -52,6 +63,9 @@
         <i class="pe-7s-user"></i>
         <a class="text-info"  href="#" xeditable data-type="text" data-name="name"
            data-mode="inline" data-showbuttons="false" data-pk="{{ Auth::user()->id }}">{{ Auth::user()->name }}</a>
+        <a href="javascript:void(0)" class="a-edit-username" data-name="a-edit">
+          <span class="glyphicon glyphicon-pencil"></span>
+        </a>
       </h3>
       <div class="form-group">
         <span class="col-xs-2 control-label">UserID</span>
@@ -70,13 +84,19 @@
         <div class="col-xs-10">
           <a href="#" xeditable data-type="text" data-name="phone"
              data-mode="inline" data-showbuttons="false" data-pk="{{ Auth::user()->id }}">{{ Auth::user()->phone}}</a>
+            <a href="javascript:void(0)" class="a-edit" data-name="a-edit">
+              <span class="glyphicon glyphicon-pencil"></span>
+            </a>
         </div>
       </div>
       <div class="form-group">
         <span class="col-xs-2 control-label">Password</span>
         <div class="col-xs-10">
           <b>************</b>
-          <a class="btn btn-xs btn-info" href="{{ URL::to('/user/password') }}">Change</a>
+          <!--<a class="btn btn-xs btn-info" href="{{ URL::to('/user/password') }}">Change</a>-->
+          <a href="{{ URL::to('/user/password') }}" class="a-edit" data-name="a-edit">
+              <span class="glyphicon glyphicon-pencil"></span>
+            </a>
           @if(session('success'))
             <span class="text-success">
               {{ session('success') }}
