@@ -62,7 +62,7 @@ $props = isset($props) ? $props : [];
 
 			<!--    <div class="content col-md-12" data-name="name">
         <label class="col-md-2" style="margin-top: 4px">Segment name: </label>
-        <p class="col-md-10"><?= property_exists($segment_first, 'name') ? $segment_first->name : ''?></p>
+        <p class="col-md-10"><?= isset($segment_first) && isset($segment_first->name) ? $segment_first->name : ''?></p>
     </div>-->
 			@if(isset($segment_first))
 				<div class="content row" data-name="description">
