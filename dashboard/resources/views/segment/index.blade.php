@@ -19,7 +19,7 @@ $props = isset($props) ? $props : [];
 						segments['{{ $segment->_id }}'] = {
 			name: '{{ property_exists($segment, 'name') ? $segment->name : '' }}',
 			description: '{{property_exists($segment, 'description') ? $segment->description : '' }}',
-			count:'{{ property_exists($segment, 'count') ? $segment->count : '' }}'
+			count: '{{ property_exists($segment, 'count') ? $segment->count : '' }}'
 		};
 		<?php
 		endforeach;
@@ -47,15 +47,15 @@ $props = isset($props) ? $props : [];
 				</div>
 
 				<a id="action_update" data-href="{{URL::to('segment/update')}}" href="{{URL::to('segment/update', [
-                                    'id' => $segment_first ? $segment_first->_id : ''
+                                    'id' => isset($segment_first) ? $segment_first->_id : ''
                                 ])}}" class="a-edit-obj" role="button">
-<!--                                    <span class="label">Update</span> -->
-                                    <span class="glyphicon glyphicon-pencil"></span>
-                                </a>
-				<a id="action_delete" href="javascript:void(0)" class="a-trash-obj" role="button"> 
-                                    <!--<span class="label">Delete</span>-->
-                                    <span class="glyphicon glyphicon-trash"></span>
-                                </a>
+					<!--                                    <span class="label">Update</span> -->
+					<span class="glyphicon glyphicon-pencil"></span>
+				</a>
+				<a id="action_delete" href="javascript:void(0)" class="a-trash-obj" role="button">
+					<!--<span class="label">Delete</span>-->
+					<span class="glyphicon glyphicon-trash"></span>
+				</a>
 				&nbsp; or &nbsp;<a href="{{ URL::to('segment/create') }}">+ CREATE NEW SEGMENTATION</a>
 				<!--</form>-->
 			</div>
@@ -64,19 +64,21 @@ $props = isset($props) ? $props : [];
         <label class="col-md-2" style="margin-top: 4px">Segment name: </label>
         <p class="col-md-10"><?= property_exists($segment_first, 'name') ? $segment_first->name : ''?></p>
     </div>-->
-			<div class="content row" data-name="description">
-				<div class=" col-md-2">
-					<h6>Description</h6>
+			@if(isset($segment_first))
+				<div class="content row" data-name="description">
+					<div class=" col-md-2">
+						<h6>Description</h6>
+					</div>
+					<!--<label class="col-md-2" style="margin-top: 4px">Segment description: </label>-->
+					<p class="col-md-10"
+									id="desc"><?= property_exists($segment_first, 'description') ? $segment_first->description : ''?></p>
+					<p> @if(isset($segment_first->startTime ))
+							Time range: <span id="startTime">{{$segment_first->startTime}}</span> to {{$segment_first->endTime}},
+						@endif
+						<span id="count">@if(isset($segment_first->count)){{$segment_first->count}}@endif</span>
+					</p>
 				</div>
-				<!--<label class="col-md-2" style="margin-top: 4px">Segment description: </label>-->
-				<p class="col-md-10" id="desc"><?= property_exists($segment_first, 'description') ? $segment_first->description : ''?></p>
-				<p> @if(isset($segment_first->startTime ))
-						Time range: <span id="startTime">{{$segment_first->startTime}}</span> to {{$segment_first->endTime}},
-					@endif
-					<span id="count">@if(isset($segment_first->count)){{$segment_first->count}}@endif</span>
-				</p>
-			</div>
-
+			@endif
 			<div class=" content row">
 				<div class=" col-md-2">
 					<h6>Filter By:</h6>
@@ -95,7 +97,7 @@ $props = isset($props) ? $props : [];
 						?>
 					</select>
 				</div>
-                            <div class="col-md-2" id="div-filter-two" style="display: none">
+				<div class="col-md-2" id="div-filter-two" style="display: none">
 					<select name="Prop[two]" class="form-control">
 						<!--<option value="">Select property</option>-->
 						<?php
@@ -109,16 +111,16 @@ $props = isset($props) ? $props : [];
 						?>
 					</select>
 				</div>
-                                <div class="col-md-2" id="div-filter-tool">
-                                    <i class="fa fa-plus fa-2" aria-hidden="true" onclick="addFilter(this)"></i>
-                                    <i class="fa fa-minus fa-2" aria-hidden="true" onclick="removeFilter(this)" style="display: none"></i>
-                                </div>
+				<div class="col-md-2" id="div-filter-tool">
+					<i class="fa fa-plus fa-2" aria-hidden="true" onclick="addFilter(this)"></i>
+					<i class="fa fa-minus fa-2" aria-hidden="true" onclick="removeFilter(this)" style="display: none"></i>
+				</div>
 				<div class="col-md-2">
 					<button type="button" class="action button blue" onclick="execute()">
 						<span class="label">Generate</span>
 					</button>
 				</div>
-                                <div class="col-md-2">
+				<div class="col-md-2">
 					<button type="button" class="action button red" onclick="cancelExecute()">
 						<span class="label">Cancel</span>
 					</button>
@@ -154,7 +156,6 @@ $props = isset($props) ? $props : [];
 			$('#desc').html(segments[that.val()].description);
 			$('#count').html(segments[that.val()].count);
 
-
 			return false;
 		});
 
@@ -173,26 +174,26 @@ $props = isset($props) ? $props : [];
 				});
 			}
 		});
-                
-                function addFilter(e){
-                    $('#div-filter-two').show();
-                    $(e).parent().find('.fa-minus').show();
-                    $(e).hide();
-                }
-                
-                function removeFilter(e){
-                    $('#div-filter-two').hide();
-                    $(e).parent().find('.fa-plus').show();
-                    $(e).hide();
-                }
-                
-                function cancelExecute(){
-                    $('#div-filter-one').find('select').val('').change();
-                    $('#div-filter-two').hide();
-                    $('#div-filter-tool').find('.fa-plus').show();
-                    $('#div-filter-tool').find('.fa-minus').hide();
-                    $('div[data-name="canvas-chart"]').html('');
-                }
+
+		function addFilter(e) {
+			$('#div-filter-two').show();
+			$(e).parent().find('.fa-minus').show();
+			$(e).hide();
+		}
+
+		function removeFilter(e) {
+			$('#div-filter-two').hide();
+			$(e).parent().find('.fa-plus').show();
+			$(e).hide();
+		}
+
+		function cancelExecute() {
+			$('#div-filter-one').find('select').val('').change();
+			$('#div-filter-two').hide();
+			$('#div-filter-tool').find('.fa-plus').show();
+			$('#div-filter-tool').find('.fa-minus').hide();
+			$('div[data-name="canvas-chart"]').html('');
+		}
 		/*
 		 * chart
 		 */
