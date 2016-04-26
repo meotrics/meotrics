@@ -214,6 +214,7 @@
 			var containter = that.parent().parent();
 			var condition_item = that.closest('div[data-name="condition-item"]');
 			var i_condition = condition_item.attr('data-i-condition');
+                        
 			$.each(type_options, function (i, v) {
 				if (v.value == that.val()) {
 					if (v.select_type == 'user') {

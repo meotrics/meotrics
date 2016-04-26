@@ -36,10 +36,10 @@ $operators_default = [
 
 <div class="condition-item row" data-name="condition-item" data-i-condition="{{$i_condition}}">
     <div class="col-sm-12" style="padding-top: 0; padding-bottom: 0">
-        <input class="row hidden" type="hidden" name="Segment[{{$i_condition}}][select_type]" value="{{$condition->select_type}}">
         <div class="row">
             <!--<label class="col-md-2" style="margin-top: 10px">List top</label>-->
             <div class="col-md-2">
+                <input class="row hidden" type="hidden" name="Segment[{{$i_condition}}][select_type]" value="{{$condition->select_type}}">
                 <select class="form-control" name="Segment[{{$i_condition}}][type]" onchange="typeChange(this)">
                     <?php
                     foreach ($type_options as $type_option):

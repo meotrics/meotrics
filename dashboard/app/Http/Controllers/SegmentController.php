@@ -230,8 +230,6 @@ class SegmentController extends Controller
 						$result = true;
 					}
 				}
-//                var_dump($data_post);
-//                var_dump($result); exit;
 				return $result;
 			});
 			if ($validator->fails()) {
@@ -274,7 +272,6 @@ class SegmentController extends Controller
 					$query[] = 'and';
 				}
 			}
-			var_dump($query);die;
 			array_pop($user_query->conditions);
 			$query[] = $user_query;
 
