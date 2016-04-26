@@ -1,6 +1,6 @@
 (function () {
 	"use strict";
-	exports.AppMgr = function (db, mongodb, converter, prefix, typeCrud, segmentCrud, trendCrud) {
+	exports.AppMgr = function (db, converter, prefix, typeCrud, segmentCrud, trendCrud) {
 		var me = this;
 		this.isSetup = function (appid, callback) {
 			me.countAction(appid, function (count) {
@@ -28,7 +28,19 @@
 				deftrendfields: [
 					{pname: "Category", pcode: "cid"},
 					{pname: "Product", pcode: "pid"},
-					{pname: "Payment type", pcode: "paymentype"}
+					{pname: "Payment type", pcode: "paymentype"},
+					{pname: "Campaign", pcode: "_utm_campaign"},
+					{pname: "Campaign Source", pcode: "_utm_source"},
+					{pname: "Campaign Medium", pcode: "_utm_medium"},
+					{pname: "Campaign Term", pcode: "_utm_term"},
+					{pname: "Campaign Content", pcode: "_utm_content"},
+					{pname: "Operating System", pcode: "_os"},
+					{pname: "City", pcode: "_city"},
+					{pname: "Referer", pcode: "_ref"},
+					{pname: "Screen Resolution", pcode: "_scrres"},
+					{pname: "Browser Version", pcode: "_browser"},
+					{pname: "OS Version", pcode: "_osver"},
+					{pname: "Location", pcode: "_location"}
 				],
 				deftrendobjects: [
 					{desc: "Number of time purchased", operation: "count", param: "_id"},
@@ -50,10 +62,23 @@
 			{
 				codename: "pageview",
 				name: "Pageview",
-				desc: "Happened when user visited site",
+				desc: "Occurs when user visited site",
 				fields: [],
 				deftrendfields: [
-					{pname: "URL", pcode: "_url"}
+					{pname: "Campaign", pcode: "_utm_campaign"},
+					{pname: "Campaign Source", pcode: "_utm_source"},
+					{pname: "Campaign Medium", pcode: "_utm_medium"},
+					{pname: "Campaign Term", pcode: "_utm_term"},
+					{pname: "Campaign Content", pcode: "_utm_content"},
+					{pname: "URL", pcode: "_url"},
+					{pname: "Operating System", pcode: "_os"},
+					{pname: "Language", pcode: "_lang"},
+					{pname: "City", pcode: "_city"},
+					{pname: "Referer", pcode: "_ref"},
+					{pname: "Screen Resolution", pcode: "_scrres"},
+					{pname: "Browser Version", pcode: "_browser"},
+					{pname: "OS Version", pcode: "_osver"},
+					{pname: "Location", pcode: "_location"}
 				],
 				deftrendobjects: [
 					{desc: "Number of pageview", operation: "count", param: "_id"},
@@ -136,6 +161,22 @@
 					{pname: "Name", pcode: "name"},
 					{pname: "Age", pcode: "age"},
 					{pname: "Gender", pcode: "gender"}
+				],
+				deftrendfields: [
+					{pname: "Campaign", pcode: "_utm_campaign"},
+					{pname: "Campaign Source", pcode: "_utm_source"},
+					{pname: "Campaign Medium", pcode: "_utm_medium"},
+					{pname: "Campaign Term", pcode: "_utm_term"},
+					{pname: "Campaign Content", pcode: "_utm_content"},
+					{pname: "URL", pcode: "_url"},
+					{pname: "Operating System", pcode: "_os"},
+					{pname: "Language", pcode: "_lang"},
+					{pname: "City", pcode: "_city"},
+					{pname: "Referer", pcode: "_ref"},
+					{pname: "Screen Resolution", pcode: "_scrres"},
+					{pname: "Browser Version", pcode: "_browser"},
+					{pname: "OS Version", pcode: "_osver"},
+					{pname: "Location", pcode: "_location"}
 				]
 			};
 
@@ -153,7 +194,23 @@
 				codename: "login",
 				name: "Login",
 				desc: "User login to site",
-				fields: []
+				fields: [],
+				deftrendfields:[
+					{pname: "Campaign", pcode: "_utm_campaign"},
+					{pname: "Campaign Source", pcode: "_utm_source"},
+					{pname: "Campaign Medium", pcode: "_utm_medium"},
+					{pname: "Campaign Term", pcode: "_utm_term"},
+					{pname: "Campaign Content", pcode: "_utm_content"},
+					{pname: "URL", pcode: "_url"},
+					{pname: "Operating System", pcode: "_os"},
+					{pname: "Language", pcode: "_lang"},
+					{pname: "City", pcode: "_city"},
+					{pname: "Referer", pcode: "_ref"},
+					{pname: "Screen Resolution", pcode: "_scrres"},
+					{pname: "Browser Version", pcode: "_browser"},
+					{pname: "OS Version", pcode: "_osver"},
+					{pname: "Location", pcode: "_location"}
+				]
 			};
 
 			var trend1 = {
@@ -171,7 +228,7 @@
 				description: "All visitor in site",
 				condition: [{}]
 			};
-
+/*
 			converter.toIDs(['_mtid', '_isUser', '_typeid'], function (ids) {
 				var keys = {};
 				keys[ids._mtid] = 1;
@@ -188,8 +245,8 @@
 
 				db.collection(prefix + appid, keys, {sparse: true});
 			});
-			
-			db.collection(prefix + appid).createIndexe()
+	*/
+			//db.collection(prefix + appid).createIndex()
 
 			typeCrud.createRaw(appid, purchase, function () {
 				typeCrud.createRaw(appid, pageview, function () {

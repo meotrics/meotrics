@@ -1,3 +1,4 @@
+"use strict";
 exports.CRUD = function (db, mongodb, async, converter, prefix, col) {
 	var me = this;
 
@@ -17,7 +18,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, col) {
 	this.create = function (req, res, callback) {
 		me.createRaw(req.params.appid, req.body, function (id) {
 			res.send(id);
-			if (callback ) callback(id)
+			if (callback ) callback(id);
 		});
 	};
 
@@ -25,30 +26,30 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, col) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + col;
 		converter.toIDs(['_appid', '_isDraft'], function (ids) {
-			var query = {'$and': []};
+			var query = {$and: []};
 			var projection = {};
 
 			var andStatement = {};
-			andStatement[ids['_appid']] = appid;
-			query['$and'].push(andStatement);
+			andStatement[ids._appid] = appid;
+			query.$and.push(andStatement);
 
-			andStatement = {'$or': []};
+			andStatement = {$or: []};
 			var orStatement = {};
-			orStatement[ids['_isDraft']] = false;
-			andStatement['$or'].push(orStatement);
+			orStatement[ids._isDraft] = false;
+			andStatement.$or.push(orStatement);
 			orStatement = {};
-			orStatement[ids['_isDraft']] = {'$exists': false};
-			andStatement['$or'].push(orStatement);
+			orStatement[ids._isDraft] = {$exists: false};
+			andStatement.$or.push(orStatement);
 
-			query['$and'].push(andStatement);
-			projection[ids['_appid']] = 0;
-			projection[ids['_isDraft']] = 0;
+			query.$and.push(andStatement);
+			projection[ids._appid] = 0;
+			projection[ids._isDraft] = 0;
 
 			var cursor = db.collection(collection).find(query, projection);
 			var done = false;
 			var results = [];
 			async.whilst(function () {
-				return done == false;
+				return done === false;
 			}, function (callback) {
 				cursor.next(function (err, r) {
 					if (err) throw err;
@@ -81,7 +82,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, col) {
 			db.collection(collection).find(query, projection).toArray(function (err, r) {
 				if (err) throw err;
 
-				if (r.length != 0) {
+				if (r.length !== 0) {
 					converter.toOriginal(r[0], function (r) {
 						res.json(r);
 						if(callback) callback();
@@ -117,18 +118,18 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, col) {
 		});
 	};
 
-	this.deleteDraf = function (req, res) {
+	this.deleteDraf = function (req, res, callback) {
 		var appid = Number(req.params.appid);
 		var collection = prefix + col;
 		converter.toIDs(['_appid', '_isDraft'], function (ids) {
 			var query = {};
-			query[ids['_appid']] = appid;
-			query[ids['_isDraft']] = true;
+			query[ids._appid] = appid;
+			query[ids._isDraft] = true;
 			db.collection(collection).deleteMany(query, function (err, r) {
 				if (err) throw err;
 				res.status(200).end();
 				if (callback) callback();
 			});
 		});
-	}
+	};
 };
