@@ -34,15 +34,15 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD) {
 		else
 			devicetype = 'desktop';
 
-		if (url == null || url == "" || url.startsWith(request.headers['referer']) == false) url = request.headers['referer'];
+		if (url == null || url == "" || url.startsWith(request.headers['referer']) === false) url = request.headers['referer'];
 		var res = {
 			_url: url,
 			_ref: request.params._ref,
 			_typeid: request.params._typeid,
 			_ip: getRemoteAddress(request),
 			_deltat: request.params._deltat,
-			_osid: r.os.family,
-			_browserid: r.ua.family,
+			_os: r.os.family,
+			_browser: r.ua.family,
 			_browserver: r.ua.major + '.' + r.ua.minor,
 			_osver: r.os.major + '.' + r.os.minor,
 			_deviceid: r.device.family,

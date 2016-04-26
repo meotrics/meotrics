@@ -1,6 +1,6 @@
 (function () {
 	"use strict";
-	exports.AppMgr = function (db, mongodb, async, converter, prefix, typeCrud, segmentCrud, trendCrud) {
+	exports.AppMgr = function (db, mongodb, converter, prefix, typeCrud, segmentCrud, trendCrud) {
 		var me = this;
 		this.isSetup = function (appid, callback) {
 			me.countAction(appid, function (count) {
@@ -37,23 +37,23 @@
 				],
 				fields: [
 					{pname: "Product ID", pcode: "pid"},
-					{pname: "Product's Name", pcode: "pname"},
-					{pname: "Category", pcode: "cid"},
-					{pname: "Category ID", pcode: "cname"},
-					{pname: "Price of product", pcode: "price"},
-					{pname: "Total amount", pcode: "amount"},
+					{pname: "Product Name", pcode: "pname"},
+					{pname: "Category ID", pcode: "cid"},
+					{pname: "Category Name", pcode: "cname"},
+					{pname: "Price", pcode: "price"},
+					{pname: "Amount", pcode: "amount"},
 					{pname: "Quantity", pcode: "quantity"},
-					{pname: "Payment type", pcode: "paymentype"}]
+					{pname: "Payment Type", pcode: "paymentype"}]
 			};
 
 			var pageview =
 			{
 				codename: "pageview",
 				name: "Pageview",
-				desc: "User view a page",
+				desc: "Happened when user visited site",
 				fields: [],
 				deftrendfields: [
-					{pname: "URL", pcode: "url"}
+					{pname: "URL", pcode: "_url"}
 				],
 				deftrendobjects: [
 					{desc: "Number of pageview", operation: "count", param: "_id"},
@@ -131,7 +131,21 @@
 				codename: "register",
 				name: "Register",
 				desc: "User register to a page",
-				fields: []
+				fields: [
+					{pname: "User ID", pcode: "userid"},
+					{pname: "Name", pcode: "name"},
+					{pname: "Age", pcode: "age"},
+					{pname: "Gender", pcode: "gender"}
+				]
+			};
+
+			var search = {
+				codename: "search",
+				name: "Search",
+				desc: "User search a keyword",
+				fields: [
+					{pname: "Keyword", pcode: "keyword"}
+				]
 			};
 
 			var login =
@@ -139,14 +153,6 @@
 				codename: "login",
 				name: "Login",
 				desc: "User login to site",
-				fields: []
-			};
-
-			var quit =
-			{
-				codename: "quit",
-				name: "Quit",
-				desc: "User quit website",
 				fields: []
 			};
 
@@ -182,6 +188,8 @@
 
 				db.collection(prefix + appid, keys, {sparse: true});
 			});
+			
+			db.collection(prefix + appid).createIndexe()
 
 			typeCrud.createRaw(appid, purchase, function () {
 				typeCrud.createRaw(appid, pageview, function () {
@@ -191,7 +199,7 @@
 								typeCrud.createRaw(appid, download, function () {
 									typeCrud.createRaw(appid, register, function () {
 										typeCrud.createRaw(appid, login, function () {
-											typeCrud.createRaw(appid, quit, function () {
+											typeCrud.createRaw(appid, search, function () {
 												trendCrud.createRaw(appid, trend1, function () {
 													segmentCrud.createRaw(appid, segment1, callback);
 												});
