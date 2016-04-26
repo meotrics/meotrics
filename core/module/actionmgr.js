@@ -1,3 +1,4 @@
+"use strict";
 exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 	var url = require('url');
 	var me = this;
@@ -11,12 +12,12 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		mtid = new mongodb.ObjectId(mtid);
 		converter.toID('_isUser', function (isUser) {
 			db.collection(collectionmapping).find({anomtid: mtid}).limit(1).toArray(function (err, r) {
-				if (r.length != 0) mtid = r[0].idemtid;
+				if (r.length !== 0) mtid = r[0].idemtid;
 				// check if user existed
 				var query = {_id: mtid};
 				query[isUser] = true;
 				db.collection(collection).find(query).limit(1).toArray(function (err, ret) {
-					if (ret.length == 0) callback(false);
+					if (ret.length === 0) callback(false);
 					else callback(true);
 				});
 			});
@@ -29,12 +30,12 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 	// + _mtid : number
 	// + _typeid: string // type of action, eg: "purchase", "pageview"
 	// + _osid: number // os information, eg: "window", "linux",
-	// + _browserid : number // eg, "chrome", "firefox", "opera",
-	// + _locationid : number // location code, eg: Hanoi, Vietnam
-	// + _referer: string
-	// + _deviceid : number
+	// + _browser : number // eg, "chrome", "firefox", "opera",
+	// + _location : number // location code, eg: Hanoi, Vietnam
+	// + _ref: string
+	// + _device : number
 	// + _ip: string // public ip address
-	// + _screenres: string // screen resolution of the device
+	// + _scrres: string // screen resolution of the device
 	// + _totalsec: number // total number of sec to finish the action
 	// + _url: string
 	// + _browserversion : number
@@ -49,10 +50,14 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		data._mtid = mtid;
 
 		// extract campaign
-		if (data._url == null) data._url = "";
+		if (data._url === null) data._url = "";
 		var query = url.parse(data._url, true).query;
 		var utm_source = query.utm_source;
 		var utm_campaign = query.utm_campaign;
+		var utm_term = query.utm_term;
+		var utm_content = query.utm_content;
+		var utm_medium = query.utm_medium;
+
 		data._segments = [];
 
 		// correct timming
@@ -62,8 +67,13 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		// retrive real mtid because user can still use old mtid
 		db.collection(collectionmapping).find({anomtid: mtid}).limit(1).toArray(function (err, r) {
 			if (err) throw err;
-			if (r.length != 0) mtid = r[0].idemtid;
+			if (r.length !== 0) mtid = r[0].idemtid;
 
+			if(data._utm_source === undefined) data._utm_source = utm_source;
+			if(data._utm_campaign === undefined) data._utm_campaign = utm_campaign;
+			if(data._utm_term === undefined) data._utm_term = utm_term;
+			if(data._utm_content === undefined) data._utm_content = utm_content;
+			if(data._utm_medium === undefined) data._utm_medium = utm_medium;
 			converter.toObject(data, function (datax) {
 				db.collection(collection).insertOne(datax, function (err, r) {
 					if (err) throw err;
@@ -74,31 +84,30 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 				db.collection(collection).find({_id: mtid}).limit(1).toArray(function (err, ret) {
 					if (err) throw err;
 					var user = ret[0];
-					if (user == undefined) throw "mtid " + mtid + " did not match any user";
+					if (user === undefined) throw "mtid " + mtid + " did not match any user";
 					var typeid = data._typeid;
 					converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_segments', '_url', '_typeid', '_referer', '_totalsec'], function (ids) {
 						// increase revenue
 						var simpleprop = {};
 
-						if (typeid == 'purchase') {
-							if (user[ids._revenue] == undefined) user[ids._revenue] = 0;
+						if (typeid === 'purchase') {
+							if (user[ids._revenue] === undefined) user[ids._revenue] = 0;
 							simpleprop[ids._revenue] = user[ids._revenue] + data.amount;
 						}
 
-						if (typeid == 'pageview') {
+						if (typeid === 'pageview') {
 							// record campaign
 							if (utm_campaign) {
-								if (user[ids._firstcampaign] == undefined) {
+								if (user[ids._firstcampaign] === undefined) {
 									simpleprop[ids._firstcampaign] = utm_campaign;
 								}
-
 								simpleprop[ids._lastcampaign] = utm_campaign;
 								datax[ids._campaign] = utm_campaign;
 							}
 						}
 
 						// update user
-						if (Object.keys(simpleprop).length != 0)
+						if (Object.keys(simpleprop).length !== 0)
 							db.collection(collection).updateOne({_id: mtid}, {$set: simpleprop}, function (err, r) {
 								if (err) throw err;
 							});
@@ -120,7 +129,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 						delete arrayprop[ids._lastcampaign];
 						delete arrayprop[ids._totalsec];
 
-						if (Object.keys(arrayprop).length != 0)
+						if (Object.keys(arrayprop).length !== 0)
 							updateArrayBasedUserInfo(collection, mtid, user, arrayprop);
 					});
 				});
@@ -138,10 +147,10 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 				// append new element to the array or create one
 				var arr = [];
 				for (var p in datax) if (datax.hasOwnProperty(p)) {
-					if (user[p] != undefined) {
+					if (user[p] !== undefined) {
 						arr = user[p];
 					}
-					if (arr instanceof Array == false)
+					if (arr instanceof Array === false)
 						arr = [arr];
 
 					arr = arr.concat(datax[p]).sort();
@@ -225,7 +234,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		// user-based prop is not started with an underscore '_' character
 		var userex = {};
 		for (var p in user) if (user.hasOwnProperty(p))
-			if (p.startsWith('_') == false)
+			if (p.startsWith('_') === false)
 				userex[p] = user[p];
 		user = userex;
 
@@ -233,7 +242,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		converter.toIDs(['_isUser', 'userid', '_mtid'], function (ids) {
 			converter.toObject(user, function (userx) {
 				// check for case 4
-				if (userid == undefined) return updateUserInfo(themtid, userx, callback);
+				if (userid === undefined) return updateUserInfo(themtid, userx, callback);
 
 				var query = {};
 				query[ids._isUser] = true;
@@ -242,12 +251,12 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 					if (err) throw err;
 
 					// case 3 : user doesn't exist
-					if (r.value == null) return updateUserInfo(themtid, userx, callback);
+					if (r.value === null) return updateUserInfo(themtid, userx, callback);
 
 					// user exist
 					var ide_mtid = r.value._id;
 					// check for case 1
-					if (themtid == ide_mtid) return updateUserInfo(themtid, userx, callback);
+					if (themtid === ide_mtid) return updateUserInfo(themtid, userx, callback);
 
 					// case 2
 					// add to mapping collection
@@ -272,7 +281,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 					db.collection(collection).deleteOne({_id: themtid}, function () {
 					});
 
-					return updateUserInfo(ide_mtid, userx, callback)
+					return updateUserInfo(ide_mtid, userx, callback);
 				});
 			});
 		});
@@ -317,7 +326,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 
 				// update mtid equal id
 				for (var p in user) if (user.hasOwnProperty(p))
-					if (user[p] == 2910) {
+					if (user[p] === 2910) {
 						user[p] = mtid;
 						break;
 					}
@@ -337,6 +346,6 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 	this.setup = function (req, res, callback) {
 		me.setupRaw(req.params.appid, function (mtid) {
 			res.send(mtid);
-		})
+		});
 	};
 };
