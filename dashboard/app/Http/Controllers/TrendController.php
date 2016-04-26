@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
+use PhpSpec\Exception\Exception;
 use stdClass;
 
 //use function redirect;
@@ -106,7 +107,27 @@ class TrendController extends Controller
 				$queryurl .= '/' . $st . '/' . $et;
 			}
 
-			$outputs = MtHttp::get($queryurl);
+			try {
+				$outputs = MtHttp::get($queryurl);
+			}catch(\Exception $e){
+				$queryurl ='trend/query/' . $app_id ;
+				$trend = reset($trends);
+				$queryurl .= '/' .  $trend->_id;
+				if(isset($segid))
+				{
+					$queryurl .= '/' . $segid;
+				}
+				else
+				{
+					$queryurl .= '/_';
+				}
+
+				if(isset($st))
+				{
+					$queryurl .= '/' . $st . '/' . $et;
+				}
+				$outputs = MtHttp::get($queryurl);
+			}
 		} else {
 			$outputs = [];
 		}

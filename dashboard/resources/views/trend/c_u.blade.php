@@ -16,7 +16,7 @@
 							</div>
 							<div class="col-sm-6">
 								<input type="text" class="form-control " name="Trend[name]" required=""
-								       value="{{isset($trend->name) ? $trend->name: ""}}"/>
+												value="{{isset($trend->name) ? $trend->name: ""}}"/>
 								@if($errors->any())
 									<p class="errror">{{$errors->first('name')}}</p>
 								@endif
@@ -29,7 +29,7 @@
 							</div>
 							<div class="col-sm-6">
 								<input type="text" class="form-control " name="Trend[desc]"
-								       value="{{isset($trend->desc) ? $trend->desc: ""}}"/>
+												value="{{isset($trend->desc) ? $trend->desc: ""}}"/>
 							</div>
 						</div>
 
@@ -128,14 +128,14 @@
 		});
 		@foreach($actiontype->fields as $field)
 						op['{{$actiontype->codename}}'].push({
-			desc: "Sum of {{$field->pname}}",
-			param: "{{$field->pcode}}",
+			@if(isset($field->pname)) desc: "Sum of {{$field->pname}}", @endif
+							@if(isset($field->pcode)) param: "{{$field->pcode}}", @endif
 			operation: "sum"
 		});
 
 		op['{{$actiontype->codename}}'].push({
-			desc: "Average of {{$field->pname}}",
-			param: "{{$field->pcode}}",
+			@if(isset($field->pname))desc: "Average of {{$field->pname}}", @endif
+							@if(isset($field->pcode))param: "{{$field->pcode}}", @endif
 			operation: "avg"
 		});
 		@endforeach
@@ -148,7 +148,10 @@
 						@else
 						objects['{{$actiontype->codename}}'] = [];
 		@foreach($actiontype->fields as $field)
-						objects['{{$actiontype->codename}}'].push({'pcode': '{{$field->pcode}}', 'pname': '{{$field->pname}}'});
+						objects['{{$actiontype->codename}}'].push({
+			@if(isset($field->pcode))'pcode': '{{$field->pcode}}',@endif
+			@if(isset($field->pname))'pname': '{{$field->pname}}'@endif
+		});
 		@endforeach
 		@endif
 	@endforeach
@@ -172,7 +175,6 @@ actionChange($('#typeid').val());
 				$('#object').hide();
 			}
 
-
 			$('#meotrics').html('');
 			var selected_value = '';
 			var selected_key = '';
@@ -192,7 +194,6 @@ actionChange($('#typeid').val());
 			}
 			$('#meotrics').val(selected_key);
 			meotricsChange(selected_value.operation, selected_value.param);
-
 
 			return false;
 		}
