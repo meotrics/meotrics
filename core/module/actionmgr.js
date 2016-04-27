@@ -169,7 +169,8 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		var appid = req.params.appid;
 
 		me.saveRaw(appid, data, function (actionid) {
-			res.send(actionid);
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			res.end(actionid);
 			callback(actionid);
 		});
 	};
@@ -182,42 +183,41 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 	this.fixRaw = function (appid, actionid, data, callback) {
 		if (data._mtid) data._mtid = new mongodb.ObjectID(data._mtid);
 		var collection = prefix + appid;
-		converter.toObject(data, function (datax) {
-			//TODO : insert campaign here
 
-			db.collection(collection).updateOne({_id: actionid}, {$set: datax}, function (err, r) {
+		converter.toObject(data, function (datax) {
+			db.collection(collection).updateOne({_id: new mongodb.ObjectId(actionid)}, {$set: datax}, function (err, r) {
 				if (err) throw err;
 				callback();
-
 			});
 		});
 	};
 
 	this.fix = function (req, res, callback) {
-		var data = req.body;
+		var data = req.params;
 		var actionid = new mongodb.ObjectID(req.params.actionid);
 		me.fixRaw(req.params.appid, actionid, data, function () {
-			res.status(200).end();
+			res.writeHead(200);
+			res.end();
 			callback();
 		});
 	};
 
 	this.x = function (req, res, callback) {
-		var data = req.body;
-		var appid = req.params.appid;
-		var collection = prefix + appid;
-		var actionid = new mongodb.ObjectId(req.params.actionid);
+		var data = req.params;
+		var collection = prefix + req.appid;
+		var actionid = new mongodb.ObjectId(req.actionid);
 		converter.toIDs(['_ctime', 'totalsec'], function (ids) {
 			var projection = {};
 			projection[ids._ctime] = 1;
-			db.collection(collection).find({_id: actionid}, projection).limit(1).toArray(function (err, res) {
+			db.collection(collection).find({_id: actionid}, projection).limit(1).toArray(function (err, r) {
 				if (err) throw err;
-				if (res.length === 0) throw "not found pageview to close, actionid: " + actionid;
+				if (r.length === 0) throw "not found pageview to close, actionid: " + actionid;
 				var newaction = {};
-				newaction[ids.totalsec] = Math.round(new Date() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0 ) - res[0][ids._ctime];
+				newaction[ids.totalsec] = Math.round(new Date() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0 ) - r[0][ids._ctime];
 				db.collection(collection).updateOne({_id: actionid}, {$set: newaction}, function (err, r) {
 					if (err) throw err;
-					res.status(200).end();
+					res.writeHead(200);
+					res.end();
 					callback();
 				});
 			});
@@ -325,7 +325,8 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 	//  user: {[userid], name, email, age, birth, gender, ...}
 	this.identify = function (req, res, callback) {
 		me.identifyRaw(req.params.appid, req.body, function (mtid) {
-			res.send(mtid);
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			res.end(mtid);
 			callback(mtid);
 		});
 	};
@@ -367,7 +368,8 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 	// output: new mtid
 	this.setup = function (req, res, callback) {
 		me.setupRaw(req.params.appid, function (mtid) {
-			res.send(mtid);
+			res.writeHead(200, {'Content-Type': 'text/plain'});
+			res.end(mtid);
 		});
 	};
 };

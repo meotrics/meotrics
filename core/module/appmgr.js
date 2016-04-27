@@ -37,7 +37,7 @@
 					{pname: "Operating System", pcode: "_os"},
 					{pname: "City", pcode: "_city"},
 					{pname: "Referer", pcode: "_ref"},
-					{pname: "Screen Resolution", pcode: "_scrres"},
+					{pname: "Screen Resolution", pcode: "_scr"},
 					{pname: "Browser Version", pcode: "_browser"},
 					{pname: "OS Version", pcode: "_osver"},
 					{pname: "Location", pcode: "_location"}

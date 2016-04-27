@@ -137,7 +137,7 @@ function dataapiroot(httpapi, trycatch, req, res, qs, url) {
 				else if (action === 'info') httpapi.info(req, res);
 				else if (action === 'x') {
 					req.actionid = parts[4];
-					httpapi.fix(req, res);
+					httpapi.x(req, res);
 				}
 				else if (action === 'suggest') {
 					req.typeid = parts[4];

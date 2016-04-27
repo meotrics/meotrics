@@ -47,7 +47,7 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 			name: "Language", code: "_lang",
 			operators: [{name: "Equal", code: "eq"}]
 		}, {
-			name: "Screen Resolution", code: "_scrres",
+			name: "Screen Resolution", code: "_scr",
 			operators: [{name: "Equal", code: "eq"}]
 		}, {
 			name: "Referrer", code: "_ref",
