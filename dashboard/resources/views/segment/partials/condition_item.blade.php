@@ -34,6 +34,8 @@ $operators_default = [
 ];
 ?>
 
+
+
 <div class="condition-item row" data-name="condition-item" data-i-condition="{{$i_condition}}">
     <div class="col-sm-12" style="padding-top: 0; padding-bottom: 0">
         <div class="row">

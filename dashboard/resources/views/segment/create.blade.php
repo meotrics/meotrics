@@ -1,6 +1,43 @@
 @extends('../layout/master')
+@section('style')
+	<link rel="stylesheet" href="{{asset('/css/typehead.css')}}"/>
+	@endsection
 @section('script')
+	<script src="{{asset('/js/typehead.js')}}"></script>
 <script type="text/javascript">
+
+	function createSuggession(appid, typeid, field,  $dom)
+	{
+		var source = new Bloodhound({
+			datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+			queryTokenizer: Bloodhound.tokenizers.whitespace,
+			remote: {
+				url: '/api/' + appid + '/suggest/' + typeid +'/' + field +'/%QUERY',
+				wildcard: '%QUERY'
+			}
+		});
+
+		$dom.typeahead(null, {
+			name: 'best-pictures',
+			display: 'value',
+			source: source
+		});
+	}
+
+	var appid = "{{\Auth::user()->id}}";
+ <?php $i = 0; ?>
+	@foreach($conditions as $condition)
+
+	@if($condition->select_type == 'user')
+					createSuggession(appid,'user', "{{$condition->type}}", $('input[name="Segment[{{$i}}][value]"]'));
+@else
+
+
+					@endif
+
+					<?php $i++ ?>
+					@endforeach
+
     var conditions = [];
     var type_options = [];
     <?php

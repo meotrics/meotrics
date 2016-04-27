@@ -203,8 +203,17 @@ class SegmentController extends Controller
 			App::abort(404, 'Segment not found');
 		}
 	}
+	public function getHello()
+	{
+		return "hello";
+	}
 
-	public function postWrite(Request $request)
+	public function getSuggest($appid, $typeid, $field, $query){
+		$ret = MtHttp::get('suggest/' . $appid . '/' . $typeid . '/' . $field . '/' . $query);
+		return $ret;
+	}
+
+	public function postWrite()
 	{
 		if (isset($_POST['Segment']) && is_array($_POST['Segment']) && isset($_POST['name'])) {
 			$query = [];
