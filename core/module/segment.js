@@ -33,14 +33,14 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 		var col = db.collection(prefix + segment._appid);
 
 		// check the lock first
-		if (locksegment[segment._id.toString()] !== undefined) callback(outcollection);
+		if (locksegment[segment._id.toString()] !== undefined) return callback(outcollection);
 		locksegment[segment._id.toString()] = true;
 		getQuery(segment.condition, function (out) {
 			col.mapReduce(out.map, out.reduce, {
 				out: outcollection,
 				query: out.option,
-				finalize: out.finalize,
-				sort: {_mtid: 1}
+				finalize: out.finalize/*,
+				sort: {_mtid: 1}*/
 			}, function (err) {
 				if (err) throw err;
 				converter.toIDs(['_isUser'], function (ids) {
@@ -48,12 +48,9 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 					// update segment count
 					db.collection(outcollection).count({value: 1}, function (err, ret) {
 						if (err) throw err;
-						console.log(ret);
 						db.collection(prefix + 'segment').updateOne({'_id': new mongodb.ObjectId(segment._id)}, {$set: {count: ret}}, function (err, ret) {
 							if (err) throw err;
-
 						});
-
 					});
 
 					var matchquery = {};
@@ -114,8 +111,8 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 
 	// purpose: convert query in json to mongodb based query
 	function getQuery(json, callback) {
-		handleInput(json, function (r) {
-			queryFilter(r, function (r) {
+		handleInput(json, function (query) {
+			queryFilter(query, function (r) {
 				buildMapReduce(json, function (ret) {
 					ret.option = r;
 					callback(ret);
@@ -176,125 +173,53 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 	}
 
 	function queryFilter(object, callback) {
-		console.log(JSON.stringify(object));
-		var length = object.length;
-		var query = {};
-		if (length === 0) return callback({});
+		converter.toID('_isUser', function (isUser) {
+			var length = object.length;
+			if (length === 0) return callback({});
+			var query = {};
+			var queryuser = {};
 
-		query.$or = [];
-		let c = 0;
-		for (var i = 0; i < length; i += 2) c++;
-		for (i = 0; i < length; i += 2) {
-			conditionToQuery(object[i], function (r) {
-
-				query.$or.push(r);
-				c--;
-				if (c !== 0) return;
-				var hasUser = false;
-				for (var i = 0; i < length; i += 2) {
-					if (object[i].type === 'user') {
-						hasUser = true;
-						break;
+			let c = Math.ceil(length / 2);
+			for (var i = 0; i < length; i += 2) {
+				conditionToQuery(object[i], queryuser, function () {
+					c--;
+					if (c !== 0) return;
+					if (Object.keys(queryuser).length !== 0) {
+						queryuser[isUser] = true;
+						query.$or = [];
+						query.$or.push(queryuser);
+						var queryaction = {};
+						queryaction[isUser] = {$exists: false};
+						query.$or.push(queryaction);
+						callback(query);
 					}
-				}
-
-				console.log(JSON.stringify(query));
-
-				/*if (object.startTime !== undefined) {
-				 match[ids._ctime``] = {
-				 $gte: object.startTime
-				 };
-				 }
-
-				 if (object.endTime !== undefined) {
-				 if (match[ids._ctime] !== undefined) {
-				 match[ids._ctime]['$lte'] = object.endTime;
-				 } else {
-				 match[ids._ctime] = {
-				 $lte: object.endTime
-				 };
-				 }
-				 }*/
-
-				if (hasUser) return callback(query);
-
-				converter.toID('_isUser', function (r) {
-					var temp = {};
-					temp[r] = true;
-					query.$or.push(temp);
-					callback(query);
+					return callback(query);
 				});
-			});
-		}
+			}
+		});
 	}
 
-	function conditionToQuery(element, callback) {
-		var query = {};
+	function conditionToQuery(element, query, callback) {
 
-		if (element.conditions === undefined) {
-			converter.toID('_typeid', function (r) {
-				query[r] = element.type;
-				callback(query);
-			});
-			return;
-		}
-
-		var conditions = element.conditions;
-		var size = conditions.length;
-		/*var hasOr = false;
-
-		 for (var i = 3; i < size; i += 4) {
-		 if (conditions[i] === 'or') {
-		 hasOr = true;
-		 break;
-		 }
-		 }
-		 if (hasOr) {
-		 query.$or = [];
-		 for (i = 0; i < size; i += 4) {
-		 if ((conditions[i + 3] === 'or') || (i + 3 === size)) {
-		 query.$or.push(translateOperator(conditions, i));
-		 } else {
-		 for (var j = i + 7; j < size; j += 4) {
-		 if (conditions[j] === 'or') {
-		 break;
-		 }
-		 }
-		 var andQuery = {
-		 '$and': []
-		 };
-		 for (i; i < j; i += 4) {
-		 andQuery.$and.push(translateOperator(conditions, i));
-		 }
-		 query.$or.push(andQuery);
-		 }
-		 }
-		 } else {*/
-		var qrs = [];
-		query = {};
-		for (var i = 0; i < size; i += 4) {
-			var returnValue = translateOperator(conditions, i);
-			var key = Object.keys(returnValue)[0];
-			qrs.push(returnValue[key]);
-		}
-		/*}*/
+		//if (element.conditions === undefined) {
+		//	converter.toID('_typeid', function (r) {
+		//		query[r] = element.type;
+		//		callback(query);
+		//	});
+		//	return;
+		//}
 
 		if (element.type === 'user') {
-			converter.toID('_isUser', function (isUser) {
-				var isUcon = {};
-				isUcon[isUser] = true;
-				qrs.push(isUcon);
-				callback({$and:qrs});
-			});
-		} else {
-			converter.toID('_typeid', function (typeid) {
-			var typecondition = {};
-				typecondition[typeid] = element.type;
-				qrs.push(typecondition);
-				callback({$and:qrs});
-			});
+			var conditions = element.conditions;
+			var size = conditions.length;
+			for (var i = 0; i < size; i += 4) {
+				var returnValue = translateOperator(conditions, i);
+				var key = Object.keys(returnValue)[0];
+				query[conditions[i]] = returnValue[key];
+			}
+			return callback();
 		}
-
+		callback();
 	}
 
 //really, put conditions[i+2] to a variable, its much easier to read
