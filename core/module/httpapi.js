@@ -146,7 +146,7 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 	};
 	
 	this.suggest = function(req, res){
-		valuemgr.suggest(req.appid, req.typeid, req.field, req.qr, function(results){
+		valuemgr.suggest(req.appid +"", req.typeid+"", req.field+"", req.qr+"", function(results){
 			res.setHeader('Content-Type', 'application/json');
 			res.end(JSON.stringify(results));
 		});
