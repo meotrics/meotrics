@@ -12,7 +12,7 @@ $i_condition = isset($i_condition) ? $i_condition : 'i_condition_replace';
 $i_condition_sub = isset($i_condition_sub) ? $i_condition_sub : 'i_condition_sub_replace';
 $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators();
 ?>
-<div class="row" data-name="condition-sub-item">
+<div class="row" data-name="condition-sub-item" data-i-condition-sub="{{ $i_condition_sub }}">
 	<div class="col-md-2 col-md-offset-1">
 		<select class="form-control "
 		        name="Segment[{{ $i_condition }}][conditions][{{ $i_condition_sub }}][cs_field]"
@@ -27,7 +27,9 @@ $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators();
 		</select>
 	</div>
 	<div class="col-md-2">
-		<select class="form-control" name="Segment[{{ $i_condition}}][conditions][{{$i_condition_sub}}][cs_operator]">
+		<select class="form-control" 
+                        name="Segment[{{ $i_condition}}][conditions][{{$i_condition_sub}}][cs_operator]"
+                        onchange="operatorSubChange(this)">
 			@foreach ($condtion_sub_operators as $cso_key => $cso_value)
 				<option value="{{ $cso_key }}" <?= $c_condition->cs_operator == $cso_key ? 'selected=""' : '' ?>>
 					{{ $cso_value}}

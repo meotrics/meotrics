@@ -77,14 +77,15 @@ $operators_default = [
                             <?php
                             foreach ($condition->fields as $c_field):
                                 ?>
-                        <option value="<?= $c_field->pcode ?>"><?= $c_field->pname ?></option>
+                        <option value="<?= $c_field->pcode ?>" 
+                                <?= $c_field->pcode == $condition->field ? 'selected=""' : '' ?>><?= $c_field->pname ?></option>
                         <?php
                     endforeach;
                     ?>
                 </select>
             </div>
             <div class="col-md-2">
-                <select class="form-control" id="" name="Segment[<?= $i_condition ?>][operator]">
+                <select class="form-control" id="" name="Segment[<?= $i_condition ?>][operator]" onchange="operatorChange(this)">
                     <?php
                     if (property_exists($condition, 'operators')) {
                         $operators = $condition->operators ? $condition->operators : $operators_default;

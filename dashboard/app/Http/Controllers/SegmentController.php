@@ -235,7 +235,7 @@ class SegmentController extends Controller
 			$validator->sometimes('conditions', 'required', function ($input) use ($data_post) {
 				$result = false;
 				foreach ($data_post as $condition) {
-					if (!isset($condition['value']) || !$condition['value']) {
+					if (!isset($condition['value'])) {
 						$result = true;
 					}
 				}
@@ -249,22 +249,22 @@ class SegmentController extends Controller
 				'conditions' => [],
 			];
 			foreach ($data_post as $data) {
-				if (isset($data['select_type']) && $data['select_type'] == 'user' && isset($data['value']) && $data['value']) {
+				if (isset($data['select_type']) && $data['select_type'] == 'user' && isset($data['value'])) {
 					$user_conditions = [
 						isset($data['type']) ? $data['type'] : '',
 						isset($data['operator']) ? $data['operator'] : '',
-						isset($data['value']) ? ((int)$data['value'] ? (int)$data['value'] : $data['value']) : '',
+						isset($data['value']) ? (is_numeric($data['value']) ? (int)$data['value'] : $data['value']) : '',
 						'and',
 					];
 					$user_query->conditions = array_merge($user_query->conditions, $user_conditions);
-				} elseif (isset($data['select_type']) && $data['select_type'] != 'user' && isset($data['value']) && $data['value']) {
+				} elseif (isset($data['select_type']) && $data['select_type'] != 'user' && isset($data['value'])) {
 					$conditions = [];
 					if (isset($data['conditions']) && is_array($data['conditions'])) {
 						foreach ($data['conditions'] as $c_value) {
 							if (isset($c_value['cs_value']) && $c_value['cs_value']) {
 								$conditions[] = isset($c_value['cs_field']) ? $c_value['cs_field'] : '';
 								$conditions[] = isset($c_value['cs_operator']) ? $c_value['cs_operator'] : '';
-								$conditions[] = isset($c_value['cs_value']) ? ((int)$c_value['cs_value'] ? (int)$c_value['cs_value'] : $c_value['cs_value']) : '';
+								$conditions[] = isset($c_value['cs_value']) ? (is_numeric($c_value['cs_value']) ? (int)$c_value['cs_value'] : $c_value['cs_value']) : '';
 								$conditions[] = "and";
 							}
 						}
@@ -275,7 +275,7 @@ class SegmentController extends Controller
 						'f' => isset($data['f']) ? $data['f'] : '',
 						'field' => isset($data['field']) ? $data['field'] : '',
 						'operator' => isset($data['operator']) ? $data['operator'] : '',
-						'value' => isset($data['value']) ? ((int)$data['value'] ? (int)$data['value'] : $data['value']) : '',
+						'value' => isset($data['value']) ? (is_numeric($data['value']) ? (int)$data['value'] : $data['value']) : '',
 						'conditions' => $conditions,
 					];
 					$query[] = 'and';
