@@ -1,8 +1,9 @@
+"use strict";
 exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
-	var code = undefined;
+	var code;
 	function loadCode(appid, actionid, callback) {
 		// cache mtcode in code for minimize disk usage, lazy load
-		if (code == undefined)
+		if (code === undefined)
 			fs.readFile(codepath,'ascii', function (err, data) {
 				code = data;
 				replaceParam();
@@ -23,7 +24,7 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 	function trackBasic(request) {
 		var useragent = request.headers['user-agent'];
 		var r = ua.parse(useragent);
-		var url = request.params._url;
+		var url = request.params._url || "";
 
 		var md = new MD(useragent);
 		var devicetype;
@@ -34,7 +35,7 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 		else
 			devicetype = 'desktop';
 
-		if (url == null || url == "" || url.startsWith(request.headers['referer']) === false) url = request.headers['referer'];
+		if (url === null || url === "" || url.startsWith(request.headers.referer) === false) url = request.headers.referer;
 		var res = {
 			_url: url,
 			_ref: request.params._ref,
@@ -51,14 +52,14 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 			_devicetype: devicetype
 		};
 		for (var i in request.params) if (request.params.hasOwnProperty(i))
-			if (i.startsWith('_') == false)
+			if (i.startsWith('_') === false)
 				res[i] = request.params[i];
 		return res;
 	}
 
 	function getMtid(req, appid, res, callback) {
 		var mtid = getCookie(req, "mtid");
-		if(mtid == undefined)
+		if(mtid === undefined)
 		{
 			return actionmgr.setupRaw(appid, function (mtid) {
 				setCookie(res, "mtid", mtid, 'api/' + appid);
@@ -106,7 +107,7 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 		getMtid(req, appid, res, function (mtid) {
 			var data = {};
 			for (var i in req.params) if (req.params.hasOwnProperty(i)) {
-				if (i.startsWith('_') == false) data[i] = req.params[i];
+				if (i.startsWith('_') === false) data[i] = req.params[i];
 			}
 
 			actionmgr.identifyRaw(appid, {mtid: mtid, user: data}, function (mtid) {

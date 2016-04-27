@@ -50,7 +50,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		data._mtid = mtid;
 
 		// extract campaign
-		if (data._url === null) data._url = "";
+		if (data._url === null || data._url === undefined) data._url = "";
 		var query = url.parse(data._url, true).query;
 		var utm_source = query.utm_source;
 		var utm_campaign = query.utm_campaign;
