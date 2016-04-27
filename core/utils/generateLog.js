@@ -87,6 +87,11 @@ function generatePageView(ids, codename) {
 	page[ids._utm_term] = generateCampainTerm();
 	page[ids._utm_medium] = generateCampaignMedium();
 	page[ids._utm_content] = generateCampaignContent();
+
+	page[ids._browser] = browsers[generateNumber(0, 6)];
+	page[ids._os] = os[generateNumber(0, 6)];
+	page[ids._device] = devices[generateNumber(0, 6)];
+
 	return page;
 }
 
@@ -113,11 +118,18 @@ function generatePurchase(ids, codename) {
 	purchase[ids._utm_term] = generateCampainTerm();
 	purchase[ids._utm_medium] = generateCampaignMedium();
 	purchase[ids._utm_content] = generateCampaignContent();
+	purchase[ids._browser] = browsers[generateNumber(0, 6)];
+	purchase[ids._os] = os[generateNumber(0, 6)];
+	purchase[ids._device] = devices[generateNumber(0, 6)];
+	purchase[ids._lang] = generateNumber(1, 2) === 1 ? 'en' : 'vn';
+	purchase[ids._city] = generateNumber(1, 2) === 1 ? 'Hồ Chí Minh' : 'Hà Nội';
 
 	purchase[ids.paymentype] = generateNumber(1, 3);
 	return purchase;
 }
-
+var os = [["window"], ["ubuntu"], ["mac"], ["ubuntu", "window"], ["mac", "ubuntu"], ["mac", "window"], ["mac", "ubuntu", "window"]];
+var devices = [["phone"], ["desktop"], ["tablet"], ["phone", "desktop"], ["tablet", "phone"], ["tablet", "desktop"], ["tablet", "phone", "desktop"]];
+var browsers = [["chrome"], ["firefox"], ["ie"], ["chrome", "firefox"], ["ie", "chrome"], ["ie", "firefox"], ["chrome", "ie", "firefox"]];
 var category = [
 	{
 		name: 'phone', products: [
@@ -316,7 +328,7 @@ function generateName() {
 function generateDB(appid, actiontype, converter, url, n, collection, typeid, valuemgr, callback) {
 	var count = 0;
 	if (actiontype === 'purchase') {
-		converter.toIDs(['_utm_campaign', '_utm_source', '_utm_medium', '_utm_content', '_utm_term','_typeid', '_ctime', 'amount', 'pname', 'cname', 'paymentype', '_mtid', 'cid', 'pid', 'pname', 'cname', 'quantity', 'price', '_segments'], function (ids) {
+		converter.toIDs(['_os', '_browser', 'device', '_utm_campaign', '_utm_source', '_utm_medium', '_utm_content', '_utm_term','_typeid', '_ctime', 'amount', 'pname', 'cname', 'paymentype', '_mtid', 'cid', 'pid', 'pname', 'cname', 'quantity', 'price', '_segments'], function (ids) {
 			for (var i = 0; i < n; i++) {
 				count++;
 				var r = generatePurchase(ids, typeid);
@@ -336,7 +348,7 @@ function generateDB(appid, actiontype, converter, url, n, collection, typeid, va
 			}
 		});
 	} else {
-		converter.toIDs(['_utm_campaign', '_utm_source', '_utm_term','_utm_content','_utm_medium','_typeid', '_url', 'camid', '_ctime', '_mtid', '_segments'], function (ids) {
+		converter.toIDs(['_os', '_browser', 'device','_utm_campaign', '_utm_source', '_utm_term','_utm_content','_utm_medium','_typeid', '_url', 'camid', '_ctime', '_mtid', '_segments'], function (ids) {
 			for (var i = 0; i < n; i++) {
 				count++;
 				var r = generatePageView(ids, typeid);
