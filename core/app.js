@@ -1,16 +1,16 @@
+"use strict";
 function route(app, com) {
-
 	//APP------------------------------------------------------------------------
 	//set up an new app
 	app.post('/app', function (req, res) {
 
 	});
 	// CRUD actiontype
-	app.postEx('/actiontype/:appid', com.typeCRUD.create); // create an actiontype
-	app.getEx('/actiontype/:appid', com.typeCRUD.list);	// get all actiontypes
-	app.getEx('/actiontype/:appid/:id', com.typeCRUD.match); // get an actiontype
-	app.putEx('/actiontype/:appid/:id', com.typeCRUD.update); // update an actiontype
-	app.deleteEx('/actiontype/:appid/:id', com.typeCRUD.delete); // delete an actiontype
+	app.postEx('/actiontype/:appid', com.typemgr.create); // create an actiontype
+	app.getEx('/actiontype/:appid', com.typemgr.list);	// get all actiontypes
+	app.getEx('/actiontype/:appid/:id', com.typemgr.match); // get an actiontype
+	app.putEx('/actiontype/:appid/:id', com.typemgr.update); // update an actiontype
+	app.deleteEx('/actiontype/:appid/:id', com.typemgr.delete); // delete an actiontype
 
 	// CRUD trend
 	app.postEx('/trend/:appid', com.trendCRUD.create);
@@ -81,7 +81,7 @@ function route(app, com) {
 	app.get('/app/init/:appid', function (req, res) {
 		com.appmgr.initApp(req.params.appid, function () {
 			res.status(200).end();
-		})
+		});
 	});
 
 	// count number of action in app
@@ -98,9 +98,8 @@ function route(app, com) {
 			res.status(200).end();
 		});
 	});
-
-
 }
+
 function buildconnstr(config) {
 	var host = config.get("mongod.host") || "127.0.0.1";
 	var port = config.get("mongod.port") || 27017;
@@ -111,7 +110,7 @@ function buildconnstr(config) {
 function dataapiroot(httpapi, trycatch, req, res, qs, url) {
 	trycatch(function () {
 		var url_parts = url.parse(req.url, true);
-		if (req.method == 'POST') {
+		if (req.method === 'POST') {
 			var body = '';
 			req.on('data', function (data) {
 				body += data;
@@ -121,22 +120,28 @@ function dataapiroot(httpapi, trycatch, req, res, qs, url) {
 				handle(req, res, url_parts.pathname);
 			});
 		}
-		else if (req.method == 'GET') {
+		else if (req.method === 'GET') {
 			req.params = url_parts.query;
 			handle(req, res, url_parts.pathname);
 		}
 
 		function handle(req, res, path) {
 			var parts = path.split('/');
-			if (parts[1] == 'api') {
+			if (parts[1] === 'api') {
 				res.statusCode = 200;
 				req.appid = parts[2];
 				var action = parts[3];
-				if (action == 'track') httpapi.track(req, res);
-				else if (action == 'code.js') httpapi.code(req, res);
-				else if (action == 'clear') httpapi.clear(req, res);
-				else if (action == 'info') httpapi.info(req, res);
-				else if (action == 'fix') {
+				if (action === 'track') httpapi.track(req, res);
+				else if (action === 'code.js') httpapi.code(req, res);
+				else if (action === 'clear') httpapi.clear(req, res);
+				else if (action === 'info') httpapi.info(req, res);
+				else if (action === 'suggest') {
+					req.typeid = parts[4];
+					req.field = parts[5];
+					req.qr = parts[6];
+					httpapi.suggest(req, res);
+				}
+				else if (action === 'fix') {
 					req.actionid = parts[4];
 					httpapi.fix(req, res);
 				} else {
@@ -162,7 +167,7 @@ var config = require('config');
 //<<<<<<<<<<<<THE ENTRY POINT
 
 //Using connection pool. Initialize mongodb once
-mongodb.MongoClient.connect(buildconnstr(config),{ server: {auto_reconnect: true, poolSize : 40}}, function (err, db) {
+mongodb.MongoClient.connect(buildconnstr(config), {server: {auto_reconnect: true, poolSize: 40}}, function (err, db) {
 	if (err) throw err;
 
 	//set up new express application
@@ -187,19 +192,22 @@ mongodb.MongoClient.connect(buildconnstr(config),{ server: {auto_reconnect: true
 	var PropMgr = require('./module/propmgr.js').PropMgr;
 	var AppMgr = require('./module/appmgr.js').AppMgr;
 	var SegMgr = require('./module/segment.js').SegmentExr;
+	var TypeMgr = require('./module/typemgr.js').TypeMgr;
+	var ValueMgr = require('./module/valuemgr.js').ValueMgr;
 
 	var component = {};
 	component.trendMgr = new TrendMgr(db, mongodb, async, converter, prefix, "trend");
 	component.actionMgr = new ActionMgr(db, mongodb, async, converter, prefix, "mapping");
 	component.propmgr = new PropMgr();
 	component.typeCRUD = new CRUD(db, mongodb, async, converter, prefix, "actiontype");
+	component.typemgr = new TypeMgr(db, mongodb, converter, async, prefix, component.typeCRUD, "actiontype");
 	component.trendCRUD = new CRUD(db, mongodb, async, converter, prefix, "trend");
 	component.segCRUD = new CRUD(db, mongodb, async, converter, prefix, "segment");
-	component.appmgr = new AppMgr(db, mongodb, async, converter, prefix, component.typeCRUD, component.segCRUD, component.trendCRUD);
+	component.appmgr = new AppMgr(db, converter, prefix, component.typeCRUD, component.segCRUD, component.trendCRUD);
 	component.propCRUD = new CRUD(db, mongodb, async, converter, prefix, "userprop");
 	component.camCRUD = new CRUD(db, mongodb, async, converter, prefix, "campaign");
 	component.segMgr = new SegMgr(db, mongodb, async, converter, prefix);
-
+	component.valuemgr = new ValueMgr(db, prefix);
 	//routing http
 	route(app, component);
 
@@ -216,19 +224,16 @@ mongodb.MongoClient.connect(buildconnstr(config),{ server: {auto_reconnect: true
 	var httpport = config.get('apiserver.port') || 1711;
 
 	var HttpApi = require('./module/httpapi.js').HttpApi;
-	var httpapi = new HttpApi(config.get('apiserver.codepath'), component.actionMgr, fs, ua, MD);
+	var httpapi = new HttpApi(config.get('apiserver.codepath'), component.actionMgr, fs, ua, MD, component.valuemgr);
 
 	var qs = require('querystring');
 	var url = require('url');
 
 	var server = http.createServer(function (req, res) {
-		dataapiroot(httpapi, trycatch, req, res, qs, url)
+		dataapiroot(httpapi, trycatch, req, res, qs, url);
 	});
 
 	server.listen(httpport, function () {
 		console.log("HTTP API SERVER is running at port " + httpport);
 	});
 });
-
-
-

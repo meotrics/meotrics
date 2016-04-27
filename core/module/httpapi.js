@@ -1,4 +1,4 @@
-exports.HttpApi = function (codepath, actionmgr, fs, ua, MD) {
+exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 	var code = undefined;
 	function loadCode(appid, actionid, callback) {
 		// cache mtcode in code for minimize disk usage, lazy load
@@ -142,6 +142,13 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD) {
 			data._mtid = mtid;
 			actionmgr.fixRaw(appid, actionid, data, function () {
 			});
+		});
+	};
+	
+	this.suggest = function(req, res){
+		valuemgr.suggest(req.appid, req.typeid, req.field, req.qr, function(results){
+			res.setHeader('Content-Type', 'application/json');
+			res.end(JSON.stringify(results));
 		});
 	};
 

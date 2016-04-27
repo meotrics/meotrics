@@ -18,7 +18,7 @@ exports.ValueMgr = function (db, prefix) {
 			typeid: (typeid + "").toLowerCase(),
 			field: (field + "").toLowerCase(),
 			value: new RegExp(regesc(query), "i")
-		}, {value: 1}).limit(10).toArray(function (err, ret) {
+		}, {value: 1, _id: 0}).limit(10).toArray(function (err, ret) {
 			if (err) throw err;
 			callback(ret);
 		});
