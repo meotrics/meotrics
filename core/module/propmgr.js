@@ -30,14 +30,14 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 			name: "Device Type", code: "devicetype",
 			operators: [{name: "Equal", code: "eq"}]
 		}, {
-			name: "Operating System", code: "_osid",
+			name: "Operating System", code: "_os",
 			operators: [{name: "Equal", code: "eq"},
 				{name: "Contain", code: "con"},
 				{name: "Start with", code: "sw"},
 				{name: "End with", code: "ew"},
 				{name: "Not contain", code: "ncon"}]
 		}, {
-			name: "Browser", code: "_browserid",
+			name: "Browser", code: "_browser",
 			operators: [{name: "Equal", code: "eq"},
 				{name: "Contain", code: "con"},
 				{name: "Start with", code: "sw"},
