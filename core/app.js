@@ -135,6 +135,10 @@ function dataapiroot(httpapi, trycatch, req, res, qs, url) {
 				else if (action === 'code.js') httpapi.code(req, res);
 				else if (action === 'clear') httpapi.clear(req, res);
 				else if (action === 'info') httpapi.info(req, res);
+				else if (action === 'x') {
+					req.actionid = parts[4];
+					httpapi.fix(req, res);
+				}
 				else if (action === 'suggest') {
 					req.typeid = parts[4];
 					req.field = parts[5];

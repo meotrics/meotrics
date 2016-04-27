@@ -120,6 +120,10 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 		});
 	};
 
+	this.x = function(req,res){
+		actionmgr.x(req, res, function(){});
+	};
+
 	function getCookie(req, name) {
 		var list = {}, rc = req.headers.cookie;
 		rc && rc.split(';').forEach(function (cookie) {

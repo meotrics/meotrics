@@ -61,7 +61,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		data._segments = [];
 
 		// correct timming
-		data._ctime = Math.round(new Date() / 1000) + (parseInt(data._deltat) ? parseInt(data._deltat) : 0);
+		data._ctime = Math.round(new Date() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0);
 		delete data._deltat;
 
 		// retrive real mtid because user can still use old mtid
@@ -69,11 +69,11 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 			if (err) throw err;
 			if (r.length !== 0) mtid = r[0].idemtid;
 
-			if(data._utm_source === undefined) data._utm_source = utm_source;
-			if(data._utm_campaign === undefined) data._utm_campaign = utm_campaign;
-			if(data._utm_term === undefined) data._utm_term = utm_term;
-			if(data._utm_content === undefined) data._utm_content = utm_content;
-			if(data._utm_medium === undefined) data._utm_medium = utm_medium;
+			if (data._utm_source === undefined) data._utm_source = utm_source;
+			if (data._utm_campaign === undefined) data._utm_campaign = utm_campaign;
+			if (data._utm_term === undefined) data._utm_term = utm_term;
+			if (data._utm_content === undefined) data._utm_content = utm_content;
+			if (data._utm_medium === undefined) data._utm_medium = utm_medium;
 			converter.toObject(data, function (datax) {
 				db.collection(collection).insertOne(datax, function (err, r) {
 					if (err) throw err;
@@ -185,7 +185,7 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		converter.toObject(data, function (datax) {
 			//TODO : insert campaign here
 
-			db.collection(collection).updateOne({_id: actionid}, {"$set": datax}, function (err, r) {
+			db.collection(collection).updateOne({_id: actionid}, {$set: datax}, function (err, r) {
 				if (err) throw err;
 				callback();
 
@@ -199,6 +199,28 @@ exports.ActionMgr = function (db, mongodb, async, converter, prefix, mapping) {
 		me.fixRaw(req.params.appid, actionid, data, function () {
 			res.status(200).end();
 			callback();
+		});
+	};
+
+	this.x = function (req, res, callback) {
+		var data = req.body;
+		var appid = req.params.appid;
+		var collection = prefix + appid;
+		var actionid = new mongodb.ObjectId(req.params.actionid);
+		converter.toIDs(['_ctime', 'totalsec'], function (ids) {
+			var projection = {};
+			projection[ids._ctime] = 1;
+			db.collection(collection).find({_id: actionid}, projection).limit(1).toArray(function (err, res) {
+				if (err) throw err;
+				if (res.length === 0) throw "not found pageview to close, actionid: " + actionid;
+				var newaction = {};
+				newaction[ids.totalsec] = Math.round(new Date() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0 ) - res[0][ids._ctime];
+				db.collection(collection).updateOne({_id: actionid}, {$set: newaction}, function (err, r) {
+					if (err) throw err;
+					res.status(200).end();
+					callback();
+				});
+			});
 		});
 	};
 
