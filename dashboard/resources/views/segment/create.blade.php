@@ -482,11 +482,7 @@
         if(condition_item.length && container_sub_item.length){
             var i_condition = condition_item.attr('data-i-condition');
             var i_sub_condition = container_sub_item.attr('data-i-condition-sub');
-            console.log(i_condition);
-            console.log(i_sub_condition);
             if(container_sub_item.find('select[name="Segment['+i_condition+'][conditions]['+i_sub_condition+'][cs_operator]"]').val() == 'eq'){
-                console.log(condition_item.find('select[name="Segment['+i_condition+'][type]"]').val());
-                console.log(container_sub_item.find('select[name="Segment['+i_condition+'][conditions]['+i_sub_condition+'][cs_field]"]').val());
                 createSuggession(appid, condition_item.find('select[name="Segment['+i_condition+'][type]"]').val(), 
                     container_sub_item.find('select[name="Segment['+i_condition+'][conditions]['+i_sub_condition+'][cs_field]"]').val(), 
                    $('input[name="Segment['+i_condition+'][conditions]['+i_sub_condition+'][cs_value]"]'));
