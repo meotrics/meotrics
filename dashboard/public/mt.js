@@ -1,5 +1,8 @@
 //THIS FILE IS CALLED AFTER MT.CODE IS CALLED
 (function () {
+	window.addEventListener("beforeunload", function (e) {
+	ajax('x/$ACTIONID$');
+	});
 
 	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document;
 
