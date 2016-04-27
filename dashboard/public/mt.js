@@ -1,7 +1,8 @@
 //THIS FILE IS CALLED AFTER MT.CODE IS CALLED
 (function () {
+	var actionid = "$ACTIONID$";
 	window.addEventListener("beforeunload", function (e) {
-	ajax('x/$ACTIONID$');
+	ajax('x/' + actionid);
 	});
 
 	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document;
@@ -63,6 +64,6 @@
 		mt[rq[0]](rq[1], rq[2], rq[3], cleanRequest2);
 	}
 
-	ajax('fix/$ACTIONID$', addVisitorPlatform({}));//update the pageview first
+	ajax('fix/' + actionid, addVisitorPlatform({}));//update the pageview first
 	cleanRequest();// excute delayed request in queue
 })();
