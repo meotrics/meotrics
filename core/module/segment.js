@@ -1,5 +1,6 @@
 "use strict";
 exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
+	const regesc = require('escape-string-regexp');
 	var locksegment = [];
 	var me = this,
 			SegRet = require('./segmentresult.js').SegmentResult,
@@ -27,6 +28,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 
 		if (callback === undefined) callback = function () {
 		};
+
 		var outcollection = prefix + "segment" + segment._id.toString();
 		var col = db.collection(prefix + segment._appid);
 
@@ -44,7 +46,6 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 				converter.toIDs(['_isUser'], function (ids) {
 
 					// update segment count
-
 					db.collection(outcollection).count({value: 1}, function (err, ret) {
 						if (err) throw err;
 						console.log(ret);
@@ -111,6 +112,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 		});
 	};
 
+	// purpose: convert query in json to mongodb based query
 	function getQuery(json, callback) {
 		handleInput(json, function (r) {
 			queryFilter(r, function (r) {
@@ -174,6 +176,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 	}
 
 	function queryFilter(object, callback) {
+		console.log(JSON.stringify(object));
 		var length = object.length;
 		var query = {};
 		if (length === 0) return callback({});
@@ -181,8 +184,9 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 		query.$or = [];
 		let c = 0;
 		for (var i = 0; i < length; i += 2) c++;
-		for ( i = 0; i < length; i += 2) {
+		for (i = 0; i < length; i += 2) {
 			conditionToQuery(object[i], function (r) {
+
 				query.$or.push(r);
 				c--;
 				if (c !== 0) return;
@@ -237,69 +241,57 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 
 		var conditions = element.conditions;
 		var size = conditions.length;
-		var hasOr = false;
+		/*var hasOr = false;
 
-		for (var i = 3; i < size; i += 4) {
-			if (conditions[i] === 'or') {
-				hasOr = true;
-				break;
-			}
+		 for (var i = 3; i < size; i += 4) {
+		 if (conditions[i] === 'or') {
+		 hasOr = true;
+		 break;
+		 }
+		 }
+		 if (hasOr) {
+		 query.$or = [];
+		 for (i = 0; i < size; i += 4) {
+		 if ((conditions[i + 3] === 'or') || (i + 3 === size)) {
+		 query.$or.push(translateOperator(conditions, i));
+		 } else {
+		 for (var j = i + 7; j < size; j += 4) {
+		 if (conditions[j] === 'or') {
+		 break;
+		 }
+		 }
+		 var andQuery = {
+		 '$and': []
+		 };
+		 for (i; i < j; i += 4) {
+		 andQuery.$and.push(translateOperator(conditions, i));
+		 }
+		 query.$or.push(andQuery);
+		 }
+		 }
+		 } else {*/
+		var qrs = [];
+		query = {};
+		for (var i = 0; i < size; i += 4) {
+			var returnValue = translateOperator(conditions, i);
+			var key = Object.keys(returnValue)[0];
+			qrs.push(returnValue[key]);
 		}
-		if (hasOr) {
-			query.$or = [];
-			for (i = 0; i < size; i += 4) {
-				if ((conditions[i + 3] === 'or') || (i + 3 === size)) {
-					query.$or.push(translateOperator(conditions, i));
-				} else {
-					for (var j = i + 7; j < size; j += 4) {
-						if (conditions[j] === 'or') {
-							break;
-						}
-					}
-					var andQuery = {
-						'$and': []
-					};
-					for (i; i < j; i += 4) {
-						andQuery.$and.push(translateOperator(conditions, i));
-					}
-					query.$or.push(andQuery);
-				}
-			}
-		} else {
-			query = {};
-			for (i = 0; i < size; i += 4) {
-				var returnValue = translateOperator(conditions, i);
-				var key = Object.keys(returnValue)[0];
-				query[key] = returnValue[key];
-			}
-		}
+		/*}*/
 
 		if (element.type === 'user') {
-			converter.toID('_isUser', function (r) {
-				console.log(query);
-				if (query.$or !== undefined) {
-					var temp = {};
-					temp[r] = true;
-					query = {
-						"$and": [temp, query]
-					};
-				} else {
-					query[r] = true;
-				}
-				callback(query);
+			converter.toID('_isUser', function (isUser) {
+				var isUcon = {};
+				isUcon[isUser] = true;
+				qrs.push(isUcon);
+				callback({$and:qrs});
 			});
 		} else {
-			converter.toID('_typeid', function (r) {
-				if (query.$or !== undefined) {
-					var temp = {};
-					temp[r] = element.type;
-					query = {
-						'$and': [temp, query]
-					};
-				} else {
-					query[r] = element.type;
-				}
-				callback(query);
+			converter.toID('_typeid', function (typeid) {
+			var typecondition = {};
+				typecondition[typeid] = element.type;
+				qrs.push(typecondition);
+				callback({$and:qrs});
 			});
 		}
 
@@ -344,17 +336,17 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 				break;
 			case 'ncon':
 				query[conditions[i]] = {
-					$regex: "^((?!" + conditions[i + 2] + ").)*$/"
+					$regex: "^((?!" + regesc(conditions[i + 2]) + ").)*$/"
 				};
 				break;
 			case 'sw':
 				query[conditions[i]] = {
-					$regex: '^' + conditions[i + 2]
+					$regex: '^' + regesc(conditions[i + 2])
 				};
 				break;
 			case 'ew':
 				query[conditions[i]] = {
-					$regex: conditions[i + 2] + '$'
+					$regex: regesc(conditions[i + 2]) + '$'
 				};
 				break;
 		}
@@ -426,7 +418,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 //param: query=see testJson
 	function buildMapReduce(query, callback) {
 		var mapfunccode = "";
-		var reducecondcode = "";
+		//var reducecondcode = "";
 		var reduceinitcode = "";
 		var reduceaggcode = "";
 		var finalizecode = "";
