@@ -12,6 +12,26 @@ exports.Dashboard = function (db, mongodb, converter, prefix, delaysec) {
 		//
 		function generateDashboard(gcallback) {
 
+			converter.toIDs(["_isUser", "_mtid"], function (ids) {
+
+
+//1 number of today visitor
+				var todayvismatch = {};
+				todayvismatch[ids._isUser] = {$exists: false};
+
+				var pipelines = [{$match: todayvismatch}, {$group: {_id: "$" + ids._mtid}}, {
+					$group: {
+						_id: null,
+						count: {$sum: 1}
+					}
+				}];
+				db.collection().aggregate(pipelines, function (err, res) {
+					if (err) throw err;
+					console.log(res);
+					
+					gcallback();
+				});
+			});
 		}
 
 		db.collection(prefix + "dashboard").find({appid: appid}).limit(1).toArray(function (err, res) {
