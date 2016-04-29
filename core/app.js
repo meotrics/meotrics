@@ -84,12 +84,12 @@ function route(app, com) {
 		});
 	});
 
-	app.get('/dashboard/:appid', function(req, res){
+	app.getEx('/dashboard/:appid', function(req, res){
 		com.dashboard.getDashboard(req.params.appid,function(result){
 			res.json(result);
 		});
 	});
-	
+
 	// count number of action in app
 	app.getEx('/api/counter/:appid', function (req, res) {
 		com.appmgr.countAction(req.params.appid, function (ret) {
@@ -207,7 +207,7 @@ mongodb.MongoClient.connect(buildconnstr(config), {server: {auto_reconnect: true
 	var Dashboard = require('./module/dashboard').Dashboard;
 
 	var component = {};
-	component.dashboard = new Dashboard(db, mongodb, converter, prefix, config.get("dashborad.delay"));
+	component.dashboard = new Dashboard(db, mongodb, converter, prefix, config.get("dashboard.delay"));
 	component.trendMgr = new TrendMgr(db, mongodb, async, converter, prefix, "trend");
 	component.actionMgr = new ActionMgr(db, mongodb, async, converter, prefix, "mapping");
 	component.propmgr = new PropMgr();

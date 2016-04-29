@@ -9,9 +9,8 @@ exports.Dashboard = function (db, mongodb, converter, prefix, delaysec) {
 	// 2. 
 	//
 	this.getDashboard = function (appid, callback) {
-		//
 		function generateDashboard(gcallback) {
-
+var dashboard ={};
 			converter.toIDs(["_isUser", "_mtid"], function (ids) {
 
 
@@ -25,11 +24,11 @@ exports.Dashboard = function (db, mongodb, converter, prefix, delaysec) {
 						count: {$sum: 1}
 					}
 				}];
-				db.collection().aggregate(pipelines, function (err, res) {
+				db.collection(prefix + appid).aggregate(pipelines, function (err, res) {
 					if (err) throw err;
 					console.log(res);
-					
-					gcallback();
+					dashboard.res = res;
+					gcallback(dashboard);
 				});
 			});
 		}
