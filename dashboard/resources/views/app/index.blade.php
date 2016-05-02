@@ -20,11 +20,11 @@
 					$st.empty();
 
 					if (data == 'true') {
-						$st.append('<span class="greendot"></span> CONNECTED');
+						$st.append('<span class="greendot"></span> <span style="color:#0ea622">OK</span>');
 					}
 
 					if (data == 'false') {
-						$st.append('<span class="reddot"></span> NOT CONNECTED')
+						$st.append('<span class="graydot"></span> <span style="color:#aaa;" >NOT CONNECTED</span>')
 					}
 				});
 			}
@@ -86,15 +86,14 @@
 		<div class="content col-sm-12">
 			@if(count($apps)>0)
 				<div class="content table-responsive table-full-width col-sm-12">
-
-					<table class="table table-hover ">
+					<table class="table ">
 						<thead>
 						<tr>
 							<th>Name</th>
 							<th>Traffic</th>
 							<th>Status</th>
 							<th>Agency</th>
-							<th></th>
+							<th>Action</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -107,11 +106,12 @@
 									<div class="spl_{{$ap->code}} sparkline"></div>
 								</td>
 
-								<td class="status_{{$ap->code}}"><span class="greendot"></span> CONNECTED</td>
+								<td class="status_{{$ap->code}}"></td>
 								<td>
 									@foreach($ap->agencies as $ag)
-										{{$ag->name}}  <span
-														class="text-muted"> {{$ag->email}}</span> {!!   $ag->can_perm == 1 ? '<i class="fa fa-star orange"></i>' : ($ag->can_struct == 1 ? '<i class="fa fa-star gray"></i>': '' )!!}
+									{!! $ag->id == $ap->ownerid ? '<b>' : ''!!}
+										{{ $ag->name}}{!! $ag->id == $ap->ownerid ? '</b>' : ''!!} <span class="text-muted"> {{$ag->email}}</span>
+										{!!   $ag->can_perm == 1 ? '<i class="fa fa-star orange"></i>' : ($ag->can_struct == 1 ? '<i class="fa fa-star gray"></i>': '' )!!}
 										<br/>
 									@endforeach
 								</td>

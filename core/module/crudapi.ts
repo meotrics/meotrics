@@ -103,7 +103,7 @@ export class CrudApi {
 		app.putEx('/campaign/:appid/:id', this.camCRUD.update);
 		app.deleteEx('/campaign/:appid/:id', this.camCRUD.delete);
 
-		app.get('/app/init/:appid', function (req, res) {
+		app.getEx('/app/init/:appid', function (req, res) {
 			me.appmgr.initApp(req.params.appid, function () {
 				res.send('OK');
 				res.status(200).end();
@@ -116,7 +116,7 @@ export class CrudApi {
 			});
 		});
 
-		app.getEx('/app/trafic14/:appid', function (req, res) {
+		app.getEx('/app/traffic14/:appid', function (req, res) {
 			me.appmgr.traffic14(req.params.appid, function (ret) {
 				res.json(ret);
 			});

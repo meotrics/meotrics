@@ -417,7 +417,7 @@ body, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6, p, .navbar, .brand, 
 	padding: 15px 15px 15px;
 }
 
-/* 
+/*
  * update 07/05/2016
  */
 .col-add-filter {
@@ -803,6 +803,18 @@ div.back .fa-chevron-left {
 	height: 10px;
 	background: rgba(98, 98, 98, 0.44);
 	border: 1px solid rgb(162, 162, 162);
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.graydot
+{
+	width: 10px;
+	display: inline-block;
+	height: 10px;
+	background: #eee;
+	border: 1px solid #aaa;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;

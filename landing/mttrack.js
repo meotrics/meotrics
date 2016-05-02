@@ -1,5 +1,5 @@
 //very light script to load first
-var event,
+var event;
 mt.track = function(t,r){
 	mt.rq.push(["track",t,r,new Date])
 };
@@ -12,8 +12,7 @@ mt.clear = function(){
 mt.onready = function(){
 	if(event) mt.excute(event)
 }
-mt.rq = []
-}
+mt.rq = [];
 
 (function(){
 	addEventListener("message", function(ev){
@@ -24,5 +23,5 @@ mt.rq = []
 	}, false);
 
 	var s = getComputedStyle(document.getElementById('mt' + mt.appid), null);
-	mt.actionid = s['font-family'].substr(1, s.content.length - 2);
+	mt.actionid = s['font-family'].substr(1, s['font-family'].length - 2);
 })();

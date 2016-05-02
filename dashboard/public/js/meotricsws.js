@@ -1,46 +1,56 @@
 var userid = userid || 0;
 (function () {
-	window.websock = {
-		data: {
-			0: {
-				'action_count': 0,
-				'status': 0
-			}
-		},
-		change: function (name, callback) {
-			if (tree[name] === undefined)
-				tree[name] = [];
-			tree[name].push(callback);
-		},
-		appChange: function (appcode, name, callback) {
-			if (branch[appcode] === undefined) branch[appcode] = {};
-			if (branch[appcode][name] === undefined) branch[appcode][name] = [];
 
-			branch[appcode][name].push(callback);
+	//var stack = [];
+
+	window.websock = {
+		change: function (code, callback) {
+			if (tree[code] === undefined)
+				tree[code] = [];
+			tree[code].push(callback);
+		},
+		appChange: function (appcode, code, callback) {
+			if (branch[appcode] === undefined) branch[appcode] = {};
+			if (branch[appcode][name] === undefined) branch[appcode][code] = [];
+
+			branch[appcode][code].push(callback);
+
+			//if(conn.readyState !== 1)
+			//	stack.push({appid: appcode, code: code});	
+			//else
+			//	conn.send(JSON.stringify({appid: appcode, code: code}));
 		}
 	};
+	// boardcast event
 	var tree = {};
+
+	// topic based event
 	var branch = {};
-
+	var conn ;
 	function start() {
-		var conn = new WebSocket('ws://' + window.location.host + '/ws?appid=' + userid, "mtdashboard");
+		conn = new WebSocket('wss://' + window.location.host + '/ws', 'mtdashboard');
 
-		conn.onopen = function (e) {
-			//connected
-		};
+		conn.onopen = function(event){
 
+			for(var i in branch) if(branch.hasOwnProperty(i))
+				for(var j in branch[i]) if(branch[i].hasOwnProperty(j))
+					conn.send(JSON.stringify({appid: i, code: j}));
+			
+
+			// clean the queue
+			//while(stack.length != 0)
+			//	conn.send(JSON.stringify(stack.pop()));
+		}
 		conn.onmessage = function (e) {
-			var name = e.name;
+			var mes = JSON.parse(e.data);
 
-			window.websock.data[e.code][name] = e.value;
-			if (tree[name] === undefined)
-				tree[name] = [];
+			if (tree[mes[mes.code]] !== undefined)
+				for (var i in tree[mes.code]) if (tree[mes.code].hasOwnProperty(i))
+				tree[mes.code][i](mes.appid, mes.code);
 
-			for (var j in branch[e.code][name]) if (branch[e.code][name].hasOwnProperty(j))
-				branch[e.code][name][j](e.code);
-
-			for (var i in tree[name]) if (tree[name].hasOwnProperty(i))
-				tree[name][i](e.code);
+			if(branch[mes.appid] !== undefined && branch[mes.appid][mes.code] !== undefined)
+			for (var j in branch[mes.appid][mes.code]) if (branch[mes.appid][mes.code].hasOwnProperty(j))
+				branch[mes.appid][mes.code][j](mes.appid, mes.code);
 		};
 
 		conn.onclose = function () {
