@@ -109,7 +109,8 @@ class ActionMgr {
                         if (user === undefined)
                             throw "mtid " + mtid + " did not match any user";
                         var typeid = data._typeid;
-                        me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_segments', '_url', '_typeid', '_referer', '_totalsec'], function (ids) {
+                        me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid',
+                            '_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed'], function (ids) {
                             // increase revenue
                             var simpleprop = {};
                             if (typeid === 'purchase') {
@@ -126,6 +127,9 @@ class ActionMgr {
                                     simpleprop[ids._lastcampaign] = utm_campaign;
                                     datax[ids._campaign] = utm_campaign;
                                 }
+                            }
+                            if (typeid === 'signup' || typeid === 'login') {
+                                simpleprop[ids.registed] = true;
                             }
                             // update user
                             if (Object.keys(simpleprop).length !== 0)
