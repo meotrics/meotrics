@@ -175,7 +175,7 @@
                         @endif
                     </div>
 
-                    <div class="col-sm-10">
+                    <div class="col-sm-10" id="div-filter-date" style="display: none">
                         <h6>Filter date</h6>
 
 
@@ -328,6 +328,7 @@
          */
         condition_item = that.closest('div[data-name="condition-item"]');
         condition_item.find('div[data-name="condition-sub-group"]').html('');
+        throwConditions();
     }
 
     function changeField(e) {
@@ -363,13 +364,14 @@
         condition_group.attr('data-i-condition-max', parseInt(condition_group.attr('data-i-condition-max')) + 1);
         condition_item.next().html(html);
         checkDisableDelete();
-        
+        throwConditions();
     }
 
     function deleteFilter(e) {
         var that = $(e).closest('div[data-name="condition-item"]');
         that.remove();
         checkDisableDelete();
+        throwConditions();
     }
 
     function checkDisableDelete() {
@@ -492,6 +494,23 @@
             }
         }
     }
+    
+    function throwConditions(){
+        var show_filter_date = false;
+        $('div[data-name="condition-item"]').each(function(){
+            var i_condition = $(this).attr('data-i-condition');
+            if($(this).find('input[name="Segment['+i_condition+'][select_type]"]').val() != 'user'){
+                show_filter_date = true;
+            }
+        });
+        if(show_filter_date){
+            $('#div-filter-date').show();
+        }
+        else{
+            $('#div-filter-date').hide();
+        }
+    }
+    throwConditions();
 </script>
 @endsection
 
