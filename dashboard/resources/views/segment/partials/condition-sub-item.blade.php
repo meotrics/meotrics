@@ -13,7 +13,7 @@ $i_condition_sub = isset($i_condition_sub) ? $i_condition_sub : 'i_condition_sub
 $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators();
 ?>
 <div class="row" data-name="condition-sub-item" data-i-condition-sub="{{ $i_condition_sub }}">
-	<div class="col-md-2 col-md-offset-1">
+    <div class="col-md-2 col-md-offset-2" >
 		<select class="form-control "
 		        name="Segment[{{ $i_condition }}][conditions][{{ $i_condition_sub }}][cs_field]"
 		        value="{{ $condition->field }}">

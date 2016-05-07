@@ -286,10 +286,19 @@ select {
 	height: 34px;
 	font-size: 15px;
 	padding-bottom: 6px;
+        /*
+         * update 07/05/2016
+         */
+        -webkit-border-radius: 20px;
 }
 
 .input-group-addon {
 	padding: 1px;
+        /*
+         * update 07/05/2016
+         */
+        -webkit-border-top-left-radius: 20px;
+        -webkit-border-bottom-left-radius: 20px;
 }
 
 .navbar-default .navbar-nav > li > a:not(.btn) {
@@ -315,8 +324,11 @@ a:hover, a:focus {
 .card h6 {
 	font-weight: normal;
 	font-size: 14px;
-	margin-top: 10px;
-	margin-bottom: 5px;
+        /*
+         * update 07/05/2016
+         */
+        color: #4B8DF8;
+        margin: 10px 0 5px 13px;
 }
 
 .mt {
@@ -398,4 +410,62 @@ body, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6, p, .navbar, .brand, 
 
 .card .content {
 	padding: 20px 20px 0;
+}
+
+/* 
+ * update 07/05/2016
+ */
+.col-add-filter{
+    text-align: left;
+}
+.col-add-condition .fa-plus, .col-add-condition .fa-minus, .col-add-filter .fa-plus, .col-add-filter .fa-minus{
+    border: 1px solid #E3E3E3;
+    border-radius: 50%;
+    padding: 11px;
+    width: 34px;
+    font-size: 10px;
+    color: #4B8DF8;
+    cursor: pointer;
+    float:left;
+}
+/*.col-add-condition .fa-minus, .col-add-filter .fa-minus{
+    float: left;
+}*/
+
+.card form .row [class*="col-"] {
+    padding: 6px 6px 6px 15px;
+}
+
+.col-add-filter a{
+    margin: 0; 
+    padding: 7px 0px; 
+    vertical-align: middle; 
+    width: 34px;
+    height: 34px;
+    float: left;
+    border-radius: 50%;
+}
+
+button.button-radius{
+    -webkit-border-radius: 20px !important; 
+}
+
+div.back{
+    padding-top: 8px;
+}
+
+div.back .fa-chevron-left{
+    border: 1px solid #E3E3E3;
+    border-radius: 50%;
+    padding: 9px;
+    width: 38px;
+    font-size: 16px;
+    color: #4B8DF8;
+    cursor: pointer;
+    float: left;
+    margin-right: 18px;
+}
+
+.twitter-typeahead .tt-hint{
+    width: 50px;
 }

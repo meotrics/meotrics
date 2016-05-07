@@ -99,7 +99,7 @@ $props = isset($props) ? $props : [];
 				</div>
 				<div class="col-md-2" id="div-filter-two" style="display: none">
 					<select name="Prop[two]" class="form-control">
-						<!--<option value="">Select property</option>-->
+						<option value="">Select property</option>
 						<?php
 						foreach ($props as $prop):
 						?>

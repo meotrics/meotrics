@@ -162,10 +162,10 @@
         <form id='segment-form' class="form-segment row" method="post"
               action="{{URL::to('segment/write')}}">
 
-            <div class="col-sm-12">
+            <div class="col-md-12">
                 <input type="hidden" class="row hidden" value="{{$segment->_id}}" name="id">
                 <div class=" row">
-                    <div class="col-sm-2">
+                    <div class="col-md-2">
                         <h6>Name</h6>
                         <input type="text" class="form-control " name="name" value="{{Input::old('name', $segment->name)}}"
                                placeholder="Enter name"/>
@@ -175,7 +175,7 @@
                         @endif
                     </div>
 
-                    <div class="col-sm-10" id="div-filter-date" style="display: none">
+                    <div class="col-md-10" id="div-filter-date" style="display: none">
                         <h6>Filter date</h6>
 
 
@@ -188,17 +188,17 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-12" style="padding-top: 0;padding-bottom: 0">
+                    <div class="col-md-12" style="padding-top: 0;padding-bottom: 0">
                         <div class="row">
-                            <div class="col-sm-12" style="padding-bottom: 0 ;padding-bottom: 0"><h6
+                            <div class="col-md-12" style="padding-bottom: 0 ;padding-bottom: 0"><h6
                                     style="margin-bottom:0px">Filter condition</h6>
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-sm-12" style="padding-top: 0;padding-bottom: 0">
+                            <div class="col-md-12" style="padding-top: 0;padding-bottom: 0">
                                 <div data-name="condition-group" class="row" data-i-condition-max="{{count($conditions)}}">
-                                    <div class="col-sm-12" style="padding-top: 0;padding-bottom: 0">
+                                    <div class="col-md-12" style="padding-top: 0;padding-bottom: 0">
                                         <?php
                                         $i_condition = 0;
                                         foreach ($conditions as $condition):
@@ -221,7 +221,7 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-sm-12" style="padding-top: 0">
+                    <div class="col-md-12" style="padding-top: 0">
                         <h6>Description</h6>
                         <!--<label class="col-md-12" style="margin-top: 10px">Segment description</label>-->
 
@@ -232,11 +232,14 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-sm-12">
-                        <button type="button" class="action button blue " onclick="backFn()">
+                    <div class="col-md-12">
+<!--                        <button type="button" class="action button blue button-radius" onclick="backFn()">
                             <span class="label">Back</span>
-                        </button>
-                        <button type="submit" class="action button blue ">
+                        </button>-->
+                        <div class="back" onclick="backFn()">
+                            <i class="fa fa-fw fa-chevron-left"></i>
+                        </div>
+                        <button type="submit" class="action button blue button-radius">
                             <span class="label">{{$segment->_id ? 'Update' : 'Create'}}</span>
                         </button>
                     </div>

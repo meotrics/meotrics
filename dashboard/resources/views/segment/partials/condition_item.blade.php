@@ -37,7 +37,7 @@ $operators_default = [
 
 
 <div class="condition-item row" data-name="condition-item" data-i-condition="{{$i_condition}}">
-    <div class="col-sm-12" style="padding-top: 0; padding-bottom: 0">
+    <div class="col-md-12" style="padding-top: 0; padding-bottom: 0">
         <div class="row">
             <!--<label class="col-md-2" style="margin-top: 10px">List top</label>-->
             <div class="col-md-2">
@@ -105,18 +105,18 @@ $operators_default = [
                        value="<?= Input::old('Segment[' . $i_condition . '][value]', $condition->value) ?>"/>
             </div>
             <div class="col-md-1 col-add-condition add"
-                 data-name="add-condition" <?= $condition->select_type == 'user' ? 'style="display: none"' : '' ?>>
+                 data-name="add-condition" <?= $condition->select_type == 'user' ? 'style="display: none; padding-left: 6px !important; width: 34px;"' : 'style="padding-left: 6px !important; width: 34px;"' ?>>
                 <i class="fa fa-plus fa-2" aria-hidden="true" onclick="addCondition(this)"></i>
             </div>
-            <div class="col-md-1 col-add-filter" style="padding-top: 10px;padding-bottom: 0">
-                <a class="button left" href="javascript:void(0);" style="margin: 0; padding: 3px 0px; vertical-align: middle; width: 31px"
+            <div class="col-md-1 col-add-filter" style="padding-top: 6px; text-align: left;">
+                <a class="button" href="javascript:void(0);" style=""
                    onclick="addFilter(this)" data-name="a-add-filter"><span class="icon icon3"></span></a>
-                <a class="button right" href="javascript:void(0);" style="margin: 0;padding: 3px 0px; vertical-align: middle; width: 31px"
+                <a class="button" href="javascript:void(0);" style=""
                    onclick="deleteFilter(this)" data-name="a-delete-filter"><span class="icon icon58"></span> </a>
             </div>
         </div>
         <div class="row">
-            <div class="condition-sub-group col-sm-12" style="padding-bottom: 0" data-name="condition-sub-group" data-i-condition-sub-max="{{count($condition->conditions)}}">
+            <div class="condition-sub-group col-md-12" style="padding-bottom: 0" data-name="condition-sub-group" data-i-condition-sub-max="{{count($condition->conditions)}}">
                 <?php
                 $i_condition_sub = 0;
                 if ($condition->conditions && is_array($condition->conditions)):
