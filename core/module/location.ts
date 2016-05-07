@@ -1,4 +1,4 @@
-﻿import * as http from 'http';
+﻿import * as request from 'request';
 import * as mongodb from 'mongodb';
 
 export class LocationMgr {
@@ -16,11 +16,15 @@ export class LocationMgr {
 				return callback(res[0]);
 
 			// 2 using the api
-			http.get('http://ipinfo.io/' + ip, function (res) {
-				callback(res);
-				me.collection.insertOne(res, function (err, ret) {
-					if (err) throw err;
-				});
+			request('http://ipinfo.io/' + ip, function (err, res, body)
+			{
+				if (!err && res.statusCode == 200) {
+					callback(body);
+					body = JSON.parse(body);
+					me.collection.insertOne(body, function (err, ret) {
+						if (err) throw err;
+					});
+				}
 			});
 		});
 	}

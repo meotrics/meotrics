@@ -99,7 +99,6 @@ export class ActionMgr {
 					me.db.collection(collection).insertOne(datax, function (err, r) {
 						if (err) throw err;
 						// update location
-		
 						me.location.parse(data._ip, function (res) {
 							var loc = { _city: res.city, _country: res.country };
 							me.valuemgr.cineObject(appid, data._typeid, loc);
@@ -168,7 +167,6 @@ export class ActionMgr {
 								delete arrayprop[ids._firstcampaign];
 								delete arrayprop[ids._lastcampaign];
 								delete arrayprop[ids._totalsec];
-
 								if (Object.keys(arrayprop).length !== 0)
 									updateArrayBasedUserInfo(collection, mtid, user, arrayprop);
 							});
@@ -184,7 +182,6 @@ export class ActionMgr {
 		// + data: data to be append to user
 		function updateArrayBasedUserInfo(collection, mtid, user, data) {
 			me.converter.toObject(data, function (datax) {
-
 				// append new element to the array or create one
 				var arr = [];
 				for (var p in datax) if (datax.hasOwnProperty(p)) {
@@ -365,7 +362,6 @@ export class ActionMgr {
 					me.db.collection(collection).updateMany(query, { $set: update }, function (err) {
 						if (err) throw err;
 					});
-
 					// merge and delete ano-mtid record IF EXISTED
 					me.db.collection(collection).find({ _id: themtid }).limit(1).toArray(function (err, r) {
 						if (err) throw err;

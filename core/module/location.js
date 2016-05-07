@@ -1,5 +1,5 @@
 "use strict";
-const http = require('http');
+const request = require('request');
 class LocationMgr {
     constructor(db, prefix) {
         this.db = db;
@@ -15,12 +15,18 @@ class LocationMgr {
             if (res.length !== 0)
                 return callback(res[0]);
             // 2 using the api
-            http.get('http://ipinfo.io/' + ip, function (res) {
-                callback(res);
-                me.collection.insertOne(res, function (err, ret) {
-                    if (err)
-                        throw err;
-                });
+            request('http://ipinfo.io/' + ip, function (err, res, body) {
+                console.log(body);
+                if (!err && res.statusCode == 200) {
+                    callback(body);
+                    body = JSON.parse(body);
+                    console.log(body);
+                    me.collection.insertOne(body, function (err, ret) {
+                        console.log(1003);
+                        if (err)
+                            throw err;
+                    });
+                }
             });
         });
     }

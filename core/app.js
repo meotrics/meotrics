@@ -38,7 +38,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err, db) {
         console.log('Meotrics CORE API / OK /      ' + crudport);
     });
     var httpport = config.get('apiserver.port') || 1711;
-    var httpapi = new HttpApi(db, converter, prefix, config.get('apiserver.codepath'), crudapi.valuemgr, ref);
+    var httpapi = new HttpApi(db, converter, prefix, config.get('apiserver.codepath'), ref, crudapi.valuemgr);
     var server = http.createServer(function (req, res) {
         httpapi.route(req, res);
     });

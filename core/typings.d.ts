@@ -8,4 +8,5 @@
 /// <reference path="../../DefinitelyTyped/ua-parser-js/ua-parser-js.d.ts" />
 /// <reference path="../../DefinitelyTyped/mobile-detect/mobile-detect.d.ts" />
 /// <reference path="../../DefinitelyTyped/websocket/websocket.d.ts" />
+/// <reference path="../../DefinitelyTyped/request/request.d.ts" />
 /// <reference path="./module/actionmgr.ts" />
