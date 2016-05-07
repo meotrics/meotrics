@@ -107,6 +107,8 @@ class ActionMgr {
                         // update location
                         me.location.parse(data._ip, function (res) {
                             var loc = { _city: res.city, _country: res.country };
+                            me.valuemgr.cineObject(appid, data._typeid, loc);
+                            me.valuemgr.cineObject(appid, "user", loc);
                             me.converter.toObject(loc, function (datax) {
                                 me.db.collection(collection).updateOne({ _id: r.insertedId }, { "$set": loc }, function (err, r) {
                                     if (err)
@@ -331,7 +333,7 @@ class ActionMgr {
                     userex[p] = user[p];
         user = userex;
         var themtid = new mongodb.ObjectID(data.mtid);
-        me.converter.toIDs(['_isUser', 'userid', '_mtid'], function (ids) {
+        me.converter.toIDs(['_isUser', 'userid', '_mtid', '_segment', '_os', '_deviceid', '_devicetype', '_lang', '_city', '_country', '_browser', '_firstcampaign', '_lastcampaign', '_campaign'], function (ids) {
             me.valuemgr.cineObject(appid, 'user', user);
             me.converter.toObject(user, function (userx) {
                 // check for case 4
@@ -370,10 +372,113 @@ class ActionMgr {
                         if (err)
                             throw err;
                     });
-                    // delete ano-mtid record IF EXISTED
-                    me.db.collection(collection).deleteOne({ _id: themtid }, function () {
+                    // merge and delete ano-mtid record IF EXISTED
+                    me.db.collection(collection).find({ _id: themtid }).limit(1).toArray(function (err, r) {
+                        if (err)
+                            throw err;
+                        if (r.length === 0)
+                            return;
+                        var olduser = r[0];
+                        if (olduser[ids._os] !== undefined && olduser[ids._os] !== null) {
+                            if (olduser[ids._os] instanceof Array) {
+                                if (userx[ids._os] !== undefined || userx[ids._os] !== null)
+                                    userx[ids._os] = olduser[ids._os].concat(userx[ids._os]);
+                            }
+                            else {
+                                if (userx[ids._os] !== undefined || userx[ids._os] !== null)
+                                    userx[ids._os] = [olduser[ids._os]].concat(userx[ids._os]);
+                            }
+                        }
+                        if (olduser[ids._segment] !== undefined && olduser[ids._segment] !== null) {
+                            if (olduser[ids._segment] instanceof Array) {
+                                if (userx[ids._segment] !== undefined || userx[ids._segment] !== null)
+                                    userx[ids._segment] = olduser[ids._segment].concat(userx[ids._segment]);
+                            }
+                            else {
+                                if (userx[ids._segment] !== undefined || userx[ids._segment] !== null)
+                                    userx[ids._segment] = [olduser[ids._segment]].concat(userx[ids._segment]);
+                            }
+                        }
+                        if (olduser[ids._devicetype] !== undefined && olduser[ids._devicetype] !== null) {
+                            if (olduser[ids._devicetype] instanceof Array) {
+                                if (userx[ids._devicetype] !== undefined || userx[ids._devicetype] !== null)
+                                    userx[ids._devicetype] = olduser[ids._devicetype].concat(userx[ids._devicetype]);
+                            }
+                            else {
+                                if (userx[ids._devicetype] !== undefined || userx[ids._devicetype] !== null)
+                                    userx[ids._devicetype] = [olduser[ids._devicetype]].concat(userx[ids._devicetype]);
+                            }
+                        }
+                        if (olduser[ids._deviceid] !== undefined && olduser[ids._deviceid] !== null) {
+                            if (olduser[ids._deviceid] instanceof Array) {
+                                if (userx[ids._deviceid] !== undefined || userx[ids._deviceid] !== null)
+                                    userx[ids._deviceid] = olduser[ids._deviceid].concat(userx[ids._deviceid]);
+                            }
+                            else {
+                                if (userx[ids._deviceid] !== undefined || userx[ids._deviceid] !== null)
+                                    userx[ids._deviceid] = [olduser[ids._deviceid]].concat(userx[ids._deviceid]);
+                            }
+                        }
+                        if (olduser[ids._lang] !== undefined && olduser[ids._lang] !== null) {
+                            if (olduser[ids._lang] instanceof Array) {
+                                if (userx[ids._lang] !== undefined || userx[ids._lang] !== null)
+                                    userx[ids._lang] = olduser[ids._lang].concat(userx[ids._lang]);
+                            }
+                            else {
+                                if (userx[ids._lang] !== undefined || userx[ids._lang] !== null)
+                                    userx[ids._lang] = [olduser[ids._lang]].concat(userx[ids._lang]);
+                            }
+                        }
+                        if (olduser[ids._city] !== undefined && olduser[ids._city] !== null) {
+                            if (olduser[ids._city] instanceof Array) {
+                                if (userx[ids._city] !== undefined || userx[ids._city] !== null)
+                                    userx[ids._city] = olduser[ids._city].concat(userx[ids._city]);
+                            }
+                            else {
+                                if (userx[ids._city] !== undefined || userx[ids._city] !== null)
+                                    userx[ids._city] = [olduser[ids._city]].concat(userx[ids._city]);
+                            }
+                        }
+                        if (olduser[ids._country] !== undefined && olduser[ids._country] !== null) {
+                            if (olduser[ids._country] instanceof Array) {
+                                if (userx[ids._country] !== undefined || userx[ids._country] !== null)
+                                    userx[ids._country] = olduser[ids._country].concat(userx[ids._country]);
+                            }
+                            else {
+                                if (userx[ids._country] !== undefined || userx[ids._country] !== null)
+                                    userx[ids._country] = [olduser[ids._country]].concat(userx[ids._country]);
+                            }
+                        }
+                        if (olduser[ids._browser] !== undefined && olduser[ids._browser] !== null) {
+                            if (olduser[ids._browser] instanceof Array) {
+                                if (userx[ids._browser] !== undefined || userx[ids._browser] !== null)
+                                    userx[ids._browser] = olduser[ids._browser].concat(userx[ids._browser]);
+                            }
+                            else {
+                                if (userx[ids._browser] !== undefined || userx[ids._browser] !== null)
+                                    userx[ids._browser] = [olduser[ids._browser]].concat(userx[ids._browser]);
+                            }
+                        }
+                        if (olduser[ids._campaign] !== undefined && olduser[ids._campaign] !== null) {
+                            if (olduser[ids._campaign] instanceof Array) {
+                                if (userx[ids._campaign] !== undefined || userx[ids._campaign] !== null)
+                                    userx[ids._campaign] = olduser[ids._campaign].concat(userx[ids._campaign]);
+                            }
+                            else {
+                                if (userx[ids._campaign] !== undefined || userx[ids._campaign] !== null)
+                                    userx[ids._campaign] = [olduser[ids._campaign]].concat(userx[ids._campaign]);
+                            }
+                        }
+                        if (userx[ids._firstcampaign] === undefined)
+                            userx[ids._firstcampaign] = olduser[ids._firstcampaign];
+                        if (userx[ids._lastcampaign] === undefined)
+                            userx[ids._lastcampaign] = olduser[ids._lastcampaign];
+                        me.db.collection(collection).deleteOne({ _id: themtid }, function (err) {
+                            if (err)
+                                throw err;
+                        });
+                        return updateUserInfo(me.db, ide_mtid, userx, callback);
                     });
-                    return updateUserInfo(me.db, ide_mtid, userx, callback);
                 });
             });
         });
