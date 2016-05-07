@@ -1,5 +1,6 @@
 "use strict";
 const mongodb = require('mongodb');
+const location = require('./location');
 class ActionMgr {
     constructor(db, converter, prefix, mapping, valuemgr, referer) {
         this.db = db;
@@ -8,6 +9,7 @@ class ActionMgr {
         this.mapping = mapping;
         this.valuemgr = valuemgr;
         this.referer = referer;
+        this.location = new location.LocationMgr(db, prefix);
     }
     // purpose: check if an mtid is valid
     // a mtid is valid if there is one user record based on mtid
@@ -102,6 +104,20 @@ class ActionMgr {
                     me.db.collection(collection).insertOne(datax, function (err, r) {
                         if (err)
                             throw err;
+                        // update location
+                        me.location.parse(data._ip, function (res) {
+                            var loc = { _city: res.city, _country: res.country };
+                            me.converter.toObject(loc, function (datax) {
+                                me.db.collection(collection).updateOne({ _id: r.insertedId }, { "$set": loc }, function (err, r) {
+                                    if (err)
+                                        throw err;
+                                });
+                                me.db.collection(collection).updateOne({ _id: data._mtid }, { $set: loc }, function (err, r) {
+                                    if (err)
+                                        throw err;
+                                });
+                            });
+                        });
                         callback(r.insertedId);
                     });
                     //get user infomation

@@ -2,8 +2,13 @@
 import * as url from 'url';
 import * as express from 'express';
 import * as referer from './referer';
+
+import * as location from './location';
+
 export class ActionMgr {
+	private location: location.LocationMgr;
 	constructor(private db: mongodb.Db, private converter, private prefix: string, private mapping: string, private valuemgr, private referer: referer.RefererType) {
+		this.location = new location.LocationMgr(db, prefix);
 	}
 
 	// purpose: check if an mtid is valid
@@ -93,6 +98,19 @@ export class ActionMgr {
 				me.converter.toObject(data, function (datax) {
 					me.db.collection(collection).insertOne(datax, function (err, r) {
 						if (err) throw err;
+						// update location
+						me.location.parse(data._ip, function (res) {
+							var loc = { _city: res.city, _country: res.country };
+							me.converter.toObject(loc, function (datax) {
+								me.db.collection(collection).updateOne({ _id: r.insertedId }, { "$set": loc } , function (err, r) {
+									if (err) throw err;
+								});
+								me.db.collection(collection).updateOne({ _id: data._mtid }, { $set: loc }, function (err, r) {
+									if (err) throw err;
+								});				
+							});
+						});
+
 						callback(r.insertedId);
 					});
 
