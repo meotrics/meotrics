@@ -84,13 +84,16 @@
 							</div>
 
 							<div class="col-sm-5">
-								<button type="submit" class="action button blue">
+                                                            <div class="back" onclick="backFn()">
+                                                                <i class="fa fa-fw fa-chevron-left"></i>
+                                                            </div>
+								<button type="submit" class="action button blue button-radius">
 									<span class="label">{{$trend->_id ? 'Update' : 'Create'}}</span>
 								</button>
-
-								<a href="/trend" class="action button">
+                                                                
+<!--								<a href="/trend" class="action button button-radius">
 									<span class="label">Back</span>
-								</a>
+								</a>-->
 							</div>
 						</div>
 					</form>
@@ -102,6 +105,10 @@
 
 @section('additional')
 	<script type="text/javascript">
+            function backFn(){
+                parent.history.back();
+                return false;
+            }
 		var objects = {};
 		var op = {};
 		@foreach($actiontypes as $actiontype)

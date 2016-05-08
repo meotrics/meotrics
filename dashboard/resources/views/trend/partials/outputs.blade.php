@@ -1,4 +1,4 @@
-<table class="table table-hover table-striped">
+<table class="table table-hover table-striped table-trend">
 	<thead class="tbhead">
 	</thead>
 	<tbody class="tbbody">

@@ -384,8 +384,8 @@ a:hover, a:focus {
 }
 
 .a-edit-obj{
-    font-size: 24px;
-    margin-right: 12px;
+/*    font-size: 24px;
+    margin-right: 12px;*/
 }
 
 .a-edit-obj span{
@@ -393,7 +393,7 @@ a:hover, a:focus {
 }
 
 .a-trash-obj{
-    font-size: 24px;
+    /*font-size: 24px;*/
 }
 
 .a-trash-obj span{
@@ -409,7 +409,7 @@ body, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6, p, .navbar, .brand, 
 }
 
 .card .content {
-	padding: 20px 20px 0;
+	padding: 20px 20px 20px;
 }
 
 /* 
@@ -446,8 +446,17 @@ body, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6, p, .navbar, .brand, 
     border-radius: 50%;
 }
 
-button.button-radius{
+/*a.blue{
+    color: #444;
+}*/
+
+button.button-radius, a.button-radius{
     -webkit-border-radius: 20px !important; 
+}
+
+button.button-head{
+    margin-top: 7px;
+    margin-left: -15px;
 }
 
 div.back{
@@ -468,4 +477,44 @@ div.back .fa-chevron-left{
 
 .twitter-typeahead .tt-hint{
     width: 50px;
+}
+
+.text-align-right{
+    text-align: right;
+}
+
+.selection .select2-selection{
+    -webkit-border-radius: 20px;
+}
+
+.a-edit-obj .fa-pencil, .a-trash-obj .fa-trash{
+    border: 1px solid #E3E3E3;
+    border-radius: 50%;
+    padding: 6px;
+    width: 34px;
+    font-size: 20px;
+    color: #4B8DF8;
+    cursor: pointer;
+    float: left;
+}
+
+.div-edit-obj, .div-trash-obj{
+    width: 60px;
+}
+
+.segment-desc{
+    margin-top: 6px;
+    margin-left: -11px;
+}
+
+.div-seg-first-col{
+    margin-left: -53px;
+}
+
+.table-trend thead th{
+    background-color: #eee;
+}
+
+.table-trend thead th{
+    color: #4B8DF8 !important;
 }
