@@ -49,7 +49,7 @@
 
 @section('content')
 <div class="row">
-    <div class="card col-sm-12">
+    <div class="card col-md-12">
         <div class="row">
             <div class="header col-md-12">
                 <div class="pull-right">
