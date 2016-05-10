@@ -587,3 +587,11 @@ div.back .fa-chevron-left{
     margin-top: -8px;
     vertical-align: middle;
 }
+
+.color-red{
+    color: red !important;
+}
+
+.font-size-20{
+    font-size: 20px;
+}
