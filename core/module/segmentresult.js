@@ -115,7 +115,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 				var groupClause2 = {$group: {}};
 				temp = {};
 				for (var i = 0; i < spaces1; i++)
-					temp["prefix1_" + i] = "$_id.prefix_" + i
+					temp["prefix1_" + i] = "$_id.prefix_" + i;
 				groupClause2.$group._id = temp;
 				groupClause2.$group.values = {
 					$push: {
@@ -123,6 +123,8 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 						count: "$count"
 					}
 				};
+
+				
 				db.collection(collection).aggregate([matchClause, projectClause1, groupClause1, groupClause2]).toArray(function (err, r) {
 					if (err) throw err;
 
