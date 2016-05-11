@@ -6,8 +6,8 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 			if (err) throw err;
 			if (trenddoc === null) return callback(null);
 			if (segid !== undefined && segid !== '' && segid !== '_') trenddoc._segment = segid;
-			if (starttime !== undefined && starttime !== '') trenddoc.startTime = Math.round(new Date(starttime) / 1000);
-			if (endtime !== undefined && endtime !== '') trenddoc.endTime = Math.round(new Date(endtime) / 1000 + 86400);
+			if (starttime !== undefined && starttime !== '') trenddoc.startTime = parseInt( Math.round(new Date(starttime) / 1000));
+			if (endtime !== undefined && endtime !== '') trenddoc.endTime = parseInt(Math.round(new Date(endtime) / 1000 + 86400));
 
 			getQueryTrending(trenddoc, converter, function (query) {
 				var collection = prefix + appid;
