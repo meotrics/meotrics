@@ -11,7 +11,7 @@
 	var param = "{{$param}}";
 
 	var typeid = "{{$typeid}}";
-	var data = JSON.parse('{!! json_encode($outputs) !!}');
+	var data = {!! json_encode($outputs) !!};
 	$body = $('.tbbody');
 	$body.css('text-align', 'center');
 	$head = $('.tbhead');
