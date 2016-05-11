@@ -29,5 +29,5 @@
 			});
 		});
 	});
-//node utils/generateDb.js meotrics_1 [2000 100000 50000 pageview purchase]
+//node utils/generateDb.js 1 [2000 100000 50000 pageview purchase]
 })();

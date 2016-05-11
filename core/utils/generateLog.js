@@ -80,7 +80,7 @@ function generatePageView(ids, codename) {
 	page[ids._typeid] = codename;
 	page[ids._url] = 'http://' + generateNumber(1, 1000) + '.com';
 	page[ids._segments] = [];
-	page[ids._ctime] = Math.floor(new Date().getTime() / 1000);
+	page[ids._ctime] = Math.floor(new Date().getTime() / 1000 - generateNumber(0, 2592000));
 	page[ids._mtid] = user._id;
 	page[ids._utm_campaign] = generateCampaign();
 	page[ids._utm_source] = generateCampaignSource();
@@ -100,7 +100,7 @@ function generatePurchase(ids, codename) {
 	var pid = generateNumber(1, 1000);
 	var purchase = {};
 	purchase[ids._typeid] = codename;
-	purchase[ids._ctime] = Math.floor(new Date().getTime() / 1000);
+	purchase[ids._ctime] = Math.floor(new Date().getTime() / 1000 - generateNumber(0, 2592000));
 	purchase[ids._mtid] = user._id;
 	purchase[ids._segments] = [];
 	var cat = genCategory();
@@ -328,7 +328,7 @@ function generateName() {
 function generateDB(appid, actiontype, converter, url, n, collection, typeid, valuemgr, callback) {
 	var count = 0;
 	if (actiontype === 'purchase') {
-		converter.toIDs(['_os', '_browser', 'device', '_utm_campaign', '_utm_source', '_utm_medium', '_utm_content', '_utm_term','_typeid', '_ctime', 'amount', 'pname', 'cname', 'paymentype', '_mtid', 'cid', 'pid', 'pname', 'cname', 'quantity', 'price', '_segments'], function (ids) {
+		converter.toIDs(['_os', '_browser', '_device', '_lang', '_utm_campaign', '_utm_source', '_utm_medium', '_utm_content', '_utm_term','_typeid', '_ctime', 'amount', 'pname', 'cname', 'paymentype', '_mtid', 'cid', 'pid', 'pname', 'cname', 'quantity', 'price', '_segments', '_city'], function (ids) {
 			for (var i = 0; i < n; i++) {
 				count++;
 				var r = generatePurchase(ids, typeid);
@@ -348,7 +348,7 @@ function generateDB(appid, actiontype, converter, url, n, collection, typeid, va
 			}
 		});
 	} else {
-		converter.toIDs(['_os', '_browser', 'device','_utm_campaign', '_utm_source', '_utm_term','_utm_content','_utm_medium','_typeid', '_url', 'camid', '_ctime', '_mtid', '_segments'], function (ids) {
+		converter.toIDs(['_os', '_browser', '_lang', '_device','_utm_campaign', '_utm_source', '_utm_term','_utm_content','_utm_medium','_typeid', '_url', 'camid', '_ctime', '_mtid', '_segments'], function (ids) {
 			for (var i = 0; i < n; i++) {
 				count++;
 				var r = generatePageView(ids, typeid);
