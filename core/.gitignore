@@ -3,3 +3,11 @@ logs
 npm-debug.log
 .idea
 /**/*.js.map
+.vs/
+meotrics.csproj
+meotrics.csproj.user
+meotrics.sln
+obj/
+web.Debug.config
+web.Release.config
+web.config
