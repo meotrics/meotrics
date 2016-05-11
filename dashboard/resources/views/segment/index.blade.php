@@ -76,11 +76,11 @@ $props = isset($props) ? $props : [];
             <div class="col-md-2"> 
                 <p class="segment-desc"
                     id="desc"><?= property_exists($segment_first, 'description') ? $segment_first->description : '' ?></p>
-                 <p> @if(isset($segment_first->startTime ))
+<!--                 <p> @if(isset($segment_first->startTime ))
                      Time range: <span id="startTime">{{$segment_first->startTime}}</span> to {{$segment_first->endTime}},
                      @endif
                      <span id="count">@if(isset($segment_first->count)){{$segment_first->count}}@endif</span>
-                 </p>
+                 </p>-->
             </div>
             @endif
             <!--</form>-->
@@ -208,6 +208,7 @@ $props = isset($props) ? $props : [];
 		}
 
 		function removeFilter(e) {
+                        $('#div-filter-two').find('select').val('').change();
 			$('#div-filter-two').hide();
                         $('#div-action').removeClass('col-md-offset-1');
                         $('#div-action').addClass('col-md-offset-3');
@@ -217,6 +218,7 @@ $props = isset($props) ? $props : [];
 
 		function cancelExecute() {
 			$('#div-filter-one').find('select').val('').change();
+                        $('#div-filter-two').find('select').val('').change();
 			$('#div-filter-two').hide();
 			$('#div-filter-tool').find('.fa-plus').show();
 			$('#div-filter-tool').find('.fa-minus').hide();

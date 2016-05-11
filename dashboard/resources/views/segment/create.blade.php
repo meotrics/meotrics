@@ -264,7 +264,7 @@
         var containter = that.parent().parent();
         var condition_item = that.closest('div[data-name="condition-item"]');
         var i_condition = condition_item.attr('data-i-condition');
-
+        destroySuggession(containter.find('input[name="Segment[' + i_condition + '][value]"]'));
         $.each(type_options, function (i, v) {
             if (v.value == that.val()) {
                 if (v.select_type == 'user') {
@@ -337,8 +337,6 @@
     function changeField(e) {
         console.log('here');
     }
-
-
 
     function addFilter(e) {
         var that = $(e);
@@ -475,7 +473,7 @@
                 createSuggession(appid, container.find('select[name="Segment['+i_condition+'][type]"]').val(), container.find('select[name="Segment['+i_condition+'][field]"]').val(), $('input[name="Segment['+i_condition+'][value]"]'));
             }
             else{
-                destroySuggession(container.find('input[name="Segment['+i_condition+'][value]"]'))
+                destroySuggession(container.find('input[name="Segment['+i_condition+'][value]"]'));
             }
         }
     }

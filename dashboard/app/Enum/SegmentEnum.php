@@ -14,9 +14,7 @@ class SegmentEnum {
     
     public static function chartColor(){
         return [
-//            'red', 'yellow', 'black', 'blue', 'pink'
-            '#3357AF', '#758ED5', '#B7AHGA', '#FBEKJ5'
-//            '#0000ff', '#6666ff', '#ccccff',
+            '#5884FF', '#4B74E0', '#4164C2', '#3855A5', '#25396E',
         ];
     }
 }
