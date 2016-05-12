@@ -595,3 +595,16 @@ div.back .fa-chevron-left{
 .font-size-20{
     font-size: 20px;
 }
+
+.chart-legend ul {
+	padding-left: 0;
+    list-style-type: none;
+}
+
+.chart-legend li .dot{
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 15px;
+    border-radius: 12px;
+}
