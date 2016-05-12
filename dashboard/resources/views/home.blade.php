@@ -56,33 +56,45 @@
            {
                label: "My First dataset",
                fill: false,
-               lineTension: 0.1,
-               backgroundColor: "rgba(75,192,192,0.4)",
-               borderColor: "rgba(75,192,192,1)",
-               borderCapStyle: 'butt',
+               lineTension: 0.5,
+
+               borderCapStyle: 'round',
+
                borderDash: [],
                borderDashOffset: 0.0,
                borderJoinStyle: 'miter',
-               pointBorderColor: "rgba(75,192,192,1)",
-               pointBackgroundColor: "#fff",
-               pointBorderWidth: 1,
-               pointHoverRadius: 5,
+
+               pointBorderWidth: 2,
+               pointHoverRadius: 1,
+               borderWidth: 2,
                pointHoverBackgroundColor: "rgba(75,192,192,1)",
                pointHoverBorderColor: "rgba(220,220,220,1)",
                pointHoverBorderWidth: 2,
-               pointRadius: 1,
+               pointRadius: 2,
                pointHitRadius: 10,
+fill: true,
+                borderColor: "#2F5CB0",
+                backgroundColor: "rgba(78,108,201,0.3)",
+                pointBorderColor: "#2F5CB0",
+                pointBackgroundColor: "white",
+                pointBorderWidth: 1,
+
                data: [65, 59, 80, 81, 32, 12, 40],
            }
        ]
    },
        options: {
+      
            legend: {display:false},
+           maintainAspectRatio: false,
+    responsive: true,
+    height: "240",
        animation : false,
-           xAxes: [{
+       scales: {
+           yAxes: [{
                display: false
            }]
-       }
+       }}
    });
    
    
@@ -186,7 +198,7 @@
 @endsection
 @section('content')
 <div class="row">
-   <div class="col-md-4">
+   <div class="col-md-4" style="height: 275px;">
       <div class="card row">
          <div class="header">
             <h4>Visits</h4>
@@ -212,8 +224,8 @@
          </div>
       </div>
    </div>
-   <div class="col-md-6">
-      <div class="card">
+   <div class="col-md-8">
+      <div class="card" style="height: 275px;"> 
          <div class="header">
             <div class="row">
                <div class="col-sm-6">
@@ -232,7 +244,7 @@
                   $ 2 238
                </div>
                <div class="col-sm-6">
-                  <canvas id="trchartpc" width="400" height="400"> </canvas>
+                  <canvas id="trchartpc" width="400" height="40"> </canvas>
                   Revenue per customer
                   $ 13.5
                </div>
@@ -246,24 +258,31 @@
       <div class="row">
          <div class="card">
             <div class="header">
-               <div class="row">
-                  Retension rate
-                  <
+            <h4>Retension rate</h4>
+              
+            </div>
+            <div class="content" style="padding-top: 0px">
+             <div class="row">
+
+                  
+                  
                   <div class="col-sm-12">
-                     <canvas id="retenratechart" width="400" height="400"> </canvas>
-                     Total revenue
-                     $ 2 238
+                  <p class="muted">This week</p>
+                  <div style="height: 100px">
+                     <canvas id="retenratechart" width="400" height="40"> </canvas>
+                    </div>
+                    
                   </div>
                </div>
-            </div>
-            <div class="content">
             </div>
          </div>
       </div>
       <div class="row">
-         <div class="card">
-            <div class="header"> User growth rate</div>
-            <div class="header"> 5%</div>
+         <div class="card" style="height: 100px">
+            <div class="header"> <h4> User growth rate</h4>
+            <div class="verybig">
+            <i class="bigup fa fa-arrow-up"></i> 5%
+            </div></div>
          </div>
       </div>
    </div>

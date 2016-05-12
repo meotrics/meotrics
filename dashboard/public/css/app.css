@@ -705,4 +705,10 @@ margin: 50px auto 0;
 	vertical-align: super;
 }
 
-h4{margin-top: 0px}
+.header h4{margin-top: 0px; margin-bottom: 0px}
+
+.card{margin-bottom: 15px;}
+
+.card .header {
+    padding: 15px 15px 0;
+}
