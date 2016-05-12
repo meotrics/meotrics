@@ -40,7 +40,8 @@
        animation : false,
        segmentShowStroke: false,
        animateRotate: false,
-       
+        maintainAspectRatio: false,
+    responsive: true,
        percentageInnerCutout: 50,
        scaleShowLabels: false,
        tooltipTemplate: "<%= svalue %>%",
@@ -72,7 +73,7 @@
                pointHoverBorderWidth: 2,
                pointRadius: 2,
                pointHitRadius: 10,
-fill: true,
+                fill: true,
                 borderColor: "#2F5CB0",
                 backgroundColor: "rgba(78,108,201,0.3)",
                 pointBorderColor: "#2F5CB0",
@@ -106,33 +107,43 @@ fill: true,
            {
                label: "My First dataset",
                fill: false,
-               lineTension: 0.1,
-               backgroundColor: "rgba(75,192,192,0.4)",
-               borderColor: "rgba(75,192,192,1)",
-               borderCapStyle: 'butt',
+               lineTension: 0.5,
+
+               borderCapStyle: 'round',
+
                borderDash: [],
                borderDashOffset: 0.0,
                borderJoinStyle: 'miter',
-               pointBorderColor: "rgba(75,192,192,1)",
-               pointBackgroundColor: "#fff",
-               pointBorderWidth: 1,
-               pointHoverRadius: 5,
+
+               pointBorderWidth: 2,
+               pointHoverRadius: 1,
+               borderWidth: 2,
                pointHoverBackgroundColor: "rgba(75,192,192,1)",
                pointHoverBorderColor: "rgba(220,220,220,1)",
                pointHoverBorderWidth: 2,
-               pointRadius: 1,
+               pointRadius: 2,
                pointHitRadius: 10,
+                fill: true,
+                borderColor: "#2F5CB0",
+                backgroundColor: "rgba(78,108,201,0.3)",
+                pointBorderColor: "#2F5CB0",
+                pointBackgroundColor: "white",
+                pointBorderWidth: 1,
                data: [65, 59, 80, 81, 32, 12, 40],
            }
        ]
    },
        options: {
+        maintainAspectRatio: false,
+    responsive: true,
            legend: {display:false},
        animation : false,
-           xAxes: [{
+           scales: {
+           yAxes: [{
                display: false
            }]
-       }
+       }}
+       
    });
    
    var trChart = new Chart($("#trchartpc"), {
@@ -143,32 +154,42 @@ fill: true,
            {
                label: "My First dataset",
                fill: false,
-               lineTension: 0.1,
-               backgroundColor: "rgba(75,192,192,0.4)",
-               borderColor: "rgba(75,192,192,1)",
-               borderCapStyle: 'butt',
+               lineTension: 0.5,
+
+               borderCapStyle: 'round',
+
                borderDash: [],
                borderDashOffset: 0.0,
                borderJoinStyle: 'miter',
-               pointBorderColor: "rgba(75,192,192,1)",
-               pointBackgroundColor: "#fff",
-               pointBorderWidth: 1,
-               pointHoverRadius: 5,
+
+               pointBorderWidth: 2,
+               pointHoverRadius: 1,
+               borderWidth: 2,
                pointHoverBackgroundColor: "rgba(75,192,192,1)",
                pointHoverBorderColor: "rgba(220,220,220,1)",
                pointHoverBorderWidth: 2,
-               pointRadius: 1,
+               pointRadius: 2,
                pointHitRadius: 10,
+                fill: true,
+                borderColor: "#2F5CB0",
+                backgroundColor: "rgba(78,108,201,0.3)",
+                pointBorderColor: "#2F5CB0",
+                pointBackgroundColor: "white",
+                pointBorderWidth: 1,
                data: [65, 59, 80, 54, 56, 55, 65],
            }
        ]
    },
        options: {
+        maintainAspectRatio: false,
+    responsive: true,
            legend: {display:false},
        animation : false,
-           xAxes: [{
-               display: true
+           scales: {
+           yAxes: [{
+               display: false
            }]
+       }
        }
    });
    
@@ -198,8 +219,8 @@ fill: true,
 @endsection
 @section('content')
 <div class="row">
-   <div class="col-md-4" style="height: 275px;">
-      <div class="card row">
+   <div class="col-md-5" >
+      <div class="card row" style="height: 275px;">
          <div class="header">
             <h4>Visits</h4>
             <p class="category pull-right">TODAY</p>
@@ -212,7 +233,9 @@ fill: true,
 
                </div>
                <div class="col-sm-7">
+                <div style="height: 158px">
                   <canvas id="visitchart" width="400" height="400" ></canvas>
+                  </div>
                   <div id="visitchartlegend" class="chart-legend"></div>
                </div>
             </div>
@@ -224,35 +247,33 @@ fill: true,
          </div>
       </div>
    </div>
-   <div class="col-md-8">
-      <div class="card" style="height: 275px;"> 
+   <div class="col-md-7">
+      <div class="card " style="height: 275px;"> 
          <div class="header">
             <div class="row">
                <div class="col-sm-6">
                   This week
+                   <div style="height: 152px">
+                  <canvas id="trchart" width="400" height="400"> </canvas>
+                  </div>
+                  <h5>Total revenue</h5> 
+                  <span class="big" >
+                  $ 2 238
+                  </span>  <i class="bigup fa fa-arrow-up"></i>
                </div>
                <div class="col-sm-6">
                   This week
-               </div>
-            </div>
-         </div>
-         <div class="content">
-            <div class="row">
-               <div class="col-sm-6">
-                  <canvas id="trchart" width="400" height="400"> </canvas>
-                  Total revenue
-                  $ 2 238
-               </div>
-               <div class="col-sm-6">
+                  <div style="height: 152px">
                   <canvas id="trchartpc" width="400" height="40"> </canvas>
-                  Revenue per customer
-                  $ 13.5
+                  </div>
+                  <h5>Revenue per customer</h5>
+                  <span class="big">$ 13.5 </span>  <i class="bigup fa fa-arrow-up"></i>
                </div>
             </div>
-         </div>
-      </div>
-   </div>
-</div>
+        </div>
+    </div>
+        </div>
+        </div>
 <div class="row">
    <div class="col-md-4">
       <div class="row">
