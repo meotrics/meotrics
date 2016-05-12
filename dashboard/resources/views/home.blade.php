@@ -164,47 +164,50 @@
        type: 'doughnut',
        data: {
        labels: [
-           "<span class='dot'></span> New visitor",
-          "<span class='dot'></span> Returning visitor",
+           "New visitor",
+          "Returning visitor",
        ],
        datasets: [
            {
-               data: [300, 50, 100],
+               data: [430, 23],
                backgroundColor: [
-                   "#FF6384",
-                   "#36A2EB",
-                   "#FFCE56"
+                   "#4E6CC9",
+                   "#8C8C8C",
                ],
                hoverBackgroundColor: [
-                   "#FF6384",
-                   "#36A2EB",
-                   "#FFCE56"
+                   "#4E6CC9",
+                   "#8C8C8C",
                ]
            }]}, options: options
        
    });
    
-   $('#visitchartlegend').html( visitChart.generateLegend());
 </script>
 @endsection
 @section('content')
 <div class="row">
-   <div class="col-md-6">
-      <div class="card">
+   <div class="col-md-4">
+      <div class="card row">
          <div class="header">
-            Visits
+            <h4>Visits</h4>
             <p class="category pull-right">TODAY</p>
          </div>
          <div class="content">
             <div class="row">
-               <div class="col-sm-6">
-                  430 <br/>
-                  23
+               <div class="col-sm-5">
+                  <span class="verybig" style="color: #4E6CC9">430</span> <i class="bigup fa fa-arrow-up"></i><br/>
+                  <span class="verybig" style="color: #8C8C8C">23</span> <i class="bigdown fa fa-arrow-down"></i><br/>
+
                </div>
-               <div class="col-sm-6">
+               <div class="col-sm-7">
                   <canvas id="visitchart" width="400" height="400" ></canvas>
                   <div id="visitchartlegend" class="chart-legend"></div>
                </div>
+            </div>
+            <div class="small mt">
+            <div class="pull-right"> <i class="fa fa-circle" style="color: #8C8C8C"></i> Returning visitor </div>
+             <div > <i class="fa fa-circle" style="color: #4E6CC9"></i> New visitor </div>
+             
             </div>
          </div>
       </div>

@@ -47,6 +47,10 @@ select {
 	padding-top: 5px;
 }
 
+.mt {
+	margin-top: 10px;
+}
+
 .mt5 {
 	margin-top: 5px;
 }
@@ -401,7 +405,7 @@ a:hover, a:focus {
 }
 body, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6, p, .navbar, .brand, .btn-simple, .alert, a, .td-name, td, button.close {
 	font-weight: 500;
-	font-size: 15px;
+	/* font-size: 15px; */
 }
 
 .card .header {
@@ -680,3 +684,25 @@ vertical-align: middle;
 .progress-pie-chart {
 margin: 50px auto 0;
 }
+
+.verybig
+{
+	font-size: 36px;
+}
+
+
+.bigup
+{
+	font-size: 20px;
+	color: #66CD00;
+	vertical-align: super;
+}
+
+.bigdown 
+{
+	font-size: 20px;
+	color: #F50739;
+	vertical-align: super;
+}
+
+h4{margin-top: 0px}
