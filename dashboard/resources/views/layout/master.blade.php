@@ -18,6 +18,7 @@
 	<link href="{{asset('css/gf-roboto.css')}}" rel='stylesheet' type='text/css'>
 	<!-- Fonts and icons -->
 	<link href="{{asset('css/font-awesome.min.css')}}" rel="stylesheet">
+	<link href="{{ asset('/css/style.css') }}" rel="stylesheet">
 	<link href="{{asset('css/fg.menu.css')}}" rel="stylesheet"/>
 	<link href="{{asset('css/daterangepicker.css')}}" rel="stylesheet"/>
 	<link href="{{asset('css/sweetalert.css')}}"/>
@@ -144,16 +145,41 @@
 				</li>
 				<li class="{{ Route::getCurrentRoute()->getPath() == 'trend' ? 'active' : '' }}">
 					<a href="{{ URL::to('/trend') }}">
-						<i class="pe-7s-cup"></i>
+						<i class="pe-7s-graph1"></i>
 						<p>Trend</p>
 					</a>
 				</li>
 				<li class="{{ Route::getCurrentRoute()->getPath() == 'segment' ? 'active' : '' }}">
 					<a href="/segment">
-						<i class="pe-7s-user"></i>
+						<i class="pe-7s-users"></i>
 						<p>Segmentation</p>
 					</a>
 				</li>
+				<li class="">
+					<a href="/funnel">
+						<i class="pe-7s-filter"></i>
+						<p>Funnel</p>
+					</a>
+				</li>
+				<li class="">
+					<a href="/segment">
+						<i class="pe-7s-cash"></i>
+						<p>Revenue</p>
+					</a>
+				</li>
+				<li class="">
+					<a href="/segment">
+						<i class="pe-7s-graph3"></i>
+						<p>Marketing Campaign</p>
+					</a>
+				</li>
+				<li class="">
+					<a href="/segment">
+						<i class="pe-7s-user"></i>
+						<p>User Profile</p>
+					</a>
+				</li>
+
 				<!-- <li class="user-area">
 					<ul class="media-list" style="margin-left: 10px; margin-top: 10px;">
 						<li class="media">
