@@ -307,9 +307,9 @@
    <div class="col-md-4">
       <div class="card" style="    height: 315px;">
          <div class="header">
-            <h4>Purchase conversion rate</h4>
+            <h4>Conversion rate</h4>
          </div>
-         <div class="content">
+         <div class="content text-center">
             <div class="bar_container">
                <div id="main_container">
                   <div id="pbar" class="progress-pie-chart" data-percent="0">
@@ -325,8 +325,9 @@
                   <progress style="display: none" id="progress_bar" value="0" max="10"></progress>
                </div>
             </div>
+            <div class="verybig" style="color: #F50739"> LOW</div> 
          </div>
-        <div class="verybig" style="color: #F50739"> LOW</div> 
+        
       </div>
    </div>
    <div class="col-md-4">
