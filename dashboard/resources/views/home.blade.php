@@ -251,23 +251,23 @@
       <div class="card " style="height: 275px;"> 
          <div class="header">
             <div class="row">
-               <div class="col-sm-6">
-                  This week
+               <div class="col-sm-6 text-center">
+                 <span class="text-muted"> This week</span>
                    <div style="height: 152px">
                   <canvas id="trchart" width="400" height="400"> </canvas>
                   </div>
-                  <h5>Total revenue</h5> 
-                  <span class="big" >
+                  <h4 class="text-center">Total revenue</h4> 
+                  <span class="big text-center" >
                   $ 2 238
                   </span>  <i class="bigup fa fa-arrow-up"></i>
                </div>
-               <div class="col-sm-6">
-                  This week
+               <div class="col-sm-6 text-center">
+                  <span class="text-muted"> This week</span>
                   <div style="height: 152px">
                   <canvas id="trchartpc" width="400" height="40"> </canvas>
                   </div>
-                  <h5>Revenue per customer</h5>
-                  <span class="big">$ 13.5 </span>  <i class="bigup fa fa-arrow-up"></i>
+                  <h4 class="">Revenue per customer</h4>
+                  <span class="big text-center">$ 13.5 </span>  <i class=" bigup fa fa-arrow-up"></i>
                </div>
             </div>
         </div>
@@ -280,15 +280,12 @@
          <div class="card">
             <div class="header">
             <h4>Retension rate</h4>
-              
             </div>
             <div class="content" style="padding-top: 0px">
              <div class="row">
 
-                  
-                  
                   <div class="col-sm-12">
-                  <p class="muted">This week</p>
+                  <p class="text-muted">This week</p>
                   <div style="height: 100px">
                      <canvas id="retenratechart" width="400" height="40"> </canvas>
                     </div>
@@ -308,9 +305,9 @@
       </div>
    </div>
    <div class="col-md-4">
-      <div class="card">
+      <div class="card" style="    height: 315px;">
          <div class="header">
-            Purchase conversion rate
+            <h4>Purchase conversion rate</h4>
          </div>
          <div class="content">
             <div class="bar_container">
@@ -325,36 +322,42 @@
                         </div>
                      </div>
                   </div>
-                  <progress style="display: none" id="progress_bar" value="0" max="100"></progress>
+                  <progress style="display: none" id="progress_bar" value="0" max="10"></progress>
                </div>
             </div>
          </div>
-         LOW 
+        <div class="verybig" style="color: #F50739"> LOW</div> 
       </div>
    </div>
    <div class="col-md-4">
       <div class="row">
-         <div class="card">
-            <div class="header">
-               Highesh revenue campaign
-            </div>
-            <div class="content">
-               <div class="col-md-11">
-                  <div class="progress">
-                     <div data-percentage="20%" style="width: 50%;" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+         <div class="card" style="height: 170px">
+            <div class="header ">
+               <h4 class="" style="margin-bottom: 20px">Highesh revenue campaign</h4>
+<h5 class="big pull-right" style="margin-top: 0">1/6</h5>
+            <h5 class="big">Facebook</h5>
+</div>
+            <div class="content " style="padding-top: 0px">
+
+               <div class="">
+                  <div class="progress" style="width: 100%;margin-bottom: 10px;margin-top: 10px; height: 12px; border-radius: 35px;">
+                     <div data-percentage="20%" style="width: 50%; background-color: #4E6CC9" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
                </div>
             </div>
          </div>
       </div>
+   
       <div class="row">
-         <div class="card">
-            <div class="header">
-               Most effective refferer
+         <div class="card" style="background: #4E6CC9; color: white; height: 130px">
+            <div class="header text-center">
+              <h4>Most effective refferer</h4>
+             
             </div>
-            <div class="content">
-               SOCIAL
+            <div class="content text-center">
+                 <span class="verybig" > SOCIAL</span>
             </div>
+           
          </div>
       </div>
    </div>

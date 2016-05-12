@@ -637,18 +637,7 @@ width: 200px;
 height: 200px;
 clip: rect(0, 200px, 200px, 100px);
 }
-.ppc-progress .ppc-progress-fill {
-content: "";
-position: absolute;
-border-radius: 50%;
-left: calc(50% - 100px);
-top: calc(50% - 100px);
-width: 200px;
-height: 200px;
-clip: rect(0, 100px, 200px, 0);
-background: #81CE97;
-transform: rotate(60deg);
-}
+.ppc-progress .ppc-progress-fill {content: "";position: absolute;border-radius: 50%;left: calc(50% - 100px);top: calc(50% - 100px);width: 200px;height: 200px;clip: rect(0, 100px, 200px, 0);background: #F50739;transform: rotate(60deg);}
 .gt-50 .ppc-progress {
 clip: rect(0, 100px, 200px, 0);
 }
@@ -669,21 +658,14 @@ background: #fff;
 text-align: center;
 display: table;
 }
-.ppc-percents span {
-display: block;
-font-size: 2.6em;
-font-weight: bold;
-color: #81CE97;
-}
+.ppc-percents span {display: block;font-size: 2.6em;font-weight: bold;color: #F50739;}
 
 .pcc-percents-wrapper {
 display: table-cell;
 vertical-align: middle;
 }
 
-.progress-pie-chart {
-margin: 50px auto 0;
-}
+.progress-pie-chart {/* margin: 50px auto 0; */}
 
 .verybig
 {
