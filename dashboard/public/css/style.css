@@ -1,0 +1,22 @@
+.color-white{
+    color:white;
+    font-size: 13px !important;
+    vertical-align: text-top;
+    width: 3px;
+}
+.select2-selection__rendered
+{
+    padding-left: 16px !important;
+}
+.fix-padding
+{
+    padding-right: 4px !important;
+    padding-left: 4px !important;
+}
+.col-segment  .div-edit-obj, .div-trash-obj
+{
+    width: 43px;
+}
+.main-panel > .content{
+    padding: 10px 15px;
+}
