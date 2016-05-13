@@ -10,7 +10,7 @@
 	function generateDB(appid, converter, url, n, collection, valuemgr,  callback) {
 		MongoClient.connect(url).then(function (db) {
 			var count = 0;
-			converter.toIDs(['_isUser', 'name', 'age', "_os", 'iq', "_device", "_browser", "_lang", "_city", 'gender', 'height', '_segments'], function (ids) {
+			converter.toIDs(['_isUser', 'name', 'age', "_os", 'iq', "_device", "_browser", "_lang", "_city", 'gender', 'height', '_segments', '_campaign', '_lastcampaign', '_firstcampaign'], function (ids) {
 				for (var i = 0; i < n; i++) {
 					count++;
 					var user = generateUsers(ids);
@@ -54,6 +54,8 @@
 		});
 	}
 
+	var campaigns = ["black_friday", "spring_sale", "justdoit", "thinkdifference", "newyear", "valentine", "chrismas"];
+
 	function generateUsers(ids) {
 		var users = {};
 		users[ids._isUser] = true;
@@ -68,7 +70,10 @@
 		users[ids.gender] = ['male' ,'female', ''][generateNumber(0, 2)];
 		users[ids._lang] = generateNumber(1, 2) === 1 ? 'en' : 'vn';
 		users[ids._city] = generateNumber(1, 2) === 1 ? 'Hồ Chí Minh' : 'Hà Nội';
-		users[ids._browser] = browsers[generateNumber(0,6)];
+		users[ids._browser] = browsers[generateNumber(0, 6)];
+		users[ids._firstcampaign] = campaigns[generateNumber(0, 6)];
+		users[ids._campaign] = [campaigns[generateNumber(0, 6)], campaigns[generateNumber(0,6)]];
+		users[ids._lastcampaign] = campaigns[generateNumber(0, 6)];
 		return users;
 	}
 

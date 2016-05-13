@@ -63,6 +63,20 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 				{name: "Start with", code: "sw"},
 				{name: "End with", code: "ew"},
 				{name: "Not contain", code: "ncon"}]
+		},{
+			name: "Last-touch Campaign", code: "_firstcampaign",
+			operators: [{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}]
+		},{
+			name: "First-touch Campaign", code: "_lastcampaign",
+			operators: [{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}]
 		}, {
 			name: "Revenue", code: "_revenue",
 			operators: [{name: "Less than", code: "lt"},
