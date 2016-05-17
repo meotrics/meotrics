@@ -18,6 +18,26 @@ class Access
 				->where('user_app.appid', $appid)->get();
 	}
 
+	// used to delete user from app
+	// return
+	// -1 acess deny
+	// -3 appid doesn't exist
+	// -4 cannot delte owner
+	//
+	public static function deletePerm($userid, $otherid,  $appid)
+	{
+		// get owner
+		$app = DB::table('apps')->where('id', $appid)->last();
+		if ($app == null) return -3;
+
+		if($otherid == $app->ownerid) return -4;
+		if (self::can_editPerm($userid, $appid)) {
+			DB::table('user_app')->where('appid', $appid)->where('userid', $otherid)->delete();
+			return 0;
+		}
+		return -1;
+	}
+
 	// used to add new user to app
 	// or $userid set perm for $otheruserid,
 	// if $can_perm is differ than null, then its value is valid
@@ -26,11 +46,15 @@ class Access
 	// 0 means unset, 1 means set
 	// return 0 if sucecss
 	// -1: access deny
-	// -2 other iser not exist in app, must add first
+	// -2 other user not exist in app, must add first
 	// -3 appid doesn't exist
 	// -4 cannot set perm for owner
+	// -5 if user doesn't exist
 	public static function setPerm($userid, $otheruser, $appid, $can_perm, $can_struct, $can_report)
 	{
+		//check if user existed
+		if( DB::table('users')->where('id', $otheruser)->count() + DB::table('users')->where('id', $userid)->count() != 2) return -5;
+
 		// get owner
 		$app = DB::table('apps')->where('id', $appid)->last();
 		if ($app == null) return -3;
