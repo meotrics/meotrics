@@ -33,6 +33,7 @@ class TypeController extends Controller
 			abort(404);
 		}
 	}
+	
 	public function update($id)
 	{
 		$app_id = \Auth::user()->id;
