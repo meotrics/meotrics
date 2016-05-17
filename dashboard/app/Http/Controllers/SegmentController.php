@@ -18,9 +18,8 @@ class SegmentController extends Controller
 
 	}
 
-	public function getExecute(Request $request)
+	public function getExecute(Request $request, $app_id)
 	{
-		$app_id = \Auth::user()->id;
 		$query = $request->input('query');
 		$id = $request->input('id');
 
@@ -35,10 +34,8 @@ class SegmentController extends Controller
 		return json_encode([]);
 	}
 
-	public function getIndex()
+	public function getIndex(Request $request, $app_id)
 	{
-		$app_id = \Auth::user()->id;
-
 		$props = MtHttp::get('prop/' . $app_id);
 
 		$segments = MtHttp::get('segment/' . $app_id);
@@ -49,9 +46,8 @@ class SegmentController extends Controller
 		]);
 	}
 
-	public function getCreate()
+	public function getCreate(Request $request, $app_id)
 	{
-		$app_id = \Auth::user()->id;
 		$actions = MtHttp::get('actiontype/' . $app_id);
 		$props = MtHttp::get('prop/' . $app_id);
 		$prop_first = isset($props[0]) ? $props[0] : (object)[
@@ -91,11 +87,10 @@ class SegmentController extends Controller
 		]);
 	}
 
-	public function getUpdate($id)
+	public function getUpdate(Request $request, $app_id, $id)
 	{
 		$t = time();
-		$segment = $this->loadModel($id);
-		$app_id = \Auth::user()->id;
+		$segment = $this->loadModel($app_id,$id);
 		$props = MtHttp::get('prop/' . $app_id);
 		$actions = MtHttp::get('actiontype/' . $app_id);
 		$tmp_conditions = $segment->condition ? $segment->condition : [];
@@ -194,9 +189,8 @@ class SegmentController extends Controller
 		]);
 	}
 
-	public function loadModel($id)
+	public function loadModel( $app_id, $id)
 	{
-		$app_id = \Auth::user()->id;
 		$model = MtHttp::get('segment/' . $app_id . '/' . $id);
 		if ($model) {
 			return $model;
@@ -204,17 +198,13 @@ class SegmentController extends Controller
 			App::abort(404, 'Segment not found');
 		}
 	}
-	public function getHello()
-	{
-		return "hello";
-	}
 
-	public function getSuggest($appid, $typeid, $field, $query){
+	public function getSuggest(Request $request, $appid, $typeid, $field, $query){
 		$ret = MtHttp::get('suggest/' . $appid . '/' . $typeid . '/' . $field . '/' . $query);
 		return $ret;
 	}
 
-	public function postWrite()
+	public function postWrite(Request $request, $app_id)
 	{
 		if (isset($_POST['Segment']) && is_array($_POST['Segment']) && isset($_POST['name'])) {
 			$query = [];
@@ -285,7 +275,6 @@ class SegmentController extends Controller
 			array_pop($user_query->conditions);
 			$query[] = $user_query;
 
-			$app_id = Auth::user()->id;
 			$id = isset($_POST['id']) && $_POST['id'] ? $_POST['id'] : 0;
 
 			$times = explode(" ", $_POST['timerange']);
@@ -312,22 +301,20 @@ class SegmentController extends Controller
 		return redirect('segment');
 	}
 
-	public function deleteRemove($id)
+	public function deleteRemove(Request $request, $app_id, $id)
 	{
 		$result = ['success' => false];
-		$app_id = \Auth::user()->id;
-		$segment = $this->loadModel($id);
+		$segment = $this->loadModel($app_id, $id);
 		$result = MtHttp::delete('segment/' . $app_id . '/' . $id, null);
 		//check result overhere
 		$result['success'] = true;
 		return $result;
 	}
 
-	public function getCharts(Request $request)
+	public function getCharts(Request $request, $app_id)
 	{
 		$result = ['success' => false];
 		if ($request->input('segment_id') && $request->input('field1') && $request->input('field2')) {
-			$app_id = \Auth::user()->id;
 //            $charts = MtHtml::get('segment/query/'.$app_id.'/'.$request->input('field1').'/'.$request->input('field2'));
 			$tmp_charts = [
 				(object)[
@@ -422,11 +409,10 @@ class SegmentController extends Controller
 		return $result;
 	}
 
-	public function getChartonefield(Request $request)
+	public function getChartonefield(Request $request, $app_id)
 	{
 		$result = ['success' => false];
 		if ($request->input('segment_id') && $request->input('field')) {
-			$app_id = \Auth::user()->id;
 			//echo 'segment/query1/' . $app_id . '/' . $request->input('segment_id') . '/' . $request->input('field');
 			$tmp_charts = MtHttp::get('segment/query1/' . $app_id . '/' . $request->input('segment_id') . '/' . $request->input('field'));
 			$convert_data = $this->convertData($tmp_charts);
@@ -437,11 +423,10 @@ class SegmentController extends Controller
 		return $result;
 	}
 
-	public function getCharttwofields(Request $request)
+	public function getCharttwofields(Request $request, $app_id)
 	{
 		$result = ['success' => false];
 		if ($request->input('segment_id') && $request->input('field1') && $request->input('field2')) {
-			$app_id = \Auth::user()->id;
 			$tmp_charts = MtHttp::get('segment/query2/' . $app_id . '/' . $request->input('segment_id') . '/' . $request->input('field2') . '/' . $request->input('field1'));
 			$labels = [];
 			$datasets = [];
