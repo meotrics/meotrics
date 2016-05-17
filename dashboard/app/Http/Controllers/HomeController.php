@@ -1,12 +1,10 @@
 <?php namespace App\Http\Controllers;
 
 use App\Util\MtHttp;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
-use \Mobile_Detect;
-use PhpSpec\Exception\Exception;
+use Mobile_Detect;
 use UAParser\Parser;
 
 class HomeController extends Controller
@@ -52,15 +50,26 @@ class HomeController extends Controller
 	public function postCurrentapp(Request $request, $appid)
 	{
 		$response = new Response();
-		return $response->withCookie(cookie('currentappid', $appid,  2147483647, '/'. $appid . '/'));
+		return $response->withCookie(cookie('currentappid', $appid, 2147483647, '/' . $appid . '/'));
 	}
-	
-	public function index(Request $request)
+
+	public function index(Request $request, $appid)
 	{
-		if ($request->user())
-			return view('home');//->withCookie(cookie()->forget('mtid'));
-		else
-			return redirect('auth/login');//->withCookie(cookie()->forget('mtid'));
+		//check if have cookie
+
+		if ($appid != null) {
+		} else {
+			$appid = $this->request->cookie('currentappid');
+
+			if ($appid == null) {
+				
+			} else {
+				if ($request->user())
+					return view('home');//->withCookie(cookie()->forget('mtid'));
+				else
+					return redirect('auth/login');//->withCookie(cookie()->forget('mtid'));
+			}
+		}
 	}
 
 	private function getRemoteIPAddress(Request $request)
