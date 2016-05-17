@@ -6,9 +6,9 @@
 			var email = prompt('Please type user email');
 			$.post('/perm/{{$appid}}/add', {email: email}, function(){
 				location.reload();
-			}).fail(){
+			}).fail(function(){
 				alert('something went wrong, maybe server has disconnection or access denied');
-			}
+			});
 		});
 		});
 	</script>

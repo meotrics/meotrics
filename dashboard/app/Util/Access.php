@@ -9,13 +9,13 @@ class Access
 
 	// list all perm
 	// if the returned array is empty then user dont have permission to list the perms
-	public static function listPerm($userid,$appid)
+	public static function listPerm($userid, $appid)
 	{
-		if(self::can_editPerm($userid, $appid) == false) return [];
+		if (self::can_editPerm($userid, $appid) == false) return [];
 
 		return DB::table('user_app')
-				->join('users', 'user_app.userid', '=', 'users.id')
-				->where('user_app.appid', $appid)->get();
+			->join('users', 'user_app.userid', '=', 'users.id')
+			->where('user_app.appid', $appid)->get();
 	}
 
 	// used to delete user from app
@@ -24,13 +24,13 @@ class Access
 	// -3 appid doesn't exist
 	// -4 cannot delte owner
 	//
-	public static function deletePerm($userid, $otherid,  $appid)
+	public static function deletePerm($userid, $otherid, $appid)
 	{
 		// get owner
 		$app = DB::table('apps')->where('id', $appid)->last();
 		if ($app == null) return -3;
 
-		if($otherid == $app->ownerid) return -4;
+		if ($otherid == $app->ownerid) return -4;
 		if (self::can_editPerm($userid, $appid)) {
 			DB::table('user_app')->where('appid', $appid)->where('userid', $otherid)->delete();
 			return 0;
@@ -53,7 +53,8 @@ class Access
 	public static function setPerm($userid, $otheruser, $appid, $can_perm, $can_struct, $can_report)
 	{
 		//check if user existed
-		if( DB::table('users')->where('id', $otheruser)->count() + DB::table('users')->where('id', $userid)->count() != 2) return -5;
+		if (DB::table('users')->where('id', $otheruser)->count() + DB::table('users')->where('id', $userid)->count() != 2)
+			return -5;
 
 		// get owner
 		$app = DB::table('apps')->where('id', $appid)->last();
@@ -72,7 +73,7 @@ class Access
 						['appid' => $appid, 'userid' => $otheruser, 'can_perm' => 0, 'can_struct' => 0, 'can_report' => 1]
 					);
 			} else {
-				if ($app->ownerid == $otheruser){
+				if ($app->ownerid == $otheruser) {
 					return -4;
 				}
 			}
