@@ -13,7 +13,8 @@ var converter = require('./utils/fakeidmanager.js');
 var appException = require('./module/appException.js');
 
 var TrendMgr = require('./module/trendmgr.js').TrendMgr;
-var ActionMgr = require('./module/actionmgr.js').ActionMgr;
+//var ActionMgr = require('./module/actionmgr.js').ActionMgr;
+import * as ActionMgr from './module/actionmgr';
 var PropMgr = require('./module/propmgr.js').PropMgr;
 var AppMgr = require('./module/appmgr.js').AppMgr;
 var SegMgr = require('./module/segment.js').SegmentExr;
@@ -218,11 +219,11 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.Mongo
 
 	//create component
 	converter = new converter.IdManager();
-	var prefix = config.get("mongod.prefix") || "meotrics_";
+	var prefix :string = config.get<string>("mongod.prefix") || "meotrics_" ;
 	var component = {
 		dashboard: new Dashboard(db, mongodb, converter, prefix, config.get("dashboard.delay")),
 		trendMgr: new TrendMgr(db, mongodb, async, converter, prefix, "trend"),
-		actionMgr: new ActionMgr(db, mongodb, async, converter, prefix, "mapping"),
+		actionMgr: new ActionMgr.ActionMgr(db, converter, prefix, "mapping"),
 		propmgr: new PropMgr(),
 		typeCRUD: new CRUD(db, mongodb, async, converter, prefix, "actiontype"),
 		typemgr: undefined,

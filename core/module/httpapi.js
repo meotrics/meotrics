@@ -17,6 +17,7 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 
 	// purpose get real ip address
 	function getRemoteAddress(req) {
+	//	console.log(req);
 		return req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress;
 	}
 
