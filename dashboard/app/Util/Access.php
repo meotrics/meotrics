@@ -2,6 +2,7 @@
 
 namespace App\Util;
 
+use Illuminate\Support\Facades\DB;
 
 class Access
 {
@@ -69,7 +70,7 @@ class Access
 		if ($app == null) return -3;
 		if ($app->ownerid == $userid) return true;
 
-		$perm = DB::table('apps')->where('appid', $appid)->where('userid', $userid)->last();
+		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->last();
 		if ($perm == null) return false;
 		if ($perm->can_perm == 1) return true;
 		return false;
@@ -82,7 +83,7 @@ class Access
 		if ($app == null) return -3;
 		if ($app->ownerid == $userid) return true;
 
-		$perm = DB::table('apps')->where('appid', $appid)->where('userid', $userid)->last();
+		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->last();
 		if ($perm == null) return false;
 		if ($perm->can_struct == 1) return true;
 		return false;
@@ -95,23 +96,9 @@ class Access
 		if ($app == null) return -3;
 		if ($app->ownerid == $userid) return true;
 
-		$perm = DB::table('apps')->where('appid', $appid)->where('userid', $userid)->last();
+		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->last();
 		if ($perm == null) return false;
 		if ($perm->can_report == 1) return true;
 		return false;
 	}
-
-
-	public static function can($userid, $appid, $action)
-	{
-
-	}
-
-	public static function init()
-	{
-
-	}
-
 }
-
-Access::init();
