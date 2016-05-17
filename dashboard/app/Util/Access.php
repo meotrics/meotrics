@@ -6,9 +6,15 @@ namespace App\Util;
 class Access
 {
 
-	public static function getPerm($appid)
+	// list all perm
+	// if the returned array is empty then user dont have permission to list the perms
+	public static function listPerm($userid,$appid)
 	{
+		if(self::can_editPerm($userid, $appid) == false) return [];
 
+		return DB::table('user_app')
+				->join('users', 'user_app.userid', '=', 'users.id')
+				->where('user_app.appid', $appid)->get();
 	}
 
 	// used to add new user to app
