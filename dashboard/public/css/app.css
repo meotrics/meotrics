@@ -698,3 +698,36 @@ vertical-align: middle;
 .card .header {
     padding: 15px 15px 0;
 }
+
+.onoffswitch {
+	position: relative; width: 54px;
+	-webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+	display: none;
+}
+.onoffswitch-label {
+	display: block; overflow: hidden; cursor: pointer;
+	height: 21px; padding: 0; line-height: 21px;
+	border: 2px solid #999999; border-radius: 21px;
+	background-color: #FAFAFA;
+	transition: background-color 0.3s ease-in;
+}
+.onoffswitch-label:before {
+	content: "";
+	display: block; width: 21px; margin: 0px;
+	background: #FFFFFF;
+	position: absolute; top: 0; bottom: 0;
+	right: 31px;
+	border: 2px solid #999999; border-radius: 21px;
+	transition: all 0.3s ease-in 0s;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label {
+	background-color: #3AC710;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label, .onoffswitch-checkbox:checked + .onoffswitch-label:before {
+	border-color: #3AC710;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label:before {
+	right: 0px;
+}
