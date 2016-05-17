@@ -49,6 +49,12 @@ class HomeController extends Controller
 		$this->middleware('auth');
 	}
 
+	public function postCurrentapp(Request $request, $appid)
+	{
+		$response = new Response();
+		return $response->withCookie(cookie('currentappid', $appid,  2147483647, '/'. $appid . '/'));
+	}
+	
 	public function index(Request $request)
 	{
 		if ($request->user())

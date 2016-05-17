@@ -67,7 +67,7 @@ class TrendController extends Controller
 	public function postCurrenttrend(Request $request, $appid, $trendid)
 	{
 		$response = new Response();
-		return $response->withCookie(cookie('currenttrendid', $trendid));
+		return $response->withCookie(cookie('currenttrendid', $trendid, 2147483647, '/'. $appid . '/'));
 	}
 
 	public function getIndex(Request $request, $app_id)
