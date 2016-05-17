@@ -105,6 +105,7 @@
                 parent.history.back();
                 return false;
             }
+            var trend = {!! json_encode($trend) !!};
 		var objects = {};
 		var op = {};
 		@foreach($actiontypes as $actiontype)
@@ -171,7 +172,7 @@ actionChange($('#typeid').val());
 			if (objects[typeid] && objects[typeid].length) {
 				$('#object').show();
 				$.each(objects[typeid], function (i, v) {
-					$('#object').append('<option value="' + v.pcode + '">' + v.pname + '</option>');
+					$('#object').append('<option value="' + v.pcode + '"  ' + (trend.object === v.pcode ? "selected" : "" )+'>' + v.pname + '</option>');
 				});
 			}
 			else {
