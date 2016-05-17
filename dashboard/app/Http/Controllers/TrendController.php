@@ -6,10 +6,8 @@ use App\Util\MtHttp;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
-use PhpSpec\Exception\Exception;
 use stdClass;
 
 //use function redirect;
@@ -26,7 +24,7 @@ class TrendController extends Controller
 		$this->middleware('auth');
 	}
 
-	public function getSave(Request $request)
+	public function getSave(Request $request, $appid)
 	{
 		$data = array(
 			'typeid' => $request->input('typeid'),
@@ -49,32 +47,31 @@ class TrendController extends Controller
 
 	}
 
-	public function postCurrenttime()
+	public function postCurrenttime(Request $request, $appid)
 	{
 		$response = new Response();
 		$st = $this->request->input('startTime', null);
 		$et = $this->request->input('endTime', null);
-		$response->withCookie(cookie('currenttrendstarttime', $st, 2147483647, '/trend/'));
-		$response->withCookie(cookie('currenttrendendtime', $et, 2147483647, '/trend/'));
+		$response->withCookie(cookie('currenttrendstarttime', $st, 2147483647, '/trend/' . $appid . '/'));
+		$response->withCookie(cookie('currenttrendendtime', $et, 2147483647, '/trend/' . $appid . '/'));
 		return $response;
 	}
 
-	public function postCurrentsegment()
+	public function postCurrentsegment(Request $request, $appid)
 	{
 		$response = new Response();
 		$segmentid = $this->request->input('segmentid', '');
-		return $response->withCookie(cookie('currentsegmentid', $segmentid, 2147483647, '/trend/'));
+		return $response->withCookie(cookie('currentsegmentid', $segmentid, 2147483647, '/trend/' . $appid . '/'));
 	}
 
-	public function postCurrenttrend($trendid)
+	public function postCurrenttrend(Request $request, $appid, $trendid)
 	{
 		$response = new Response();
 		return $response->withCookie(cookie('currenttrendid', $trendid));
 	}
 
-	public function getIndex()
+	public function getIndex(Request $request, $app_id)
 	{
-		$app_id = Auth::user()->id;
 		$actiontypes = MtHttp::get('actiontype/' . $app_id);
 
 		$segid = $this->request->cookie('currentsegmentid');
@@ -84,46 +81,38 @@ class TrendController extends Controller
 		$trends = MtHttp::get('trend/' . $app_id);
 
 		if ($trends) {
-			$queryurl ='trend/query/' . $app_id ;
+			$queryurl = 'trend/query/' . $app_id;
 			if ($this->request->cookie('currenttrendid')) {
 				$trendid = $this->request->cookie('currenttrendid');
 				$queryurl .= '/' . $trendid;
 			} else {
 				$trend = reset($trends);
-				$queryurl .= '/' .  $trend->_id;
+				$queryurl .= '/' . $trend->_id;
 			}
 
-			if(isset($segid))
-			{
+			if (isset($segid)) {
 				$queryurl .= '/' . $segid;
-			}
-			else
-			{
+			} else {
 				$queryurl .= '/_';
 			}
 
-			if(isset($st))
-			{
+			if (isset($st)) {
 				$queryurl .= '/' . $st . '/' . $et;
 			}
 
 			try {
 				$outputs = MtHttp::get($queryurl);
-			}catch(\Exception $e){
-				$queryurl ='trend/query/' . $app_id ;
+			} catch (\Exception $e) {
+				$queryurl = 'trend/query/' . $app_id;
 				$trend = reset($trends);
-				$queryurl .= '/' .  $trend->_id;
-				if(isset($segid))
-				{
+				$queryurl .= '/' . $trend->_id;
+				if (isset($segid)) {
 					$queryurl .= '/' . $segid;
-				}
-				else
-				{
+				} else {
 					$queryurl .= '/_';
 				}
 
-				if(isset($st))
-				{
+				if (isset($st)) {
 					$queryurl .= '/' . $st . '/' . $et;
 				}
 				$outputs = MtHttp::get($queryurl);
@@ -147,12 +136,11 @@ class TrendController extends Controller
 		]);
 	}
 
-	public function getQuery(Request $request)
+	public function getQuery(Request $request, $app_id)
 	{
 		$result = ['success' => false];
 		if ($request->input('_id') != null) {
 			$trendid = $request->input('_id');
-			$app_id = \Auth::user()->id;
 			$outputs = MtHttp::get('trend/query/' . $app_id . '/' . $trendid);
 			$result['success'] = true;
 			$result['outputs'] = $outputs;
@@ -172,14 +160,8 @@ class TrendController extends Controller
 		return $result;
 	}
 
-	public function show()
+	public function getCreate(Request $request, $app_id)
 	{
-		return "";
-	}
-
-	public function getCreate()
-	{
-		$app_id = Auth::user()->id;
 		$actiontypes = MtHttp::get('actiontype/' . $app_id);
 		$actiontype_first = $actiontypes && $actiontypes[0] ? $actiontypes[0] : (object)[
 			'name' => '',
@@ -202,7 +184,7 @@ class TrendController extends Controller
 		]);
 	}
 
-	public function postWrite(Request $request)
+	public function postWrite(Request $request, $app_id)
 	{
 		if (isset($_POST['Trend'])) {
 
@@ -237,7 +219,6 @@ class TrendController extends Controller
 			if (isset($data_post['order'])) $data['order'] = $data_post['order'];
 			if (isset($data_post['name'])) $data['name'] = $data_post['name'];
 
-			$app_id = Auth::user()->id;
 			if (isset($data_post['_id']) && $data_post['_id']) {
 				$trendid = MtHttp::put('trend/' . $app_id . '/' . $data_post['_id'], $data);
 			} else {
@@ -266,12 +247,11 @@ class TrendController extends Controller
 		return response()->json($result);
 	}
 
-	public function getHtmloutputs(Request $request)
+	public function getHtmloutputs(Request $request, $app_id)
 	{
 		$result = ['success' => false];
 		if ($request->input('_id') != null) {
 			$trendid = $request->input('_id');
-			$app_id = Auth::user()->id;
 			$outputs = MtHttp::get('trend/query/' . $app_id . '/' . $trendid);
 			$view = View::make('trend.partials.outputs', [
 				'outputs' => $outputs,
@@ -285,10 +265,9 @@ class TrendController extends Controller
 		return $result;
 	}
 
-	public function getUpdate($id)
+	public function getUpdate(Request $requrest, $app_id, $id)
 	{
-		$trend = $this->loadTrend($id);
-		$app_id = Auth::user()->id;
+		$trend = $this->loadTrend($app_id, $id);
 		$actiontypes = MtHttp::get('actiontype/' . $app_id);
 		$actiontype_first = $actiontypes && $actiontypes[0] ? $actiontypes[0] : (object)[
 			'name' => '',
@@ -302,9 +281,8 @@ class TrendController extends Controller
 		]);
 	}
 
-	public function loadTrend($id)
+	public function loadTrend($app_id, $id)
 	{
-		$app_id = \Auth::user()->id;
 		$trend = MtHttp::get('trend/' . $app_id . '/' . $id);
 		if ($trend) {
 			return $trend;
@@ -313,11 +291,10 @@ class TrendController extends Controller
 		}
 	}
 
-	public function deleteRemove($id)
+	public function deleteRemove(Request $requrest, $app_id, $id)
 	{
 		$result = ['success' => false];
-		$app_id = \Auth::user()->id;
-		$trend = $this->loadTrend($id);
+		$trend = $this->loadTrend($app_id, $id);
 		$result = MtHttp::delete('trend/' . $app_id . '/' . $id, null);
 		//check result overhere
 

@@ -15,7 +15,19 @@ Route::get('/', 'HomeController@index');
 
 Route::get('home', 'HomeController@index');
 
-Route::controller('trend', 'TrendController');
+//Route::controller('trend', 'TrendController');
+Route::get('/trend/{appid}/save', 'TrendController@getSave');
+Route::post('/trend/{appid}/currenttime', 'TrendController@postCurrenttime');
+Route::post('/trend/{appid}/currentsegment', 'TrendController@postCurrentsegment');
+Route::post('/trend/{appid}/currenttrend/{$trendid}', 'TrendController@postCurrenttrend');
+Route::get('/trend/{appid}/index', 'TrendController@getIndex');
+Route::get('/trend/{appid}/query', 'TrendController@getQuery');
+Route::get('/trend/{appid}/create', 'TrendController@getCreate');
+Route::post('/trend/{appid}/write', 'TrendController@postWrite');
+Route::get('/trend/{appid}/htmloutputs', 'TrendController@getHtmloutputs');
+Route::get('/trend/{appid}/update/{id}', 'TrendController@getUpdate');
+Route::delete('/trend/{appid}/remove/{id}', 'TrendController@deleteRemove');
+
 
 Route::resource('actiontype', 'TypeController');
 
