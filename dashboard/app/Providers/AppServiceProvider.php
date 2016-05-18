@@ -22,11 +22,12 @@ class AppServiceProvider extends ServiceProvider
 			if (\Auth::user() == null) return;
 			$userid = \Auth::user()->id;
 
-			$appid = Request::route()->parameters('appid');
+			$appid = Request::route()->parameters();
 
 			if ($appid == null) {
 				$appid = Request::cookie('currentappid');
-			}
+			} else
+				$appid = $appid['appcode'];
 
 			if ($appid == null) // first time with no app
 			{
@@ -42,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
 
 			$ap = \App\App::find($appid);
 
-			$view->with('curappname', $ap->name);
+			$view->with('curappname', "\$ap->name");
 			$view->with('curappid', $appid);
 		});
 	}

@@ -9,13 +9,17 @@ class Access
 
 	// list all perm
 	// if the returned array is empty then user dont have permission to list the perms
-	public static function listPerm($userid, $appid)
+	public static function listPerm($userid, $appcode)
 	{
-		if (self::can_editPerm($userid, $appid) == false) return [];
+		if (self::can_editPerm($userid, $appcode) == false) return [];
+
+		$app = DB::table('apps')->where('code', $appcode)->first();
+		if ($app == null) return -3;
+
 
 		return DB::table('user_app')
 			->join('users', 'user_app.userid', '=', 'users.id')
-			->where('user_app.appid', $appid)->get();
+			->where('user_app.appid', $app->id)->get();
 	}
 
 	// used to delete user from app
@@ -24,15 +28,15 @@ class Access
 	// -3 appid doesn't exist
 	// -4 cannot delte owner
 	//
-	public static function deletePerm($userid, $otherid, $appid)
+	public static function deletePerm($userid, $otherid, $appcode)
 	{
 		// get owner
-		$app = DB::table('apps')->where('id', $appid)->first();
+		$app = DB::table('apps')->where('code', $appcode)->first();
 		if ($app == null) return -3;
 
 		if ($otherid == $app->ownerid) return -4;
-		if (self::can_editPerm($userid, $appid)) {
-			DB::table('user_app')->where('appid', $appid)->where('userid', $otherid)->delete();
+		if (self::can_editPerm($userid, $app->id)) {
+			DB::table('user_app')->where('appid', $app->id)->where('userid', $otherid)->delete();
 			return 0;
 		}
 		return -1;
@@ -50,27 +54,27 @@ class Access
 	// -3 appid doesn't exist
 	// -4 cannot set perm for owner
 	// -5 if user doesn't exist
-	public static function setPerm($userid, $otheruser, $appid, $can_perm, $can_struct, $can_report)
+	public static function setPerm($userid, $otheruser, $appcode, $can_perm, $can_struct, $can_report)
 	{
 		//check if user existed
 		if (DB::table('users')->where('id', $otheruser)->count() + DB::table('users')->where('id', $userid)->count() != 2)
 			return -5;
 
 		// get owner
-		$app = DB::table('apps')->where('id', $appid)->first();
+		$app = DB::table('apps')->where('code', $appcode)->first();
 		if ($app == null) return -3;
 
-		if (self::can_editPerm($userid, $appid)) {
+		if (self::can_editPerm($userid, $appcode)) {
 
-			$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $otheruser)->first();
+			$perm = DB::table('user_app')->where('appid', $app->id)->where('userid', $otheruser)->first();
 			if ($perm == null) {
 				if ($app->ownerid == $otheruser)
 					DB::table('user_app')->insert(
-						['appid' => $appid, 'userid' => $otheruser, 'can_perm' => 1, 'can_struct' => 1, 'can_report' => 1]
+						['appid' => $app->id, 'userid' => $otheruser, 'can_perm' => 1, 'can_struct' => 1, 'can_report' => 1]
 					);
 				else
 					DB::table('user_app')->insert(
-						['appid' => $appid, 'userid' => $otheruser, 'can_perm' => 0, 'can_struct' => 0, 'can_report' => 1]
+						['appid' => $app->id, 'userid' => $otheruser, 'can_perm' => 0, 'can_struct' => 0, 'can_report' => 1]
 					);
 			} else {
 				if ($app->ownerid == $otheruser) {
@@ -80,60 +84,63 @@ class Access
 
 			$permrecord = [];
 			if ($can_perm != null) $permrecord['can_perm'] = $can_perm;
+
 			if ($can_struct != null) $permrecord['can_struct'] = $can_struct;
 			if ($can_report != null) $permrecord['can_report'] = $can_report;
-			DB::table('user_app')->where('appid', $appid)->where('userid', $otheruser)->update($permrecord);
+			if (count($permrecord) != 0) {
+				DB::table('user_app')->where('appid', $app->id)->where('userid', $otheruser)->update($permrecord);
+			}
 			return 0;
 		}
 		return -1;
 	}
 
-	public static function can_editPerm($userid, $appid)
+	public static function can_editPerm($userid, $appcode)
 	{
 		// full access for app owner
-		$app = DB::table('apps')->where('id', $appid)->first();
+		$app = DB::table('apps')->where('code', $appcode)->first();
 		if ($app == null) return -3;
 		if ($app->ownerid == $userid) return true;
 
-		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->first();
+		$perm = DB::table('user_app')->where('appid', $app->id)->where('userid', $userid)->first();
 		if ($perm == null) return false;
 		if ($perm->can_perm == 1) return true;
 		return false;
 	}
 
-	public static function can_editStruct($userid, $appid)
+	public static function can_editStruct($userid, $appcode)
 	{
 		// full access for app owner
-		$app = DB::table('apps')->where('id', $appid)->first();
+		$app = DB::table('apps')->where('code', $appcode)->first();
 		if ($app == null) return -3;
 		if ($app->ownerid == $userid) return true;
 
-		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->first();
+		$perm = DB::table('user_app')->where('appid', $app->id)->where('userid', $userid)->first();
 		if ($perm == null) return false;
 		if ($perm->can_struct == 1) return true;
 		return false;
 	}
 
-	public static function can_view($userid, $appid)
+	public static function can_view($userid, $appcode)
 	{
 		// full access for app owner
-		$app = DB::table('apps')->where('id', $appid)->first();
+		$app = DB::table('apps')->where('code', $appcode)->first();
 		if ($app == null) return -3;
 		if ($app->ownerid == $userid) return true;
 
-		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->first();
+		$perm = DB::table('user_app')->where('appid', $app->id)->where('userid', $userid)->first();
 		if ($perm == null) return false;
 		return true;
 	}
 
-	public static function can_editReport($userid, $appid)
+	public static function can_editReport($userid, $appcode)
 	{
 		// full access for app owner
-		$app = DB::table('apps')->where('id', $appid)->first();
+		$app = DB::table('apps')->where('code', $appcode)->first();
 		if ($app == null) return -3;
 		if ($app->ownerid == $userid) return true;
 
-		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->first();
+		$perm = DB::table('user_app')->where('appid', $app->id)->where('userid', $userid)->first();
 		if ($perm == null) return false;
 		if ($perm->can_report == 1) return true;
 		return false;

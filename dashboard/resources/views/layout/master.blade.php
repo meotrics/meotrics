@@ -125,13 +125,13 @@
 			</div>
 			<ul class="nav">
 				<li class="{{ Route::getCurrentRoute()->getPath() == 'home' ? 'active' : '' }}">
-					<a href="{{ URL::to('/home/'. $curappid ) }}">
+					<a href="/{{ $curappid }}">
 						<i class="pe-7s-graph"></i>
 						<p>Dashboard</p>
 					</a>
 				</li>
 				<li class="{{ Route::getCurrentRoute()->getPath() == 'trend' ? 'active' : '' }}">
-					<a href="{{ URL::to('/trend/'.$curappid) }}">
+					<a href="/trend/{{$curappid}}">
 						<i class="pe-7s-graph1"></i>
 						<p>Trend</p>
 					</a>
@@ -265,8 +265,8 @@
 
 <script>
 
-	onPageLoad(function(){
-		$('.id_trackingcode').click(function(){
+	onPageLoad(function () {
+		$('.id_trackingcode').click(function () {
 			showCodeDialog(appid);
 		});
 	});

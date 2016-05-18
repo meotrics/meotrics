@@ -4,7 +4,7 @@
 		onPageLoad(function(){
 		$('.id_grant').click(function () {
 			var email = prompt('Please type user email');
-			$.post('/perm/{{$appid}}/add', {email: email}, function(){
+			$.post('/perm/{{$appcode}}/add', {email: email}, function(){
 				location.reload();
 			}).fail(function(){
 				alert('something went wrong, maybe server has disconnection or access denied');
@@ -21,7 +21,7 @@
 			<form method="POST">
 				<input type="hidden" name="_method" value="PUT">
 				<div>
-					<a href="{{ URL::to('app') }}">
+					<a href="/">
 						<small class="text-muted pull-left uppercase">
 							<b><i class="fa fa-chevron-left"></i>All Apps</b>
 						</small>
@@ -52,7 +52,7 @@
 							<tbody>
 							@foreach($ap->agencies as $ag)
 								<tr id="tr{{$ag->userid}}">
-									<td>$ag->name</td>
+									<td>{{$ag->email}}</td>
 									<td>
 										<div class="onoffswitch">
 											<input type="checkbox" class="onoffswitch-checkbox"
@@ -74,7 +74,7 @@
 											<label class="onoffswitch-label" for="of_{{$ag->userid}}_3"></label>
 										</div>
 									</td>
-									<td><a href="#" id="rm{{$ag->userid}}" data-appid={{$ag->appid}} data-userid="{{$ag->userid}}">Remove
+									<td><a href="#" id="rm{{$ag->userid}}" data-appid={{$appcode}} data-userid="{{$ag->userid}}">Remove
 											access</a></td>
 								</tr>
 
@@ -83,7 +83,7 @@
 										$('#rm{{$ag->userid}}').click(function () {
 											var ok = confirm("are you sure want to delete access from user {{$ag->name}}?");
 											if (ok) {
-												$.post('/perm/{{$ag->appid}}/delete/{{$ag->userid}}', function () {
+												$.post('/perm/{{$appcode}}/delete/{{$ag->userid}}', function () {
 													$('#tr{{$ag->userid}}').addClass('hidden');
 												}).fail(function () {
 													alert('something went wrong, maybe server has disconnection or access denied');
@@ -93,21 +93,23 @@
 
 										$('#of_{{$ag->userid}}_1').change(function () {
 											var $this = $(this);
-											$.post('/perm/{{$ag->appid}}/{{$ag->userid}}', {can_perm: $this.prop('checked') == true ? 1 : 0}, function () {
+											$.post('/perm/{{$appcode}}/set/{{$ag->userid}}', {can_perm: $this.prop('checked') == true ? 1 : 0}, function () {
 											}).fail(function () {
 												$this.prop('checked', !$this.prop('checked'));
 												alert('something went wrong, maybe server has disconnection or access denied');
 											});
 										});
-										$('#of_{{$ag->userid}}_1').change(function () {
-											$.post('/perm/{{$ag->appid}}/{{$ag->userid}}', {can_struct: $this.prop('checked') == true ? 1 : 0}, function () {
+										$('#of_{{$ag->userid}}_2').change(function () {
+											var $this = $(this);
+											$.post('/perm/{{$appcode}}/set/{{$ag->userid}}', {can_struct: $this.prop('checked') == true ? 1 : 0}, function () {
 											}).fail(function () {
 												$this.prop('checked', !$this.prop('checked'));
 												alert('something went wrong, maybe server has disconnection or access denied');
 											});
 										});
-										$('#of_{{$ag->userid}}_1').change(function () {
-											$.post('/perm/{{$ag->appid}}/{{$ag->userid}}', {can_report: $this.prop('checked') == true ? 1 : 0}, function () {
+										$('#of_{{$ag->userid}}_3').change(function () {
+											var $this = $(this);
+											$.post('/perm/{{$appcode}}/set/{{$ag->userid}}', {can_report: $this.prop('checked') == true ? 1 : 0}, function () {
 											}).fail(function () {
 												$this.prop('checked', !$this.prop('checked'));
 												alert('something went wrong, maybe server has disconnection or access denied');

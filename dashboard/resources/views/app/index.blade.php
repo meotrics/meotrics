@@ -26,7 +26,6 @@
 			<h3>Apps </h3>
 			<button type="button" data-toggle="modal" data-target="#addModal" class="button action blue">
 				<span class="label">Track new app</span></button>
-
 		</div>
 		<div class="content col-sm-12">
 			<div class="content table-responsive table-full-width col-sm-12">
@@ -53,8 +52,8 @@
 								@endforeach
 							</td>
 							<td class="row">
-								<a class="btn btn-primary btn-sm btn-fill" href="/home/{{$ap->id}}"><i class="fa fa-sign-in"></i> Enter</a>
-								<a class="btn btn-sm" href="/app/{{$ap->id}}"><i class="fa fa-edit"></i></a>
+								<a class="btn btn-primary btn-sm btn-fill" href="/{{$ap->code}}"><i class="fa fa-sign-in"></i> Enter</a>
+								<a class="btn btn-sm" href="/app/{{$ap->code}}"><i class="fa fa-edit"></i></a>
 							</td>
 						</tr>
 					@endforeach

@@ -32,9 +32,15 @@ class PermController extends Controller
 		]);
 	}
 
-	public function edit(Request $request, $appid)
+	public function edit(Request $request, $appcode)
 	{
-		//return view('app/')
+		$ap = DB::table('apps')->where('apps.code', $appcode)->first();
+		if ($ap == null) abort(500, 'cannot find app: ' . $appcode);
+
+		$ap->owner = \App\User::find($ap->ownerid);
+		$ap->agencies = DB::table('user_app')->join('users', 'users.id', '=', 'user_app.userid')->where('user_app.appid', $ap->id)->get();
+
+		return view('app/edit', ['ap' => $ap, 'appcode' => $appcode]);
 	}
 
 	public function set(Request $request, $appid, $userid)
@@ -85,14 +91,18 @@ class PermController extends Controller
 		else abort(403, 'Unauthorized action');
 	}
 
-	public function add(Request $request, $appid, $email)
+	public function add(Request $request, $appcode)
 	{
+		$email = $request->input('email');
 		$uid = \Auth::user()->id;
 		//get userid from email
-		$userid = DB::table('users')->where('email', $email)->value('id');
+		$user = DB::table('users')->where('email', $email)->first();
+		if($user == null) abort(500, 'user not found: ' . $email);
+		$userid = $user->id;
 		if ($userid == null)
 			abort(500, 'cannot find user with email ' . $email);
-		$status = Access::setPerm($uid, $userid, $appid, null, null, null);
+		
+		$status = Access::setPerm($uid, $userid, $appcode, null, null, null);
 		if ($status == 0)
 			return new Response();
 		else abort(403, 'Unauthorized action');
