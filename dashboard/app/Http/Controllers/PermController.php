@@ -2,6 +2,7 @@
 
 use App\Util\Access;
 use App\Util\AppCodeGen;
+use App\Util\MtHttp;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -20,14 +21,20 @@ class PermController extends Controller
 		$apps = DB::table('apps')->join('user_app', 'apps.id', '=', 'user_app.appid')
 			->where('user_app.userid', $userid)
 			->where('user_app.can_perm', 1)->get();
+
 		foreach ($apps as $ap) {
 			$ap->owner = \App\User::find($ap->ownerid);
-			$ap->agencies = DB::table('user_app')->join('users', 'users.id', '=', 'user_app.userid')->where('user_app.appid', $ap->id) . get();
+			$ap->agencies = DB::table('user_app')->join('users', 'users.id', '=', 'user_app.userid')->where('user_app.appid', $ap->id)->get();
 		}
 
 		return view('app/index', [
 			'apps' => $apps
 		]);
+	}
+
+	public function edit(Request $request, $appid)
+	{
+		//return view('app/')
 	}
 
 	public function set(Request $request, $appid, $userid)
@@ -44,19 +51,28 @@ class PermController extends Controller
 		$uid = \Auth::user()->id;
 		$name = $request->input('name');
 		if ($name == null || $name == '') abort(500, 'name must not be empty');
+
+		// lock thread
 		$out = AppCodeGen::alloc($name);
 		$code = $out['code'];
 		$mutex = $out['lock'];
-		$appid = DB::table('apps')->insert(array(
+		$appid = DB::table('apps')->insertGetId(array(
 				'name' => $name,
 				'code' => $code,
 				'ownerid' => $uid
 			)
 		);
 
+		// unlock thread
+		AppCodeGen::used($mutex);
+
+
+		// create role for owner
 		Access::setPerm($uid, $uid, $appid, 1, 1, 1);
 
-		AppCodeGen::used($mutex);
+		// init app in backend
+		MtHttp::get('app/init/' . $code);
+
 		return new Response($code);
 	}
 

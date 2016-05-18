@@ -96,7 +96,7 @@
 
 	function showCodeDialog(APP_ID) {
 		$('#guideline').modal('show');
-		getIntegrationCode();
+		getIntegrationCode(APP_ID);
 	}
 
 	$(document).ready(function () {

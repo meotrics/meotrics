@@ -1,10 +1,10 @@
 <?php namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use View;
-use Route;
-use Request;
 use DB;
+use Illuminate\Support\ServiceProvider;
+use Request;
+use Route;
+use View;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,11 +18,11 @@ class AppServiceProvider extends ServiceProvider
 	{
 
 		//view()->composer('segment.select', 'App\Http\Composers\SegmentSegment');
-		View::composer('*', function( $view){
+		View::composer('*', function ($view) {
+			if (\Auth::user() == null) return;
 			$userid = \Auth::user()->id;
 
-			$currentRoute = Route::current();
-			$appid = $currentRoute->parameters('appid');
+			$appid = Request::route()->parameters('appid');
 
 			if ($appid == null) {
 				$appid = Request::cookie('currentappid');

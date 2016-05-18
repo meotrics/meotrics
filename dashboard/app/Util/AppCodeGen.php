@@ -25,7 +25,7 @@ class AppCodeGen
 			$appcode = preg_replace('/\s+/', '', $appname);
 
 			// no more than 20 character
-			$appcode = substr($appcode, 0, 20);
+			$appcode = strtoupper(substr($appcode, 0, 20));
 			$i = "";
 			//check if appname is existed
 			while (DB::table('apps')->where('code', $appcode . $i)->count() != 0) {

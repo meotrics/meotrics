@@ -12,7 +12,7 @@
 */
 
 Route::get('/', 'PermController@index');
-Route::get('/{appid}', 'HomeController@index');
+Route::get('/app/{appid}', 'PermController@set');
 
 Route::post('/app/create','PermController@create' );
 
