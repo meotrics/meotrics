@@ -14,6 +14,10 @@
 Route::get('/', 'PermController@index');
 Route::get('/{appid}', 'HomeController@index');
 
+Route::post('/app/create','PermController@create' );
+
+
+
 //Route::controller('trend', 'TrendController');
 Route::get('/trend/{appid}/save', 'TrendController@getSave');
 Route::post('/trend/{appid}/currenttime', 'TrendController@postCurrenttime');

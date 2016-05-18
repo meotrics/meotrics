@@ -366,5 +366,5 @@
 </div>
 @endsection
 @section('additional')
-@include('partials/install_guide')
+
 @endsection

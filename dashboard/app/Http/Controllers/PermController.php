@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 use App\Util\Access;
+use App\Util\AppCodeGen;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -17,8 +18,8 @@ class PermController extends Controller
 	{
 		$userid = \Auth::user()->id;
 		$apps = DB::table('apps')->join('user_app', 'apps.id', '=', 'user_app.appid')
-				->where('user_app.userid', $userid)
-				->where('user_app.can_perm', 1)->get();
+			->where('user_app.userid', $userid)
+			->where('user_app.can_perm', 1)->get();
 		foreach ($apps as $ap) {
 			$ap->owner = \App\User::find($ap->ownerid);
 			$ap->agencies = DB::table('user_app')->join('users', 'users.id', '=', 'user_app.userid')->where('user_app.appid', $ap->id) . get();
@@ -38,11 +39,24 @@ class PermController extends Controller
 		else abort(403, 'Unauthorized action');
 	}
 
-	public function  create(Request $request)
+	public function create(Request $request)
 	{
-		
+		$uid = \Auth::user()->id;
+		$name = $request->input('name');
+		if ($name == null || $name == '') abort(500, 'name must not be empty');
+		$code = AppCodeGen::alloc($name);
+
+		$appid = DB::table('apps')->insert(array(
+				'name' => $name,
+				'code' => $code,
+				'ownerid' => $uid
+			)
+		);
+
+		AppCodeGen::used();
+		return new Response($code);
 	}
-	
+
 	public function delete(Request $request, $appid, $userid)
 	{
 		$uid = \Auth::user()->id;

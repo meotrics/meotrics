@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
 				//get first app
 				$ua = DB::table('user_app')->where('userid', $userid)->first();
 				if ($ua == null) {
-					$view->with('curappname', '<code>Setting</code>');
+					$view->with('curappname', 'Setting');
 					$view->with('curappid', '-1');
 					return;
 				}

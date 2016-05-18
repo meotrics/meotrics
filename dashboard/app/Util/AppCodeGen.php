@@ -8,10 +8,11 @@ use Mutex;
 
 class AppCodeGen
 {
-	public static $mutex;
-	public  static function used()
+	private static $mutex;
+	
+	public static function used()
 	{
-		Mutex::unlock( AppCodeGen::$mutex);
+		Mutex::unlock(AppCodeGen::$mutex);
 	}
 
 	public static function alloc($appname)
@@ -35,9 +36,14 @@ class AppCodeGen
 		}
 
 		$appcode = $appcode . $i;
-		
+
 		return $appcode;
+	}
+
+	public static function init()
+	{
+		self::$mutex = Mutex::create();
 	}
 }
 
-AppCodeGen::$mutex = Mutex::create();
+AppCodeGen::init();

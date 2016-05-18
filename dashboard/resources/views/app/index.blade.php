@@ -8,23 +8,29 @@
 
 		onPageLoad(function(){
 			$('.id_add').click(function(){
-
+				$.post('/app/create', {name: $('.id_name').val() }, function(appid){
+					showCodeDialog(appid);
+				}).fail(function()
+				{
+					alert('cannot create app');
+				});
+				$('.id_name').val("");
 			});
 		});
 	</script>
 @endsection
 
 @section('content')
+
 	<div class="card row">
 		<div class="header col-sm-12">
-			<h3>Action type </h3>
-			<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-				Track new app
-			</button>
+			<h3>Apps </h3>
+			<button type="button" data-toggle="modal" data-target="#addModal" class="button action blue">
+				<span class="label">Track new app</span></button>
+
 		</div>
 		<div class="content col-sm-12">
 			<div class="content table-responsive table-full-width col-sm-12">
-
 				<table class="table table-hover table-striped">
 					<thead>
 					<tr>
@@ -59,29 +65,37 @@
 
 	</div>
 
-	<div class="modal fade" id="addModal">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-					<h4 class="modal-title">Track new app</h4>
-				</div>
-				<div class="modal-body">
-					<div class="row">
-						<div class="col-sm-2 ">
-							<h6 class="pull-right">Name</h6>
-						</div>
-						<div class="col-sm-5">
-							<input type="text" class="form-control" placeholder="App Name" required>
-						</div>
-					</div>
+	<div class="hidden">
 
+	</div>
+@endsection
+
+@section('additional')
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="myModalLabel">Track new app</h4>
+			</div>
+			<div class="modal-body">
+				<div class="row pt pb10">
+					<div class="col-sm-4 ">
+						<h6 class="pull-right" >name of the app</h6>
+					</div>
+					<div class="col-sm-7">
+						<input type="text" class="form-control id_name" placeholder="App Name" required>
+					</div>
 				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary id_add" >Create</button>
-				</div>
-			</div><!-- /.modal-content -->
-		</div><!-- /.modal-dialog -->
-	</div><!-- /.modal -->
+			</div>
+			<div class="modal-footer">
+				<button type="button" data-dismiss="modal" class="button action ">
+					<span class="label">Cancel</span></button>
+				<button type="button" data-dismiss="modal" class="button action blue id_add">
+					<span class="label">Next step</span></button>
+
+			</div>
+		</div>
+	</div>
+</div>
 @endsection

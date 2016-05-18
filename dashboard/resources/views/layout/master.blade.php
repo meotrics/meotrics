@@ -54,8 +54,8 @@
 
 					options = options || {};
 					options.type = 'danger';
-					option.timer = 3000;
-					option.placement = {
+					options.timer = 3000;
+					options.placement = {
 						from: 'top',
 						align: 'right'
 					};
@@ -68,8 +68,8 @@
 				success: function (message, options) {
 					options = options || {};
 					options.type = 'success';
-					option.timer = 3000;
-					option.placement = {
+					options.timer = 3000;
+					options.placement = {
 						from: 'top',
 						align: 'right'
 					};
@@ -260,7 +260,7 @@
 	</div>
 </div>
 
-@include('partials/install_guide')
+
 @yield('additional')
 
 <script>
@@ -270,9 +270,6 @@
 			showCodeDialog(appid);
 		});
 	});
-	function showCode()
-	{}
-
 	var config = {
 		customOpenAnimation: function (cb) {
 			$(this).fadeIn(300, cb);
@@ -299,5 +296,6 @@
 <script src="{{asset('js/sweetalert.js')}}" type="text/javascript"></script> @include('Alerts::alerts')
 <script src="{{asset('js/odometer.min.js')}}"></script>
 @yield('script')
+@include('partials/install_guide')
 </body>
 </html>
