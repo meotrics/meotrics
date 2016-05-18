@@ -138,43 +138,43 @@
 			</div>
 			<ul class="nav">
 				<li class="{{ Route::getCurrentRoute()->getPath() == 'home' ? 'active' : '' }}">
-					<a href="{{ URL::to('/home') }}">
+					<a href="{{ URL::to('/home/{{$curappid}}') }}">
 						<i class="pe-7s-graph"></i>
 						<p>Dashboard</p>
 					</a>
 				</li>
 				<li class="{{ Route::getCurrentRoute()->getPath() == 'trend' ? 'active' : '' }}">
-					<a href="{{ URL::to('/trend') }}">
+					<a href="{{ URL::to('/trend/{{$curappid}}') }}">
 						<i class="pe-7s-graph1"></i>
 						<p>Trend</p>
 					</a>
 				</li>
 				<li class="{{ Route::getCurrentRoute()->getPath() == 'segment' ? 'active' : '' }}">
-					<a href="/segment">
+					<a href="/segment/{{$curappid}}">
 						<i class="pe-7s-users"></i>
 						<p>Segmentation</p>
 					</a>
 				</li>
-				<li class="">
-					<a href="/funnel">
+				<li class="{{ Route::getCurrentRoute()->getPath() == 'funnel' ? 'active' : '' }}">
+					<a href="/funnel/{{$curappid}}">
 						<i class="pe-7s-filter"></i>
 						<p>Funnel</p>
 					</a>
 				</li>
-				<li class="">
-					<a href="/segment">
+				<li class="{{ Route::getCurrentRoute()->getPath() == 'revenue' ? 'active' : '' }}">
+					<a href="/revenue/{{$curappid}}">
 						<i class="pe-7s-cash"></i>
 						<p>Revenue</p>
 					</a>
 				</li>
-				<li class="">
-					<a href="/segment">
+				<li class="{{ Route::getCurrentRoute()->getPath() == 'campaign' ? 'active' : '' }}">
+					<a href="/campaign/{{$curappid}}">
 						<i class="pe-7s-graph3"></i>
 						<p>Marketing Campaign</p>
 					</a>
 				</li>
-				<li class="">
-					<a href="/segment">
+				<li class="{{ Route::getCurrentRoute()->getPath() == 'insight' ? 'active' : '' }}">
+					<a href="/insight/{{$curappid}}">
 						<i class="pe-7s-user"></i>
 						<p>User Profile</p>
 					</a>
