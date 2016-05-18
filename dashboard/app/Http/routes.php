@@ -46,6 +46,12 @@ Route::delete('/segment/{appid}/remove/{id}', 'SegmentController@deleteRemove');
 Route::get('/segment/{appid}/chartonefield', 'SegmentController@getChartonefield');
 Route::get('/segment/{appid}/charttwofields', 'SegmentController@getCharttwofields');
 
+
+Route::post('/perm/{appid}/add/{email}', 'PermController@add');
+Route::post('/perm/{appid}/{userid}', 'PermController@set');
+Route::get('/perm/{appid}/{id}', 'PermController@index');
+Route::post('/perm/{appid}/delete/{userid}', 'PermController@delete');
+
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',
