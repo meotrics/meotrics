@@ -1,9 +1,6 @@
 <?php namespace App\Http\Composers;
 
 use App\Http\Requests\Request;
-use \App\Util\MtHttp;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Cookie;
 use Illuminate\View\View;
 
 //App\Http\Composers\View
@@ -16,17 +13,15 @@ class MasterComposer
 
 		$currentRoute = Route::current();
 		$appid = $currentRoute->parameters('appid');
-		if ($appid == null)
-		{
+		if ($appid == null) {
 			$appid = Request::cookie('currentappid');
 
 		}
-		if($appid == null) // first time with no app
+		if ($appid == null) // first time with no app
 		{
 			//get first app
 			$ua = DB::table('user_app')->where('userid', $userid)->first();
-			if($ua == null)
-			{
+			if ($ua == null) {
 				$view->with('curappname', '<code>Setting</code>');
 				$view->with('curappid', -1);
 				return;
@@ -38,9 +33,6 @@ class MasterComposer
 
 		$view->with('curappname', $ap->name);
 		$view->with('curappid', $appid);
-
-
-
 	}
 
 }

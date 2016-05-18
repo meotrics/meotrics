@@ -114,6 +114,18 @@ class Access
 		return false;
 	}
 
+	public static function can_view($userid, $appid)
+	{
+		// full access for app owner
+		$app = DB::table('apps')->where('id', $appid)->last();
+		if ($app == null) return -3;
+		if ($app->ownerid == $userid) return true;
+
+		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->last();
+		if ($perm == null) return false;
+		return true;
+	}
+
 	public static function can_editReport($userid, $appid)
 	{
 		// full access for app owner
