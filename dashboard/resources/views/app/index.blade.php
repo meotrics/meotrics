@@ -5,6 +5,12 @@
 		function confirmDelete(acode){
 			return confirm('Are you sure ? Detele `' + acode + '` action type !');
 		}
+
+		onPageLoad(function(){
+			$('.id_add').click(function(){
+
+			});
+		});
 	</script>
 @endsection
 
@@ -12,8 +18,9 @@
 	<div class="card row">
 		<div class="header col-sm-12">
 			<h3>Action type </h3>
-			<a href="/app/create" class="button action blue"><span class="label">Track new app</span></a>
-
+			<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+				Track new app
+			</button>
 		</div>
 		<div class="content col-sm-12">
 			<div class="content table-responsive table-full-width col-sm-12">
@@ -52,4 +59,29 @@
 
 	</div>
 
+	<div class="modal fade" id="addModal">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					<h4 class="modal-title">Track new app</h4>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-sm-2 ">
+							<h6 class="pull-right">Name</h6>
+						</div>
+						<div class="col-sm-5">
+							<input type="text" class="form-control" placeholder="App Name" required>
+						</div>
+					</div>
+
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary id_add" >Create</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
 @endsection

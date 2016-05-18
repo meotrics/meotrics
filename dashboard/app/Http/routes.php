@@ -11,9 +11,8 @@
 |
 */
 
-Route::get('/', 'HomeController@index');
-
-Route::get('home', 'HomeController@index');
+Route::get('/', 'PermController@index');
+Route::get('/{appid}', 'HomeController@index');
 
 //Route::controller('trend', 'TrendController');
 Route::get('/trend/{appid}/save', 'TrendController@getSave');
@@ -51,6 +50,8 @@ Route::post('/perm/{appid}/add/{email}', 'PermController@add');
 Route::post('/perm/{appid}/{userid}', 'PermController@set');
 Route::get('/perm/{appid}/{id}', 'PermController@index');
 Route::post('/perm/{appid}/delete/{userid}', 'PermController@delete');
+Route::put('/app/create', 'PermController@create');
+
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',

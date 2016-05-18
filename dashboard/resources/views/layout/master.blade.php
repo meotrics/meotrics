@@ -84,7 +84,6 @@
 	</script>
 
 
-
 	<script>window.odometerOptions = {
 			duration: 350
 		};
@@ -126,13 +125,13 @@
 			</div>
 			<ul class="nav">
 				<li class="{{ Route::getCurrentRoute()->getPath() == 'home' ? 'active' : '' }}">
-					<a href="{{ URL::to('/home/{{$curappid}}') }}">
+					<a href="{{ URL::to('/home/'. $curappid ) }}">
 						<i class="pe-7s-graph"></i>
 						<p>Dashboard</p>
 					</a>
 				</li>
 				<li class="{{ Route::getCurrentRoute()->getPath() == 'trend' ? 'active' : '' }}">
-					<a href="{{ URL::to('/trend/{{$curappid}}') }}">
+					<a href="{{ URL::to('/trend/'.$curappid) }}">
 						<i class="pe-7s-graph1"></i>
 						<p>Trend</p>
 					</a>
@@ -240,7 +239,7 @@
 							</a>
 							<ul class="dropdown-menu">
 								<li><a href="{{ URL::to('/user/profile') }}">Profile</a></li>
-								<li><a href="{{ URL::to('/actiontype/$curappid') }}">Action types</a></li>
+								<li><a href="{{ URL::to('/actiontype/'.$curappid) }}">Action types</a></li>
 								<li class="divider"></li>
 								<li><a href="{{ URL::to('/auth/logout') }}">Logout</a></li>
 							</ul>
