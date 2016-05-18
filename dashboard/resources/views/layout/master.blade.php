@@ -24,24 +24,10 @@
 	<link href="{{asset('css/sweetalert.css')}}"/>
 	@yield('style')
 					<!-- App's styles -->
+
 	<link href="{{asset('css/app.css')}}" rel="stylesheet"/>
+	<link rel="stylesheet" href="{{asset('css/odometer-theme-minimal.css')}}"/>
 
-
-	<script src="{{asset('js/he.js')}}" type="text/javascript"></script>
-	<script src="{{asset('js/jquery-1.12.1.min.js')}}" type="text/javascript"></script>
-
-	<script src="{{asset('js/bootstrap.min.js')}}" type="text/javascript"></script>
-
-	<!-- Light bootstrap dashboard theme -->
-	<script src="{{asset('/js/bootstrap-notify.js')}}"></script>
-	<script src="{{asset('/js/bootstrap-checkbox-radio-switch.js')}}"></script>
-	<script src="{{asset('/js/chartist.min.js')}}"></script>
-	<script src="{{asset('/js/light-bootstrap-dashboard.js')}}"></script>
-	<!-- App's dependencies -->
-	<script src="{{asset('js/moment.js')}}"></script>
-	<script src="{{asset('js/fg.menu.js')}}"></script>
-	<script src="{{asset('js/jquery.daterangepicker.js')}}"></script>
-	<script src="{{asset('js/sweetalert.js')}}" type="text/javascript"></script> @include('Alerts::alerts')
 
 	<script>
 		function onPageLoad(fn) {
@@ -96,12 +82,14 @@
 			}
 		}
 	</script>
-	<link rel="stylesheet" href="{{asset('css/odometer-theme-minimal.css')}}"/>
+
+
 
 	<script>window.odometerOptions = {
 			duration: 350
-		};</script>
-	<script src="{{asset('js/odometer.min.js')}}"></script>
+		};
+	</script>
+
 	<script>
 
 		onPageLoad(function () {
@@ -216,7 +204,7 @@
 				<div class="collapse navbar-collapse">
 					<ul class="nav navbar-nav navbar-left">
 						@yield('action')
-						<!-- <li class="dropdown">
+										<!-- <li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 								<i class="fa fa-globe"></i>
 								<b class="caret"></b>
@@ -247,12 +235,12 @@
 						</li>
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-								<span class="vam">	{{ Auth::user()->name }}</span>
+								<span class="vam">	{{ $curappname }}</span>
 								<b class="caret"></b>
 							</a>
 							<ul class="dropdown-menu">
 								<li><a href="{{ URL::to('/user/profile') }}">Profile</a></li>
-								<li><a href="{{ URL::to('/actiontype') }}">Action types</a></li>
+								<li><a href="{{ URL::to('/actiontype/$curappid') }}">Action types</a></li>
 								<li class="divider"></li>
 								<li><a href="{{ URL::to('/auth/logout') }}">Logout</a></li>
 							</ul>
@@ -285,7 +273,21 @@
 	};
 
 </script>
+<script src="{{asset('js/he.js')}}" type="text/javascript"></script>
+<script src="{{asset('js/jquery-1.12.1.min.js')}}" type="text/javascript"></script>
+<script src="{{asset('js/bootstrap.min.js')}}" type="text/javascript"></script>
 
+<!-- Light bootstrap dashboard theme -->
+<script src="{{asset('/js/bootstrap-notify.js')}}"></script>
+<script src="{{asset('/js/bootstrap-checkbox-radio-switch.js')}}"></script>
+<script src="{{asset('/js/chartist.min.js')}}"></script>
+<script src="{{asset('/js/light-bootstrap-dashboard.js')}}"></script>
+<!-- App's dependencies -->
+<script src="{{asset('js/moment.js')}}"></script>
+<script src="{{asset('js/fg.menu.js')}}"></script>
+<script src="{{asset('js/jquery.daterangepicker.js')}}"></script>
+<script src="{{asset('js/sweetalert.js')}}" type="text/javascript"></script> @include('Alerts::alerts')
+<script src="{{asset('js/odometer.min.js')}}"></script>
 @yield('script')
 </body>
 </html>
