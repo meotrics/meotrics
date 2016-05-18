@@ -238,7 +238,9 @@
 								<b class="caret"></b>
 							</a>
 							<ul class="dropdown-menu">
+								<li><a href="#" class="id_trackingcode">Get tracking code</a></li>
 								<li><a href="{{ URL::to('/user/profile') }}">Profile</a></li>
+
 								<li><a href="{{ URL::to('/actiontype/'.$curappid) }}">Action types</a></li>
 								<li class="divider"></li>
 								<li><a href="{{ URL::to('/auth/logout') }}">Logout</a></li>
@@ -258,9 +260,18 @@
 	</div>
 </div>
 
+@include('partials/install_guide')
 @yield('additional')
 
 <script>
+
+	onPageLoad(function(){
+		$('.id_trackingcode').click(function(){
+			showCodeDialog(appid);
+		});
+	});
+	function showCode()
+	{}
 
 	var config = {
 		customOpenAnimation: function (cb) {
