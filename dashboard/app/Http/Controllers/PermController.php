@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+use App\Util\Access;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -29,5 +30,12 @@ class PermController extends Controller
 		]);
 	}
 
-	
+	public function set(Request $request, $appid, $userid)
+	{
+		$uid = \Auth::user()->id;
+		$status =Access::setPerm($uid,$userid,$appid,$request->input('can_perm'),$request->input('can_struct'),$request->input('can_report'));
+		if($status == 0)
+			return new Response();
+		else abort(403, 'Unauthorized action');
+	}
 }
