@@ -19,8 +19,7 @@ class PermController extends Controller
 	{
 		$userid = \Auth::user()->id;
 		$apps = DB::table('apps')->join('user_app', 'apps.id', '=', 'user_app.appid')
-			->where('user_app.userid', $userid)
-			->where('user_app.can_perm', 1)->get();
+			->where('user_app.userid', $userid)->get();
 
 		foreach ($apps as $ap) {
 			$ap->owner = \App\User::find($ap->ownerid);

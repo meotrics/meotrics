@@ -34,6 +34,7 @@
 					<tr>
 						<th>Code</th>
 						<th>Name</th>
+						<th>Status</th>
 						<th>Owner</th>
 						<th>Agency</th>
 						<th></th>
@@ -44,10 +45,11 @@
 						<tr>
 							<td><code class="fmonospaced">{{$ap->code}}</code></td>
 							<td>{{$ap->name}}</td>
-							<td>{{$ap->owner->name .'('.$ap->owner->email.')'}}</td>
+							<td><span class="greendot"></span> OK</td>
+							<td>{{$ap->owner->name}}  <span class="text-muted"> {{$ap->owner->email}} </span></td>
 							<td>
 								@foreach($ap->agencies as $ag)
-									{{$ag->name . '('.$ag->email.')'}} {!!   $ag->can_perm == 1 ? '<i class="fa fa-star orange"><i/>' : ($ag->can_struct == 1 ? '<i class="fa fa-star"><i/>': '' )!!}
+									{{$ag->name}}  <span class="text-muted"> {{$ag->email}}</span> {!!   $ag->can_perm == 1 ? '<i class="fa fa-star orange"></i>' : ($ag->can_struct == 1 ? '<i class="fa fa-star gray"></i>': '' )!!}
 									<br/>
 								@endforeach
 							</td>
