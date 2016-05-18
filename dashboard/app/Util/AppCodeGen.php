@@ -4,46 +4,43 @@ namespace App\Util;
 
 
 use Illuminate\Support\Facades\DB;
-use Mutex;
 
 class AppCodeGen
 {
-	private static $mutex;
-	
-	public static function used()
+	public static function used($mutex)
 	{
-		Mutex::unlock(AppCodeGen::$mutex);
+		flock($mutex, LOCK_UN);
+		fclose($mutex);
 	}
 
 	public static function alloc($appname)
 	{
-		// this make sure to excute this one time in a row only
-		Mutex::lock(AppCodeGen::$mutex);
+		$mutex = fopen("./appcodegen.lock", "r+");
+		if (flock($mutex, LOCK_EX)) {
+			// this make sure to excute this one time in a row only
 
-		// remove all unicode character
-		$appname = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $appname);
-		// remove all whitespace
-		$appcode = preg_replace('/\s+/', '', $appname);
+			// remove all unicode character
+			$appname = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $appname);
+			// remove all whitespace
+			$appcode = preg_replace('/\s+/', '', $appname);
 
-		// no more than 20 character
-		$appcode = substr($appcode, 0, 20);
-		$i = "";
+			// no more than 20 character
+			$appcode = substr($appcode, 0, 20);
+			$i = "";
+			//check if appname is existed
+			while (DB::table('apps')->where('code', $appcode . $i)->count() != 0) {
+				if ($i == "") $i = 0;
+				$i++;
+			}
 
-		//check if appname is existed
-		while (DB::table('apps')->count('code', $appcode . $i) != 0) {
-			if ($i == "") $i = 0;
-			$i++;
+			$appcode = $appcode . $i;
+
+			return ['code'=>$appcode, 'lock'=>$mutex];
+
+		} else {
+			throw new Exception('Unable to gain lock!');
 		}
 
-		$appcode = $appcode . $i;
-
-		return $appcode;
 	}
 
-	public static function init()
-	{
-		self::$mutex = Mutex::create();
-	}
 }
-
-AppCodeGen::init();

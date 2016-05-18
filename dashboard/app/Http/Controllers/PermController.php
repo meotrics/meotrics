@@ -44,8 +44,9 @@ class PermController extends Controller
 		$uid = \Auth::user()->id;
 		$name = $request->input('name');
 		if ($name == null || $name == '') abort(500, 'name must not be empty');
-		$code = AppCodeGen::alloc($name);
-
+		$out = AppCodeGen::alloc($name);
+		$code = $out['code'];
+		$mutex = $out['lock'];
 		$appid = DB::table('apps')->insert(array(
 				'name' => $name,
 				'code' => $code,
@@ -53,7 +54,9 @@ class PermController extends Controller
 			)
 		);
 
-		AppCodeGen::used();
+		Access::setPerm($uid, $uid, $appid, 1, 1, 1);
+
+		AppCodeGen::used($mutex);
 		return new Response($code);
 	}
 

@@ -27,7 +27,7 @@ class Access
 	public static function deletePerm($userid, $otherid, $appid)
 	{
 		// get owner
-		$app = DB::table('apps')->where('id', $appid)->last();
+		$app = DB::table('apps')->where('id', $appid)->first();
 		if ($app == null) return -3;
 
 		if ($otherid == $app->ownerid) return -4;
@@ -57,12 +57,12 @@ class Access
 			return -5;
 
 		// get owner
-		$app = DB::table('apps')->where('id', $appid)->last();
+		$app = DB::table('apps')->where('id', $appid)->first();
 		if ($app == null) return -3;
 
 		if (self::can_editPerm($userid, $appid)) {
 
-			$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $otheruser)->last();
+			$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $otheruser)->first();
 			if ($perm == null) {
 				if ($app->ownerid == $otheruser)
 					DB::table('user_app')->insert(
@@ -91,11 +91,11 @@ class Access
 	public static function can_editPerm($userid, $appid)
 	{
 		// full access for app owner
-		$app = DB::table('apps')->where('id', $appid)->last();
+		$app = DB::table('apps')->where('id', $appid)->first();
 		if ($app == null) return -3;
 		if ($app->ownerid == $userid) return true;
 
-		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->last();
+		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->first();
 		if ($perm == null) return false;
 		if ($perm->can_perm == 1) return true;
 		return false;
@@ -104,11 +104,11 @@ class Access
 	public static function can_editStruct($userid, $appid)
 	{
 		// full access for app owner
-		$app = DB::table('apps')->where('id', $appid)->last();
+		$app = DB::table('apps')->where('id', $appid)->first();
 		if ($app == null) return -3;
 		if ($app->ownerid == $userid) return true;
 
-		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->last();
+		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->first();
 		if ($perm == null) return false;
 		if ($perm->can_struct == 1) return true;
 		return false;
@@ -117,11 +117,11 @@ class Access
 	public static function can_view($userid, $appid)
 	{
 		// full access for app owner
-		$app = DB::table('apps')->where('id', $appid)->last();
+		$app = DB::table('apps')->where('id', $appid)->first();
 		if ($app == null) return -3;
 		if ($app->ownerid == $userid) return true;
 
-		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->last();
+		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->first();
 		if ($perm == null) return false;
 		return true;
 	}
@@ -129,11 +129,11 @@ class Access
 	public static function can_editReport($userid, $appid)
 	{
 		// full access for app owner
-		$app = DB::table('apps')->where('id', $appid)->last();
+		$app = DB::table('apps')->where('id', $appid)->first();
 		if ($app == null) return -3;
 		if ($app->ownerid == $userid) return true;
 
-		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->last();
+		$perm = DB::table('user_app')->where('appid', $appid)->where('userid', $userid)->first();
 		if ($perm == null) return false;
 		if ($perm->can_report == 1) return true;
 		return false;
