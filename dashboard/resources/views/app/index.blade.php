@@ -7,6 +7,27 @@
 		}
 
 		onPageLoad(function () {
+
+			function update_status(app) {
+				// ok
+				var $st = $('.status_' + app);
+				$st.empty();
+
+				if (websock.data[app].status == '0') {
+					$st.append('<span class="greendot"></span> OK');
+				}
+
+				if (websock.data[app].status == '-1') {
+					$st.appendChild('<span class="reddot"></span> DISCONNECTED')
+				}
+			}
+
+			websock.change('status', update_status);
+
+			@foreach($apps as $ap)
+				update_status({{$ap->code}});
+			@endforeach
+
 			$('.id_add').click(function () {
 				$.post('/app/create', {name: $('.id_name').val()}, function (appid) {
 					showCodeDialog(appid);
@@ -45,11 +66,12 @@
 						<tr>
 							<td><code class="fmonospaced">{{$ap->code}}</code></td>
 							<td>{{$ap->name}}</td>
-							<td><span class="greendot"></span> OK</td>
-							<td>{{$ap->owner->name}}  <span class="text-muted"> {{$ap->owner->email}} </span></td>
+							<td class="status_{{$ap->code}}"></td>
+							<td>{{$ap->owner->name}} <span class="text-muted"> {{$ap->owner->email}} </span></td>
 							<td>
 								@foreach($ap->agencies as $ag)
-									{{$ag->name}}  <span class="text-muted"> {{$ag->email}}</span> {!!   $ag->can_perm == 1 ? '<i class="fa fa-star orange"></i>' : ($ag->can_struct == 1 ? '<i class="fa fa-star gray"></i>': '' )!!}
+									{{$ag->name}}  <span
+													class="text-muted"> {{$ag->email}}</span> {!!   $ag->can_perm == 1 ? '<i class="fa fa-star orange"></i>' : ($ag->can_struct == 1 ? '<i class="fa fa-star gray"></i>': '' )!!}
 									<br/>
 								@endforeach
 							</td>

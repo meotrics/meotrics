@@ -30,6 +30,9 @@
 
 
 	<script>
+		var userid = '{{$userid}}';
+		var appcode = '{{$curappcode}}';
+
 		function onPageLoad(fn) {
 			if (window.addEventListener)
 				window.addEventListener('load', fn, false);
@@ -83,29 +86,21 @@
 		}
 	</script>
 
-
-	<script>window.odometerOptions = {
+	<script>
+		window.odometerOptions = {
 			duration: 350
 		};
-	</script>
 
-	<script>
-
-		onPageLoad(function () {
-			function bg_refresh_counter() {
-				$.get('/home/counter', {}, function (data) {
-					if (odometer.length !== undefined) {
-						for (var i in odometer) if (odometer.hasOwnProperty(i))odometer[i].innerHTML = data;
-					}
-					else odometer.innerHTML = parseInt(data);
-					setTimeout(function () {
-						bg_refresh_counter();
-					}, 2000);
-				});
+		function update_action_count(){
+			var data = websock.data[appcode].action_count;
+			if (odometer.length !== undefined) {
+				for (var i in odometer) if (odometer.hasOwnProperty(i))odometer[i].innerHTML = data;
 			}
+			else odometer.innerHTML = parseInt(data);
+		}
 
-			//bg_refresh_counter();
-		});
+		websock.appChange(appcode, 'action_count', update_action_count);
+		update_action_count();
 	</script>
 
 
@@ -295,6 +290,9 @@
 <script src="{{asset('js/jquery.daterangepicker.js')}}"></script>
 <script src="{{asset('js/sweetalert.js')}}" type="text/javascript"></script> @include('Alerts::alerts')
 <script src="{{asset('js/odometer.min.js')}}"></script>
+
+<script src="{{asset('js/meotricsws.js')}}" type="text/javascript"></script>
+
 @yield('script')
 @include('partials/install_guide')
 </body>
