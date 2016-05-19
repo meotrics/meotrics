@@ -14,7 +14,7 @@
 				$st.empty();
 
 				if (websock.data[app].status == '0') {
-					$st.append('<span class="greendot"></span> OK');
+					$st.append('<span class="greendot"></span> CONNECTED');
 				}
 
 				if (websock.data[app].status == '-1') {
@@ -66,7 +66,7 @@
 						<tr>
 							<td><code class="fmonospaced">{{$ap->code}}</code></td>
 							<td>{{$ap->name}}</td>
-							<td class="status_{{$ap->code}}"></td>
+							<td class="status_{{$ap->code}}"><span class="graydot"></span></td>
 							<td>{{$ap->owner->name}} <span class="text-muted"> {{$ap->owner->email}} </span></td>
 							<td>
 								@foreach($ap->agencies as $ag)

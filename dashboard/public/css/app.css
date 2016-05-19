@@ -795,3 +795,27 @@ div.back .fa-chevron-left {
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 }
+
+.graydot
+{
+	width: 10px;
+	display: inline-block;
+	height: 10px;
+	background: rgba(98, 98, 98, 0.44);
+	border: 1px solid rgb(104, 106, 104);
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.reddot
+{
+	width: 10px;
+	display: inline-block;
+	height: 10px;
+	background: #ec1035;
+	border: 1px solid #b40c27;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
