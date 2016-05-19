@@ -2,6 +2,8 @@ import * as mongodb from 'mongodb';
 import * as config from 'config';
 import * as express from 'express';
 import * as async from 'async';
+import * as WS from './module/ws.ts';
+
 var trycatch = require('trycatch');
 import bodyParser = require('body-parser');
 var ua = require('ua-parser');
@@ -207,6 +209,8 @@ var option: mongodb.MongoClientOptions = {};
 option.server = {};
 option.server.poolSize = 40;
 
+
+
 mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.MongoError, db: mongodb.Db) {
 	if (err) throw err;
 
@@ -250,9 +254,14 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.Mongo
 	var httpport = config.get('apiserver.port') || 1711;
 	var httpapi = new HttpApi(config.get('apiserver.codepath'), component.actionMgr, fs, ua, MD, component.valuemgr);
 
+	
+
 	var server = http.createServer(function (req: http.ServerRequest, res: http.ServerResponse) {
 		dataapiroot(httpapi, req, res);
 	});
+
+	var ws = new WS.WS('/ws', 80, server);
+	ws.run();
 
 	server.listen(httpport, function () {
 		console.log("HTTP API SERVER is running at port " + httpport);
