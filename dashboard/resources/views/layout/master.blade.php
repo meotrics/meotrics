@@ -99,8 +99,8 @@
 			else odometer.innerHTML = parseInt(data);
 		}
 
-		websock.appChange(appcode, 'action_count', update_action_count);
-		update_action_count();
+		//websock.appChange(appcode, 'action_count', update_action_count);
+		//update_action_count();
 	</script>
 
 

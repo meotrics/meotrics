@@ -4,6 +4,7 @@ use DB;
 use Illuminate\Support\ServiceProvider;
 use Request;
 use Route;
+use Session;
 use View;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,29 +23,43 @@ class AppServiceProvider extends ServiceProvider
 			if (\Auth::user() == null) return;
 			$userid = \Auth::user()->id;
 
-			$appid = Request::route()->parameters();
+			//abort(400, Request::route()->currentRouteName() );
 
-			if ($appid == null) {
-				$appid = Request::cookie('currentappid');
-			} else
-				$appid = $appid['appcode'];
+			$param = Route::current()->parameters();
 
-			if ($appid == null) // first time with no app
+			if ($param == null)
+				$appcode = Request::cookie('currentappcode');
+			 else
+				$appcode = $param['appcode'];
+
+			if ($appcode == null || $appcode== '' ) // first time with no app
 			{
 				//get first app
 				$ua = DB::table('user_app')->where('userid', $userid)->first();
+
 				if ($ua == null) {
 					$view->with('curappname', 'Setting');
 					$view->with('curappid', '-1');
 					return;
 				}
-				$appid = $ua->appid;
+				$view->with('curappid', $ua->appid);
+			} else {
+				$ap = DB::table('apps')->where('code', $appcode)->first();
+				if ($ap == null)
+					abort(500, 'app doesn\'t exist: ' . $appcode . '\/');
+				$view->with('curappid', $ap->id);
 			}
 
-			$ap = \App\App::find($appid);
+
+
+
+
 
 			$view->with('curappname', "\$ap->name");
-			$view->with('curappid', $appid);
+
+			$view->with('curappcode', $appcode);
+			$view->with('userid', $userid);
+
 		});
 	}
 

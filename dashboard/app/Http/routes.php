@@ -1,25 +1,12 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It's a breeze. Simply tell Laravel the URIs it should respond to
-| and give it the controller to call when that URI is requested.
-|
-*/
-
+Route::get('/app/edit/{appcode}', 'PermController@edit');
 Route::get('/', 'PermController@index');
-Route::get('/app/{appcode}', 'PermController@edit');
-
 Route::post('/app/create','PermController@create' );
-Route::get('/{appcode}', 'HomeController@index');
+Route::get('/dashboard/{appcode}', 'HomeController@index');
 Route::post('/perm/{appcode}/add', 'PermController@add');
 Route::post('/perm/{appcode}/set/{userid}', 'PermController@set');
 Route::post('/perm/{appcode}/delete/{userid}', 'PermController@delete');
-
 
 
 //Route::controller('trend', 'TrendController');
@@ -39,10 +26,6 @@ Route::delete('/trend/{appcode}/remove/{id}', 'TrendController@deleteRemove');
 Route::resource('actiontype', 'TypeController');
 
 Route::post('/actiontype/{appid}/create', 'TypeController@create');
-
-Route::get('/home/{appid}/setup_status', 'HomeController@setup_status');
-
-Route::get('/home/{appid}/counter', 'HomeController@counter');
 
 Route::get('/segment/{appcode}/execute', 'SegmentController@getExecute');
 Route::get('/segment/{appcode}/index', 'SegmentController@getIndex');

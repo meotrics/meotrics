@@ -96,11 +96,11 @@ class PermController extends Controller
 		$uid = \Auth::user()->id;
 		//get userid from email
 		$user = DB::table('users')->where('email', $email)->first();
-		if($user == null) abort(500, 'user not found: ' . $email);
+		if ($user == null) abort(500, 'user not found: ' . $email);
 		$userid = $user->id;
 		if ($userid == null)
 			abort(500, 'cannot find user with email ' . $email);
-		
+
 		$status = Access::setPerm($uid, $userid, $appcode, null, null, null);
 		if ($status == 0)
 			return new Response();

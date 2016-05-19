@@ -53,23 +53,20 @@ class HomeController extends Controller
 		return $response->withCookie(cookie('currentappid', $appid, 2147483647, '/' . $appid . '/'));
 	}
 
-	public function index(Request $request, $appid)
+	public function index(Request $request, $appid )
 	{
-		//check if have cookie
 
-		if ($appid != null) {
-		} else {
-			$appid = $this->request->cookie('currentappid');
+			//$appid = $request->cookie('currentappid');
 
-			if ($appid == null) {
-				
-			} else {
+			//if ($appid == null) {
+
+			//} else {
 				if ($request->user())
 					return view('home');//->withCookie(cookie()->forget('mtid'));
 				else
 					return redirect('auth/login');//->withCookie(cookie()->forget('mtid'));
-			}
-		}
+			//}
+		////}
 	}
 
 	private function getRemoteIPAddress(Request $request)
