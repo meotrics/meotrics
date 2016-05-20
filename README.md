@@ -14,6 +14,7 @@ Trỏ danh sách tên miền sau để tiện phát triển hệ thống:
 | Tên miền              | Địa chỉ           |
 |-----------------------|-------------------|
 |`meotrics.dev`           | `127.0.0.1`         |
+|`app.meotrics.dev`		| `127.0.0.1`		|
 |`client.meotrics.dev`		| `127.0.0.1`		|
 
 Trong hệ thống Window, sửa file, `Windows\\System32\\drivers\\etc\\host`, trong Linux hoặc Mac, sửa file `/etc/hosts` (`/private/etc/hosts`)
@@ -99,62 +100,87 @@ LoadModule proxy_connect_module modules/mod_proxy_connect.so
 1.  Apache from 2.2, 2.4, 2.6, ...
   ```apache
   <VirtualHost *:80>
-	    DocumentRoot "E:\workspace\nodemeotrics\meotrics\dashboard\public"
-	   	ServerName meotrics.dev
-	
-	     ErrorLog "logs/meotrics.dev-error.log"
-	     CustomLog "logs/meotrics.dev-access.log" common
-	
-	    ProxyPreserveHost On
-	    ProxyPass /api http://127.0.0.1:1711/api
-	    ProxyPassReverse /api http://127.0.0.1:1711/api
-	    <Directory />
-	     	Require all granted
-	    	AllowOverride FileInfo Options=MultiViews
-	   	</Directory>
-	</VirtualHost>
-		    
-	<VirtualHost *:80>
-		DocumentRoot "E:\workspace\nodemeotrics\meotrics\client\client.com"
-		ServerName client.meotrics.dev
-		
-		ErrorLog "logs/client.meotrics.dev-error.log"
-		CustomLog "logs/client.meotrics.dev-access.log" common
-		
-		<Directory />
-			Require all granted
-			AllowOverride FileInfo Options=MultiViews
-		</Directory>
+    DocumentRoot "E:\workspace\nodemeotrics\meotrics\dashboard\public"
+    ServerName app.meotrics.dev
+
+    ErrorLog "logs/meotrics.dev-error.log"
+    CustomLog "logs/meotrics.dev-access.log" common
+
+    ProxyPreserveHost On
+    ProxyPass /api http://127.0.0.1:1711/api
+    ProxyPassReverse /api http://127.0.0.1:1711/api
+    <Directory />
+      Require all granted
+      AllowOverride FileInfo Options=MultiViews
+    </Directory>
+  </VirtualHost>
+
+  <VirtualHost *:80>
+    DocumentRoot "E:\workspace\nodemeotrics\meotrics\landing"
+    ServerName meotrics.dev
+
+    ErrorLog "logs/meotricslanding.dev-error.log"
+    CustomLog "logs/meotricslanding.dev-access.log" common
+
+    <Directory />
+      Require all granted
+      AllowOverride FileInfo Options=MultiViews
+    </Directory>
+  </VirtualHost>
+
+  <VirtualHost *:80>
+    DocumentRoot "E:\workspace\nodemeotrics\meotrics\client\client.com"
+    ServerName client.meotrics.dev
+
+    ErrorLog "logs/client.meotrics.dev-error.log"
+    CustomLog "logs/client.meotrics.dev-access.log" common
+
+    <Directory />
+      Require all granted
+      AllowOverride FileInfo Options=MultiViews
+    </Directory>
   </VirtualHost>
   ```
 2. Apache before 2.2
   ```apache
   <VirtualHost *:80>
-  	DocumentRoot "E:\workspace\nodemeotrics\meotrics\dashboard\public"
-	ServerName meotrics.dev
+    DocumentRoot "E:\workspace\nodemeotrics\meotrics\dashboard\public"
+    ServerName app.meotrics.dev
+
+    ErrorLog "logs/meotrics.dev-error.log"
+    CustomLog "logs/meotrics.dev-access.log" common
       
-	ErrorLog "logs/meotrics.dev-error.log"
-	CustomLog "logs/meotrics.dev-access.log" common
-      
-	ProxyPreserveHost On
-	ProxyPass /api http://127.0.0.1:1711/api
-	ProxyPassReverse /api http://127.0.0.1:1711/api
-      
-	<Directory />
-		AllowOverride FileInfo Options=MultiViews
-	</Directory>
+    ProxyPreserveHost On
+    ProxyPass /api http://127.0.0.1:1711/api
+    ProxyPassReverse /api http://127.0.0.1:1711/api
+
+    <Directory />
+      AllowOverride FileInfo Options=MultiViews
+    </Directory>
   </VirtualHost>
 
   <VirtualHost *:80>
-		DocumentRoot "E:\workspace\nodemeotrics\meotrics\client\client.com"
-			ServerName client.meotrics.dev
+    DocumentRoot "E:\workspace\nodemeotrics\meotrics\landing"
+    ServerName meotrics.dev
+
+    ErrorLog "logs/meotricslanding.dev-error.log"
+    CustomLog "logs/meotricslanding.dev-access.log" common
+   
+    <Directory />
+      AllowOverride FileInfo Options=MultiViews
+    </Directory>
+  </VirtualHost>
+
+  <VirtualHost *:80>
+    DocumentRoot "E:\workspace\nodemeotrics\meotrics\client\client.com"
+    ServerName client.meotrics.dev
 	      
-			ErrorLog "logs/client.meotrics.dev-error.log"
-			CustomLog "logs/client.meotrics.dev-access.log" common
-	      
-			<Directory />
-				AllowOverride FileInfo Options=MultiViews
-			</Directory>
+    ErrorLog "logs/client.meotrics.dev-error.log"
+    CustomLog "logs/client.meotrics.dev-access.log" common
+    
+    <Directory />
+      AllowOverride FileInfo Options=MultiViews
+    </Directory>
   </VirtualHost>
   ```
 
@@ -162,61 +188,88 @@ LoadModule proxy_connect_module modules/mod_proxy_connect.so
 
 ```nginx
 server {
-	  charset utf-8;
-	  listen 80;
-	
-	  server_name meotrics.dev;
-	  root        /home/thanhpk/space/meotrics/dashboard/public/;
-	  index       index.php;
-	
-	  access_log  /home/thanhpk/tmp/meotrics-access.log;
-	  error_log   /home/thanhpk/tmp/meotrics-error.log;
-	
-	  location /api {
-	        proxy_pass http://127.0.0.1:1711/api;
-	  }
-	  
-	  location / {
-	    try_files $uri $uri/ /index.php?$args;
-	  }
-	
-	  location ~ \.php$ {
-	    include fastcgi_params;
-	    fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
-	    fastcgi_pass   unix:/var/run/php5-fpm.sock;
-	    try_files $uri =404;
-	  }
-	
-	  location ~ /\.(ht|svn|git) {
-	    deny all;
-	  }
+  charset utf-8;
+  listen 80;
+
+  server_name app.meotrics.dev;
+  root        /home/thanhpk/space/meotrics/dashboard/public/;
+  index       index.php;
+
+  access_log  /home/thanhpk/tmp/meotrics-access.log;
+  error_log   /home/thanhpk/tmp/meotrics-error.log;
+
+  location /api {
+    proxy_pass http://127.0.0.1:1711/api;
+  }
+
+  location / {
+    try_files $uri $uri/ /index.php?$args;
+  }
+
+  location ~ \.php$ {
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+    fastcgi_pass   unix:/var/run/php5-fpm.sock;
+    try_files $uri =404;
+  }
+
+  location ~ /\.(ht|svn|git) {
+    deny all;
+  }
+}
+
+server {
+  charset utf-8;
+  listen 80;
+
+  server_name meotrics.dev;
+  root        /home/thanhpk/space/meotrics/landing/;
+  index       index.html;
+
+  access_log  /home/thanhpk/tmp/meotricslanding-access.log;
+  error_log   /home/thanhpk/tmp/meotricslanding-error.log;
+
+  location / {
+    try_files $uri $uri/ /index.php?$args;
+  }
+
+  location ~ \.php$ {
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+    fastcgi_pass   unix:/var/run/php5-fpm.sock;
+    try_files $uri =404;
+  }
+
+  location ~ /\.(ht|svn|git) {
+    deny all;
+  }
 }
 	
 server {
-	  charset utf-8;
-	  listen 80;
+  charset utf-8;
+  listen 80;
 	
-	  server_name client.meotrics.dev;
-	  root        /home/thanhpk/space/meotrics/dashboard/public/;
-	  index       index.php;
+  server_name client.meotrics.dev;
+  root        /home/thanhpk/space/meotrics/dashboard/public/;
+  index       index.php;
 	
-	  access_log  /home/thanhpk/tmp/client.meotrics-access.log;
-	  error_log   /home/thanhpk/tmp/client.meotrics-error.log;
+  access_log  /home/thanhpk/tmp/client.meotrics-access.log;
+  error_log   /home/thanhpk/tmp/client.meotrics-error.log;
 	
-	  location / {
-	    try_files $uri $uri/ /index.php?$args;
-	  }
+  location / {
+    try_files $uri $uri/ /index.php?$args;
+  }
 	
-	  location ~ \.php$ {
-	    include fastcgi_params;
-	    fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
-	    fastcgi_pass   unix:/var/run/php5-fpm.sock;
-	    try_files $uri =404;
-	  }
+  location ~ \.php$ {
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
+    fastcgi_pass   unix:/var/run/php5-fpm.sock;
+    try_files $uri =404;
+  }
 	
-	  location ~ /\.(ht|svn|git) {
-	    deny all;
-	  }
+  location ~ /\.(ht|svn|git) {
+    deny all;
+  }
 }
 ```
 ### Database server
@@ -243,6 +296,6 @@ Chạy chương trình
   ```
   Backend sẽ lắng nghe ở 2 cổng `2108` và `1711`.
 
-* Truy cập vào địa chỉ [meotrics.dev/auth/login](http://meotrics.dev/auth/login) để đăng nhập.
-
+* Truy cập vào địa chỉ [meotrics.dev](client.meotrics.dev) để vào website.
+* Truy cập vào địa chỉ [app.meotrics.dev/auth/login](http://app.meotrics.dev/auth/login) để đăng nhập.
 * Truy cập vào địa chỉ [client.meotrics.dev](client.meotrics.dev) để chạy web site client.
