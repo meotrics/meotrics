@@ -82,7 +82,7 @@
 								<ul class="dropdown-menu">
 									<li><a href="{{ URL::to('/user/profile') }}">Profile</a></li>
 									<li class="divider"></li>
-									<li><a href="{{ URL::to('/auth/logout') }}">Logout</a></li>
+									<li><a href="{{ URL::to('/auth/signout') }}">Logout</a></li>
 								</ul>
 							</li>
 						</ul>
