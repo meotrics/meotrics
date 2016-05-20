@@ -1,39 +1,6 @@
-@extends('../layout/master', ['sidebarselect' => 'trend'])
+@extends('layout.master', ['sidebarselect' => 'trend'])
 @section('title', 'Trend')
 
-@section('header-script')
-	<script>
-		onPageLoad(function () {
-
-			var $tp = $('#timepick');
-			var tp = $tp.dateRangePicker();
-			//load segment time range
-
-			@if(isset($starttime))
-			$('#segment-date-range').data('dateRangePicker').setDateRange('{{$starttime}}', '{{$endtime}}');
-			@else
-			// 30 ngay truoc do
-			var today = new Date().toISOString().substr(0, 10);
-			var lastyear = new Date(new Date().getTime() - 31104000000).toISOString();
-			$tp.data('dateRangePicker').setDateRange(lastyear, today);
-			@endif
-			// bind event
-			$('#segpick').on('change', function () {
-				var val = $(this).val();
-				$.post('/trend/currentsegment/', {'segmentid': val}, function () {
-					location.reload();
-				});
-			});
-
-			tp.bind('datepicker-change', function (event, obj) {
-				var val = $(this).val();
-				$.post('/trend/currenttime/', {'endTime': val.split(' ')[2], 'startTime': val.split(' ')[0]}, function () {
-					location.reload();
-				});
-			});
-		});
-	</script>
-@endsection
 
 @section('style')
 	<link rel="stylesheet" href="{{asset('css/select2.min.css')}}"/>
@@ -131,6 +98,39 @@
 @endsection
 
 @section('additional')
+
+	<script>
+		onPageLoad(function () {
+
+			var $tp = $('#timepick');
+			var tp = $tp.dateRangePicker();
+			//load segment time range
+
+			@if(isset($starttime))
+			$('#segment-date-range').data('dateRangePicker').setDateRange('{{$starttime}}', '{{$endtime}}');
+			@else
+			// 30 ngay truoc do
+			var today = new Date().toISOString().substr(0, 10);
+			var lastyear = new Date(new Date().getTime() - 31104000000).toISOString();
+			$tp.data('dateRangePicker').setDateRange(lastyear, today);
+			@endif
+			// bind event
+			$('#segpick').on('change', function () {
+				var val = $(this).val();
+				$.post('/trend/currentsegment/', {'segmentid': val}, function () {
+					location.reload();
+				});
+			});
+
+			tp.bind('datepicker-change', function (event, obj) {
+				var val = $(this).val();
+				$.post('/trend/currenttime/', {'endTime': val.split(' ')[2], 'startTime': val.split(' ')[0]}, function () {
+					location.reload();
+				});
+			});
+		});
+	</script>
+
 	<script src="{{asset('js/select2.min.js')}}"></script>
 	<script type="text/javascript">
 		$('select').select2();

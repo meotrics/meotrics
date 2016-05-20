@@ -44,10 +44,8 @@
     responsive: true,
        percentageInnerCutout: 50,
        scaleShowLabels: false,
-       tooltipTemplate: "<%= svalue %>%",
-   }
-   
-   
+       tooltipTemplate: {{"<%= value %> %"}},
+   };
    
    var retenratechart = new Chart($("#retenratechart"), {
        type: 'line',

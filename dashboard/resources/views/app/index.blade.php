@@ -1,4 +1,4 @@
-@extends('../layout/master')
+@extends('layout.apmgr')
 
 @section('script')
 
@@ -53,19 +53,15 @@
 	</script>
 @endsection
 
-@section('action')
-	<button type="button" data-toggle="modal" data-target="#addModal" class="button action blue">
-		<span class="label">Track new app</span></button>
-@endsection
 @section('content')
-
 	<div class="card row">
 		<div class="header col-sm-12">
-			<h4>Apps manager</h4>
+			<h4 style="display: inline-block">Apps manager </h4> <button type="button" data-toggle="modal" data-target="#addModal" class=" button action blue">
+				<span class="label">Track new app</span></button>
 		</div>
 		<div class="content col-sm-12">
 			<div class="content table-responsive table-full-width col-sm-12">
-				<table class="table table-hover table-striped">
+				<table class="table table-hover ">
 					<thead>
 					<tr>
 						<th>Name</th>
