@@ -11,6 +11,10 @@ $props = isset($props) ? $props : [];
 		<?php
 						if($segments):
 						$segment_first = null;
+
+						if($segmentid != null)
+						$segment_first = $segmentid;
+						else
 						foreach ($segments as $key => $segment):
 						if ($key == 0) {
 							$segment_first = $segment;
@@ -33,141 +37,144 @@ $props = isset($props) ? $props : [];
 @endsection
 
 @section('action')
-<li>
-    <a href="{{ URL::to('segment/'. $appcode . '/create') }}" class="button action blue button-radius" style="margin-left: -14px;">
-        <span class="label">New Segmentation</span>
-    </a>
-</li>
+	<li>
+		<a href="{{ URL::to('segment/'. $appcode . '/create') }}" class="button action blue button-radius"
+		   style="margin-left: -14px;">
+			<span class="label">New Segmentation</span>
+		</a>
+	</li>
 @endsection
 
 @section('content')
-<div class="row">
-    <div class="card col-md-12">
-        <div class="header row col-segment">
-            <!--<form class="col-md-12">-->
-			<div class="col-md-6">
-				<div class="col-md-3 fix-padding">
-					<h6>Segmentation</h6>
-				</div>
-				<div class="col-md-5 fix-padding">
-					<select id="segment" class="form-control input-sm" style="display:inline-block">
-						@foreach($segments as $segment)
-							<option value="{{$segment->_id}}" <?= $segment->_id == $segment_first->_id ? 'selected=""' : '' ?>>{{$segment->name ? $segment->name : TrendEnum::EMPTY_NAME}}</option>
-						@endforeach
-					</select>
-				</div>
-				<div class="col-md-2 div-edit-obj fix-padding">
-					<a id="action_update" data-href="{{URL::to('segment/'. $appcode .'/update')}}" href="{{URL::to('segment/'. $appcode .'/update', [
+	<div class="row">
+		<div class="card col-md-12">
+			<div class="header row col-segment">
+				<!--<form class="col-md-12">-->
+				<div class="col-md-6">
+					<div class="col-md-3 fix-padding">
+						<h6>Segmentation</h6>
+					</div>
+					<div class="col-md-5 fix-padding">
+						<select id="segment" class="form-control input-sm" style="display:inline-block">
+							@foreach($segments as $segment)
+								<option value="{{$segment->_id == $segment_first->_id ? 'selected' : '' }}>{{$segment->name ? $segment->name : TrendEnum::EMPTY_NAME}}</option>
+							@endforeach
+						</select>
+					</div>
+					<div class="col-md-2 div-edit-obj fix-padding">
+						<a id="action_update" data-href="{{URL::to('segment/'. $appcode .'/update')}}" href="{{URL::to('segment/'. $appcode .'/update', [
                                         'id' => isset($segment_first) ? $segment_first->_id : ''
                                     ])}}" class="a-edit-obj" role="button">
-						<!--<span class="glyphicon glyphicon-pencil"></span>-->
-						<i class="fa fa-pencil" aria-hidden="true"></i>
-					</a>
+							<!--<span class="glyphicon glyphicon-pencil"></span>-->
+							<i class="fa fa-pencil" aria-hidden="true"></i>
+						</a>
+					</div>
+					<div class="col-md-2 div-trash-obj fix-padding">
+						<a id="action_delete" href="javascript:void(0)" class="a-trash-obj" role="button">
+							<!--<span class="glyphicon glyphicon-trash"></span>-->
+							<i class="fa fa-trash" aria-hidden="true"></i>
+						</a>
+					</div>
 				</div>
-				<div class="col-md-2 div-trash-obj fix-padding">
-					<a id="action_delete" href="javascript:void(0)" class="a-trash-obj" role="button">
-						<!--<span class="glyphicon glyphicon-trash"></span>-->
-						<i class="fa fa-trash" aria-hidden="true"></i>
-					</a>
-				</div>
+				@if(isset($segment_first))
+					<div class="col-md-5 pull-right">
+						<div class="col-md-5">
+							<h6>Description</h6>
+						</div>
+						<div class="col-md-7">
+							<p class="segment-desc"
+							   id="desc"><?= property_exists($segment_first, 'description') ? $segment_first->description : '' ?></p>
+							<p> @if(isset($segment_first->startTime ))
+									<label>Time range:</label></br> <span id="startTime">{{$segment_first->startTime}}</span>
+									to {{$segment_first->endTime}},
+								@endif
+								<span id="count">@if(isset($segment_first->count)){{$segment_first->count}}@endif</span>
+							</p>
+						</div>
+					</div>
+					@endif
+									<!--</form>-->
 			</div>
-            @if(isset($segment_first))
-				<div class="col-md-5 pull-right">
-					<div class="col-md-5">
-						<h6>Description</h6>
-					</div>
-					<div class="col-md-7">
-						<p class="segment-desc"
-						   id="desc"><?= property_exists($segment_first, 'description') ? $segment_first->description : '' ?></p>
-						<p> @if(isset($segment_first->startTime ))
-								<label>Time range:</label></br> <span id="startTime">{{$segment_first->startTime}}</span> to {{$segment_first->endTime}},
-							@endif
-							<span id="count">@if(isset($segment_first->count)){{$segment_first->count}}@endif</span>
-						</p>
-					</div>
-				</div>
-            @endif
-            <!--</form>-->
-        </div>
 
-        <!--    <div class="content col-md-12" data-name="name">
+			<!--    <div class="content col-md-12" data-name="name">
 <label class="col-md-2" style="margin-top: 4px">Segment name: </label>
 <p class="col-md-10"><?= isset($segment_first) && isset($segment_first->name) ? $segment_first->name : '' ?></p>
 </div>-->
-<!--        @if(isset($segment_first))
-        <div class="content row" data-name="description">
-            <div class=" col-md-2">
-                <h6>Description</h6>
-            </div>
-            <label class="col-md-2" style="margin-top: 4px">Segment description: </label>
-        </div>
-        @endif
--->
-        <div class=" content row">
-			<div class="col-md-6">
-				<div class="col-md-3 fix-padding" style="text-align: right">
-					<h6>Filter By</h6>
-				</div>
-				<div class="col-md-4 fix-padding" id="div-filter-one ">
-					<select name="Prop[one]" class="form-control">
-						<option value="">Select property</option>
-						<?php
-						foreach ($props as $prop):
-						?>
-						<option value="<?= property_exists($prop, 'code') ? $prop->code : '' ?>">
-							<?= property_exists($prop, 'name') ? $prop->name : '' ?>
-						</option>
-						<?php
-						endforeach;
-						?>
-					</select>
-				</div>
-				<div class="col-md-4 fix-padding" id="div-filter-two" style="display: none">
-					<select name="Prop[two]" class="form-control">
-						<option value="">Select property</option>
-						<?php
-						foreach ($props as $prop):
-						?>
-						<option value="<?= property_exists($prop, 'code') ? $prop->code : '' ?>">
-							<?= property_exists($prop, 'name') ? $prop->name : '' ?>
-						</option>
-						<?php
-						endforeach;
-						?>
-					</select>
-				</div>
-				<div class="col-md-1 col-add-filter fix-padding" id="div-filter-tool">
-					<i class="fa fa-plus fa-2 fix-padding" aria-hidden="true" onclick="addFilter(this)"></i>
-					<i class="fa fa-minus fa-2 fix-padding" aria-hidden="true" onclick="removeFilter(this)" style="display: none"></i>
-				</div>
-			</div>
-			<div class="col-md-5 pull-right">
-				<div class="col-md-12 col-md-offset-1" id="div-action">
-					<div class="col-md-4">
-						<button type="button" class="action button blue button-radius" onclick="execute()">
-							<span class="label">Generate</span>
-						</button>
+			<!--        @if(isset($segment_first))
+							<div class="content row" data-name="description">
+									<div class=" col-md-2">
+											<h6>Description</h6>
+									</div>
+									<label class="col-md-2" style="margin-top: 4px">Segment description: </label>
+							</div>
+							@endif
+							-->
+			<div class=" content row">
+				<div class="col-md-6">
+					<div class="col-md-3 fix-padding" style="text-align: right">
+						<h6>Filter By</h6>
 					</div>
-					<div class="col-md-4">
-						<button type="button" class="action button red button-radius" onclick="cancelExecute()">
-							<span class="label">Cancel</span>
-						</button>
+					<div class="col-md-4 fix-padding" id="div-filter-one ">
+						<select name="Prop[one]" class="form-control">
+							<option value="">Select property</option>
+							<?php
+							foreach ($props as $prop):
+							?>
+							<option value="<?= property_exists($prop, 'code') ? $prop->code : '' ?>">
+								<?= property_exists($prop, 'name') ? $prop->name : '' ?>
+							</option>
+							<?php
+							endforeach;
+							?>
+						</select>
+					</div>
+					<div class="col-md-4 fix-padding" id="div-filter-two" style="display: none">
+						<select name="Prop[two]" class="form-control">
+							<option value="">Select property</option>
+							<?php
+							foreach ($props as $prop):
+							?>
+							<option value="<?= property_exists($prop, 'code') ? $prop->code : '' ?>">
+								<?= property_exists($prop, 'name') ? $prop->name : '' ?>
+							</option>
+							<?php
+							endforeach;
+							?>
+						</select>
+					</div>
+					<div class="col-md-1 col-add-filter fix-padding" id="div-filter-tool">
+						<i class="fa fa-plus fa-2 fix-padding" aria-hidden="true" onclick="addFilter(this)"></i>
+						<i class="fa fa-minus fa-2 fix-padding" aria-hidden="true" onclick="removeFilter(this)"
+						   style="display: none"></i>
 					</div>
 				</div>
-			</div>
-<!--            <div class="col-md-2">
-                <button type="button" class="action button red" onclick="cancelExecute()">
-                    <span class="label">Cancel</span>
-                </button>
-            </div>-->
+				<div class="col-md-5 pull-right">
+					<div class="col-md-12 col-md-offset-1" id="div-action">
+						<div class="col-md-4">
+							<button type="button" class="action button blue button-radius" onclick="execute()">
+								<span class="label">Generate</span>
+							</button>
+						</div>
+						<div class="col-md-4">
+							<button type="button" class="action button red button-radius" onclick="cancelExecute()">
+								<span class="label">Cancel</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<!--            <div class="col-md-2">
+												<button type="button" class="action button red" onclick="cancelExecute()">
+														<span class="label">Cancel</span>
+												</button>
+										</div>-->
 
-                                <!--        <canvas id="myChart" width="400" height="100" style="display: none"></canvas>-->
-        </div>
-        <div class="row">
-            <div class="col-md-12" data-name="canvas-chart"></div>
-        </div>
-    </div>
-</div>
+				<!--        <canvas id="myChart" width="400" height="100" style="display: none"></canvas>-->
+			</div>
+			<div class="row">
+				<div class="col-md-12" data-name="canvas-chart"></div>
+			</div>
+		</div>
+	</div>
 @endsection
 
 @section('additional')
@@ -190,8 +197,8 @@ $props = isset($props) ? $props : [];
 
 			$('#desc').html(segments[that.val()].description);
 			$('#count').html(segments[that.val()].count);
-                        
-                        $('div[data-name="canvas-chart"]').html('');
+
+			$('div[data-name="canvas-chart"]').html('');
 			return false;
 		});
 
@@ -213,7 +220,7 @@ $props = isset($props) ? $props : [];
 
 		function addFilter(e) {
 			$('#div-filter-two').show();
-                        $('#div-filter-two').find('span.select2-container').width('154px');
+			$('#div-filter-two').find('span.select2-container').width('154px');
 //                        $('#div-action').removeClass('col-md-offset-3');
 //                        $('#div-action').addClass('col-md-offset-1');
 			$(e).parent().find('.fa-minus').show();
@@ -233,8 +240,8 @@ $props = isset($props) ? $props : [];
 			$('#div-filter-two').hide();
 			$('#div-filter-tool').find('.fa-plus').show();
 			$('#div-filter-tool').find('.fa-minus').hide();
-                        $('#div-action').removeClass('col-md-offset-1');
-                        $('#div-action').addClass('col-md-offset-3');
+			$('#div-action').removeClass('col-md-offset-1');
+			$('#div-action').addClass('col-md-offset-3');
 			$('div[data-name="canvas-chart"]').html('');
 		}
 		/*

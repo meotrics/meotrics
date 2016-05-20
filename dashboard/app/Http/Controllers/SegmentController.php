@@ -33,15 +33,17 @@ class SegmentController extends Controller
 		return json_encode([]);
 	}
 
-	public function getIndex(Request $request, $app_id)
+	public function getIndex(Request $request, $appcode, $segid=null)
 	{
-		$props = MtHttp::get('prop/' . $app_id);
+		$props = MtHttp::get('prop/' . $appcode);
 
-		$segments = MtHttp::get('segment/' . $app_id);
+		$segments = MtHttp::get('segment/' . $appcode);
 
+	
 		return view('segment/index', [
 			'props' => $props,
-			'segments' => $segments
+			'segments' => $segments,
+			'segmentid' => $segid
 		]);
 	}
 

@@ -28,14 +28,14 @@ Route::resource('actiontype', 'TypeController');
 Route::post('/actiontype/{appid}/create', 'TypeController@create');
 
 Route::get('/segment/{appcode}/execute', 'SegmentController@getExecute');
-Route::get('/segment/{appcode}', 'SegmentController@getIndex');
+
 Route::get('/segment/{appcode}/create', 'SegmentController@getCreate');
 Route::get('/segment/{appcode}/update/{id}', 'SegmentController@getUpdate');
 Route::post('/segment/{appcode}/write', 'SegmentController@postWrite');
 Route::delete('/segment/{appcode}/remove/{id}', 'SegmentController@deleteRemove');
 Route::get('/segment/{appcode}/chartonefield', 'SegmentController@getChartonefield');
 Route::get('/segment/{appcode}/charttwofields', 'SegmentController@getCharttwofields');
-
+Route::get('/segment/{appcode}/{segid?}', 'SegmentController@getIndex');
 
 
 
