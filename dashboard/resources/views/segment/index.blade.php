@@ -8,17 +8,14 @@ $props = isset($props) ? $props : [];
 @section('script')
 	<script type="text/javascript">
 		var segments = {};
-		<?php
-						if($segments):
+		<?php if($segments):
 						$segment_first = null;
 
-						if($segmentid != null)
-						$segment_first = $segmentid;
-						else
 						foreach ($segments as $key => $segment):
-						if ($key == 0) {
+						if ($segmentid == null && $key == 0)
 							$segment_first = $segment;
-						}
+						else if ($segmentid == $segment->_id)
+							$segment_first = $segment;
 						?>
 						segments['{{ $segment->_id }}'] = {
 			name: '{{ property_exists($segment, 'name') ? $segment->name : '' }}',
@@ -57,11 +54,13 @@ $props = isset($props) ? $props : [];
 					<div class="col-md-5 fix-padding">
 						<select id="segment" class="form-control input-sm" style="display:inline-block">
 							@foreach($segments as $segment)
-								<option value="{{$segment->_id == $segment_first->_id ? 'selected' : '' }}>{{$segment->name ? $segment->name : TrendEnum::EMPTY_NAME}}</option>
+								<option value="{{$segment->_id}}" {{ $segment->_id == $segment_first->_id ? 'selected' : '' }}>
+									{{$segment->name ? $segment->name : TrendEnum::EMPTY_NAME}}
+								</option>
 							@endforeach
 						</select>
 					</div>
-					<div class="col-md-2 div-edit-obj fix-padding">
+					<div class=" col-md-2 div-edit-obj fix-padding">
 						<a id="action_update" data-href="{{URL::to('segment/'. $appcode .'/update')}}" href="{{URL::to('segment/'. $appcode .'/update', [
                                         'id' => isset($segment_first) ? $segment_first->_id : ''
                                     ])}}" class="a-edit-obj" role="button">

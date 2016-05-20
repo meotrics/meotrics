@@ -39,7 +39,12 @@ class SegmentController extends Controller
 
 		$segments = MtHttp::get('segment/' . $appcode);
 
-	
+		//check if segment exist
+		if($segid !== null) {
+			$seg = MtHttp::get('segment/' . $appcode . '/' . $segid);
+			if($seg == null)
+				return view('segment/notfound');
+		}
 		return view('segment/index', [
 			'props' => $props,
 			'segments' => $segments,
