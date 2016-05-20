@@ -41,6 +41,7 @@ CREATE TABLE `users` (
   `updated_at` int(11) NOT NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `remember_token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `verified` int(4) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`),
   UNIQUE KEY `password_reset_token` (`password_reset_token`)
@@ -49,8 +50,8 @@ CREATE TABLE `users` (
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES ('1', '', '$2y$10$vlR4xsKws521k0JDWkW73ezOHBXDGZePi048qkiGfCklW/KHsD9KK', null, 'thanh@gmail.com', null, null, null, null, '10', '2016', '2016', 'Thanh', 'z9gMXGYyEvvvYQUYNbHCFohFyz3530gQJJbcQEJkHtvBN0idGRhxScSpJS7l');
-INSERT INTO `users` VALUES ('2', '', '$2y$10$xaERgAC4H.p5BLE1efhoWeDmzTNyFaS4D0pKbhmHET1AwA31sIYF2', null, 'van@gmail.com', null, null, null, null, '10', '2016', '2016', 'Hai van', null);
+INSERT INTO `users` VALUES ('1', '', '$2y$10$vlR4xsKws521k0JDWkW73ezOHBXDGZePi048qkiGfCklW/KHsD9KK', null, 'thanh@gmail.com', null, null, null, null, '10', '2016', '2016', 'Thanh', null, 1);
+INSERT INTO `users` VALUES ('2', '', '$2y$10$xaERgAC4H.p5BLE1efhoWeDmzTNyFaS4D0pKbhmHET1AwA31sIYF2', null, 'van@gmail.com', null, null, null, null, '10', '2016', '2016', 'Hai van', null, 1);
 
 -- ----------------------------
 -- Table structure for `user_app`
