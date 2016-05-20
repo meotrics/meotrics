@@ -1,6 +1,11 @@
-@extends('../layout/landing')
+@extends('layout.landing')
 @section('title', 'Login')
+@section('header')
+	<meta name="google-signin-scope" content="profile email">
+	<meta name="google-signin-client_id" content="102248826764-hvb3ej6gj2cn04upgtfrs8eja7djb6bu.apps.googleusercontent.com">
+	<script src="https://apis.google.com/js/platform.js" async defer></script>
 
+	@endsection
 @section('style')
 	<style>
 		section {
@@ -101,7 +106,31 @@
 @endsection
 
 @section('content')
+<section>
 
+	<script>
+		function onSignIn(googleUser) {
+
+			$.post('/auth/googletoken', {id: profile.getId(), eidtoken:id_token }, function(url){
+				window.location.href= url;
+			});
+			// Useful data for your client-side scripts:
+			var profile = googleUser.getBasicProfile();
+			console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+			console.log('Full Name: ' + profile.getName());
+			console.log('Given Name: ' + profile.getGivenName());
+			console.log('Family Name: ' + profile.getFamilyName());
+			console.log("Image URL: " + profile.getImageUrl());
+			console.log("Email: " + profile.getEmail());
+
+			// The ID token you need to pass to your backend:
+			var id_token = googleUser.getAuthResponse().id_token;
+			console.log("ID Token: " + id_token);
+			console.log(profile);
+		};
+	</script>
+
+</section>
 <section>
 	<div class="container">
 		<div class="row">
@@ -120,7 +149,13 @@
 						<div class="tab-content row">
 							<div id="login" class="tab-pane fade in active text-center col-md-12">
 								<h1 class="login-msg">Hey Buddy, welcome back!</h1>
+
+
+
 								<form role="form" class="col-sm-8 col-sm-offset-2" method="POST" action="{{ URL::to('/auth/login') }}">
+
+									<div class=" g-signin2" data-onsuccess="onSignIn" ></div>
+									<p> Or use your account</p>
 									<input type="hidden" name="_token" value="{{ csrf_token() }}">
 									@if(count($errors) > 0)
 										<div class="text-danger">
