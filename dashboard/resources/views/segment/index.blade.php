@@ -34,8 +34,8 @@ $props = isset($props) ? $props : [];
 
 @section('action')
 <li>
-    <a href="{{ URL::to('segment/create') }}" class="button action blue button-radius" style="margin-left: -14px;">
-        <i class="fa fa-plus fa-lg color-white" aria-hidden="true"></i><span class="label"><b>New Segmentation</b></span>
+    <a href="{{ URL::to('segment/'. $appcode . '/create') }}" class="button action blue button-radius" style="margin-left: -14px;">
+        <span class="label">New Segmentation</span>
     </a>
 </li>
 @endsection
@@ -57,7 +57,7 @@ $props = isset($props) ? $props : [];
 					</select>
 				</div>
 				<div class="col-md-2 div-edit-obj fix-padding">
-					<a id="action_update" data-href="{{URL::to('segment/update')}}" href="{{URL::to('segment/update', [
+					<a id="action_update" data-href="{{URL::to('segment/'. $appcode .'/update')}}" href="{{URL::to('segment/'. $appcode .'/update', [
                                         'id' => isset($segment_first) ? $segment_first->_id : ''
                                     ])}}" class="a-edit-obj" role="button">
 						<!--<span class="glyphicon glyphicon-pencil"></span>-->
@@ -201,7 +201,7 @@ $props = isset($props) ? $props : [];
 				$.ajax({
 					type: 'DELETE',
 					dataType: 'JSON',
-					url: '{{ URL::to('segment/remove') }}' + '/' + $('#segment').val(),
+					url: '{{ URL::to('segment/'. $appcode .'/remove') }}' + '/' + $('#segment').val(),
 					success: function (data) {
 						if (data.success) {
 							location.reload();
@@ -257,7 +257,7 @@ $props = isset($props) ? $props : [];
 			var label_field = '';
 			var demonstrate = '';
 			if (field1 && field2 && field1 != field2) {
-				url = '{{ URL::to('segment/charttwofields') }}';
+				url = '{{ URL::to('segment/'. $appcode .'/charttwofields') }}';
 				data_get = {
 					'segment_id': segment_id,
 					'field1': field1,
@@ -266,7 +266,7 @@ $props = isset($props) ? $props : [];
 				demonstrate = $('select[name="Prop[one]"]').find(':selected').text().toUpperCase() + ' and ' + $('select[name="Prop[two]"]').find(':selected').text().toUpperCase();
 			}
 			else if (field1 || field2) {
-				url = '{{ URL::to('segment/chartonefield') }}';
+				url = '{{ URL::to('segment/'. $appcode .'/chartonefield') }}';
 				data_get = {
 					'segment_id': segment_id,
 				};

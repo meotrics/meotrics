@@ -160,7 +160,7 @@
 <div class="card row">
     <div class="header col-md-12">
         <form id='segment-form' class="form-segment row" method="post"
-              action="{{URL::to('segment/write')}}">
+              action="{{URL::to('segment/'. $appcode . '/write')}}">
 
             <div class="col-md-12">
                 <input type="hidden" class="row hidden" value="{{$segment->_id}}" name="id">

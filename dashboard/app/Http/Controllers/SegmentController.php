@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Util\MtHttp;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
@@ -90,7 +89,7 @@ class SegmentController extends Controller
 	public function getUpdate(Request $request, $app_id, $id)
 	{
 		$t = time();
-		$segment = $this->loadModel($app_id,$id);
+		$segment = $this->loadModel($app_id, $id);
 		$props = MtHttp::get('prop/' . $app_id);
 		$actions = MtHttp::get('actiontype/' . $app_id);
 		$tmp_conditions = $segment->condition ? $segment->condition : [];
@@ -189,7 +188,7 @@ class SegmentController extends Controller
 		]);
 	}
 
-	public function loadModel( $app_id, $id)
+	public function loadModel($app_id, $id)
 	{
 		$model = MtHttp::get('segment/' . $app_id . '/' . $id);
 		if ($model) {
@@ -199,12 +198,13 @@ class SegmentController extends Controller
 		}
 	}
 
-	public function getSuggest(Request $request, $appid, $typeid, $field, $query){
+	public function getSuggest(Request $request, $appid, $typeid, $field, $query)
+	{
 		$ret = MtHttp::get('suggest/' . $appid . '/' . $typeid . '/' . $field . '/' . $query);
 		return $ret;
 	}
 
-	public function postWrite(Request $request, $app_id)
+	public function postWrite(Request $request, $appcode)
 	{
 		if (isset($_POST['Segment']) && is_array($_POST['Segment']) && isset($_POST['name'])) {
 			$query = [];
@@ -281,7 +281,7 @@ class SegmentController extends Controller
 			$startTime = $times[0];
 			$endTime = $times[2];
 			if (!$id) {
-				$id_new = MtHttp::post('segment/' . $app_id, [
+				$id = MtHttp::post('segment/' . $appcode, [
 					'condition' => $query,
 					'name' => $_POST['name'],
 					'startTime' => $startTime,
@@ -289,7 +289,7 @@ class SegmentController extends Controller
 					'description' => isset($_POST['description']) ? $_POST['description'] : '',
 				]);
 			} else {
-				$id = MtHttp::put('segment/' . $app_id . '/' . $id, [
+				$id = MtHttp::put('segment/' . $appcode . '/' . $id, [
 					'condition' => $query,
 					'name' => $_POST['name'],
 					'startTime' => $startTime,
@@ -298,7 +298,7 @@ class SegmentController extends Controller
 				]);
 			}
 		}
-		return redirect('segment');
+		return redirect('segment/' . $appcode . '/' . $id);
 	}
 
 	public function deleteRemove(Request $request, $app_id, $id)

@@ -18,6 +18,28 @@ class AppServiceProvider extends ServiceProvider
 	public function boot()
 	{
 		//view()->composer('segment.select', 'App\Http\Composers\SegmentSegment');
+		View::composer('*', function ($view) {
+			if (\Auth::user() == null) return;
+			$userid = \Auth::user()->id;
+
+			//abort(400, Request::route()->currentRouteName() );
+
+			$param = Route::current()->parameters();
+
+			if ($param == null)
+				abort(505, 'route not found');
+			else
+				$appcode = $param['appcode'];
+
+			if ($appcode == null || $appcode == '') // first time with no app
+			{
+				abort(505, 'appcode not found');
+			}
+			
+			$view->with('userid', $userid);
+			$view->with('appcode', $appcode);
+		});
+
 		View::composer('layout.master', function ($view) {
 			if (\Auth::user() == null) return;
 			$userid = \Auth::user()->id;
@@ -28,14 +50,12 @@ class AppServiceProvider extends ServiceProvider
 
 			if ($param == null)
 				abort(505, 'route not found');
-			 else
+			else
 				$appcode = $param['appcode'];
 
-			if ($appcode == null || $appcode== '' ) // first time with no app
+			if ($appcode == null || $appcode == '') // first time with no app
 			{
 				abort(505, 'appcode not found');
-
-
 			} else {
 				//get first app
 				$ap = DB::table('apps')->where('code', $appcode)->first();
@@ -47,7 +67,7 @@ class AppServiceProvider extends ServiceProvider
 				$view->with('appid', $ap->id);
 				$view->with('appname', $ap->name);
 				$view->with('appcode', $appcode);
-				$view->with('userid', $userid);
+
 			}
 		});
 	}
