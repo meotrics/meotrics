@@ -70,7 +70,7 @@ class TrendController extends Controller
 		return $response->withCookie(cookie('currenttrendid', $trendid, 2147483647, '/'. $appid . '/'));
 	}
 
-	public function getIndex(Request $request, $app_id)
+	public function getIndex(Request $request, $app_id, $trendid)
 	{
 		$actiontypes = MtHttp::get('actiontype/' . $app_id);
 

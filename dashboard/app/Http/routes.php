@@ -10,18 +10,19 @@ Route::post('/perm/{appcode}/delete/{userid}', 'PermController@delete');
 
 
 //Route::controller('trend', 'TrendController');
+
 Route::get('/trend/{appcode}/save', 'TrendController@getSave');
 Route::post('/trend/{appcode}/currenttime', 'TrendController@postCurrenttime');
 Route::post('/trend/{appcode}/currentsegment', 'TrendController@postCurrentsegment');
 Route::post('/trend/{appcode}/currenttrend/{$trendid}', 'TrendController@postCurrenttrend');
-Route::get('/trend/{appcode}', 'TrendController@getIndex');
+
 Route::get('/trend/{appcode}/query', 'TrendController@getQuery');
 Route::get('/trend/{appcode}/create', 'TrendController@getCreate');
 Route::post('/trend/{appcode}/write', 'TrendController@postWrite');
 Route::get('/trend/{appcode}/htmloutputs', 'TrendController@getHtmloutputs');
 Route::get('/trend/{appcode}/update/{id}', 'TrendController@getUpdate');
 Route::delete('/trend/{appcode}/remove/{id}', 'TrendController@deleteRemove');
-
+Route::get('/trend/{appcode}/{trendid?}', 'TrendController@getIndex');
 
 Route::resource('actiontype', 'TypeController');
 

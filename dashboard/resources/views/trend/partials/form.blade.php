@@ -5,7 +5,7 @@
 
 	<div class="card row">
 		<div class="header col-md-12">
-			<form class="form-horizontal" method="post" action="{{URL::to('trend/write')}}">
+			<form class="form-horizontal" method="post" action="{{URL::to('trend/'.$appcode.'/write')}}">
 				<div class="form-group col-md-12">
 					<label class="col-md-2" style="margin-top: 10px">Trend name</label>
 					<div class="col-md-4">
