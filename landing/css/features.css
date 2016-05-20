@@ -1,0 +1,185 @@
+.header-content > img {
+	margin: 30px auto;
+}
+
+.info {
+	color: #8492af;
+	font-size: 15px;
+}
+
+.info-primary{
+	color: #5284ff;
+}
+
+.info-primary .info-icon {
+	padding: 0 10px;
+	font-size: 25px;
+	color: #5284ff;
+}
+
+.info-primary .limit {
+	color: #f83c7b;
+}
+
+.info-primary .info-detail {
+	vertical-align: middle;
+	font-size: 18px;
+}
+
+.info-more{
+	padding-left: 45px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+
+#fullfeatures,
+.feature-item {
+	padding-bottom: 40px;
+}
+
+
+/**
+ * features
+ */
+
+#features{
+	background-repeat: repeat-x;
+	background-image: url("../img/features-bg.png");
+	background-position: bottom;
+	padding-bottom: 40px;
+}
+
+
+.feature-item > img {
+	margin: 35px 0;
+	height: 60px;
+}
+
+.feature-item .title{
+	font-weight: bold;
+	font-size: 17px;
+	color: #0e1a35;
+}
+.feature-item .description{
+	padding: 5px 60px;
+}
+
+.feature-item > a {
+	font-weight: bold;
+	margin-top: 15px;
+}
+
+.description {
+	font-size: 13px;
+	color: #8492af;
+}
+
+/*----------------------*/
+#sketching,
+#fullfeatures{
+	background-color: #f6f7fa;
+}
+
+.fullfeature-item img{
+	margin: 20px 0;
+	height: 50px;
+}
+
+.fullfeature-item .title{
+	font-weight: 400;
+	font-size: 17px;
+	color: #0e1a35;
+}
+
+.fullfeature-item .description{
+	margin: 20px 0;
+}
+
+/**
+ * sketching
+ */
+
+#sketching {
+	padding: 80px 0;
+}
+
+.sketching-thumb > img {
+	margin: 0 auto;
+}
+
+.sketching-info .sketching-title{
+	font-weight: lighter;
+	font-size: 36px;
+	margin-top: 0px;
+	margin-bottom: 20px;
+}
+
+.sketching-info .sketching-description{
+	font-size: 17px;	
+}
+
+/**
+ * marketing
+ */
+
+.marketing-item{
+	height: 280px;
+	background-repeat: no-repeat;
+	background-position: center 40px;
+	background-size: 160px;
+}
+
+.marketing-item > p{
+	font-size: 16px;
+}
+
+#datatracking{
+	background-image: url("../img/feature-icon-datatracking.png");
+}
+
+#comparision{
+	background-image: url("../img/feature-icon-comparsion.png");	
+}
+
+#costmanager{
+	background-image: url("../img/feature-icon-costmanager.png");
+}
+
+#customerengage{
+	background-image: url("../img/feature-icon-customerengage.png");	
+}
+
+.marketing-info .marketing-detail,
+.marketing-info .marketing-title{
+	text-transform: uppercase;
+}
+
+.marketing-info .marketing-title{
+	font-weight: bold;
+}
+
+.marketing-info .marketing-detail{
+	font-size: 35px;
+	font-weight: lighter;
+}
+
+
+
+@media (min-width: 992px) {
+	#datatracking,
+	#customerengage{
+		margin-top: 200px;
+	}
+
+	.marketing-info{
+		margin-top: -200px;
+	}
+}
+
+@media (max-width: 1201px) {
+	.feature-item .description {
+	    padding: 5px 0px!important;
+	}
+}

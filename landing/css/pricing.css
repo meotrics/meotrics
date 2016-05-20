@@ -1,0 +1,173 @@
+.info {
+	color: #8492af;
+	font-size: 15px;
+}
+
+.info:hover{
+	color: #5284ff;
+}
+
+.info .info-icon {
+	padding: 0 5px;
+	font-size: 20px;
+	color: #5284ff;
+}
+
+.info .limit {
+	color: #f83c7b;
+}
+
+.info .info-detail {
+	vertical-align: middle;
+	font-size: 15px;
+}
+
+
+.outstanding-item,
+.included-item {
+	padding: 0 30px;
+    margin: 30px auto;
+}
+
+
+/*--------------------*/
+
+
+#plans {
+	margin-top: 30px;
+	margin-bottom: 50px;
+}
+
+.plan{
+	padding: 10px 20px;
+	display: inline-block;
+}
+
+.plan-item{
+	max-width: 255px;
+	background-color: #fff;
+	padding: 20px 30px;
+}
+
+.plan-item .plan-title{
+	text-transform: uppercase;
+	font-size: 17px;
+}
+
+.plan-item .plan-price .currency,
+.plan-item .plan-price .money{
+	font-weight: bold;
+}
+
+.plan-item .plan-price{
+	height: 90px;
+	padding: 18px 0;
+}
+
+.plan-item .plan-price .contact{
+	font-size: 38px;
+	font-weight: bold;
+	padding-bottom: 35px;
+}
+
+.plan-item .plan-price .currency{
+	font-size: 28px;
+}
+
+.plan-item .plan-price .money{
+	font-size: 50px;
+}
+
+.plan-item .plan-price .time{
+	font-size: 17px;
+	color: #8492af;
+}
+
+.plan-item .plan-choose {
+	margin: 20px 0;
+    padding: 8px 20px;
+    border: 1px solid #0e1a35;
+    color: #fff;
+    font-weight: bolder;
+    font-size: 15px;
+    border-radius: 5px;
+    background-color: #0e1a35;
+    display: inline-block;
+}
+
+.plan-item .plan-choose:hover{
+	text-decoration: none;
+	background-color: transparent;
+	color: #0e1a35;
+}
+
+.plan-info{
+	text-align: left;
+}
+
+/**
+ * included
+ */
+
+#included h1{
+	text-align: center;
+}
+
+.included-info .info-detail{
+	font-size: 18px;
+    font-weight: 300;
+}
+
+
+/**
+ * outstanding
+ */
+
+#outstanding{
+	padding: 0;
+}
+
+.outstanding-item .outstanding-title{
+	font-size: 20px;	
+}
+
+.outstanding-item .outstanding-detail{
+	font-weight: 300;
+    font-size: 18px;
+}
+
+/**
+ * card
+ */
+
+.card-info{
+	margin-bottom: 50px;
+}
+
+.card{
+	padding-left: 60px;
+}
+
+.card-info{
+	background-color: #f0f3fa;
+	padding: 10px;
+}
+
+.card-info .detail{ 
+    font-size: 20px;
+    font-weight: 300;
+}
+
+.card-info .thumb{
+	/*display: inline-block;*/
+	padding: 0 20px;
+}
+
+.card-info .detail .title{ 
+	font-size: 22px;
+}
+
+.card-info .detail .description{ 
+	font-size: 16px;
+}
+

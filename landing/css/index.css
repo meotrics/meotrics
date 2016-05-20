@@ -1,0 +1,275 @@
+/**
+ * header content
+ */
+
+header .container{
+	padding-bottom: 300px;
+}
+
+.header-content{
+	padding-top: 20px;
+	padding-bottom: 35px;
+}
+
+.header-content > p {
+	color: #8492af;
+	font-size: 26px;
+}
+
+.header-content > a {
+	font-weight: bold;
+	margin-top: 50px;
+	margin-bottom: 30px;
+}
+
+#dashboard {
+	margin-top: -375px;
+}
+
+#dashboard img {
+	width: 605px;
+	display: block;
+	margin: 0 auto;
+}
+
+
+/**
+ * features
+ */
+
+
+#features{
+	background-repeat: repeat-x;
+	background-image: url("../img/features-bg.png");
+	background-position: bottom;
+	padding-bottom: 40px;
+}
+.feature-item {
+	padding-bottom: 40px;
+}
+
+.feature-item > img {
+	margin: 35px 0;
+	height: 52px;
+}
+
+.feature-item .title{
+	font-weight: bold;
+	font-size: 17px;
+	color: #0e1a35;
+}
+.feature-item .description{
+	padding: 5px 55px;
+	margin-bottom: 20px;
+}
+
+.description {
+	font-size: 13px;
+	color: #8492af;
+}
+
+.feature-item > a {
+	font-weight: bold;
+}
+
+
+/**
+ * Beer
+ */
+
+
+#beer {
+	background: url("../img/beer-bg.png");
+}
+
+#beer > div {
+	background: url("../img/beer-bg-device.png") no-repeat right center;
+	padding: 70px 0;
+}
+
+.beer-item .title{
+	color: #0e1a35;
+    font-size: 35px;
+    font-weight: lighter;
+    padding: 20px 0px;
+}
+
+.beer-item .description{
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.beer-item i.fa {
+	font-size: 20px;
+	margin-right: 10px;
+}
+
+.beer-item .emphasize {
+	color: #5584ff;
+	font-size: 16px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	font-weight: 500;
+}
+
+
+/**
+ * step
+ */
+
+
+#step {
+	background: url("../img/slide-bg.png") no-repeat center;
+	background-size: cover;
+	color: #ffffff;
+	text-align: center;
+}
+
+#step .row{
+	padding-top: 70px;
+    padding-bottom: 80px;
+}
+
+.step-item{
+	padding-top: 40px;
+	padding-bottom: 40px;
+}
+
+.step-item{
+	background: url("../img/circle.png") no-repeat left;
+	padding-right: 40px;
+}
+
+.step-item .number,
+.step-item i.fa{
+	font-size: 40px;
+}
+
+.step-item .title,
+.step-item .number{
+	font-weight: lighter;
+}
+
+.step-item .title{
+	font-size: 30px;
+}
+
+.step-item .number{
+	color: #0e1a35;
+	padding-left: 8px;
+}
+
+.step-item i.fa{
+	padding-top: 10px;
+}
+
+
+/*plan*/
+
+
+.info {
+	color: #8492af;
+	font-size: 15px;
+}
+
+.info:hover{
+	color: #5284ff;
+}
+
+.info .info-icon {
+	padding: 0 5px;
+	font-size: 20px;
+	color: #5284ff;
+}
+
+.info .limit {
+	color: #f83c7b;
+}
+
+.info .info-detail {
+	vertical-align: middle;
+	font-size: 15px;
+}
+
+#plans {
+	margin-top: 30px;
+	margin-bottom: 50px;
+}
+
+.plan{
+	padding: 10px 20px;
+}
+
+.plan{
+	background-color: #fff;
+    padding: 20px 30px;
+    width: 260px;
+    margin: 0 auto;
+}
+
+.plan .plan-title{
+	text-transform: uppercase;
+	font-size: 17px;
+}
+
+.plan .plan-price .currency,
+.plan .plan-price .money{
+	font-weight: bold;
+}
+
+.plan .plan-price{
+	height: 100px;
+	padding: 18px 0;
+}
+
+.plan .plan-price .contact{
+	font-size: 38px;
+	font-weight: bold;
+	padding-bottom: 35px;
+}
+
+.plan .plan-price .currency{
+	font-size: 28px;
+}
+
+.plan .plan-price .money{
+	font-size: 50px;
+}
+
+.plan .plan-price .time{
+	font-size: 17px;
+	color: #8492af;
+}
+
+.plan .plan-choose {
+	margin: 20px 0;
+    padding: 8px 20px;
+    border: 1px solid #0e1a35;
+    color: #fff;
+    font-weight: bolder;
+    font-size: 15px;
+    border-radius: 5px;
+    background-color: #0e1a35;
+}
+
+.plan .plan-choose:hover{
+	background-color: transparent;
+	color: #0e1a35;
+}
+
+.plan-info{
+	text-align: left;
+}
+
+@media screen and (max-width: 360px) {
+	.feature-item .description{
+		padding-left: 0px!important;
+		padding-right: 0px!important;
+	}
+}
+
+@media screen and (max-width: 960px) {
+	#beer>div{
+		background: transparent!important;
+	}
+}
