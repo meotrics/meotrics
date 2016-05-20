@@ -14,7 +14,7 @@ Route::get('/trend/{appcode}/save', 'TrendController@getSave');
 Route::post('/trend/{appcode}/currenttime', 'TrendController@postCurrenttime');
 Route::post('/trend/{appcode}/currentsegment', 'TrendController@postCurrentsegment');
 Route::post('/trend/{appcode}/currenttrend/{$trendid}', 'TrendController@postCurrenttrend');
-Route::get('/trend/{appcode}/index', 'TrendController@getIndex');
+Route::get('/trend/{appcode}', 'TrendController@getIndex');
 Route::get('/trend/{appcode}/query', 'TrendController@getQuery');
 Route::get('/trend/{appcode}/create', 'TrendController@getCreate');
 Route::post('/trend/{appcode}/write', 'TrendController@postWrite');
@@ -28,7 +28,7 @@ Route::resource('actiontype', 'TypeController');
 Route::post('/actiontype/{appid}/create', 'TypeController@create');
 
 Route::get('/segment/{appcode}/execute', 'SegmentController@getExecute');
-Route::get('/segment/{appcode}/index', 'SegmentController@getIndex');
+Route::get('/segment/{appcode}', 'SegmentController@getIndex');
 Route::get('/segment/{appcode}/create', 'SegmentController@getCreate');
 Route::get('/segment/{appcode}/update/{id}', 'SegmentController@getUpdate');
 Route::post('/segment/{appcode}/write', 'SegmentController@postWrite');
