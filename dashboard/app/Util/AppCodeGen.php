@@ -13,7 +13,7 @@ class AppCodeGen
 
 	public static function alloc($appname)
 	{
-		$mutex = fopen("./appcodegen.lock", "r+");
+		$mutex = fopen("./appcodegen.lock", "w");
 		if (flock($mutex, LOCK_EX)) {
 			// this make sure to excute this one time in a row only
 
