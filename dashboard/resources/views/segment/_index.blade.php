@@ -1,4 +1,4 @@
-@extends('../layout/master')
+@extends('layout.master')
 
 @section('style')
 	<style>

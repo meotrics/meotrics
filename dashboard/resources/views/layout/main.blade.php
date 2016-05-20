@@ -23,8 +23,9 @@
 	<link href="{{asset('css/daterangepicker.css')}}" rel="stylesheet"/>
 	<link href="{{asset('css/sweetalert.css')}}"/>
 	<link rel="stylesheet" href="{{asset('css/odometer-theme-minimal.css')}}"/>
-	<link href="{{asset('css/app.css')}}" rel="stylesheet"/>
+
 	@yield('style')
+	<link href="{{asset('css/app.css')}}" rel="stylesheet"/>
 	@yield('header-script')
 </head>
 <body>

@@ -3,7 +3,7 @@
 $segments = isset($segments) ? $segments : [];
 $props = isset($props) ? $props : [];
 ?>
-@extends('../layout/master', ['sidebarselect' => 'segment'])
+@extends('layout.master', ['sidebarselect' => 'segment'])
 @section('title', 'Segment')
 @section('script')
 	<script type="text/javascript">

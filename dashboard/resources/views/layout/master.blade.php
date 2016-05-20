@@ -2,7 +2,7 @@
 @section('header-script')
 	<script>
 		var userid = '{{$userid}}';
-		var appcode = '{{$curappcode}}';
+		var appcode = '{{$appcode}}';
 
 		function onPageLoad(fn) {
 			if (window.addEventListener)
@@ -88,43 +88,43 @@
 				</div>
 				<ul class="nav">
 					<li class="{{ Route::getCurrentRoute()->getPath() == 'home' ? 'active' : '' }}">
-						<a href="/{{ $curappid }}">
+						<a href="/{{ $appcode }}">
 							<i class="pe-7s-graph"></i>
 							<p>Dashboard</p>
 						</a>
 					</li>
 					<li class="{{ Route::getCurrentRoute()->getPath() == 'trend' ? 'active' : '' }}">
-						<a href="/trend/{{$curappid}}">
+						<a href="/trend/{{$appcode}}">
 							<i class="pe-7s-graph1"></i>
 							<p>Trend</p>
 						</a>
 					</li>
 					<li class="{{ Route::getCurrentRoute()->getPath() == 'segment' ? 'active' : '' }}">
-						<a href="/segment/{{$curappid}}">
+						<a href="/segment/{{$appcode}}">
 							<i class="pe-7s-users"></i>
 							<p>Segmentation</p>
 						</a>
 					</li>
 					<li class="{{ Route::getCurrentRoute()->getPath() == 'funnel' ? 'active' : '' }}">
-						<a href="/funnel/{{$curappid}}">
+						<a href="/funnel/{{$appcode}}">
 							<i class="pe-7s-filter"></i>
 							<p>Funnel</p>
 						</a>
 					</li>
 					<li class="{{ Route::getCurrentRoute()->getPath() == 'revenue' ? 'active' : '' }}">
-						<a href="/revenue/{{$curappid}}">
+						<a href="/revenue/{{$appcode}}">
 							<i class="pe-7s-cash"></i>
 							<p>Revenue</p>
 						</a>
 					</li>
 					<li class="{{ Route::getCurrentRoute()->getPath() == 'campaign' ? 'active' : '' }}">
-						<a href="/campaign/{{$curappid}}">
+						<a href="/campaign/{{$appcode}}">
 							<i class="pe-7s-graph3"></i>
 							<p>Marketing Campaign</p>
 						</a>
 					</li>
 					<li class="{{ Route::getCurrentRoute()->getPath() == 'insight' ? 'active' : '' }}">
-						<a href="/insight/{{$curappid}}">
+						<a href="/insight/{{$appcode}}">
 							<i class="pe-7s-user"></i>
 							<p>User Profile</p>
 						</a>
@@ -197,14 +197,14 @@
 							</li>
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-									<span class="vam">	{{ $curappname }}</span>
+									<span class="vam">	{{ $appname }}</span>
 									<b class="caret"></b>
 								</a>
 								<ul class="dropdown-menu">
 									<li><a href="#" class="id_trackingcode">Get tracking code</a></li>
 									<li><a href="{{ URL::to('/user/profile') }}">Profile</a></li>
 
-									<li><a href="{{ URL::to('/actiontype/'.$curappid) }}">Action types</a></li>
+									<li><a href="{{ URL::to('/actiontype/'.$appcode) }}">Action types</a></li>
 									<li class="divider"></li>
 									<li><a href="{{ URL::to('/auth/logout') }}">Logout</a></li>
 								</ul>
@@ -229,7 +229,7 @@
 
 		onPageLoad(function () {
 			$('.id_trackingcode').click(function () {
-				showCodeDialog(appid);
+				showCodeDialog('{{$appcode}}');
 			});
 		});
 		var config = {

@@ -1,6 +1,6 @@
 <?php
 ?>
-@extends('../layout/master', ['sidebarselect' => 'trend'])
+@extends('layout.master', ['sidebarselect' => 'trend'])
 @section('title', 'Trend')
 
 @section('content')

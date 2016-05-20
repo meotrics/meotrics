@@ -1,4 +1,4 @@
-@extends('../layout/master')
+@extends('layout.master')
 @section('style')
 <link rel="stylesheet" href="{{asset('/css/typehead.css')}}"/>
 @endsection
