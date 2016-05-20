@@ -4,7 +4,7 @@
 
 @section('action')
 	<li>
-		<a href="/trend/create" class="button action blue button-radius" style="margin-left: -14px;">
+		<a href="/trend/{{$appcode}}/create" class="button action blue button-radius" style="margin-left: -14px;">
 			<span class="label">New trend</span>
 		</a>
 	</li>
@@ -21,10 +21,9 @@
 							<select id="trend" class="form-control input-sm " style="width: 200px; display:inline-block">
 								<?php if (isset($trends[0])) $trend_first = $trends[0]; ?>
 								@foreach($trends as $trend)
-									@if(isset($trendid) && $trendid == $trend->_id)
+									@if( $trendid == $trend->_id)
 										<?php $trend_first = $trend; ?>
-										<option selected
-										        value="{{$trend->_id}}">{{ isset($trend->name) ? $trend->name : "unnamed"}}</option>
+										<option value="{{$trend->_id}}" selected>{{ isset($trend->name) ? $trend->name : "unnamed"}}</option>
 									@else
 										<option value="{{$trend->_id}}">{{ isset($trend->name) ? $trend->name : "unnamed"}}</option>
 									@endif

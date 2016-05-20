@@ -70,7 +70,7 @@ class TrendController extends Controller
 		return $response->withCookie(cookie('currenttrendid', $trendid, 2147483647, '/'. $appid . '/'));
 	}
 
-	public function getIndex(Request $request, $app_id, $trendid)
+	public function getIndex(Request $request, $app_id, $trendid = null)
 	{
 		$actiontypes = MtHttp::get('actiontype/' . $app_id);
 
@@ -80,10 +80,16 @@ class TrendController extends Controller
 
 		$trends = MtHttp::get('trend/' . $app_id);
 
+		if($trendid !== null) {
+			$tre = MtHttp::get('trend/' . $app_id . '/' . $trendid);
+			if($tre == null)
+				return view('trend/notfound');
+		}
+		
+		
 		if ($trends) {
 			$queryurl = 'trend/query/' . $app_id;
-			if ($this->request->cookie('currenttrendid')) {
-				$trendid = $this->request->cookie('currenttrendid');
+			if ($trendid!= null) {
 				$queryurl .= '/' . $trendid;
 			} else {
 				$trend = reset($trends);
@@ -128,7 +134,7 @@ class TrendController extends Controller
 			'startTime' => $this->request->cookie('currenttrendstarttime'),
 			'endTime' => $this->request->cookie('currenttrendendtime'),
 			'segments' => $segments,
-			'trendid' => $this->request->cookie('currenttrendid'),
+			'trendid' => $trendid,
 			'types' => json_encode($actiontypes),
 			'trends' => $trends,
 			'outputs' => $outputs,
@@ -224,7 +230,7 @@ class TrendController extends Controller
 			} else {
 				$trendid = MtHttp::post('trend/' . $app_id, $data);
 			}
-			return redirect('trend');
+			return redirect('trend/' . $app_id . '/' . $trendid);
 		}
 		return false;
 	}
