@@ -23,7 +23,7 @@
 	<link href="{{asset('css/daterangepicker.css')}}" rel="stylesheet"/>
 	<link href="{{asset('css/sweetalert.css')}}"/>
 	<link rel="stylesheet" href="{{asset('css/odometer-theme-minimal.css')}}"/>
-
+	<link rel="stylesheet" href="{{asset('css/select2.min.css')}}"/>
 	@yield('style')
 	<link href="{{asset('css/app.css')}}" rel="stylesheet"/>
 	@yield('header-script')
@@ -48,7 +48,7 @@
 <script src="{{asset('js/sweetalert.js')}}" type="text/javascript"></script> @include('Alerts::alerts')
 <script src="{{asset('js/odometer.min.js')}}"></script>
 <script src="{{asset('js/meotricsws.js')}}" type="text/javascript"></script>
-
+<script src="{{asset('js/select2.min.js')}}"></script>
 @yield('footer-script')
 </body>
 </html>

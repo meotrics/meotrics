@@ -1,10 +1,11 @@
-<?php
+@extends('layout.master', ['sidebarselect' => 'segment'])
+@section('title', 'Segment')
 
+<?php
 $segments = isset($segments) ? $segments : [];
 $props = isset($props) ? $props : [];
 ?>
-@extends('layout.master', ['sidebarselect' => 'segment'])
-@section('title', 'Segment')
+
 @section('script')
 	<script type="text/javascript">
 		var segments = {};
@@ -27,10 +28,6 @@ $props = isset($props) ? $props : [];
 		endif;
 		?>
 	</script>
-@endsection
-
-@section('style')
-	<link rel="stylesheet" href="{{asset('css/select2.min.css')}}"/>
 @endsection
 
 @section('action')
@@ -177,7 +174,6 @@ $props = isset($props) ? $props : [];
 @endsection
 
 @section('additional')
-	<script src="{{asset('js/select2.min.js')}}"></script>
 	<script src="{{asset('js/Chart.js')}}"></script>
 	<script type="text/javascript">
 		$('select').select2();

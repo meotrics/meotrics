@@ -151,10 +151,6 @@
 	</script>
 @endsection
 
-@section('style')
-	<link rel="stylesheet" href="{{asset('css/select2.min.css')}}"/>
-@endsection
-
 @section('content')
 	<div class="card row">
 		<div class="header col-md-12">
@@ -250,7 +246,7 @@
 @endsection
 
 @section('additional')
-	<script src="{{asset('js/select2.min.js')}}"></script>
+
 	<script type="text/javascript">
 		//    $('select').select2();
 		function backFn() {

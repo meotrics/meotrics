@@ -1,40 +1,5 @@
-<?php
-
-$segments = isset($segments) ? $segments : [];
-$props = isset($props) ? $props : [];
-?>
 @extends('layout.master', ['sidebarselect' => 'segment'])
 @section('title', 'Segment')
-@section('script')
-	<script type="text/javascript">
-		var segments = {};
-		<?php
-						if($segments):
-						$segment_first = null;
-
-						if($segmentid != null)
-						$segment_first = $segmentid;
-						else
-						foreach ($segments as $key => $segment):
-						if ($key == 0) {
-							$segment_first = $segment;
-						}
-						?>
-						segments['{{ $segment->_id }}'] = {
-			name: '{{ property_exists($segment, 'name') ? $segment->name : '' }}',
-			description: '{{property_exists($segment, 'description') ? $segment->description : '' }}',
-			count: '{{ property_exists($segment, 'count') ? $segment->count : '' }}'
-		};
-		<?php
-		endforeach;
-		endif;
-		?>
-	</script>
-@endsection
-
-@section('style')
-	<link rel="stylesheet" href="{{asset('css/select2.min.css')}}"/>
-@endsection
 
 @section('action')
 	<li>
