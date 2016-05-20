@@ -42,10 +42,10 @@ class PermController extends Controller
 		return view('app/edit', ['ap' => $ap, 'appcode' => $appcode]);
 	}
 
-	public function set(Request $request, $appid, $userid)
+	public function set(Request $request, $appcode, $userid)
 	{
 		$uid = \Auth::user()->id;
-		$status = Access::setPerm($uid, $userid, $appid, $request->input('can_perm'), $request->input('can_struct'), $request->input('can_report'));
+		$status = Access::setPerm($uid, $userid, $appcode, $request->input('can_perm'), $request->input('can_struct'), $request->input('can_report'));
 		if ($status == 0)
 			return new Response();
 		else abort(403, 'Unauthorized action');
@@ -61,7 +61,7 @@ class PermController extends Controller
 		$out = AppCodeGen::alloc($name);
 		$code = $out['code'];
 		$mutex = $out['lock'];
-		$appid = DB::table('apps')->insertGetId(array(
+		DB::table('apps')->insert(array(
 				'name' => $name,
 				'code' => $code,
 				'ownerid' => $uid
@@ -71,20 +71,18 @@ class PermController extends Controller
 		// unlock thread
 		AppCodeGen::used($mutex);
 
-
 		// create role for owner
-		Access::setPerm($uid, $uid, $appid, 1, 1, 1);
-
+		Access::setPerm($uid, $uid, $code, 1, 1, 1);
 		// init app in backend
 		MtHttp::get('app/init/' . $code);
 
 		return new Response($code);
 	}
 
-	public function delete(Request $request, $appid, $userid)
+	public function delete(Request $request, $appcode, $userid)
 	{
 		$uid = \Auth::user()->id;
-		$status = Access::deletePerm($uid, $userid, $appid);
+		$status = Access::deletePerm($uid, $userid, $appcode);
 		if ($status == 0)
 			return new Response();
 		else abort(403, 'Unauthorized action');
@@ -106,5 +104,4 @@ class PermController extends Controller
 			return new Response();
 		else abort(403, 'Unauthorized action');
 	}
-
 }

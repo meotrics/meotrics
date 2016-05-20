@@ -42,8 +42,10 @@
 			});
 
 			$('.id_add').click(function () {
-				$.post('/app/create', {name: $('.id_name').val()}, function (appid) {
-					showCodeDialog(appid);
+				$.post('/app/create', {name: $('.id_name').val()}, function (appcode) {
+					showCodeDialog(appcode, function(){
+						location.reload();
+					});
 				}).fail(function () {
 					alert('cannot create app');
 				});
@@ -76,7 +78,7 @@
 						<tr>
 							<td>{{$ap->name}}
 								<br/>
-							<code>{{$ap->code}}</code></td>
+							<code class="fmonospaced">{{$ap->code}}</code></td>
 							<td>43 953 <div class="sparkline"></div></td>
 
 							<td class="status_{{$ap->code}}"><span class="greendot"></span> CONNECTED</td>
@@ -89,7 +91,8 @@
 							</td>
 							<td class="row">
 								<a class="button action" href="/dashboard/{{$ap->code}}"> Enter Dashboard</a>
-								<a class="button action" href="/app/edit/{{$ap->code}}"><i class="fa fa-edit"></i></a>
+								<a class="button action" href="/app/edit/{{$ap->code}}"><i class="fa fa-pencil"></i></a>
+								<a class="button action" onclick="showCodeDialog('{{$ap->code}}')" href="#"><i class="fa fa-file-code-o"></i></a>
 							</td>
 						</tr>
 					@endforeach

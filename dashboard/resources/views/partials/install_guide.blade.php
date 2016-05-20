@@ -54,7 +54,7 @@
 				<small>Done ?</small>
 				&nbsp;
 				<button type="button" class="btn btn-sm btn-fill btn-primary"
-				        data-dismiss="modal" aria-label="Close">
+								data-dismiss="modal" aria-label="Close">
 					Close
 				</button>
 			</div>
@@ -94,7 +94,11 @@
 		});
 	}
 
-	function showCodeDialog(APP_ID) {
+	function showCodeDialog(APP_ID, callback) {
+		if (callback !== undefined)
+			$('#guideline').on('hidden.bs.modal', function () {
+				callback();
+			});
 		$('#guideline').modal('show');
 		getIntegrationCode(APP_ID);
 	}

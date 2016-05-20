@@ -92,6 +92,7 @@ class Access
 			}
 			return 0;
 		}
+		abort(500, "sdfdf");
 		return -1;
 	}
 
