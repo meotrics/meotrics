@@ -8,7 +8,7 @@ export class DashboardEntity {
 		public n_returning_visitor: number;
 		public total_revenues: number[];
 		public total_revenues_per_user: number[];
-		public retention_rates\: number;
+		public retention_rates: number[];
 		public usergrowth_rate: number;
 		public conversion_rate: number;
 		public highest_revenue_campaign: string;
@@ -188,16 +188,21 @@ export class Dashboard {
 
 						// 3 retenstion rate
 						me.getRetensionRate(me.db, me.prefix, appid, ids, function (retention_rates: number[]) {
-							dashboard.retention_rates\ = retention_rates;
+							dashboard.retention_rates = retention_rates;
+
+							//4 highest campaign
+							var highestcampaing_project = {};
+							highestcampaing_project[ids._ctime] = 1;
+							highestcampaing_project[ids._isUser] = 1;
+							highestcampaing_project[ids._revenue] = 1;
+
+							var hc_match = {};
+							hc_match[ids._isUser] = true;
+							me.db.collection(me.prefix + appid).aggregate([], {$: ''}
+
+
 						});
-
-
-
-
-
-
-
-
+					
 					});
 				});
 
