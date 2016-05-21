@@ -6,7 +6,7 @@ class MtHttp
 	private static $port;
 	private static $host;
 
-	private static function json_decodeEx($data)
+	public static function json_decodeEx($data)
 	{
 		//unction isJson($string) {
 			$ret = json_decode($data);
