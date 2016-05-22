@@ -44,6 +44,11 @@ class AppServiceProvider extends ServiceProvider
 		View::composer('layout.master', function ($view) {
 			if (\Auth::user() == null) return;
 			$userid = \Auth::user()->id;
+			$apps = DB::table('apps')->join('user_app', 'apps.id', '=', 'user_app.appid')
+				->where('user_app.userid', $userid)->get();
+
+			$view->with('apps', $apps);
+
 
 			//abort(400, Request::route()->currentRouteName() );
 

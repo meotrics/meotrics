@@ -202,10 +202,18 @@
 								</a>
 								<ul class="dropdown-menu">
 									<li><a href="#" class="id_trackingcode">Get tracking code</a></li>
-									<li><a href="{{ URL::to('/user/profile') }}">Profile</a></li>
-
-									<li><a href="{{ URL::to('/actiontype/'.$appcode) }}">Action types</a></li>
+									<li><a href="/actiontype/{{$appcode}}">Manage action types</a></li>
+									@if(count($apps) !=0)
+										<li class="divider"></li>
+										@foreach($apps as $ap)
+											@if($ap->code != $appcode)
+												<li><a href="/dashboard/{{$ap->code }}">Switch to {{$ap->name}}</a></li>
+											@endif
+										@endforeach
+										<li><a href="/app">Manage apps</a></li>
+									@endif
 									<li class="divider"></li>
+									<li><a href="{{ URL::to('/user/profile') }}">Your profile</a></li>
 									<li><a href="{{ URL::to('/auth/signout') }}">Logout</a></li>
 								</ul>
 							</li>
