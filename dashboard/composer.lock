@@ -4,71 +4,9 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f2df1e91f169d2754a3e93357f1e5dc0",
-    "content-hash": "a899d8bb1618905e0e1c668c725d9bbe",
+    "hash": "c1d6ab0de328cfba2a4629bde7098ba4",
+    "content-hash": "b30d28dad4d6294f876f13bcce43f323",
     "packages": [
-        {
-            "name": "arvenil/ninja-mutex",
-            "version": "0.5.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/arvenil/ninja-mutex.git",
-                "reference": "9726729fe27ff02acd9887e85c150d353a073a2e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/arvenil/ninja-mutex/zipball/9726729fe27ff02acd9887e85c150d353a073a2e",
-                "reference": "9726729fe27ff02acd9887e85c150d353a073a2e",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "codeclimate/php-test-reporter": "0.1.*",
-                "ext-memcache": "*",
-                "ext-memcached": "*",
-                "ext-pdo_mysql": "*",
-                "mikey179/vfsstream": "1.4.* || 1.5.*",
-                "predis/predis": "1.0.*",
-                "scrutinizer/ocular": "1.1.*"
-            },
-            "suggest": {
-                "ext-memcache": "Create mutex using memcache extension",
-                "ext-memcached": "Create mutex using memcached extension",
-                "ext-pdo_mysql": "Create mutex using MySql",
-                "predis/predis": "Create mutex using Predis (client library for Redis)"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "NinjaMutex": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Kamil Dziedzic",
-                    "email": "arvenil@klecza.pl"
-                }
-            ],
-            "description": "Simple to use mutex implementation that can use flock, memcache, memcached, mysql or redis for locking",
-            "homepage": "https://github.com/arvenil/ninja-mutex",
-            "keywords": [
-                "flock",
-                "lock",
-                "locking",
-                "memcache",
-                "memcached",
-                "mutex",
-                "mysql",
-                "redis"
-            ],
-            "time": "2015-09-10 15:12:42"
-        },
         {
             "name": "classpreloader/classpreloader",
             "version": "1.4.0",
@@ -1761,16 +1699,16 @@
         },
         {
             "name": "symfony/polyfill-php56",
-            "version": "v1.1.1",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php56.git",
-                "reference": "4d891fff050101a53a4caabb03277284942d1ad9"
+                "reference": "3edf57a8fbf9a927533344cef65ad7e1cf31030a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php56/zipball/4d891fff050101a53a4caabb03277284942d1ad9",
-                "reference": "4d891fff050101a53a4caabb03277284942d1ad9",
+                "url": "https://api.github.com/repos/symfony/polyfill-php56/zipball/3edf57a8fbf9a927533344cef65ad7e1cf31030a",
+                "reference": "3edf57a8fbf9a927533344cef65ad7e1cf31030a",
                 "shasum": ""
             },
             "require": {
@@ -1780,7 +1718,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.1-dev"
+                    "dev-master": "1.2-dev"
                 }
             },
             "autoload": {
@@ -1813,20 +1751,20 @@
                 "portable",
                 "shim"
             ],
-            "time": "2016-01-20 09:13:37"
+            "time": "2016-05-18 14:26:46"
         },
         {
             "name": "symfony/polyfill-util",
-            "version": "v1.1.1",
+            "version": "v1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-util.git",
-                "reference": "8de62801aa12bc4dfcf85eef5d21981ae7bb3cc4"
+                "reference": "ef830ce3d218e622b221d6bfad42c751d974bf99"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-util/zipball/8de62801aa12bc4dfcf85eef5d21981ae7bb3cc4",
-                "reference": "8de62801aa12bc4dfcf85eef5d21981ae7bb3cc4",
+                "url": "https://api.github.com/repos/symfony/polyfill-util/zipball/ef830ce3d218e622b221d6bfad42c751d974bf99",
+                "reference": "ef830ce3d218e622b221d6bfad42c751d974bf99",
                 "shasum": ""
             },
             "require": {
@@ -1835,7 +1773,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.1-dev"
+                    "dev-master": "1.2-dev"
                 }
             },
             "autoload": {
@@ -1865,7 +1803,7 @@
                 "polyfill",
                 "shim"
             ],
-            "time": "2016-01-20 09:13:37"
+            "time": "2016-05-18 14:26:46"
         },
         {
             "name": "symfony/process",
