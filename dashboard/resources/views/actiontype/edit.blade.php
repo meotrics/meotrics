@@ -2,7 +2,6 @@
 @section('script')
 	<script>
 		function removeStaticProp(c){
-			console.log(c);
 			$('#pcode_' + c).remove();
 		}
 		function addProp(prop) {

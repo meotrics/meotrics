@@ -104,7 +104,6 @@
 
 	$(document).ready(function () {
 		$.get('/app/setup_status/{{$appcode}}', function (response) {
-			console.log(response);
 			if (response == "true" || response == 1) {
 				//'Integrated !'
 			} else {

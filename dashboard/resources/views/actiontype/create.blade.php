@@ -9,7 +9,6 @@
 
 				$newprop.find('input').prop('disabled', true);
 				var $children = $list.children();
-				console.log($children);
 				var c = 0;
 				for (var i = 0; i < $children.length; i++) {
 					if (!$($children[i]).hasClass('hidden'))

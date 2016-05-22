@@ -19,8 +19,6 @@
 				}, function (url) {
 					window.location.href = url;
 				});
-
-				console.log(profile);
 			}
 		</script>
 

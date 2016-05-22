@@ -192,7 +192,6 @@ actionChange($('#typeid').val());
 			if (!selected_value) {
 				selected_value = op[typeid][0];
 				selected_key = 0;
-				console.log(selected_value, selected_key)
 			}
 			$('#meotrics').val(selected_key);
 			meotricsChange(selected_value.operation, selected_value.param);
@@ -206,7 +205,6 @@ actionChange($('#typeid').val());
 		});
 
 		function meotricsChange(operation, param) {
-			console.log(operation, param)
 			$('#operation').val(operation);
 			$('#param').val(param);
 		}

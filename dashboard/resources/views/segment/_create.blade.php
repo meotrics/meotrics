@@ -62,10 +62,9 @@
         var evt = document.createEvent('HTMLEvents');
         evt.initEvent('change', false, true);
         el.dispatchEvent(evt);
-      }
+      };
       var onSelectSegment = function(){
-        console.log('onSegment selected !');
-      }
+      };
       var appendAdditionFilter = function(){
         // Filter type selection
         var wrapper = document.createElement('div');

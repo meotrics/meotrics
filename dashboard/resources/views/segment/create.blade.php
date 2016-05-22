@@ -330,7 +330,6 @@
 		}
 
 		function changeField(e) {
-			console.log('here');
 		}
 
 		function addFilter(e) {

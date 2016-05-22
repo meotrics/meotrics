@@ -56,7 +56,6 @@
 
 	// clean request queue step 2
 	function cleanRequest2() {
-		console.log(j, request_queue2);
 		if (j + 1 >= request_queue2.length) // clean the state when done
 			return isready = 1;
 		alert('how');
