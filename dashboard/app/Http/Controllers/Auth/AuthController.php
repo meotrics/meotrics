@@ -1,9 +1,12 @@
 <?php namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Util\MtHttp;
+use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\Registrar;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -36,12 +39,9 @@ class AuthController extends Controller
 		$this->middleware('guest', ['except' => 'getLogout']);
 	}
 
-
-	public function googlelogin(Request $request)
+	public function googlesignin(Request $request)
 	{
-		$tokenid = $request->input('tokenid');
-
-
+		$tokenid = $request->input('id_token');
 		$url = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" . $tokenid;
 
 		$options = array('http' => array(
@@ -54,9 +54,10 @@ class AuthController extends Controller
 		if (substr_compare($http_response_header[0], "200 OK", strlen($http_response_header[0]) - strlen("200 OK"), strlen("200 OK")) == 0) {
 			$data = MtHttp::json_decodeEx($output);
 			$user = DB::table('users')->where('email', $data->email)->first();
+
 			if ($user == null) {
 				// send a confirm mail
-				$user->id = DB::table('users')->insertGetId(['password' => '',
+				$userid = DB::table('users')->insertGetId(['password' => '',
 					'email' => $data->email,
 					'name' => $data->name,
 					'status' => 10,
@@ -65,11 +66,11 @@ class AuthController extends Controller
 					'verified' => 1]);
 			} else {
 				// update verified token
-				DB::table('users')->where('email', $data->email)->update('verified', 1);
-
+				DB::table('users')->where('email', $data->email)->update(['verified'=> 1]);
+				$userid = $user->id;
 			}
 
-			\Auth::loginUsingId($user->id);
+			\Auth::loginUsingId($userid);
 			return;
 		} else {
 			abort(500, 'wrong tokenid');

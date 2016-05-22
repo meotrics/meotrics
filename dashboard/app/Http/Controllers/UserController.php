@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 use App\Util\MtHttp;
+use Illuminate\Support\Facades\Request;
 
 class UserController extends Controller {
 
@@ -8,6 +9,11 @@ class UserController extends Controller {
   {
     $this->middleware('auth');
   }
+
+	public function signout(Request $request)
+	{
+		return view('auth/signout');
+	}
 
   public function getProfile()
   {

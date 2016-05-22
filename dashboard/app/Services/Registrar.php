@@ -1,6 +1,7 @@
 <?php namespace App\Services;
 
 use App\User;
+use App\Util\MailSender;
 use App\Util\MtHttp;
 use Validator;
 use Illuminate\Contracts\Auth\Registrar as RegistrarContract;
@@ -36,7 +37,8 @@ class Registrar implements RegistrarContract {
 			'password' => bcrypt($data['password']),
 		]);
 
-		MtHttp::get('app/init/' .$user->id );
+		MailSender::send($data['email'], MailSender::$templates->registration,['name' => $data['name']]);
+
 		return $user;
 	}
 

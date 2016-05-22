@@ -2,6 +2,7 @@
 
 Route::get('/app/edit/{appcode}', 'PermController@edit');
 Route::get('/', 'PermController@index');
+Route::get('/home', 'PermController@index');
 Route::post('/app/create','PermController@create' );
 Route::get('/dashboard/{appcode}', 'HomeController@index');
 Route::post('/perm/{appcode}/add', 'PermController@add');
@@ -38,8 +39,8 @@ Route::get('/segment/{appcode}/chartonefield', 'SegmentController@getChartonefie
 Route::get('/segment/{appcode}/charttwofields', 'SegmentController@getCharttwofields');
 Route::get('/segment/{appcode}/{segid?}', 'SegmentController@getIndex');
 
-
-
+Route::post('/auth/googlesignin', 'Auth\AuthController@googlesignin');
+Route::get('auth/signout', 'UserController@signout');
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',

@@ -27,14 +27,14 @@ class AppServiceProvider extends ServiceProvider
 			$param = Route::current()->parameters();
 
 			if ($param == null)
-				abort(505, 'route not found');
+				$appcode = null;
 			else
 				$appcode = $param['appcode'];
-
+/*
 			if ($appcode == null || $appcode == '') // first time with no app
 			{
 				abort(505, 'appcode not found');
-			}
+			}*/
 			
 			$view->with('userid', $userid);
 			$view->with('appcode', $appcode);
