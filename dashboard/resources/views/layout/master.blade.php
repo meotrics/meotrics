@@ -88,7 +88,7 @@
 				</div>
 				<ul class="nav">
 					<li class="{{ Route::getCurrentRoute()->getPath() == 'home' ? 'active' : '' }}">
-						<a href="/{{ $appcode }}">
+						<a href="/dashboard/{{ $appcode }}">
 							<i class="pe-7s-graph"></i>
 							<p>Dashboard</p>
 						</a>
