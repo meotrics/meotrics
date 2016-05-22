@@ -43,7 +43,7 @@
 
 			$('.id_add').click(function () {
 				$.post('/app/create', {name: $('.id_name').val()}, function (appcode) {
-					showCodeDialog(appcode, function(){
+					showCodeDialog(appcode, function () {
 						location.reload();
 					});
 				}).fail(function () {
@@ -58,47 +58,54 @@
 @section('content')
 	<div class="card row">
 		<div class="header col-sm-12">
-			<h4 style="display: inline-block">Apps manager </h4> <button type="button" data-toggle="modal" data-target="#addModal" class=" button action blue">
+			<h4 style="display: inline-block">Apps manager </h4>
+			<button type="button" data-toggle="modal" data-target="#addModal" class=" button action blue">
 				<span class="label">Track new app</span></button>
 		</div>
 		<div class="content col-sm-12">
+			@if(count($apps)>0)
 			<div class="content table-responsive table-full-width col-sm-12">
-				<table class="table table-hover ">
-					<thead>
-					<tr>
-						<th>Name</th>
-						<th>Traffic</th>
-						<th>Status</th>
-						<th>Agency</th>
-						<th></th>
-					</tr>
-					</thead>
-					<tbody>
-					@foreach($apps as $ap)
-						<tr>
-							<td>{{$ap->name}}
-								<br/>
-							<code class="fmonospaced">{{$ap->code}}</code></td>
-							<td>43 953 <div class="sparkline"></div></td>
 
-							<td class="status_{{$ap->code}}"><span class="greendot"></span> CONNECTED</td>
-							<td>
-								@foreach($ap->agencies as $ag)
-									{{$ag->name}}  <span
-													class="text-muted"> {{$ag->email}}</span> {!!   $ag->can_perm == 1 ? '<i class="fa fa-star orange"></i>' : ($ag->can_struct == 1 ? '<i class="fa fa-star gray"></i>': '' )!!}
-									<br/>
-								@endforeach
-							</td>
-							<td class="row">
-								<a class="button action" href="/dashboard/{{$ap->code}}"> Enter Dashboard</a>
-								<a class="button action" href="/app/edit/{{$ap->code}}"><i class="fa fa-pencil"></i></a>
-								<a class="button action" onclick="showCodeDialog('{{$ap->code}}')" href="#"><i class="fa fa-file-code-o"></i></a>
-							</td>
+					<table class="table table-hover ">
+						<thead>
+						<tr>
+							<th>Name</th>
+							<th>Traffic</th>
+							<th>Status</th>
+							<th>Agency</th>
+							<th></th>
 						</tr>
-					@endforeach
-					</tbody>
-				</table>
-			</div>
+						</thead>
+						<tbody>
+						@foreach($apps as $ap)
+							<tr>
+								<td>{{$ap->name}}
+									<br/>
+									<code class="fmonospaced">{{$ap->code}}</code></td>
+								<td>43 953
+									<div class="sparkline"></div>
+								</td>
+
+								<td class="status_{{$ap->code}}"><span class="greendot"></span> CONNECTED</td>
+								<td>
+									@foreach($ap->agencies as $ag)
+										{{$ag->name}}  <span
+														class="text-muted"> {{$ag->email}}</span> {!!   $ag->can_perm == 1 ? '<i class="fa fa-star orange"></i>' : ($ag->can_struct == 1 ? '<i class="fa fa-star gray"></i>': '' )!!}
+										<br/>
+									@endforeach
+								</td>
+								<td class="row">
+									<a class="button action" href="/dashboard/{{$ap->code}}"> Enter Dashboard</a>
+									<a class="button action" href="/app/edit/{{$ap->code}}"><i class="fa fa-pencil"></i></a>
+									<a class="button action" onclick="showCodeDialog('{{$ap->code}}')" href="#"><i
+														class="fa fa-file-code-o"></i></a>
+								</td>
+							</tr>
+						@endforeach
+						</tbody>
+					</table>
+
+			</div>@endif
 		</div>
 
 	</div>

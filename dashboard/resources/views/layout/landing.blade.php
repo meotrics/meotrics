@@ -21,7 +21,103 @@
   <link href="{{asset('css/sweetalert.css')}}"/>
   <!-- App's styles -->
   <link href="{{asset('css/landing.css')}}" rel="stylesheet"/>
+<style>
+	<style>
+	section {
+		padding-top: 40px;
+	}
+	/**
+	 * Login Modal
+	 */
 
+
+	.modal-content{
+		border-radius: 0;
+	}
+
+	.login-box {
+		background: #f6f7fa;
+		-moz-box-shadow:    0 50px 150px -40px #5584ff;
+		-webkit-box-shadow: 0 50px 150px -40px #5584ff;
+		box-shadow: 0 50px 150px -40px #5584ff;
+	}
+
+	.login-box .logo > img{
+		height: 40px;
+	}
+
+	.login-box .login-box-header{
+		padding: 15px;
+		background-color: #0e1a35;
+	}
+
+	.login-box .login-navbar {
+		margin-top: -15px;
+		margin-right: -15px;
+		float: right;
+		padding-left: 0;
+	}
+
+	.login-box .login-navbar>li {
+		float: left;
+		display: block;
+	}
+
+	.login-box .login-navbar>li>a {
+		width: 100px;
+		display: block;
+		color: #fff;
+		text-align: center;
+		padding: 25px 15px 20px 15px;
+		border-bottom: 5px solid transparent;
+		text-decoration: none;
+	}
+
+	.login-navbar>li.active>a, .login-navbar>li.active>a:focus, .login-navbar>li.active>a:hover{
+		border-bottom: 5px solid #5584ff;
+		color: #5584ff;
+	}
+
+	#login > h1,
+	#register > h1{
+		font-weight: 300;
+		padding: 10px 0;
+		font-size: 28px;
+		color: #8492af;
+	}
+
+
+	#login > form input,
+	#register > form input {
+		background-size: 15px;
+		text-indent: 30px;
+	}
+
+	#login > form > button,
+	#register > form > button{
+		width: 180px;
+		margin-top: 30px;
+		margin-bottom: 10px;
+	}
+
+	#login > form > i,
+	#register > form > i{
+		color: #fff;
+		font-size: 8px;
+		margin-left: -20px;
+	}
+
+	.username {
+		background: url("../img/form-user-icon.png") no-repeat 10px center;
+	}
+
+	.email {
+		background: url("../img/form-email-icon.png") no-repeat 10px center;
+	}
+	.psw {
+		background: url("../img/form-password-icon.png") no-repeat 10px center;
+	}
+</style>
   @yield('style')
 
   <script src="{{asset('js/he.js')}}" type="text/javascript"></script>

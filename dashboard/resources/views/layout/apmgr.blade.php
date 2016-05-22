@@ -62,8 +62,8 @@
 			<nav class="navbar navbar-default navbar-fixed">
 				<div class="container">
 					<div class="navbar-header">
-						<div class="row"><a class="" href="#"><img style="margin-top: 7px" width="40px" src="/img/meotrics-blue.png"/></a>
-							<a class="" style=" height: 37px;margin-left: 5px;vertical-align: bottom;color: #7195C5;font-size: 19px;">meotrics</a> </div>
+						<div class="row"><a class="" href="#"><img style="margin-top: 4px" width="40px" src="/img/logo-blue.png"/></a>
+							</div>
 
 					</div>
 
