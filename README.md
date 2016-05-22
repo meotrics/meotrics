@@ -75,7 +75,12 @@ Trong hệ thống Window, sửa file, `Windows\\System32\\drivers\\etc\\host`, 
   sudo composer update
   sudo chmod -R 777 storage
   ```
-
+3. [optional] Xóa cache
+  ```bash
+  php artisan route:clear
+  php artisan clear-compiled
+  php artisan cache:clear
+  ```
 ### Cài đặt Backend
 1. Cài đặt nodejs
   Chuyển vào thư mục core (`meotrics/core`), gõ
@@ -211,6 +216,7 @@ server {
 
   location ~ \.php$ {
     include fastcgi_params;
+    fastcgi_param REMOTE_ADDR $http_x_real_ip;
     fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
     fastcgi_pass   unix:/var/run/php5-fpm.sock;
     try_files $uri =404;
@@ -238,6 +244,7 @@ server {
 
   location ~ \.php$ {
     include fastcgi_params;
+    fastcgi_param REMOTE_ADDR $http_x_real_ip;
     fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
     fastcgi_pass   unix:/var/run/php5-fpm.sock;
     try_files $uri =404;
@@ -265,6 +272,7 @@ server {
 	
   location ~ \.php$ {
     include fastcgi_params;
+    fastcgi_param REMOTE_ADDR $http_x_real_ip;
     fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
     fastcgi_pass   unix:/var/run/php5-fpm.sock;
     try_files $uri =404;
