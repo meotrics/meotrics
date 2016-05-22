@@ -199,6 +199,9 @@ server {
   error_log   /home/thanhpk/tmp/meotrics-error.log;
 
   location /api {
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
     proxy_pass http://127.0.0.1:1711/api;
   }
 
