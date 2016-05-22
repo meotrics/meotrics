@@ -47,6 +47,6 @@ Route::controllers([
 	'password' => 'Auth\PasswordController',
 ]);
 
-Route::get('/helper/setup_status', 'HelperController@setup_status');
+Route::get('/app/setup_status/{appcode}', 'PermController@setup_status');
 
 Route::controller('user', 'UserController');

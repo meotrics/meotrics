@@ -54,7 +54,7 @@
 				<small>Done ?</small>
 				&nbsp;
 				<button type="button" class="btn btn-sm btn-fill btn-primary"
-								data-dismiss="modal" aria-label="Close">
+				        data-dismiss="modal" aria-label="Close">
 					Close
 				</button>
 			</div>
@@ -62,7 +62,6 @@
 	</div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 <script>
-	var APP_ID = '{{ Auth::user()->id }}'; // TODO: Fill app id to this line
 	function copyScript() {
 		var el = $('#guideline').find('textarea');
 		el.select();
@@ -85,39 +84,34 @@
 			window.getSelection().removeAllRanges();
 		}
 	}
-	function getIntegrationCode(APP_ID) {
+	function getIntegrationCode(appcode) {
 		$.get('/mt.min.html', function (response) {
 			var html = $('<div/>').text(response).html();
-			$('#guideline').find('textarea').html(html.replace('$APPID$', APP_ID));
+			$('#guideline').find('textarea').html(html.replace('$APPID$', appcode));
 		}).fail(function (err) {
 			_helper.notification.error(err.statusText)
 		});
 	}
 
-	function showCodeDialog(APP_ID, callback) {
+	function showCodeDialog(appcode, callback) {
 		if (callback !== undefined)
 			$('#guideline').on('hidden.bs.modal', function () {
 				callback();
 			});
 		$('#guideline').modal('show');
-		getIntegrationCode(APP_ID);
+		getIntegrationCode(appcode);
 	}
 
 	$(document).ready(function () {
-		$.ajax({
-			method: 'GET',
-			url: '{{ URL::to("/") }}/home/setup_status',
-			success: function (response) {
-				console.log(response);
-				if (response == "true" || response == 1) {
-					//'Integrated !'
-				} else {
-					showCodeDialog(APP_ID);
-				}
-			},
-			error: function (err) {
-				_helper.notification.error('Failed to check installation !')
+		$.get('/app/setup_status/{{$appcode}}', function (response) {
+			console.log(response);
+			if (response == "true" || response == 1) {
+				//'Integrated !'
+			} else {
+				showCodeDialog(appcode);
 			}
-		})
-	})
+		}).fail(function (err) {
+			_helper.notification.error('Failed to check installation !')
+		});
+	});
 </script>

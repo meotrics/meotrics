@@ -12,19 +12,6 @@ class HomeController extends Controller
 	private static $code;
 	private $parser;
 
-
-	public function setup_status(Request $request)
-	{
-		$res = MtHttp::get('api/status/' . \Auth::user()->id);
-		return $res . '';
-	}
-
-	public function counter(Request $request)
-	{
-		$res = MtHttp::get('api/counter/' . \Auth::user()->id);
-		return $res . '';
-	}
-
 	private function loadCode($appid = null)
 	{
 		// cache mt.min.js in ::$code

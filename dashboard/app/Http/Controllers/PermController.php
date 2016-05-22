@@ -31,27 +31,39 @@ class PermController extends Controller
 		]);
 	}
 
+	public function setup_status(Request $request, $appcode)
+	{
+		$res = MtHttp::get('api/status/' . $appcode);
+		return $res . '';
+	}
+
+	public function counter(Request $request, $appcode)
+	{
+		$res = MtHttp::get('api/counter/' . $appcode);
+		return $res . '';
+	}
+
 	public function getedit(Request $request, $appcode)
-{
-	$ap = DB::table('apps')->where('code', $appcode)->first();
-	if ($ap == null) abort(500, 'cannot find app: ' . $appcode);
+	{
+		$ap = DB::table('apps')->where('code', $appcode)->first();
+		if ($ap == null) abort(500, 'cannot find app: ' . $appcode);
 
-	$ap->owner = \App\User::find($ap->ownerid);
-	$ap->agencies = DB::table('user_app')->join('users', 'users.id', '=', 'user_app.userid')->where('user_app.appid', $ap->id)->get();
+		$ap->owner = \App\User::find($ap->ownerid);
+		$ap->agencies = DB::table('user_app')->join('users', 'users.id', '=', 'user_app.userid')->where('user_app.appid', $ap->id)->get();
 
-	return view('app/edit', ['ap' => $ap, 'appcode' => $appcode]);
-}
+		return view('app/edit', ['ap' => $ap, 'appcode' => $appcode]);
+	}
 
 	public function postedit(Request $request, $appcode)
 	{
 		$name = $request->input('name');
-		if($name == null || $name == '')
+		if ($name == null || $name == '')
 			abort(500, 'name must not be empty');
 
 		$ap = DB::table('apps')->where('apps.code', $appcode)->first();
 		if ($ap == null) abort(500, 'cannot find app: ' . $appcode);
 
-		DB::table('apps')->where('id', $ap->id)->update(['name'=>$name]);
+		DB::table('apps')->where('id', $ap->id)->update(['name' => $name]);
 
 		return redirect('/');
 	}
