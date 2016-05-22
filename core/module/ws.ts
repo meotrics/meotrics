@@ -38,7 +38,8 @@ export class WS {
 					if (client.readyState === client.OPEN) {
 						client.sendUTF(JSON.stringify(message));
 					}
-				});
+				}
+			});
 			connection.on('close', function (reasonCode, description) {
 				//TODO: remove all
 			});

@@ -247,7 +247,6 @@
 			});
 	*/
 			//db.collection(prefix + appid).createIndex()
-
 			typeCrud.createRaw(appid, purchase, function () {
 				typeCrud.createRaw(appid, pageview, function () {
 					typeCrud.createRaw(appid, click, function () {

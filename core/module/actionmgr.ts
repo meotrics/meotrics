@@ -82,6 +82,7 @@ export class ActionMgr {
 			if (data._utm_content === undefined) data._utm_content = utm_content;
 			if (data._utm_medium === undefined) data._utm_medium = utm_medium;
 			me.converter.toObject(data, function (datax) {
+				console.log(collection);
 				me.db.collection(collection).insertOne(datax, function (err, r) {
 					if (err) throw err;
 					callback(r.insertedId);

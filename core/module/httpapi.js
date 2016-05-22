@@ -17,7 +17,6 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 
 	// purpose get real ip address
 	function getRemoteAddress(req) {
-	//	console.log(req);
 		return req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress;
 	}
 
@@ -165,6 +164,7 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 		getMtid(req, appid, res, function (mtid) {
 			data._mtid = mtid;
 			data._typeid = 'pageview';
+			
 			actionmgr.saveRaw(appid, data, function (actionid) {
 				// return code
 				loadCode(appid, actionid, function (code) {

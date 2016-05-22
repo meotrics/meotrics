@@ -1,5 +1,4 @@
-﻿"use strict";
-import * as mongo from 'mongodb';
+﻿import * as mongo from 'mongodb';
 
 export class DashboardEntity {
 		public ctime: number;
@@ -198,7 +197,7 @@ export class Dashboard {
 
 							var hc_match = {};
 							hc_match[ids._isUser] = true;
-							me.db.collection(me.prefix + appid).aggregate([], {$: ''}
+						//	me.db.collection(me.prefix + appid).aggregate([], {$: ''}
 
 
 						});

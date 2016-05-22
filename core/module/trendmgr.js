@@ -33,7 +33,6 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 		var segid = req.params.segid;
 		var starttime = req.params.starttime;
 		var endtime = req.params.endtime;
-		console.log(trid);
 		me.queryRaw(appid, trid, segid, starttime, endtime, function (results) {
 			if (results === null)
 				return res.status(404).end();

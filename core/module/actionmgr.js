@@ -12,7 +12,7 @@ class ActionMgr {
     // a mtid is valid if there is one user record based on mtid
     // if a mtid is ano-mtid, convert it to iden-mtid
     ismtidValid(appid, mtids, callback) {
-        let collection = this.prefix + appid;
+        let collection = this.prefix + "app" + appid;
         let collectionmapping = this.prefix + this.mapping;
         let mtid = new mongodb.ObjectID(mtids);
         var me = this;
@@ -54,7 +54,7 @@ class ActionMgr {
     // + data3
     saveRaw(appid, data, callback) {
         let me = this;
-        var collection = this.prefix + appid;
+        var collection = this.prefix + "app" + appid;
         var collectionmapping = this.prefix + this.mapping;
         var mtid = new mongodb.ObjectID(data._mtid);
         data._mtid = mtid;
@@ -88,6 +88,7 @@ class ActionMgr {
             if (data._utm_medium === undefined)
                 data._utm_medium = utm_medium;
             me.converter.toObject(data, function (datax) {
+                console.log(collection);
                 me.db.collection(collection).insertOne(datax, function (err, r) {
                     if (err)
                         throw err;
@@ -195,7 +196,7 @@ class ActionMgr {
         let actionid = new mongodb.ObjectID(actionids);
         if (data._mtid)
             data._mtid = new mongodb.ObjectID(data._mtid);
-        var collection = me.prefix + appid;
+        var collection = me.prefix + "app" + appid;
         //make sure dont change typeid
         delete data._typeid;
         me.converter.toObject(data, function (datax) {
@@ -218,7 +219,7 @@ class ActionMgr {
     x(req, res, callback) {
         var me = this;
         var data = req.params;
-        var collection = me.prefix + req.appid;
+        var collection = me.prefix + "app" + req.appid;
         var actionid = new mongodb.ObjectID(req.actionid);
         me.converter.toIDs(['_ctime', 'totalsec'], function (ids) {
             var projection = {};
@@ -264,7 +265,7 @@ class ActionMgr {
     // output: return mtid of identified visitor
     identifyRaw(appid, data, callback) {
         let me = this;
-        var collection = me.prefix + appid;
+        var collection = me.prefix + "app" + appid;
         var collectionmapping = me.prefix + me.mapping;
         var user = data.user;
         var userid = user.userid;
@@ -350,7 +351,7 @@ class ActionMgr {
     // param: appid: id of the app
     setupRaw(appid, callback) {
         var me = this;
-        var collection = me.prefix + appid;
+        var collection = me.prefix + "app" + appid;
         var user = {
             _isUser: true,
             _segments: [],

@@ -4,7 +4,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, col) {
 
 	this.createRaw = function (appid, data, callback) {
 		var collection = prefix + col;
-		data._appid = Number(appid);
+		data._appid = appid;
 		data._ctime = Math.round(new Date() / 1000);
 		converter.toObject(data, function (r) {
 			db.collection(collection).insertOne(r, function (err, ret) {

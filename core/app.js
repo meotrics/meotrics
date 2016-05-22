@@ -3,6 +3,7 @@ const mongodb = require('mongodb');
 const config = require('config');
 const express = require('express');
 const async = require('async');
+const WS = require('./module/ws');
 var trycatch = require('trycatch');
 const bodyParser = require('body-parser');
 var ua = require('ua-parser');
@@ -225,6 +226,8 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err, db) {
     var server = http.createServer(function (req, res) {
         dataapiroot(httpapi, req, res);
     });
+    var ws = new WS.WS('/ws', 80, server);
+    ws.run();
     server.listen(httpport, function () {
         console.log("HTTP API SERVER is running at port " + httpport);
     });
