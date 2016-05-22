@@ -1,6 +1,7 @@
 <?php
 
-Route::get('/app/edit/{appcode}', 'PermController@edit');
+Route::get('/app/edit/{appcode}', 'PermController@getedit');
+Route::post('/app/edit/{appcode}', 'PermController@postedit');
 Route::get('/', 'PermController@index');
 Route::get('/home', 'PermController@index');
 Route::post('/app/create','PermController@create' );
