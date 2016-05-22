@@ -4,13 +4,12 @@ body {
 }
 
 header{
-  background-image: url({{ URL::asset("/img/slide-bg.png") }});
+  background-image: url("/img/slide-bg.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
   font-size: 13px;
 }
-
 
 .header-content h1{
   color: #fff;
@@ -224,7 +223,7 @@ header .navbar-brand > img{
 
 #tail{
   height: 200px;
-  background: url({{ URL::asset("/img/features-bg.png") }}) repeat-x bottom;
+  background: url("/img/features-bg.png") repeat-x bottom;
   -webkit-transform: rotate(180deg);
   -moz-transform: rotate(180deg);
   -ms-transform: rotate(180deg);
@@ -355,14 +354,12 @@ header .navbar-brand > img{
   background: url("../img/form-password-icon.png") no-repeat 10px center;
 }
 
-
 @media screen and (max-width: 768px) {
   header .navbar-brand > img{
       height: 50px;
       margin-top: 10px;
   }
 }
-
 
 @media screen and (max-width: 480px) {
   .line{

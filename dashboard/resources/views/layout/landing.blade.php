@@ -22,7 +22,6 @@
   <!-- App's styles -->
   <link href="{{asset('css/landing.css')}}" rel="stylesheet"/>
 <style>
-	<style>
 	section {
 		padding-top: 40px;
 	}

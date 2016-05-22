@@ -213,8 +213,8 @@
 										<li><a href="/app">Manage apps</a></li>
 									@endif
 									<li class="divider"></li>
-									<li><a href="{{ URL::to('/user/profile') }}">Your profile</a></li>
-									<li><a href="{{ URL::to('/auth/signout') }}">Logout</a></li>
+									<li><a href="/user/profile">Your profile</a></li>
+									<li><a href="/auth/signout">Logout</a></li>
 								</ul>
 							</li>
 						</ul>

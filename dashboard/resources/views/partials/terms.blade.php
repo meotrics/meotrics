@@ -73,7 +73,7 @@
               <br>
               <h2>3. LICENSES</h2>
               <h3 style="padding-left: 30px;">3.1 LICENSE TO MEOTRICS SOFTWARE</h3>
-              <p style="padding-left: 30px;">Subject to the terms and conditions of this Agreement, Meotrics hereby grants you a limited, revocable, non-exclusive, non-transferable and non-assignable license to (a) include the Meotrics-provided code (together with any fixes, updates and upgrades provided to you, the &ldquo;Meotrics Script&rdquo;) in the HTML code for web page(s) that are properly registered for the Services and owned or operated by you, solely for the purposes of accessing and providing information to the Services and accessing information available from the Services with respect to such web page(s); and (b) remotely access the Services to view and download your reports stored on the Meotrics Website, located at http://www.Meotrics.com.</p>
+              <p style="padding-left: 30px;">Subject to the terms and conditions of this Agreement, Meotrics hereby grants you a limited, revocable, non-exclusive, non-transferable and non-assignable license to (a) include the Meotrics-provided code (together with any fixes, updates and upgrades provided to you, the &ldquo;Meotrics Script&rdquo;) in the HTML code for web page(s) that are properly registered for the Services and owned or operated by you, solely for the purposes of accessing and providing information to the Services and accessing information available from the Services with respect to such web page(s); and (b) remotely access the Services to view and download your reports stored on the Meotrics Website, located at https://www.meotrics.com.</p>
               <p style="padding-left: 30px;">Except as expressly set forth herein, you shall not (x) use, reproduce, modify, or create derivative works of the Meotrics Script, or (y) transfer, lease, lend, sublicense, use for timesharing, or service bureau purposes, resell or otherwise distribute or allow third-party access to all or any portion of the Meotrics Script or the Services.</p>
               <p style="padding-left: 30px;">&nbsp;</p>
               <h3 style="padding-left: 30px;">3.2 LICENSE TO CLIENT DATA</h3>
@@ -86,7 +86,7 @@
               <br>
               <br>
               <h2>4. PRIVACY</h2>
-              <p style="padding-left: 30px;">Meotrics&rsquo; Privacy Policy is incorporated into this Agreement by this reference and is available at&nbsp;<a href="privacy.html">http://www.Meotrics.com/privacy</a>.</p>
+              <p style="padding-left: 30px;">Meotrics&rsquo; Privacy Policy is incorporated into this Agreement by this reference and is available at&nbsp;<a href="privacy.html">https://www.meotrics.com/privacy</a>.</p>
               <p style="padding-left: 30px;">As used in this section, &ldquo;Personally Identifiable Information&rdquo; refers to information that can be used to personally identify a unique individual, such as name, address and phone number.</p>
               <p style="padding-left: 30px;">&nbsp;</p>
               <h3 style="padding-left: 30px;">4.1 YOUR OBLIGATIONS WITH RESPECT TO COOKIES USED BY THE MEOTRICS SCRIPT ON VISITORS TO YOUR WEBSITE</h3>
