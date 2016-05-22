@@ -12,7 +12,7 @@
 			converter.toIDs(['_isUser'], function (ids) {
 				var query = {};
 				query[ids._isUser] = {$exists: false};
-				db.collection(prefix + appid).count(query, function (err, count) {
+				db.collection(prefix + "app" + appid).count(query, function (err, count) {
 					if (err) throw err;
 					return callback(count);
 				});

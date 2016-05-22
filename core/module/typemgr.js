@@ -29,7 +29,7 @@ exports.TypeMgr = function (db, mongodb, converter, async, prefix, typecrud, col
 	};
 
 	this.list = function (req, res, callback) {
-		var appid = Number(req.params.appid);
+		var appid = req.params.appid;
 		var collection = prefix + col;
 		converter.toIDs(['_appid', '_isDraft'], function (ids) {
 			var query = {$and: []};

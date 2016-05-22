@@ -30,7 +30,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 		};
 
 		var outcollection = prefix + "segment" + segment._id.toString();
-		var col = db.collection(prefix + segment._appid);
+		var col = db.collection(prefix + "app" + segment._appid);
 
 		// check the lock first
 		if (locksegment[segment._id.toString()] !== undefined) return callback(outcollection);

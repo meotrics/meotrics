@@ -10,7 +10,7 @@ exports.TrendMgr = function (db, mongodb, async, converter, prefix, col) {
 			if (endtime !== undefined && endtime !== '') trenddoc.endTime = parseInt(Math.round(new Date(endtime) / 1000 + 86400));
 
 			getQueryTrending(trenddoc, converter, function (query) {
-				var collection = prefix + appid;
+				var collection = prefix + "app" + appid;
 				db.collection(collection).aggregate(query).toArray(function (err, results) {
 					if (err) throw err;
 					async.forEachOf(results, function (value, key, asyncCallback) {

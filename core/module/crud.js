@@ -23,7 +23,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, col) {
 	};
 
 	this.list = function (req, res, callback) {
-		var appid = Number(req.params.appid);
+		var appid = req.params.appid;
 		var collection = prefix + col;
 		converter.toIDs(['_appid', '_isDraft'], function (ids) {
 			var query = {$and: []};
@@ -119,7 +119,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, col) {
 	};
 
 	this.deleteDraf = function (req, res, callback) {
-		var appid = Number(req.params.appid);
+		var appid = req.params.appid;
 		var collection = prefix + col;
 		converter.toIDs(['_appid', '_isDraft'], function (ids) {
 			var query = {};

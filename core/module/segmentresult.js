@@ -2,7 +2,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 	var me = this;
 
 	me.groupby = function (appid, segmentid, field1, type1, field2, type2, callback) {
-		var collection = prefix + appid;
+		var collection = prefix + "app" + appid;
 		if (field2 == undefined) {
 			if ((type1 == 'string') || (type1 == 'array'))
 				oneFieldString(collection, segmentid, field1, callback);

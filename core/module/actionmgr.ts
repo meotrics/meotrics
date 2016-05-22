@@ -10,7 +10,7 @@ export class ActionMgr {
 	// a mtid is valid if there is one user record based on mtid
 	// if a mtid is ano-mtid, convert it to iden-mtid
 	public ismtidValid(appid: string, mtids: string, callback) {
-		let collection = this.prefix + appid;
+		let collection = this.prefix + "app" + appid;
 		let collectionmapping = this.prefix + this.mapping;
 		let mtid = new mongodb.ObjectID(mtids);
 		var me = this;
@@ -51,7 +51,7 @@ export class ActionMgr {
 	// + data3
 	public saveRaw(appid, data, callback) {
 		let me = this;
-		var collection = this.prefix + appid;
+		var collection = this.prefix + "app" + appid;
 		var collectionmapping = this.prefix + this.mapping;
 		var mtid = new mongodb.ObjectID(data._mtid);
 		data._mtid = mtid;
@@ -192,7 +192,7 @@ export class ActionMgr {
 		let me = this;
 		let actionid = new mongodb.ObjectID(actionids);
 		if (data._mtid) data._mtid = new mongodb.ObjectID(data._mtid);
-		var collection = me.prefix + appid;
+		var collection = me.prefix + "app" + appid;
 		//make sure dont change typeid
 		delete data._typeid;
 		me.converter.toObject(data, function (datax) {
@@ -216,7 +216,7 @@ export class ActionMgr {
 	public x(req, res, callback) {
 		var me = this;
 		var data = req.params;
-		var collection = me.prefix + req.appid;
+		var collection = me.prefix + "app"+ req.appid;
 		var actionid = new mongodb.ObjectID(req.actionid);
 		me.converter.toIDs(['_ctime', 'totalsec'], function (ids) {
 			var projection = {};
@@ -260,7 +260,7 @@ export class ActionMgr {
 	// output: return mtid of identified visitor
 	public identifyRaw(appid, data, callback) {
 		let me = this;
-		var collection = me.prefix + appid;
+		var collection = me.prefix + "app" + appid;
 		var collectionmapping = me.prefix + me.mapping;
 		var user = data.user;
 		var userid = user.userid;
@@ -350,7 +350,7 @@ export class ActionMgr {
 	// param: appid: id of the app
 	public setupRaw(appid: string, callback) {
 		var me = this;
-		var collection = me.prefix + appid;
+		var collection = me.prefix + "app" + appid;
 		var user = {
 			_isUser: true,
 			_segments: [],
