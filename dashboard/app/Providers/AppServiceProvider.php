@@ -18,6 +18,7 @@ class AppServiceProvider extends ServiceProvider
 	public function boot()
 	{
 		//view()->composer('segment.select', 'App\Http\Composers\SegmentSegment');
+
 		View::composer('*', function ($view) {
 			if (\Auth::user() == null) return;
 			$userid = \Auth::user()->id;
@@ -30,12 +31,12 @@ class AppServiceProvider extends ServiceProvider
 				$appcode = null;
 			else
 				$appcode = $param['appcode'];
-/*
-			if ($appcode == null || $appcode == '') // first time with no app
-			{
-				abort(505, 'appcode not found');
-			}*/
-			
+			/*
+						if ($appcode == null || $appcode == '') // first time with no app
+						{
+							abort(505, 'appcode not found');
+						}*/
+
 			$view->with('userid', $userid);
 			$view->with('appcode', $appcode);
 		});
@@ -57,6 +58,8 @@ class AppServiceProvider extends ServiceProvider
 			{
 				abort(505, 'appcode not found');
 			} else {
+
+				session(['appcode' => $appcode]);
 				//get first app
 				$ap = DB::table('apps')->where('code', $appcode)->first();
 

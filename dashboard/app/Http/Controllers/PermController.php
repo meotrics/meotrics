@@ -15,7 +15,17 @@ class PermController extends Controller
 		$this->middleware('auth');
 	}
 
+
 	public function index(Request $request)
+	{
+		$appcode = session('appcode');
+		if ($appcode == null)
+			return redirect('app');
+		else
+			return redirect('dashboard/' . $appcode);
+	}
+
+	public function app(Request $request)
 	{
 		$userid = \Auth::user()->id;
 		$apps = DB::table('apps')->join('user_app', 'apps.id', '=', 'user_app.appid')

@@ -3,7 +3,7 @@
 Route::get('/app/edit/{appcode}', 'PermController@getedit');
 Route::post('/app/edit/{appcode}', 'PermController@postedit');
 Route::get('/', 'PermController@index');
-Route::get('/home', 'PermController@index');
+Route::get('/app', 'PermController@app');
 Route::post('/app/create','PermController@create' );
 Route::get('/dashboard/{appcode}', 'HomeController@index');
 Route::post('/perm/{appcode}/add', 'PermController@add');
