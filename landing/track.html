@@ -1,0 +1,10 @@
+<iframe src="//api.meotrics.com/$APPID$" style="display: none"></iframe>
+<script style="display: none">
+!function(){var t;window.mt={appid:$APPID$,
+track:function(t,n){mt.rq.push(["track",t,n,new Date])},
+identify:function(t){mt.rq.push(["identify",t])},
+clear:function(){mt.rq.push(["clear"])},
+onready:function(){void 0!==t&&mt.excute(t)}},mt.rq=mt.rq||[],
+addEventListener("message",function(n){t=n,mt.excute&&excute(n)},!1)}();
+</script>
+<script src="//meotrics.com/track.js" defer style="display: none"></script>
