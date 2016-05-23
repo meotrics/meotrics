@@ -1,15 +1,14 @@
-//THIS FILE IS CALLED AFTER MT.CODE IS CALLED
 (function () {
-	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document, actionid = "$ACTIONID$";
-
+	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document;
+	
 	window.addEventListener("beforeunload", function (e) {
-		ajax('x/' + actionid);
+		ajax('x/' + mt.actionid);
 	});
 
 	function ajax(url, data, callback) {
 		var script = doc.createElement('script');
 		// script.type = 'text/javascript'; comment this because we dont need to excute the script
-		script.src = '//api.meotrics.com/$APPID$/' + url + (data ? '?' + serialize(data) : '');
+		script.src = '//api.meotrics.com/' + mt.appid + '/' + url + (data ? '?' + serialize(data) : '');
 		script.style.display = 'none';
 		script.onreadystatechange = script.onload = callback;//for IE
 		doc.body.appendChild(script);
@@ -42,11 +41,12 @@
 		data._ref = doc.referrer;
 		data._scr = screen.width + "x" + screen.height;
 		data._url = location.href;
+		data._link = mt.actionid;
 		return data;
 	}
 
 	// clean request queue
-	function cleanRequest() {
+	function cleanRequest {
 		// clean queue number 2 when out of element in queue number 1
 		if (i + 1 >= mt.rq.length) return cleanRequest2();
 		var rq = mt.rq[i++];
@@ -57,17 +57,25 @@
 	function cleanRequest2() {
 		if (j + 1 >= request_queue2.length) // clean the state when done
 			return isready = 1;
-		alert('how');
 		var rq = request_queue2[j++];
 		mt[rq[0]](rq[1], rq[2], rq[3], cleanRequest2);
 	}
 
-	ajax('fix/' + actionid, addVisitorPlatform({}));//update the pageview first
-	cleanRequest();// excute delayed request in queue
+	mt.excute = function(event){
+ 		var origin = event.origin || event.originalEvent.origin; 
+		if (origin.split('/')[2] !== "meotrics.com") return;
 
-	//create iframe
-	var ifrm = doc.createElement("iframe");
-	ifrm.setAttribute("src", "//app.meotrics.com/iframe.html?x=$APPID$-$ACTIONID$");
-	ifrm.style.display = 'none';
-	doc.body.appendChild(ifrm);
+		var data = JSON.parse(event.data);
+		mt.actionid = data.actionid;
+		
+		ajax('fix', {
+			actionid : data.actionid, 
+			lastactionid: data.lastactionid, 
+			data: addVisitorPlatform({})
+		});
+
+		cleanRequest();// excute delayed request in queue
+	}
+
+	mt.onready();
 })();

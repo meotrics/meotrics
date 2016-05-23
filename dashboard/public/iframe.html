@@ -1,23 +1,10 @@
 <html>
-<body>
-	<script type="text/javascript">
-
-		function ajax(appid, url, data, callback) {
-			var script = doc.createElement('script');
-			// script.type = 'text/javascript'; comment this because we dont need to excute the script
-			script.src = '//api.meotrics.com/' + appid +'/'+ url + (data ? '?' + serialize(data) : '');
-			// script.style.display = 'none';
-			script.onreadystatechange = script.onload = callback;//for IE
-			document.body.appendChild(script);
-		}
-
-		var lastactionid = sessionStorage.getItem('lastactionid');
-		var params= location.search.substr(3).split('-');
-		var actionid = params[1];
-		var appid = [0];
-
-		sessionStorage.setItem('lastactionid', actionid);
-		ajax(appid, 'link', {actionid : actionid, lastactionid: lastactionid });
-	</script>
-</body>
+<head>
+<script>
+	data = JSON.parse(event.data);
+	var lastactionid = sessionStorage.getItem('lastactionid');
+	sessionStorage.setItem('lastactionid', actionid);
+	parent.postMessage(JSON.stringify({actionid : $ACTIONID$, lastactionid: lastactionid}), "*");
+</script>
+</head>
 </html>
