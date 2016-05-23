@@ -8,7 +8,7 @@
 			script.src = '//api.meotrics.com/' + appid +'/'+ url + (data ? '?' + serialize(data) : '');
 			// script.style.display = 'none';
 			script.onreadystatechange = script.onload = callback;//for IE
-			doc.body.appendChild(script);
+			document.body.appendChild(script);
 		}
 
 		var lastactionid = sessionStorage.getItem('lastactionid');

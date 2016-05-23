@@ -57,7 +57,7 @@ class ActionMgr {
         var collectionmapping = this.prefix + this.mapping;
         var mtid = new mongodb.ObjectID(data._mtid);
         data._mtid = mtid;
-        var utm_campaign = data.utm_campaign;
+        var utm_campaign = data._utm_campaign;
         data._segments = [];
         // correct timming
         data._ctime = Math.round(new Date().getTime() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0);

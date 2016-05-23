@@ -1,17 +1,16 @@
 //THIS FILE IS CALLED AFTER MT.CODE IS CALLED
 (function () {
-	var actionid = "$ACTIONID$";
-	window.addEventListener("beforeunload", function (e) {
-	ajax('x/' + actionid);
-	});
+	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document, actionid = "$ACTIONID$";
 
-	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document;
+	window.addEventListener("beforeunload", function (e) {
+		ajax('x/' + actionid);
+	});
 
 	function ajax(url, data, callback) {
 		var script = doc.createElement('script');
 		// script.type = 'text/javascript'; comment this because we dont need to excute the script
-		script.src = '//meotrics.dev/api/$APPID$/' + url + (data ? '?' + serialize(data) : '');
-		// script.style.display = 'none';
+		script.src = '//api.meotrics.com/$APPID$/' + url + (data ? '?' + serialize(data) : '');
+		script.style.display = 'none';
 		script.onreadystatechange = script.onload = callback;//for IE
 		doc.body.appendChild(script);
 	}
@@ -67,8 +66,8 @@
 	cleanRequest();// excute delayed request in queue
 
 	//create iframe
-	var ifrm = document.createElement("iframe");
-	ifrm.setAttribute("src", "//meotrics.com/iframe.html?x=$APPID$-$ACTIONID$");
+	var ifrm = doc.createElement("iframe");
+	ifrm.setAttribute("src", "//app.meotrics.com/iframe.html?x=$APPID$-$ACTIONID$");
 	ifrm.style.display = 'none';
-	document.body.appendChild(ifrm);
+	doc.body.appendChild(ifrm);
 })();

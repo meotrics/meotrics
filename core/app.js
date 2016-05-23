@@ -139,40 +139,36 @@ function dataapiroot(httpapi, req, res) {
         }
         function handle(req, res, path) {
             var parts = path.split('/');
-            if (parts[1] === 'api') {
-                res.statusCode = 200;
-                req['appid'] = parts[2];
-                var action = parts[3];
-                if (action === 'track')
-                    httpapi.track(req, res);
-                else if (action === 'code.js')
-                    httpapi.code(req, res);
-                else if (action === 'clear')
-                    httpapi.clear(req, res);
-                else if (action === 'info')
-                    httpapi.info(req, res);
-                else if (action === 'x') {
-                    req['actionid'] = parts[4];
-                    httpapi.x(req, res);
-                }
-                else if (action === 'suggest') {
-                    req['typeid'] = parts[4];
-                    req['field'] = parts[5];
-                    req['qr'] = parts[6];
-                    httpapi.suggest(req, res);
-                }
-                else if (action === 'fix') {
-                    req['actionid'] = parts[4];
-                    httpapi.fix(req, res);
-                }
-                else {
-                    res.statusCode = 404;
-                    res.end('action must be one of [code, clear, ingo, fix, track]');
-                }
+            res.statusCode = 200;
+            req['appid'] = parts[1];
+            var action = parts[2];
+            if (action === 'track')
+                httpapi.track(req, res);
+            else if (action === 'code.js')
+                httpapi.code(req, res);
+            else if (action === 'clear')
+                httpapi.clear(req, res);
+            else if (action === 'info')
+                httpapi.info(req, res);
+            else if (action === 'link')
+                httpapi.link(req, res);
+            else if (action === 'x') {
+                req['actionid'] = parts[3];
+                httpapi.x(req, res);
+            }
+            else if (action === 'suggest') {
+                req['typeid'] = parts[3];
+                req['field'] = parts[4];
+                req['qr'] = parts[5];
+                httpapi.suggest(req, res);
+            }
+            else if (action === 'fix') {
+                req['actionid'] = parts[3];
+                httpapi.fix(req, res);
             }
             else {
                 res.statusCode = 404;
-                res.end('path must be [api]');
+                res.end('action must be one of [code, clear, ingo, fix, track]');
             }
         }
     }, function (err) {
