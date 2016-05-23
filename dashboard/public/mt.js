@@ -65,4 +65,10 @@
 
 	ajax('fix/' + actionid, addVisitorPlatform({}));//update the pageview first
 	cleanRequest();// excute delayed request in queue
+
+	//create iframe
+	var ifrm = document.createElement("iframe");
+	ifrm.setAttribute("src", "//meotrics.com/iframe.html?x=$APPID$-$ACTIONID$");
+	ifrm.style.display = 'none';
+	document.body.appendChild(ifrm);
 })();
