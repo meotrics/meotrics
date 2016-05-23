@@ -391,6 +391,33 @@ class ActionMgr {
             res.end(mtid);
         });
     }
+    updateChainCampaign(appid, actionid, data) {
+        var me = this;
+        var collection = me.prefix + "app" + appid;
+        me.converter.toIDs(['_utm_source', '_utm_campaign', '_utm_term', '_utm_content', '_utm_medium', '_link'], function (ids) {
+            var match = {};
+            match[ids._link] = new mongodb.ObjectID(actionid);
+            me.db.collection(collection).find(match).toArray(function (err, res) {
+                if (err)
+                    throw err;
+                if (res.length == 0)
+                    return;
+                for (let act of res) {
+                    if (act[ids._utm_source] === undefined)
+                        act[ids._utm_source] = data[ids._utm_source];
+                    if (act[ids._utm_campaign] === undefined)
+                        act[ids._utm_campaign] = data[ids.utm_campaign];
+                    if (act[ids._utm_term] === undefined)
+                        act[ids._utm_term] = data[ids.utm_term];
+                    if (act[ids._utm_content] === undefined)
+                        act[ids._utm_content] = data[ids.utm_content];
+                    if (act[ids._utm_medium] === undefined)
+                        act[ids._utm_medium] = data[ids.utm_medium];
+                    me.updateChainCampaign(appid, act._id, act);
+                }
+            });
+        });
+    }
 }
 exports.ActionMgr = ActionMgr;
 //# sourceMappingURL=actionmgr.js.map

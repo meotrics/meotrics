@@ -247,7 +247,7 @@ class Dashboard {
                                 callback(dash);
                                 dash.appid = appid + "";
                                 dash.ctime = Math.round(new Date().getTime() / 1000);
-                                me.db.collection(me.prefix + "dashboard").update({ appid: appid + "" }, dash, { upsert: true }, function (err) {
+                                me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "" }, dash, { upsert: true }, function (err) {
                                     release();
                                     if (err)
                                         throw err;
