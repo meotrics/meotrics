@@ -55,16 +55,7 @@ export class ActionMgr {
 		var collectionmapping = this.prefix + this.mapping;
 		var mtid = new mongodb.ObjectID(data._mtid);
 		data._mtid = mtid;
-
-		// extract campaign
-		if (data._url === null || data._url === undefined) data._url = "";
-		var query = url.parse(data._url, true).query;
-		var utm_source = query.utm_source;
-		var utm_campaign = query.utm_campaign;
-		var utm_term = query.utm_term;
-		var utm_content = query.utm_content;
-		var utm_medium = query.utm_medium;
-
+		var utm_campaign =  data.utm_campaign;
 		data._segments = [];
 
 		// correct timming
@@ -76,13 +67,7 @@ export class ActionMgr {
 			if (err) throw err;
 			if (r.length !== 0) mtid = r[0].idemtid;
 
-			if (data._utm_source === undefined) data._utm_source = utm_source;
-			if (data._utm_campaign === undefined) data._utm_campaign = utm_campaign;
-			if (data._utm_term === undefined) data._utm_term = utm_term;
-			if (data._utm_content === undefined) data._utm_content = utm_content;
-			if (data._utm_medium === undefined) data._utm_medium = utm_medium;
 			me.converter.toObject(data, function (datax) {
-				console.log(collection);
 				me.db.collection(collection).insertOne(datax, function (err, r) {
 					if (err) throw err;
 					callback(r.insertedId);

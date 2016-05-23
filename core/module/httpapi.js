@@ -35,7 +35,7 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 		else
 			devicetype = 'desktop';
 
-		if (url === null || url === "" || url.startsWith(request.headers.referer) === false) url = request.headers.referer;
+		if ( url === "" || url.startsWith(request.headers.referer) === false) url = request.headers.referer;
 		var res = {
 			_url: url,
 			_ref: request.params._ref,
@@ -54,6 +54,15 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 		for (var i in request.params) if (request.params.hasOwnProperty(i))
 			if (i.startsWith('_') === false)
 				res[i] = request.params[i];
+
+		// extract campaign
+		var query = url.parse(url, true).query;
+		res._utm_source = query.utm_source;
+		res._utm_campaign = query.utm_campaign;
+		res._utm_term = query.utm_term;
+		res._utm_content = query.utm_content;
+		res._utm_medium = query.utm_medium;
+
 		return res;
 	}
 
