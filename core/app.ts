@@ -30,7 +30,7 @@ import qs = require('querystring');
 import url = require('url');
 var HttpApi = require('./module/httpapi.js').HttpApi;
 
-function route(app, com): void {
+function route(app, com):void {
 	//APP------------------------------------------------------------------------
 	//set up an new app
 	app.post('/app', function (req, res) {
@@ -137,14 +137,14 @@ function route(app, com): void {
 	});
 }
 
-function buildconnstr(): string {
+function buildconnstr():string {
 	var host = config.get("mongod.host") || "127.0.0.1";
 	var port = config.get("mongod.port") || 27017;
 	var database = config.get("mongod.database") || "test";
 	return "mongodb://" + host + ":" + port + "/" + database;
 }
 
-function dataapiroot(httpapi, req: http.ServerRequest, res: http.ServerResponse) {
+function dataapiroot(httpapi, req:http.ServerRequest, res:http.ServerResponse) {
 	trycatch(function () {
 		var url_parts = url.parse(req.url, true);
 		if (req.method === 'POST') {
@@ -162,37 +162,32 @@ function dataapiroot(httpapi, req: http.ServerRequest, res: http.ServerResponse)
 			handle(req, res, url_parts.pathname);
 		}
 
-		function handle(req: http.ServerRequest, res: http.ServerResponse, path: string) {
+		function handle(req:http.ServerRequest, res:http.ServerResponse, path:string) {
 			var parts = path.split('/');
-			if (parts[1] === 'api') {
-				res.statusCode = 200;
-				req['appid'] = parts[2];
-				var action = parts[3];
-				if (action === 'track') httpapi.track(req, res);
-				else if (action === 'code.js') httpapi.code(req, res);
-				else if (action === 'clear') httpapi.clear(req, res);
-				else if (action === 'info') httpapi.info(req, res);
-				else if (action === 'x') {
-					req['actionid'] = parts[4];
-					httpapi.x(req, res);
-				}
-				else if (action === 'suggest') {
-					req['typeid'] = parts[4];
-					req['field'] = parts[5];
-					req['qr'] = parts[6];
-					httpapi.suggest(req, res);
-				}
-				else if (action === 'fix') {
-					req['actionid'] = parts[4];
-					httpapi.fix(req, res);
-				} else {
-					res.statusCode = 404;
-					res.end('action must be one of [code, clear, ingo, fix, track]');
-				}
+			res.statusCode = 200;
+			req['appid'] = parts[1];
+			var action = parts[2];
+			if (action === 'track') httpapi.track(req, res);
+			else if (action === 'code.js') httpapi.code(req, res);
+			else if (action === 'clear') httpapi.clear(req, res);
+			else if (action === 'info') httpapi.info(req, res);
+			else if (action === 'link') httpapi.link(req, res);
+			else if (action === 'x') {
+				req['actionid'] = parts[3];
+				httpapi.x(req, res);
 			}
-			else {
+			else if (action === 'suggest') {
+				req['typeid'] = parts[3];
+				req['field'] = parts[4];
+				req['qr'] = parts[5];
+				httpapi.suggest(req, res);
+			}
+			else if (action === 'fix') {
+				req['actionid'] = parts[3];
+				httpapi.fix(req, res);
+			} else {
 				res.statusCode = 404;
-				res.end('path must be [api]');
+				res.end('action must be one of [code, clear, ingo, fix, track]');
 			}
 		}
 	}, function (err) {
@@ -205,13 +200,12 @@ function dataapiroot(httpapi, req: http.ServerRequest, res: http.ServerResponse)
 //<<<<<<<<<<<<THE ENTRY POINT
 
 //Using connection pool. Initialize mongodb once
-var option: mongodb.MongoClientOptions = {};
+var option:mongodb.MongoClientOptions = {};
 option.server = {};
 option.server.poolSize = 40;
 
 
-
-mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.MongoError, db: mongodb.Db) {
+mongodb.MongoClient.connect(buildconnstr(), option, function (err:mongodb.MongoError, db:mongodb.Db) {
 	if (err) throw err;
 
 	//set up new express application
@@ -223,7 +217,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.Mongo
 
 	//create component
 	converter = new converter.IdManager();
-	var prefix :string = config.get<string>("mongod.prefix") || "meotrics_" ;
+	var prefix:string = config.get<string>("mongod.prefix") || "meotrics_";
 	var component = {
 		dashboard: new Dashboard(db, mongodb, converter, prefix, config.get("dashboard.delay")),
 		trendMgr: new TrendMgr(db, mongodb, async, converter, prefix, "trend"),
@@ -238,7 +232,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.Mongo
 		camCRUD: new CRUD(db, mongodb, async, converter, prefix, "campaign"),
 		segMgr: new SegMgr(db, mongodb, async, converter, prefix),
 		valuemgr: new ValueMgr(db, prefix)
-	}
+	};
 
 	component.typemgr = new TypeMgr(db, mongodb, converter, async, prefix, component.typeCRUD, "actiontype");
 	component.appmgr = new AppMgr(db, converter, prefix, component.typeCRUD, component.segCRUD, component.trendCRUD);
@@ -254,7 +248,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.Mongo
 	var httpport = config.get('apiserver.port') || 1711;
 	var httpapi = new HttpApi(config.get('apiserver.codepath'), component.actionMgr, fs, ua, MD, component.valuemgr);
 
-	var server = http.createServer(function (req: http.ServerRequest, res: http.ServerResponse) {
+	var server = http.createServer(function (req:http.ServerRequest, res:http.ServerResponse) {
 		dataapiroot(httpapi, req, res);
 	});
 

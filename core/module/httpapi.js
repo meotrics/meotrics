@@ -3,11 +3,12 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 	var code;
 	function loadCode(appid, actionid, callback) {
 		// cache mtcode in code for minimize disk usage, lazy load
-		if (code === undefined)
-			fs.readFile(codepath,'ascii', function (err, data) {
-				code = data;
+		if (code === undefined) {
+			//fs.readFile(codepath,'ascii', function (err, data) {
+				code = '<html><head><script>data=JSON.parse(event.data);var lastactionid=sessionStorage.getItem("lastactionid");sessionStorage.setItem("lastactionid",actionid),parent.postMessage(JSON.stringify({actionid:$ACTIONID$,lastactionid:lastactionid}),"*");</script></head></html>';
 				replaceParam();
-			});
+			//});
+		}
 		else replaceParam();
 
 		function replaceParam() {
@@ -97,6 +98,10 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 		// delete the cookie
 		eraseCookie(res, 'mtid', 'api/' + req.appid);
 		res.end();
+	};
+
+	this.link = function(req, res){
+		// this function must call before fix
 	};
 
 	this.track = function (req, res) {
