@@ -1,8 +1,4 @@
-<html>
-<head>
-<script>
-	parent.postMessage(JSON.stringify({appid: '$APPID$',actionid : '$ACTIONID$', lastactionid: sessionStorage.getItem('lastactionid')}), "*");
-	sessionStorage.setItem('lastactionid', '$ACTIONID$');
-</script>
-</head>
-</html>
+#mt$APPID$
+{
+	content: "$ACTIONID$";
+}

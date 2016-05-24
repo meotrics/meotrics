@@ -1,10 +1,7 @@
-<iframe src="//api.meotrics.com/$APPID$" style="display: none"></iframe>
-<script style="display: none">
-!function(){var t;window.mt={appid:$APPID$,
-track:function(t,n){mt.rq.push(["track",t,n,new Date])},
-identify:function(t){mt.rq.push(["identify",t])},
-clear:function(){mt.rq.push(["clear"])},
-onready:function(){void 0!==t&&mt.excute(t)}},mt.rq=mt.rq||[],
-addEventListener("message",function(n){t=n,mt.excute&&excute(n)},!1)}();
-</script>
-<script src="//meotrics.com/track.js" defer style="display: none"></script>
+<!--BEGIN MEOTRICS TRACKING CODE -->
+<link href="//api.meotrics.com/$APPID$" rel="stylesheet" type="text/css"/>
+<script id="mt$APPID$" src="//meotrics.com/mttrack.js"></script>
+<script>mt.appid='$APPID$';
+mt.actionid=getComputedStyle(document.getElementById('mt'+mt.appid),null).content.substr(1, cs.content.length-2);</script>
+<script src="//meotrics.com/mtend.js" defer async="true"></script>
+<!--END MEOTRICS TRACKING CODE -->
