@@ -80,7 +80,7 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 		var mtid = getCookie(req, "mtid");
 		if (mtid === undefined) {
 			return actionmgr.setupRaw(appid, function (mtid) {
-				setCookie(res, "mtid", mtid, '/' + appid);
+				setCookie(res, "mtid", mtid, appid);
 				callback(mtid);
 			});
 		}
@@ -89,9 +89,9 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 		actionmgr.ismtidValid(appid, mtid, function (ret) {
 			if (ret) callback(mtid);
 			else {
-				eraseCookie(res, "mtid", '/' + appid);
+				eraseCookie(res, "mtid",  appid);
 				actionmgr.setupRaw(appid, function (mtid) {
-					setCookie(res, "mtid", mtid, '/' + appid);
+					setCookie(res, "mtid", mtid,  appid);
 					callback(mtid);
 				});
 			}
@@ -104,7 +104,7 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 
 	function clear(req, res) {
 		// delete the cookie
-		eraseCookie(res, 'mtid', '/' + req.appid);
+		eraseCookie(res, 'mtid',  req.appid);
 		res.end();
 	}
 
@@ -130,7 +130,7 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 
 			actionmgr.identifyRaw(appid, {mtid: mtid, user: data}, function (mtid) {
 				//set new mtid if need
-				setCookie(res, "mtid", mtid, 'api/' + appid);
+				setCookie(res, "mtid", mtid,  appid);
 				res.setHeader('Content-Type', 'text/plain');
 
 				res.end("//" + mtid);
