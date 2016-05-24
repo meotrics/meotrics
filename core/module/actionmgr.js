@@ -179,7 +179,7 @@ class ActionMgr {
         var collection = me.prefix + "app" + appid;
         //make sure dont change typeid
         delete data._typeid;
-        if (lastactionidstr !== null || lastactionidstr !== undefined || lastactionidstr !== '') {
+        if (lastactionidstr !== null && lastactionidstr !== undefined && lastactionidstr !== '') {
             let lastactionid = new mongodb.ObjectID(lastactionidstr);
             me.db.collection(collection).find({ _id: lastactionid }).limit(1).toArray(function (err, r) {
                 if (err)

@@ -234,8 +234,8 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 				}
 				else if (action === 'fix') {
 					var query = url.parse(path, true).query;
-					req['actionid'] = query.actionid;
-					req['lastactionid'] = query.lastactionid;
+					req['actionid'] = req.params.actionid;
+					req['lastactionid'] = req.params.lastactionid;
 					fix(req, res);
 				} else {
 					res.statusCode = 404;

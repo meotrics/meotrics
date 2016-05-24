@@ -177,17 +177,16 @@ export class ActionMgr {
 	public fixRaw(appid:string, actionids:string, lastactionidstr:string, data, callback:() => void) {
 		let me = this;
 		let actionid = new mongodb.ObjectID(actionids);
-
-
+		
 		if (data._mtid) data._mtid = new mongodb.ObjectID(data._mtid);
 		var collection = me.prefix + "app" + appid;
 		//make sure dont change typeid
 		delete data._typeid;
-		if (lastactionidstr !== null || lastactionidstr !== undefined || lastactionidstr !== '') {
+		if (lastactionidstr !== null && lastactionidstr !== undefined && lastactionidstr !== '') {
 			let lastactionid = new mongodb.ObjectID(lastactionidstr);
 			me.db.collection(collection).find({_id: lastactionid}).limit(1).toArray(function (err, r) {
 				if (err) throw err;
-				if (r.length == 0) throw "wrong last action id: " + lastactionidstr;
+				if (r.length == 0) throw "wrong last action id: " + lastactionidstr ;
 				let lastaction = r[0];
 				data._link = lastactionid;
 				me.converter.toIDs(['_utm_source', '_utm_campaign', '_utm_term', '_utm_content', '_utm_medium'], function (ids) {
