@@ -120,63 +120,6 @@ function buildconnstr() {
     var database = config.get("mongod.database") || "test";
     return "mongodb://" + host + ":" + port + "/" + database;
 }
-function dataapiroot(httpapi, req, res) {
-    trycatch(function () {
-        var url_parts = url.parse(req.url, true);
-        if (req.method === 'POST') {
-            var body = '';
-            req.on('data', function (data) {
-                body += data;
-            });
-            req.on('end', function () {
-                req['params'] = qs.parse(body);
-                handle(req, res, url_parts.pathname);
-            });
-        }
-        else if (req.method === 'GET') {
-            req['params'] = url_parts.query;
-            handle(req, res, url_parts.pathname);
-        }
-        function handle(req, res, path) {
-            var parts = path.split('/');
-            res.statusCode = 200;
-            req['appid'] = parts[1];
-            var action = parts[2];
-            if (action === 'track')
-                httpapi.track(req, res);
-            else if (action === 'code.js')
-                httpapi.code(req, res);
-            else if (action === 'clear')
-                httpapi.clear(req, res);
-            else if (action === 'info')
-                httpapi.info(req, res);
-            else if (action === 'link')
-                httpapi.link(req, res);
-            else if (action === 'x') {
-                req['actionid'] = parts[3];
-                httpapi.x(req, res);
-            }
-            else if (action === 'suggest') {
-                req['typeid'] = parts[3];
-                req['field'] = parts[4];
-                req['qr'] = parts[5];
-                httpapi.suggest(req, res);
-            }
-            else if (action === 'fix') {
-                req['actionid'] = parts[3];
-                httpapi.fix(req, res);
-            }
-            else {
-                res.statusCode = 404;
-                res.end('action must be one of [code, clear, ingo, fix, track]');
-            }
-        }
-    }, function (err) {
-        res.statusCode = 500;
-        res.end();
-        console.log(err, err.stack);
-    });
-}
 //<<<<<<<<<<<<THE ENTRY POINT
 //Using connection pool. Initialize mongodb once
 var option = {};
@@ -218,9 +161,9 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err, db) {
         console.log('Meotrics CORE API is listening at port ' + port);
     });
     var httpport = config.get('apiserver.port') || 1711;
-    var httpapi = new HttpApi(config.get('apiserver.codepath'), component.actionMgr, fs, ua, MD, component.valuemgr);
+    var httpapi = new HttpApi(config.get('apiserver.codepath'), component.actionMgr, fs, ua, MD, component.valuemgr, trycatch, url, qs);
     var server = http.createServer(function (req, res) {
-        dataapiroot(httpapi, req, res);
+        httpapi.route(req, res);
     });
     var ws = new WS.WS('/ws', 80, server);
     ws.run();

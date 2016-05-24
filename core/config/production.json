@@ -2,7 +2,7 @@
 	"port": 2108,
 	"apiserver": {
 		"port": 1711,
-		"codepath": "../dashboard/public/mt.min.js"
+		"codepath": "../asset/iframe.html"
 	},
 	"mongod": {
 		"host": "127.0.0.1",

@@ -1,13 +1,13 @@
 "use strict";
-exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
+exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr, trycatch, url, qs) {
 	var code;
 	function loadCode(appid, actionid, callback) {
 		// cache mtcode in code for minimize disk usage, lazy load
 		if (code === undefined) {
-			//fs.readFile(codepath,'ascii', function (err, data) {
-				code = '<html><head><script>data=JSON.parse(event.data);var lastactionid=sessionStorage.getItem("lastactionid");sessionStorage.setItem("lastactionid",actionid),parent.postMessage(JSON.stringify({actionid:$ACTIONID$,lastactionid:lastactionid}),"*");</script></head></html>';
+			fs.readFile(codepath,'ascii', function (err, data) {
+				code = data;
 				replaceParam();
-			//});
+			});
 		}
 		else replaceParam();
 
@@ -94,17 +94,13 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 		res.setHeader('Set-Cookie', name + "=x; expires=Wed, 21 Aug 1995 11:11:11 GMT; path=/" + path);
 	}
 
-	this.clear = function (req, res) {
+	function clear(req, res) {
 		// delete the cookie
 		eraseCookie(res, 'mtid', 'api/' + req.appid);
 		res.end();
-	};
+	}
 
-	this.link = function(req, res){
-		// this function must call before fix
-	};
-
-	this.track = function (req, res) {
+	function track (req, res) {
 		var appid = req.appid;
 		var data = trackBasic(req);
 		getMtid(req, appid, res, function (mtid) {
@@ -114,9 +110,9 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 				res.end("//" + actionid);
 			});
 		});
-	};
+	}
 
-	this.info = function (req, res) {
+	function info (req, res) {
 		var appid = req.appid;
 		getMtid(req, appid, res, function (mtid) {
 			var data = {};
@@ -132,11 +128,11 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 				res.end("//"+ mtid);
 			});
 		});
-	};
+	}
 
-	this.x = function(req,res){
+	function x(req,res){
 		actionmgr.x(req, res, function(){});
-	};
+	}
 
 	function getCookie(req, name) {
 		var list = {}, rc = req.headers.cookie;
@@ -152,7 +148,7 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 		res.setHeader('Set-Cookie', name + '=' + encodeURIComponent(value) + "; expires=Wed, 21 Aug " + tenyearlater + " 11:11:11 GMT; path=/" + path);
 	}
 
-	this.fix = function (req, res) {
+	 function fix(req, res) {
 		var appid = req.appid;
 		var actionid = req.actionid;
 		var data = trackBasic(req);
@@ -162,16 +158,16 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 			actionmgr.fixRaw(appid, actionid, data, function () {
 			});
 		});
-	};
+	}
 	
-	this.suggest = function(req, res){
+	function suggest(req, res){
 		valuemgr.suggest(req.appid +"", req.typeid+"", req.field+"", req.qr+"", function(results){
 			res.setHeader('Content-Type', 'application/json');
 			res.end(JSON.stringify(results));
 		});
-	};
+	}
 
-	this.code = function (req, res) {
+	function pageview (req, res) {
 		var appid = req.appid;
 		// record an new pageview
 		var data = trackBasic(req);
@@ -186,6 +182,59 @@ exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr) {
 					res.end(code);
 				});
 			});
+		});
+	}
+
+	this.route = function( req, res) {
+		var me = this;
+		trycatch(function () {
+			var url_parts = url.parse(req.url, true);
+			if (req.method === 'POST') {
+				var body = '';
+				req.on('data', function (data) {
+					body += data;
+				});
+				req.on('end', function () {
+					req['params'] = qs.parse(body);
+					handle(req, res, url_parts.pathname);
+				});
+			}
+			else if (req.method === 'GET') {
+				req['params'] = url_parts.query;
+				handle(req, res, url_parts.pathname);
+			}
+
+			function handle(req, res, path) {
+				var parts = path.split('/');
+				res.statusCode = 200;
+				req['appid'] = parts[1];
+				var action = parts[2];
+				if (action === 'track') track(req, res);
+				else if (action === '') pageview(req, res);
+				else if (action === 'clear') clear(req, res);
+				else if (action === 'info') info(req, res);
+				else if (action === 'x') {
+					req['actionid'] = parts[3];
+					x(req, res);
+				}
+				else if (action === 'suggest') {
+					req['typeid'] = parts[3];
+					req['field'] = parts[4];
+					req['qr'] = parts[5];
+					suggest(req, res);
+				}
+				else if (action === 'fix') {
+					req['actionid'] = parts[3];
+					fix(req, res);
+				} else {
+					res.statusCode = 404;
+					res.end('action must be one of [code, clear, ingo, fix, track]');
+				}
+			}
+		}, function (err) {
+			res.statusCode = 500;
+			res.end();
+			console.log(err, err.stack);
 		});
 	};
 };
