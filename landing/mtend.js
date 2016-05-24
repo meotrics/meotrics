@@ -64,12 +64,17 @@
 	mt.excute = function(event){
 		var data = JSON.parse(event.data);
 		mt.actionid = data.actionid;
-		ajax('fix', {
-			actionid : data.actionid, 
-			lastactionid: data.lastactionid, 
-			data: addVisitorPlatform({})
-		});
-
+		if(data.lastactionid !== undefined)
+			ajax('fix', {
+				actionid : data.actionid, 
+				lastactionid: data.lastactionid, 
+				data: addVisitorPlatform({})
+			});
+		else
+			ajax('fix', {
+				actionid : data.actionid, 
+				data: addVisitorPlatform({})
+			});
 		cleanRequest();// excute delayed request in queue
 	}
 
