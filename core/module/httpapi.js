@@ -33,7 +33,7 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 	function trackBasic(request) {
 		var useragent = request.headers['user-agent'];
 		var r = ua.parse(useragent);
-		var url = request.params._url || "";
+		var uri = request.params._url || "";
 
 		var md = new MD(useragent);
 		var devicetype;
@@ -44,9 +44,9 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 		else
 			devicetype = 'desktop';
 
-		if ( url === "" || url.startsWith(request.headers.referer) === false) url = request.headers.referer;
+		if ( uri === "" || uri.startsWith(request.headers.referer) === false) uri = request.headers.referer;
 		var res = {
-			_url: url,
+			_url: uri,
 			_ref: request.params._ref,
 			_typeid: request.params._typeid,
 			_ip: getRemoteAddress(request),
@@ -65,7 +65,7 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 				res[i] = request.params[i];
 
 		// extract campaign
-		var query = url.parse(url, true).query;
+		var query = url.parse(uri, true).query;
 		res._utm_source = query.utm_source;
 		res._utm_campaign = query.utm_campaign;
 		res._utm_term = query.utm_term;
@@ -186,7 +186,6 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 			actionmgr.saveRaw(appid, data, function (actionid) {
 				// return code
 				loadCode(appid, actionid, function (code) {
-					res.setHeader('Content-Type', 'application/javascript');
 					res.end(code);
 				});
 			});
@@ -218,7 +217,7 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 				req['appid'] = parts[1];
 				var action = parts[2];
 				if (action === 'track') track(req, res);
-				else if (action === '') pageview(req, res);
+				else if (action === '' || action===undefined) pageview(req, res);
 				else if (action === 'clear') clear(req, res);
 				else if (action === 'info') info(req, res);
 				else if (action === 'x') {
@@ -236,7 +235,7 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 					fix(req, res);
 				} else {
 					res.statusCode = 404;
-					res.end('action must be one of [code, clear, ingo, fix, track]');
+					res.end('action "' + action + '" not found, action must be one of [code, clear, ingo, fix, track]');
 				}
 			}
 		}, function (err) {

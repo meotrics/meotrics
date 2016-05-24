@@ -2,8 +2,6 @@
 const mongodb = require('mongodb');
 const async = require('async');
 var trycatch = require('trycatch');
-var ua = require('ua-parser');
-var MD = require('mobile-detect');
 var CRUD = require('./crud.js').CRUD;
 var appException = require('./appException.js');
 var TrendMgr = require('./trendmgr.js').TrendMgr;
@@ -99,6 +97,7 @@ class CrudApi {
         app.postEx('/f/:appid/:actionid', this.actionMgr.fix);
         app.get('/app/init/:appid', function (req, res) {
             me.appmgr.initApp(req.params.appid, function () {
+                res.send('OK');
                 res.status(200).end();
             });
         });

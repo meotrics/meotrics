@@ -3,8 +3,6 @@ import * as async from 'async';
 
 var trycatch = require('trycatch');
 import bodyParser = require('body-parser');
-var ua = require('ua-parser');
-var MD = require('mobile-detect');
 var CRUD = require('./crud.js').CRUD;
 
 var appException = require('./appException.js');
@@ -118,6 +116,7 @@ export class CrudApi {
 
 		app.get('/app/init/:appid', function (req, res) {
 			me.appmgr.initApp(req.params.appid, function () {
+				res.send('OK');
 				res.status(200).end();
 			});
 		});
