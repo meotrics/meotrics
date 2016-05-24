@@ -3,7 +3,7 @@ import * as url from 'url';
 import * as express from 'express';
 
 export class ActionMgr {
-	constructor(private db:mongodb.Db, private converter, private prefix:string, private mapping:string) {
+	constructor(private db:mongodb.Db, private converter, private prefix:string, private mapping:string, private valuemgr) {
 	}
 
 	// purpose: check if an mtid is valid
@@ -66,9 +66,9 @@ export class ActionMgr {
 		me.db.collection(collectionmapping).find({anomtid: mtid}).limit(1).toArray(function (err, r) {
 			if (err) throw err;
 			if (r.length !== 0) mtid = r[0].idemtid;
-
+			me.valuemgr.cineObject(appid, data._typeid, data );
 			me.converter.toObject(data, function (datax) {
-				me.db.collection(collection).insertOne(datax, function (err, r) {
+					me.db.collection(collection).insertOne(datax, function (err, r) {
 					if (err) throw err;
 					callback(r.insertedId);
 				});
@@ -184,6 +184,7 @@ export class ActionMgr {
 		delete data._typeid;
 		if (lastactionidstr !== null && lastactionidstr !== undefined && lastactionidstr !== '') {
 			let lastactionid = new mongodb.ObjectID(lastactionidstr);
+
 			me.db.collection(collection).find({_id: lastactionid}).limit(1).toArray(function (err, r) {
 				if (err) throw err;
 				if (r.length == 0) throw "wrong last action id: " + lastactionidstr ;
@@ -202,6 +203,7 @@ export class ActionMgr {
 		return store();
 
 		function store() {
+			me.valuemgr.cineObject(appid, "pageview", data);
 			me.converter.toObject(data, function (datax) {
 				me.db.collection(collection).updateOne({_id: actionid}, {$set: datax}, function (err, r) {
 					if (err) throw err;
@@ -273,6 +275,7 @@ export class ActionMgr {
 
 		var themtid = new mongodb.ObjectID(data.mtid);
 		me.converter.toIDs(['_isUser', 'userid', '_mtid'], function (ids) {
+			me.valuemgr.cineObject(appid, 'user', user);
 			me.converter.toObject(user, function (userx) {
 				// check for case 4
 				if (userid === undefined) return updateUserInfo(themtid, userx, callback);

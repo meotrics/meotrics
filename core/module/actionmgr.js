@@ -1,11 +1,12 @@
 "use strict";
 const mongodb = require('mongodb');
 class ActionMgr {
-    constructor(db, converter, prefix, mapping) {
+    constructor(db, converter, prefix, mapping, valuemgr) {
         this.db = db;
         this.converter = converter;
         this.prefix = prefix;
         this.mapping = mapping;
+        this.valuemgr = valuemgr;
     }
     // purpose: check if an mtid is valid
     // a mtid is valid if there is one user record based on mtid
@@ -68,6 +69,7 @@ class ActionMgr {
                 throw err;
             if (r.length !== 0)
                 mtid = r[0].idemtid;
+            me.valuemgr.cineObject(appid, data._typeid, data);
             me.converter.toObject(data, function (datax) {
                 me.db.collection(collection).insertOne(datax, function (err, r) {
                     if (err)
@@ -205,6 +207,7 @@ class ActionMgr {
         }
         return store();
         function store() {
+            me.valuemgr.cineObject(appid, "pageview", data);
             me.converter.toObject(data, function (datax) {
                 me.db.collection(collection).updateOne({ _id: actionid }, { $set: datax }, function (err, r) {
                     if (err)
@@ -277,6 +280,7 @@ class ActionMgr {
         user = userex;
         var themtid = new mongodb.ObjectID(data.mtid);
         me.converter.toIDs(['_isUser', 'userid', '_mtid'], function (ids) {
+            me.valuemgr.cineObject(appid, 'user', user);
             me.converter.toObject(user, function (userx) {
                 // check for case 4
                 if (userid === undefined)
