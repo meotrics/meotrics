@@ -171,7 +171,7 @@ class ActionMgr {
     // + appid: id of the app
     // + actionid: ObjectID, id of action
     // + data: action data
-    fixRaw(appid, actionids, data, callback) {
+    fixRaw(appid, actionids, lastactionidstr, data, callback) {
         let me = this;
         let actionid = new mongodb.ObjectID(actionids);
         if (data._mtid)
@@ -179,22 +179,40 @@ class ActionMgr {
         var collection = me.prefix + "app" + appid;
         //make sure dont change typeid
         delete data._typeid;
-        me.converter.toObject(data, function (datax) {
-            me.db.collection(collection).updateOne({ _id: actionid }, { $set: datax }, function (err, r) {
+        if (lastactionidstr !== null || lastactionidstr !== undefined || lastactionidstr !== '') {
+            let lastactionid = new mongodb.ObjectID(lastactionidstr);
+            me.db.collection(collection).find({ _id: lastactionid }).limit(1).toArray(function (err, r) {
                 if (err)
                     throw err;
-                callback();
+                if (r.length == 0)
+                    throw "wrong last action id: " + lastactionidstr;
+                let lastaction = r[0];
+                data._link = lastactionid;
+                me.converter.toIDs(['_utm_source', '_utm_campaign', '_utm_term', '_utm_content', '_utm_medium'], function (ids) {
+                    if (data._utm_source == undefined)
+                        data._utm_source = lastaction[ids._utm_source];
+                    if (data._utm_campaign == undefined)
+                        data._utm_campaign = lastaction[ids._utm_campaign];
+                    if (data._utm_term == undefined)
+                        data._utm_term = lastaction[ids._utm_term];
+                    if (data._utm_content == undefined)
+                        data._utm_content = lastaction[ids._utm_content];
+                    if (data._utm_medium == undefined)
+                        data._utm_medium = lastaction[ids._utm_meidum];
+                    return store();
+                });
             });
-        });
-    }
-    fix(req, res, callback) {
-        var me = this;
-        var data = req.params;
-        me.fixRaw(req.params.appid, req.params.actionid, data, function () {
-            res.writeHead(200);
-            res.end();
-            callback();
-        });
+        }
+        return store();
+        function store() {
+            me.converter.toObject(data, function (datax) {
+                me.db.collection(collection).updateOne({ _id: actionid }, { $set: datax }, function (err, r) {
+                    if (err)
+                        throw err;
+                    callback();
+                });
+            });
+        }
     }
     x(req, res, callback) {
         var me = this;

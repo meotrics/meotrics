@@ -9,10 +9,11 @@ var MD = require('mobile-detect');
 
 exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 	var code;
+
 	function loadCode(appid, actionid, callback) {
 		// cache mtcode in code for minimize disk usage, lazy load
 		if (code === undefined) {
-			fs.readFile(codepath,'ascii', function (err, data) {
+			fs.readFile(codepath, 'ascii', function (err, data) {
 				code = data;
 				replaceParam();
 			});
@@ -44,7 +45,7 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 		else
 			devicetype = 'desktop';
 
-		if ( uri === "" || uri.startsWith(request.headers.referer) === false) uri = request.headers.referer;
+		if (uri === "" || uri.startsWith(request.headers.referer) === false) uri = request.headers.referer;
 		var res = {
 			_url: uri,
 			_ref: request.params._ref,
@@ -77,21 +78,20 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 
 	function getMtid(req, appid, res, callback) {
 		var mtid = getCookie(req, "mtid");
-		if(mtid === undefined)
-		{
+		if (mtid === undefined) {
 			return actionmgr.setupRaw(appid, function (mtid) {
-				setCookie(res, "mtid", mtid, 'api/' + appid);
+				setCookie(res, "mtid", mtid, '/' + appid);
 				callback(mtid);
 			});
 		}
 
 		// check if mtid is valid
-		actionmgr.ismtidValid(appid, mtid, function(ret){
-			if(ret) callback(mtid);
+		actionmgr.ismtidValid(appid, mtid, function (ret) {
+			if (ret) callback(mtid);
 			else {
-				eraseCookie(res, "mtid", 'api/' + appid);
+				eraseCookie(res, "mtid", '/' + appid);
 				actionmgr.setupRaw(appid, function (mtid) {
-					setCookie(res, "mtid", mtid, 'api/' + appid);
+					setCookie(res, "mtid", mtid, '/' + appid);
 					callback(mtid);
 				});
 			}
@@ -104,11 +104,11 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 
 	function clear(req, res) {
 		// delete the cookie
-		eraseCookie(res, 'mtid', 'api/' + req.appid);
+		eraseCookie(res, 'mtid', '/' + req.appid);
 		res.end();
 	}
 
-	function track (req, res) {
+	function track(req, res) {
 		var appid = req.appid;
 		var data = trackBasic(req);
 		getMtid(req, appid, res, function (mtid) {
@@ -120,7 +120,7 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 		});
 	}
 
-	function info (req, res) {
+	function info(req, res) {
 		var appid = req.appid;
 		getMtid(req, appid, res, function (mtid) {
 			var data = {};
@@ -133,13 +133,14 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 				setCookie(res, "mtid", mtid, 'api/' + appid);
 				res.setHeader('Content-Type', 'text/plain');
 
-				res.end("//"+ mtid);
+				res.end("//" + mtid);
 			});
 		});
 	}
 
-	function x(req,res){
-		actionmgr.x(req, res, function(){});
+	function x(req, res) {
+		actionmgr.x(req, res, function () {
+		});
 	}
 
 	function getCookie(req, name) {
@@ -156,33 +157,34 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 		res.setHeader('Set-Cookie', name + '=' + encodeURIComponent(value) + "; expires=Wed, 21 Aug " + tenyearlater + " 11:11:11 GMT; path=/" + path);
 	}
 
-	 function fix(req, res) {
+	function fix(req, res) {
 		var appid = req.appid;
 		var actionid = req.actionid;
+		var lastactionid = req.lastactionid;
 		var data = trackBasic(req);
 		getMtid(req, appid, res, function (mtid) {
-			res.end();
 			data._mtid = mtid;
-			actionmgr.fixRaw(appid, actionid, data, function () {
+			actionmgr.fixRaw(appid, actionid, lastactionid, data, function () {
+				res.end();
 			});
 		});
 	}
-	
-	function suggest(req, res){
-		valuemgr.suggest(req.appid +"", req.typeid+"", req.field+"", req.qr+"", function(results){
+
+	function suggest(req, res) {
+		valuemgr.suggest(req.appid + "", req.typeid + "", req.field + "", req.qr + "", function (results) {
 			res.setHeader('Content-Type', 'application/json');
 			res.end(JSON.stringify(results));
 		});
 	}
 
-	function pageview (req, res) {
+	function pageview(req, res) {
 		var appid = req.appid;
 		// record an new pageview
 		var data = trackBasic(req);
 		getMtid(req, appid, res, function (mtid) {
 			data._mtid = mtid;
 			data._typeid = 'pageview';
-			
+
 			actionmgr.saveRaw(appid, data, function (actionid) {
 				// return code
 				loadCode(appid, actionid, function (code) {
@@ -192,7 +194,7 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 		});
 	}
 
-	this.route = function( req, res) {
+	this.route = function (req, res) {
 		var me = this;
 		trycatch(function () {
 			var url_parts = url.parse(req.url, true);
@@ -217,7 +219,7 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 				req['appid'] = parts[1];
 				var action = parts[2];
 				if (action === 'track') track(req, res);
-				else if (action === '' || action===undefined) pageview(req, res);
+				else if (action === '' || action === undefined) pageview(req, res);
 				else if (action === 'clear') clear(req, res);
 				else if (action === 'info') info(req, res);
 				else if (action === 'x') {
@@ -231,7 +233,9 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 					suggest(req, res);
 				}
 				else if (action === 'fix') {
-					req['actionid'] = parts[3];
+					var query = url.parse(path, true).query;
+					req['actionid'] = query.actionid;
+					req['lastactionid'] = query.lastactionid;
 					fix(req, res);
 				} else {
 					res.statusCode = 404;
