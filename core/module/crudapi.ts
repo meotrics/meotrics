@@ -42,7 +42,8 @@ export class CrudApi {
 	public appmgr = new AppMgr(this.db, this.converter, this.prefix, this.typeCRUD, this.segCRUD, this.trendCRUD);
 
 	public route(app):void {
-		// CRUD actiontype
+		var me = this;
+			// CRUD actiontype
 		app.postEx('/actiontype/:appid', this.typemgr.create); // create an actiontype
 		app.getEx('/actiontype/:appid', this.typemgr.list);	// get all actiontypes
 		app.getEx('/actiontype/:appid/:id', this.typemgr.match); // get an actiontype
@@ -61,15 +62,15 @@ export class CrudApi {
 
 		// CRUD segment
 		app.postEx('/segment/:appid', function (req, res) {
-			this.segCRUD.create(req, res, function (id) {
-				this.segMgr.excuteSegment(id);
+			me.segCRUD.create(req, res, function (id) {
+				me.segMgr.excuteSegment(id);
 			});
 		});
 
 		app.getEx('/segment/:appid', this.segCRUD.list);
 		app.getEx('/segment/:appid/:id', function (req, res) {
-			this.segCRUD.match(req, res, function () {
-				this.segMgr.excuteSegment(req.params.id);
+			me.segCRUD.match(req, res, function () {
+				me.segMgr.excuteSegment(req.params.id);
 			});
 		});
 
@@ -78,14 +79,14 @@ export class CrudApi {
 
 		//update or
 		app.get('/segment/query1/:appid/:id/:field1/', function (req, res) {
-			this.segMgr.querySegment(req.params.appid, req.params.id, req.params.field1, undefined, function (results) {
+			me.segMgr.querySegment(req.params.appid, req.params.id, req.params.field1, undefined, function (results) {
 				res.json(results);
 			});
 		});
 
 		//update or
 		app.get('/segment/query2/:appid/:id/:field1/:field2', function (req, res) {
-			this.segMgr.querySegment(req.params.appid, req.params.id, req.params.field1, req.params.field2, function (results) {
+			me.segMgr.querySegment(req.params.appid, req.params.id, req.params.field1, req.params.field2, function (results) {
 				res.json(results);
 			});
 		});
@@ -116,27 +117,27 @@ export class CrudApi {
 		app.postEx('/f/:appid/:actionid', this.actionMgr.fix);
 
 		app.get('/app/init/:appid', function (req, res) {
-			this.appmgr.initApp(req.params.appid, function () {
+			me.appmgr.initApp(req.params.appid, function () {
 				res.status(200).end();
 			});
 		});
 
 		app.getEx('/dashboard/:appid', function (req, res) {
-			this.dashboard.getDashboard(req.params.appid, function (result) {
+			me.dashboard.getDashboard(req.params.appid, function (result) {
 				res.json(result);
 			});
 		});
 
 		// count number of action in app
 		app.getEx('/api/counter/:appid', function (req, res) {
-			this.appmgr.countAction(req.params.appid, function (ret) {
+			me.appmgr.countAction(req.params.appid, function (ret) {
 				res.send(ret + "");
 			});
 		});
 
 		//check whether user has setup tracking code
 		app.get('/api/status/:appid', function (req, res) {
-			this.appmgr.isSetup(req.params.appid, function (ret) {
+			me.appmgr.isSetup(req.params.appid, function (ret) {
 				res.send(ret + "");
 				res.status(200).end();
 			});
