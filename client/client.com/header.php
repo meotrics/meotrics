@@ -17,11 +17,12 @@
 		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 		<![endif]-->
-
-	<script>
-		var mt=mt||{track:function(t,r){mt.rq.push(["track",t,r,new Date])},
-				identify:function(t){mt.rq.push(["identify",t])},
-				clear:function(){mt.rq.push(["clear"])}};mt.rq=mt.rq||[];
-	</script>
-	<script src="//meotrics.dev/api/1/code.js" type="text/javascript" defer></script>
-
+		
+<!--BEGIN MEOTRICS TRACKING CODE -->
+<link href="//api.meotrics.com/speedyapply" rel="stylesheet" type="text/css"/>
+<script id="mtspeedyapply" src="//meotrics.com/mttrack.js"></script>
+<script>mt.appid='speedyapply';
+var s=getComputedStyle(document.getElementById('mt'+mt.appid),null);
+mt.actionid = s.content.substr(1,s.content.length-2);</script>
+<script src="//meotrics.com/mtend.js" defer async="true"></script>
+<!--END MEOTRICS TRACKING CODE -->
