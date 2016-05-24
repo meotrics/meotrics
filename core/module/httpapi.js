@@ -1,5 +1,13 @@
 "use strict";
-exports.HttpApi = function (codepath, actionmgr, fs, ua, MD, valuemgr, trycatch, url, qs) {
+
+var trycatch = require('trycatch');
+var qs = require('querystring');
+var url = require('url');
+var fs = require('fs');
+var ua = require('ua-parser');
+var MD = require('mobile-detect');
+
+exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 	var code;
 	function loadCode(appid, actionid, callback) {
 		// cache mtcode in code for minimize disk usage, lazy load
