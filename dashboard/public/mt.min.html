@@ -1,6 +1,6 @@
 <script>
 	(function(){
-		var event = undefined;
+		var event;
 		window.mt = {
 			appid: $APPID$,
 			track:function(t,r){
@@ -12,7 +12,7 @@
 			clear:function(){
 				mt.rq.push(["clear"])
 			},
-			onready = function(){
+			onready:function(){
 				if(event !== undefined) mt.excute(event);
 			}
 		};
@@ -21,7 +21,7 @@
 			event = ev;
 			if(mt.excute) excute(ev);
 		}, false);
-	}();
+	})();
 </script>
 <script src="//meotrics.com/track.js" defer style="display: none"></script>
 <!-- NO CACHE -->

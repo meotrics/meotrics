@@ -1,10 +1,8 @@
 <html>
 <head>
 <script>
-	data = JSON.parse(event.data);
-	var lastactionid = sessionStorage.getItem('lastactionid');
-	sessionStorage.setItem('lastactionid', actionid);
-	parent.postMessage(JSON.stringify({actionid : $ACTIONID$, lastactionid: lastactionid}), "*");
+	parent.postMessage(JSON.stringify({appid: '$APPID$',actionid : '$ACTIONID$', lastactionid: sessionStorage.getItem('lastactionid')}), "*");
+	sessionStorage.setItem('lastactionid', '$ACTIONID$');
 </script>
 </head>
 </html>

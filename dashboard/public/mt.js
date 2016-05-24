@@ -46,7 +46,7 @@
 	}
 
 	// clean request queue
-	function cleanRequest {
+	function cleanRequest() {
 		// clean queue number 2 when out of element in queue number 1
 		if (i + 1 >= mt.rq.length) return cleanRequest2();
 		var rq = mt.rq[i++];
@@ -62,9 +62,6 @@
 	}
 
 	mt.excute = function(event){
- 		var origin = event.origin || event.originalEvent.origin; 
-		if (origin.split('/')[2] !== "meotrics.com") return;
-
 		var data = JSON.parse(event.data);
 		mt.actionid = data.actionid;
 		
