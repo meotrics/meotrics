@@ -63,74 +63,100 @@ class ActionMgr {
         // correct timming
         data._ctime = Math.round(new Date().getTime() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0);
         delete data._deltat;
-        // retrive real mtid because user can still use old mtid
-        me.db.collection(collectionmapping).find({ anomtid: mtid }).limit(1).toArray(function (err, r) {
-            if (err)
-                throw err;
-            if (r.length !== 0)
-                mtid = r[0].idemtid;
-            me.valuemgr.cineObject(appid, data._typeid, data);
-            me.converter.toObject(data, function (datax) {
-                me.db.collection(collection).insertOne(datax, function (err, r) {
-                    if (err)
-                        throw err;
-                    callback(r.insertedId);
+        if (data._link !== undefined) {
+            me.db.collection(collection).find({ _id: new mongodb.ObjectID(data._link) }).limit(1).toArray(function (err, ret) {
+                if (err)
+                    throw err;
+                if (ret.length == 0)
+                    throw "link not found: " + data._link + ", in app: " + appid;
+                let link = ret[0];
+                me.converter.toIDs(['_utm_source', '_utm_campaign', '_utm_term', '_utm_content', '_utm_medium'], function (ids) {
+                    if (data._utm_source == undefined)
+                        data._utm_source = link[ids._utm_source];
+                    if (data._utm_campaign == undefined)
+                        data._utm_campaign = link[ids._utm_campaign];
+                    if (data._utm_term == undefined)
+                        data._utm_term = link[ids._utm_term];
+                    if (data._utm_content == undefined)
+                        data._utm_content = link[ids._utm_content];
+                    if (data._utm_medium == undefined)
+                        data._utm_medium = link[ids._utm_meidum];
+                    lastsave();
                 });
-                //get user infomation
-                me.db.collection(collection).find({ _id: mtid }).limit(1).toArray(function (err, ret) {
-                    if (err)
-                        throw err;
-                    var user = ret[0];
-                    if (user === undefined)
-                        throw "mtid " + mtid + " did not match any user";
-                    var typeid = data._typeid;
-                    me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_segments', '_url', '_typeid', '_referer', '_totalsec'], function (ids) {
-                        // increase revenue
-                        var simpleprop = {};
-                        if (typeid === 'purchase') {
-                            if (user[ids._revenue] === undefined)
-                                user[ids._revenue] = 0;
-                            simpleprop[ids._revenue] = user[ids._revenue] + data.amount;
-                        }
-                        if (typeid === 'pageview') {
-                            // record campaign
-                            if (utm_campaign) {
-                                if (user[ids._firstcampaign] === undefined) {
-                                    simpleprop[ids._firstcampaign] = utm_campaign;
-                                }
-                                simpleprop[ids._lastcampaign] = utm_campaign;
-                                datax[ids._campaign] = utm_campaign;
+            });
+        }
+        else
+            lastsave();
+        function lastsave() {
+            // retrive real mtid because user can still use old mtid
+            me.db.collection(collectionmapping).find({ anomtid: mtid }).limit(1).toArray(function (err, r) {
+                if (err)
+                    throw err;
+                if (r.length !== 0)
+                    mtid = r[0].idemtid;
+                me.valuemgr.cineObject(appid, data._typeid, data);
+                me.converter.toObject(data, function (datax) {
+                    me.db.collection(collection).insertOne(datax, function (err, r) {
+                        if (err)
+                            throw err;
+                        callback(r.insertedId);
+                    });
+                    //get user infomation
+                    me.db.collection(collection).find({ _id: mtid }).limit(1).toArray(function (err, ret) {
+                        if (err)
+                            throw err;
+                        var user = ret[0];
+                        if (user === undefined)
+                            throw "mtid " + mtid + " did not match any user";
+                        var typeid = data._typeid;
+                        me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_segments', '_url', '_typeid', '_referer', '_totalsec'], function (ids) {
+                            // increase revenue
+                            var simpleprop = {};
+                            if (typeid === 'purchase') {
+                                if (user[ids._revenue] === undefined)
+                                    user[ids._revenue] = 0;
+                                simpleprop[ids._revenue] = user[ids._revenue] + data.amount;
                             }
-                        }
-                        // update user
-                        if (Object.keys(simpleprop).length !== 0)
-                            me.db.collection(collection).updateOne({ _id: mtid }, { $set: simpleprop }, function (err, r) {
-                                if (err)
-                                    throw err;
-                            });
-                        // filter out unneeded array prop
-                        var arrayprop = {};
-                        for (var p in datax)
-                            if (datax.hasOwnProperty(p))
-                                if (p.startsWith('_'))
-                                    arrayprop[p] = datax[p];
-                        delete arrayprop[ids._mtid];
-                        delete arrayprop[ids._ctime];
-                        delete arrayprop[ids._segments];
-                        delete arrayprop[ids._url];
-                        delete arrayprop[ids._typeid];
-                        delete arrayprop[ids._referer];
-                        delete arrayprop[ids._totalsec];
-                        delete arrayprop[ids._revenue];
-                        delete arrayprop[ids._firstcampaign];
-                        delete arrayprop[ids._lastcampaign];
-                        delete arrayprop[ids._totalsec];
-                        if (Object.keys(arrayprop).length !== 0)
-                            updateArrayBasedUserInfo(collection, mtid, user, arrayprop);
+                            if (typeid === 'pageview') {
+                                // record campaign
+                                if (utm_campaign) {
+                                    if (user[ids._firstcampaign] === undefined) {
+                                        simpleprop[ids._firstcampaign] = utm_campaign;
+                                    }
+                                    simpleprop[ids._lastcampaign] = utm_campaign;
+                                    datax[ids._campaign] = utm_campaign;
+                                }
+                            }
+                            // update user
+                            if (Object.keys(simpleprop).length !== 0)
+                                me.db.collection(collection).updateOne({ _id: mtid }, { $set: simpleprop }, function (err, r) {
+                                    if (err)
+                                        throw err;
+                                });
+                            // filter out unneeded array prop
+                            var arrayprop = {};
+                            for (var p in datax)
+                                if (datax.hasOwnProperty(p))
+                                    if (p.startsWith('_'))
+                                        arrayprop[p] = datax[p];
+                            delete arrayprop[ids._mtid];
+                            delete arrayprop[ids._ctime];
+                            delete arrayprop[ids._segments];
+                            delete arrayprop[ids._url];
+                            delete arrayprop[ids._typeid];
+                            delete arrayprop[ids._referer];
+                            delete arrayprop[ids._totalsec];
+                            delete arrayprop[ids._revenue];
+                            delete arrayprop[ids._firstcampaign];
+                            delete arrayprop[ids._lastcampaign];
+                            delete arrayprop[ids._totalsec];
+                            if (Object.keys(arrayprop).length !== 0)
+                                updateArrayBasedUserInfo(collection, mtid, user, arrayprop);
+                        });
                     });
                 });
             });
-        });
+        }
         // purpose: add new data to arrays in user
         // param:
         // + collection: collection to query user information
@@ -207,6 +233,7 @@ class ActionMgr {
         }
         return store();
         function store() {
+            me.updateChainCampaign(appid, actionids, data);
             me.valuemgr.cineObject(appid, "pageview", data);
             me.converter.toObject(data, function (datax) {
                 me.db.collection(collection).updateOne({ _id: actionid }, { $set: datax }, function (err, r) {
