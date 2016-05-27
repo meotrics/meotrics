@@ -35,8 +35,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 	function trackBasic(request) {
 		var useragent = request.headers['user-agent'];
 		var r = ua.parse(useragent);
-		var uri = request.params._url || "";
-
+		var uri = request.params._url || '';
 		var md = new MD(useragent);
 		var devicetype;
 		if (md.tablet() !== null)
@@ -46,7 +45,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 		else
 			devicetype = 'desktop';
 
-		if (uri === "" || uri.startsWith(request.headers.referer) === false) uri = request.headers.referer;
+		if (uri === "" || uri.startsWith(request.headers.referer) === false) uri = request.headers.referer || '';
 		var res = {
 			_url: uri,
 			_ref: request.params._ref,
