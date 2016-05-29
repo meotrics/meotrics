@@ -5,8 +5,6 @@ var trycatch = require('trycatch');
 var CRUD = require('./crud.js').CRUD;
 var appException = require('./appException.js');
 var TrendMgr = require('./trendmgr.js').TrendMgr;
-//var ActionMgr = require('./module/actionmgr.js').ActionMgr;
-const ActionMgr = require('./actionmgr');
 var PropMgr = require('./propmgr.js').PropMgr;
 var AppMgr = require('./appmgr.js').AppMgr;
 var SegMgr = require('./segment.js').SegmentExr;
@@ -21,7 +19,6 @@ class CrudApi {
         this.dashboarddelay = dashboarddelay;
         this.dashboard = new Dashboard(this.db, mongodb, this.converter, this.prefix, this.dashboarddelay);
         this.trendMgr = new TrendMgr(this.db, mongodb, async, this.converter, this.prefix, "trend");
-        this.actionMgr = new ActionMgr.ActionMgr(this.db, this.converter, this.prefix, "mapping");
         this.propmgr = new PropMgr();
         this.typeCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "actiontype");
         this.trendCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "trend");
@@ -88,13 +85,6 @@ class CrudApi {
         app.getEx('/campaign/:appid/:id', this.camCRUD.match);
         app.putEx('/campaign/:appid/:id', this.camCRUD.update);
         app.deleteEx('/campaign/:appid/:id', this.camCRUD.delete);
-        // save a action
-        app.postEx('/r/:appid', this.actionMgr.save);
-        // identity an user
-        app.postEx('/i/:appid', this.actionMgr.identify);
-        // set up a new cookie
-        app.getEx('/s/:appid', this.actionMgr.setup);
-        app.postEx('/f/:appid/:actionid', this.actionMgr.fix);
         app.get('/app/init/:appid', function (req, res) {
             me.appmgr.initApp(req.params.appid, function () {
                 res.send('OK');

@@ -6,9 +6,10 @@ var url = require('url');
 var fs = require('fs');
 var ua = require('ua-parser');
 var MD = require('mobile-detect');
-
-exports.HttpApi = function (codepath, actionmgr, valuemgr) {
+var ActionMgr = require('./actionmgr');
+exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 	var code;
+	var actionmgr =  new ActionMgr.ActionMgr(db, converter, prefix, "mapping", valuemgr);
 
 	function loadCode(appid, actionid, callback) {
 		// cache mtcode in code for minimize disk usage, lazy load
@@ -34,8 +35,7 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 	function trackBasic(request) {
 		var useragent = request.headers['user-agent'];
 		var r = ua.parse(useragent);
-		var uri = request.params._url || "";
-
+		var uri = request.params._url || '';
 		var md = new MD(useragent);
 		var devicetype;
 		if (md.tablet() !== null)
@@ -45,7 +45,7 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 		else
 			devicetype = 'desktop';
 
-		if (uri === "" || uri.startsWith(request.headers.referer) === false) uri = request.headers.referer;
+		if (uri === "" || uri.startsWith(request.headers.referer) === false) uri = request.headers.referer || '';
 		var res = {
 			_url: uri,
 			_ref: request.params._ref,
@@ -164,6 +164,7 @@ exports.HttpApi = function (codepath, actionmgr, valuemgr) {
 		var data = trackBasic(req);
 		getMtid(req, appid, res, function (mtid) {
 			data._mtid = mtid;
+			console.log(appid,actionid, lastactionid, data);
 			actionmgr.fixRaw(appid, actionid, lastactionid, data, function () {
 				res.end();
 			});
