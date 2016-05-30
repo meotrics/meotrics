@@ -338,7 +338,7 @@ class Dashboard {
                             _id: null, count: { $sum: 1 }
                         }
                     }];
-                me.db.collection(me.prefix + appid).aggregate(pipelines, function (err, res) {
+                me.db.collection(me.prefix + "app" + appid).aggregate(pipelines, function (err, res) {
                     if (err)
                         throw err;
                     if (res.length === 0)
@@ -347,7 +347,7 @@ class Dashboard {
                         dashboard.n_returning_visitor = res[0].count;
                     // 2 number of returning visitor
                     todayvismatch[ids._ctime] = { $lt: todaysec };
-                    me.db.collection(me.prefix + appid).aggregate(pipelines, function (err, res) {
+                    me.db.collection(me.prefix + "app" + appid).aggregate(pipelines, function (err, res) {
                         if (err)
                             throw err;
                         if (res.length === 0)

@@ -151,7 +151,7 @@
       ],
       datasets: [
         {
-          data: [{{$dashboard->n_new_visitor}}, {{$dashboard->n_returning_visitor == 0 ? 1 : $dashboard->n_new_visitor}}],
+          data: [{{$dashboard->n_new_visitor}}, {{$dashboard->n_returning_visitor == 0 ? 1 : $dashboard->n_returning_visitor}}],
           backgroundColor: ["#4E6CC9","#8C8C8C"],
           hoverBackgroundColor: ["#4E6CC9","#8C8C8C",]
         }

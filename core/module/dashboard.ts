@@ -349,7 +349,7 @@ export class Dashboard {
 						_id: null, count: {$sum: 1}
 					}
 				}];
-				me.db.collection(me.prefix + appid).aggregate(pipelines, function (err, res) {
+				me.db.collection(me.prefix + "app" + appid).aggregate(pipelines, function (err, res) {
 					if (err) throw err;
 					if (res.length === 0)
 						dashboard.n_returning_visitor = 0;
@@ -357,7 +357,7 @@ export class Dashboard {
 
 					// 2 number of returning visitor
 					todayvismatch[ids._ctime] = {$lt: todaysec};
-					me.db.collection(me.prefix + appid).aggregate(pipelines, function (err, res) {
+					me.db.collection(me.prefix + "app" + appid).aggregate(pipelines, function (err, res) {
 						if (err) throw err;
 						if (res.length === 0)
 							dashboard.n_new_visitor = 0;
@@ -442,16 +442,13 @@ export class Dashboard {
 								dash.appid = appid + "";
 								dash.ctime = Math.round(new Date().getTime() / 1000);
 								me.db.collection(me.prefix + "dashboard").updateOne({appid: appid + ""}, dash, {upsert: true}, function (err) {
-									console.log('release +2(2)');
 									release(function(){
-										console.log('release -2(1)');
 									})();
 									if (err) throw err;
 								});
 							});
 						} else
 							return release(function () {
-								console.log('release 2(2)');
 								// callback(dash);
 								// again, why not use callback(dash) ? because i want 100% guarranty that the dash
 								// is up to date (deltatime < delay)
