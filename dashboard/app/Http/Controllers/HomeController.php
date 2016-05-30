@@ -42,18 +42,12 @@ class HomeController extends Controller
 
 	public function index(Request $request, $appid )
 	{
+		if ($request->user()) {
+      $dashboard = MtHttp::get('dashboard/'. $appid);
+			return view('home', ['dashboard' => $dashboard]);//->withCookie(cookie()->forget('mtid'));
+    } else
+			return redirect('auth/login');//->withCookie(cookie()->forget('mtid'));
 
-			//$appid = $request->cookie('currentappid');
-
-			//if ($appid == null) {
-
-			//} else {
-				if ($request->user())
-					return view('home');//->withCookie(cookie()->forget('mtid'));
-				else
-					return redirect('auth/login');//->withCookie(cookie()->forget('mtid'));
-			//}
-		////}
 	}
 
 	private function getRemoteIPAddress(Request $request)

@@ -44,7 +44,7 @@
     responsive: true,
        percentageInnerCutout: 50,
        scaleShowLabels: false,
-       tooltipTemplate: {{"<%= value %> %"}},
+       //tooltipTemplate: {{"<%= value %> %"}},
    };
 
    var retenratechart = new Chart($("#retenratechart"), {
@@ -90,9 +90,7 @@
     height: "240",
        animation : false,
        scales: {
-           yAxes: [{
-               display: false
-           }]
+          yAxes: [{display: false}], xAxes: [{display:false}]
        }}
    });
 
@@ -137,97 +135,68 @@
            legend: {display:false},
        animation : false,
            scales: {
-           yAxes: [{
-               display: false
-           }]
+           yAxes: [{display: false}], xAxes: [{display:true}]
        }}
 
    });
 
-   var trChart = new Chart($("#trchartpc"), {
-       type: 'line',
-       data: {
-       labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-       datasets: [
-           {
-               label: "My First dataset",
-               fill: false,
-               lineTension: 0.5,
 
-               borderCapStyle: 'round',
 
-               borderDash: [],
-               borderDashOffset: 0.0,
-               borderJoinStyle: 'miter',
-
-               pointBorderWidth: 2,
-               pointHoverRadius: 1,
-               borderWidth: 2,
-               pointHoverBackgroundColor: "rgba(75,192,192,1)",
-               pointHoverBorderColor: "rgba(220,220,220,1)",
-               pointHoverBorderWidth: 2,
-               pointRadius: 2,
-               pointHitRadius: 10,
-                fill: true,
-                borderColor: "#2F5CB0",
-                backgroundColor: "rgba(78,108,201,0.3)",
-                pointBorderColor: "#2F5CB0",
-                pointBackgroundColor: "white",
-                pointBorderWidth: 1,
-               data: [65, 59, 80, 54, 56, 55, 65],
-           }
-       ]
-   },
-       options: {
-        maintainAspectRatio: false,
-    responsive: true,
-           legend: {display:false},
-       animation : false,
-           scales: {
-           yAxes: [{
-               display: false
-           }]
-       }
-       }
-   });
-
-   var visitChart = new Chart($("#visitchart"), {
-       type: 'doughnut',
-       data: {
-       labels: [
-           "New visitor",
-          "Returning visitor",
-       ],
-       datasets: [
-           {
-               data: [430, 23],
-               backgroundColor: [
-                   "#4E6CC9",
-                   "#8C8C8C",
-               ],
-               hoverBackgroundColor: [
-                   "#4E6CC9",
-                   "#8C8C8C",
-               ]
-           }]}, options: options
-
-   });
-
+  var visitChart = new Chart($("#visitchart"), {
+    type: 'doughnut',
+    data: {
+      labels: [
+        "New visitor",
+        "Returning visitor",
+      ],
+      datasets: [
+        {
+          data: [{{$dashboard->n_new_visitor}}, {{$dashboard->n_returning_visitor == 0 ? 1 : $dashboard->n_new_visitor}}],
+          backgroundColor: ["#4E6CC9","#8C8C8C"],
+          hoverBackgroundColor: ["#4E6CC9","#8C8C8C",]
+        }
+      ]},
+    options: options
+  });
 </script>
 @endsection
 @section('content')
 <div class="row">
-  <div class="col-md-4 pl0"  >
+  <div class="col-md-4 pl0">
+    <div class="card " style="height: 275px;">
+      <div class="header">
+      <p>Number of new Signup</p>
+      <p>Average card size</p>
+      <p>Most category</p>
+      <p>User growth rate</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 pl0">
+    <div class="card " style="height: 275px;">
+      <div class="header">
+          <h4> Revenue</h4>
+      </div>
+      <div class="content">
+          <div style="height: 187px">
+            <canvas id="trchart" width="400" height="400"> </canvas>
+          </div>
+          <p class="text-center" style="margin-top: 5px">Total revenue <b> $ 2 238</b> ($20 per customer) </p>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4 pl0">
       <div class="card" style="height: 275px;">
          <div class="header">
             <h4>Visits</h4>
-            <p class="category pull-right">TODAY</p>
          </div>
          <div class="content">
             <div class="row">
                <div class="col-sm-5">
-                  <span class="verybig" style="color: #4E6CC9">430</span> <i class="bigup fa fa-arrow-up"></i><br/>
-                  <span class="verybig" style="color: #8C8C8C">23</span> <i class="bigdown fa fa-arrow-down"></i><br/>
+                  <span class="verybig" style="color: #4E6CC9">{{$dashboard->n_new_visitor}}</span> <i class="bigup fa fa-arrow-up"></i><br/>
+                  <span class="verybig" style="color: #8C8C8C">{{$dashboard->n_returning_visitor}}</span> <i class="bigdown fa fa-arrow-down"></i><br/>
 
                </div>
                <div class="col-sm-7">
@@ -244,32 +213,6 @@
             </div>
          </div>
       </div>
-  </div>
-  <div class="col-md-4 pl0">
-    <div class="card " style="height: 275px;">
-      <div class="header">
-        <div class="row">
-          <div class="col-sm-6 text-center">
-            <span class="text-muted"> This week</span>
-            <div style="height: 152px">
-              <canvas id="trchart" width="400" height="400"> </canvas>
-            </div>
-            <h4 class="text-center">Total revenue</h4>
-            <span class="big text-center" > $ 2 238</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4 pl0">
-    <div class="card " style="height: 275px;">
-      <div class="header">
-      <p>Number of new Signup</p>
-      <p>Average card size</p>
-      <p>Most category</p>
-      <p>User growth rate</p>
-      </div>
-    </div>
   </div>
 </div>
 <div class="row">
