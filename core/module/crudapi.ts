@@ -14,7 +14,7 @@ var AppMgr = require('./appmgr.js').AppMgr;
 var SegMgr = require('./segment.js').SegmentExr;
 var TypeMgr = require('./typemgr.js').TypeMgr;
 var ValueMgr = require('./valuemgr.js').ValueMgr;
-var Dashboard = require('./dashboard').Dashboard;
+import * as Dashboard from './dashboard';
 import http = require('http');
 
 import fs = require('fs');
@@ -24,7 +24,7 @@ export class CrudApi {
 	public  constructor(private db:mongodb.Db, private converter, private prefix, private dashboarddelay) {
 	}
 
-	public dashboard = new Dashboard(this.db, mongodb, this.converter, this.prefix, this.dashboarddelay);
+	public dashboard = new Dashboard.Dashboard(this.db, this.converter, this.prefix, this.dashboarddelay);
 	public trendMgr = new TrendMgr(this.db, mongodb, async, this.converter, this.prefix, "trend");
 	public propmgr = new PropMgr();
 	public typeCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "actiontype");

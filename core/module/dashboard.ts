@@ -328,8 +328,9 @@ export class Dashboard {
 	}
 
 	public getDashboard(appid:string, callback:(d:DashboardEntity) => void) {
-		let me = this;
 
+		let me = this;
+		console.log('get dashboard');
 		function generateDashboard(gcallback:(d:DashboardEntity) => void) {
 			var dashboard:DashboardEntity = new DashboardEntity();
 			me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid"], function (ids) {
@@ -362,6 +363,7 @@ export class Dashboard {
 							dashboard.n_new_visitor = 0;
 						else dashboard.n_new_visitor = res[0].count;
 
+						return gcallback(dashboard);
 						// 3 retenstion rate
 						me.getConversionRate(me.db, me.prefix, appid, ids, function (retention_rates:number[]) {
 							dashboard.retention_rates = retention_rates;
@@ -389,7 +391,9 @@ export class Dashboard {
 			if (err) throw err;
 			// cache not existed
 			if (res.length === 0) {
+				console.log('waiting lock 1');
 				me.lock("c_" + appid, function (release) {
+					console.log('getin lock 1');
 					// recheck because cache could be create after the lock
 					me.db.collection(me.prefix + "dashboard").find({appid: appid}).limit(1).toArray(function (err, res) {
 						if (err) throw err;
@@ -400,7 +404,7 @@ export class Dashboard {
 								dash.appid = appid + "";
 								dash.ctime = Math.round(new Date().getTime() / 1000);
 								me.db.collection(me.prefix + "dashboard").updateOne({appid: appid + ""}, dash, {upsert: true}, function (err) {
-									release();
+									release()();
 									if (err) throw err;
 								});
 							});
@@ -412,7 +416,7 @@ export class Dashboard {
 								// the problem with res[0] is that, is very likely up to date
 								// (deltatime < delay) but there is no warranty
 								me.getDashboard(appid, callback);
-							});
+							})();
 						}
 					});
 				});
@@ -423,7 +427,9 @@ export class Dashboard {
 			var deltaT = Math.round(new Date().getTime() / 1000) - dash.ctime;
 
 			if (deltaT > me.delaysec) {
-				me.lock(appid + "", function (release) {
+				console.log('lock 2');
+				me.lock("c_" + appid , function (release) {
+					console.log('getin lock 2');
 					me.db.collection(me.prefix + "dashboard").find({appid: appid}).limit(1).toArray(function (err, res) {
 						if (err) throw err;
 						// this is a must found
@@ -436,17 +442,21 @@ export class Dashboard {
 								dash.appid = appid + "";
 								dash.ctime = Math.round(new Date().getTime() / 1000);
 								me.db.collection(me.prefix + "dashboard").updateOne({appid: appid + ""}, dash, {upsert: true}, function (err) {
-									release();
+									console.log('release +2(2)');
+									release(function(){
+										console.log('release -2(1)');
+									})();
 									if (err) throw err;
 								});
 							});
 						} else
 							return release(function () {
+								console.log('release 2(2)');
 								// callback(dash);
 								// again, why not use callback(dash) ? because i want 100% guarranty that the dash
 								// is up to date (deltatime < delay)
 								me.getDashboard(appid, callback);
-							});
+							})();
 					});
 				});
 			} else {

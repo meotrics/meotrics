@@ -10,14 +10,14 @@ var AppMgr = require('./appmgr.js').AppMgr;
 var SegMgr = require('./segment.js').SegmentExr;
 var TypeMgr = require('./typemgr.js').TypeMgr;
 var ValueMgr = require('./valuemgr.js').ValueMgr;
-var Dashboard = require('./dashboard').Dashboard;
+const Dashboard = require('./dashboard');
 class CrudApi {
     constructor(db, converter, prefix, dashboarddelay) {
         this.db = db;
         this.converter = converter;
         this.prefix = prefix;
         this.dashboarddelay = dashboarddelay;
-        this.dashboard = new Dashboard(this.db, mongodb, this.converter, this.prefix, this.dashboarddelay);
+        this.dashboard = new Dashboard.Dashboard(this.db, this.converter, this.prefix, this.dashboarddelay);
         this.trendMgr = new TrendMgr(this.db, mongodb, async, this.converter, this.prefix, "trend");
         this.propmgr = new PropMgr();
         this.typeCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "actiontype");
