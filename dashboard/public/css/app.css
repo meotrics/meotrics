@@ -831,3 +831,7 @@ div.back .fa-chevron-left {
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
 }
+
+.pl0{
+	padding-left: 0;
+}

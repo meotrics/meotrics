@@ -10,31 +10,31 @@
    max = progressbar.attr('max');
    time = (1000 / max) * 5;
    value = progressbar.val();
-   
+
    var loading = function() {
    value += 1;
    addValue = progressbar.val(value);
-   
+
    $('.progress-value').html(value + '%');
    var $ppc = $('.progress-pie-chart'),
    deg = 360 * value / 100;
    if (value > 50) {
    $ppc.addClass('gt-50');
    }
-   
+
    $('.ppc-progress-fill').css('transform', 'rotate(' + deg + 'deg)');
    $('.ppc-percents span').html(value + '%');
-   
+
    if (value == max) {
    clearInterval(animate);
    }
    };
-   
+
    var animate = setInterval(function() {
    loading();
    }, time);
    });
-   
+
    var options = {
        legend: {display:false},
        animation : false,
@@ -46,7 +46,7 @@
        scaleShowLabels: false,
        tooltipTemplate: {{"<%= value %> %"}},
    };
-   
+
    var retenratechart = new Chart($("#retenratechart"), {
        type: 'line',
        data: {
@@ -83,7 +83,7 @@
        ]
    },
        options: {
-      
+
            legend: {display:false},
            maintainAspectRatio: false,
     responsive: true,
@@ -95,8 +95,8 @@
            }]
        }}
    });
-   
-   
+
+
    var trChart = new Chart($("#trchart"), {
        type: 'line',
        data: {
@@ -141,9 +141,9 @@
                display: false
            }]
        }}
-       
+
    });
-   
+
    var trChart = new Chart($("#trchartpc"), {
        type: 'line',
        data: {
@@ -190,7 +190,7 @@
        }
        }
    });
-   
+
    var visitChart = new Chart($("#visitchart"), {
        type: 'doughnut',
        data: {
@@ -210,15 +210,15 @@
                    "#8C8C8C",
                ]
            }]}, options: options
-       
+
    });
-   
+
 </script>
 @endsection
 @section('content')
 <div class="row">
-   <div class="col-md-5" >
-      <div class="card row" style="height: 275px;">
+  <div class="col-md-4 pl0"  >
+      <div class="card" style="height: 275px;">
          <div class="header">
             <h4>Visits</h4>
             <p class="category pull-right">TODAY</p>
@@ -240,127 +240,112 @@
             <div class="small mt">
             <div class="pull-right"> <i class="fa fa-circle" style="color: #8C8C8C"></i> Returning visitor </div>
              <div > <i class="fa fa-circle" style="color: #4E6CC9"></i> New visitor </div>
-             
+
             </div>
          </div>
       </div>
-   </div>
-   <div class="col-md-7">
-      <div class="card " style="height: 275px;"> 
-         <div class="header">
-            <div class="row">
-               <div class="col-sm-6 text-center">
-                 <span class="text-muted"> This week</span>
-                   <div style="height: 152px">
-                  <canvas id="trchart" width="400" height="400"> </canvas>
-                  </div>
-                  <h4 class="text-center">Total revenue</h4> 
-                  <span class="big text-center" >
-                  $ 2 238
-                  </span>  <i class="bigup fa fa-arrow-up"></i>
-               </div>
-               <div class="col-sm-6 text-center">
-                  <span class="text-muted"> This week</span>
-                  <div style="height: 152px">
-                  <canvas id="trchartpc" width="400" height="40"> </canvas>
-                  </div>
-                  <h4 class="">Revenue per customer</h4>
-                  <span class="big text-center">$ 13.5 </span>  <i class=" bigup fa fa-arrow-up"></i>
-               </div>
+  </div>
+  <div class="col-md-4 pl0">
+    <div class="card " style="height: 275px;">
+      <div class="header">
+        <div class="row">
+          <div class="col-sm-6 text-center">
+            <span class="text-muted"> This week</span>
+            <div style="height: 152px">
+              <canvas id="trchart" width="400" height="400"> </canvas>
             </div>
+            <h4 class="text-center">Total revenue</h4>
+            <span class="big text-center" > $ 2 238</span>
+          </div>
         </div>
+      </div>
     </div>
-        </div>
-        </div>
+  </div>
+  <div class="col-md-4 pl0">
+    <div class="card " style="height: 275px;">
+      <div class="header">
+      <p>Number of new Signup</p>
+      <p>Average card size</p>
+      <p>Most category</p>
+      <p>User growth rate</p>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="row">
-   <div class="col-md-4">
-      <div class="row">
-         <div class="card">
-            <div class="header">
-            <h4>Retension rate</h4>
-            </div>
-            <div class="content" style="padding-top: 0px">
-             <div class="row">
-
-                  <div class="col-sm-12">
-                  <p class="text-muted">This week</p>
-                  <div style="height: 100px">
-                     <canvas id="retenratechart" width="400" height="40"> </canvas>
-                    </div>
-                    
-                  </div>
-               </div>
-            </div>
-         </div>
+  <div class="col-md-4 pl0">
+    <div class="card">
+      <div class="header">
+        <h4>Retension rate</h4>
       </div>
-      <div class="row">
-         <div class="card" style="height: 100px">
-            <div class="header"> <h4> User growth rate</h4>
-            <div class="verybig">
-            <i class="bigup fa fa-arrow-up"></i> 5%
-            </div></div>
-         </div>
-      </div>
-   </div>
-   <div class="col-md-4">
-      <div class="card" style="    height: 315px;">
-         <div class="header">
-            <h4>Conversion rate</h4>
-         </div>
-         <div class="content text-center">
-            <div class="bar_container">
-               <div id="main_container">
-                  <div id="pbar" class="progress-pie-chart" data-percent="0">
-                     <div class="ppc-progress">
-                        <div class="ppc-progress-fill"></div>
-                     </div>
-                     <div class="ppc-percents">
-                        <div class="pcc-percents-wrapper">
-                           <span>%</span>
-                        </div>
-                     </div>
-                  </div>
-                  <progress style="display: none" id="progress_bar" value="0" max="10"></progress>
-               </div>
+      <div class="content" style="padding-top: 0px">
+         <div class="row">
+          <div class="col-sm-12">
+            <p class="text-muted">This week</p>
+            <div style="height: 100px">
+              <canvas id="retenratechart" width="400" height="40"> </canvas>
             </div>
-            <div class="verybig" style="color: #F50739"> LOW</div> 
-         </div>
-        
+          </div>
+        </div>
       </div>
-   </div>
-   <div class="col-md-4">
-      <div class="row">
-         <div class="card" style="height: 170px">
-            <div class="header ">
-               <h4 class="" style="margin-bottom: 20px">Highesh revenue campaign</h4>
-<h5 class="big pull-right" style="margin-top: 0">1/6</h5>
+    </div>
+  </div>
+  <div class="col-md-4 pl0">
+    <div class="card" style="  height: 275px;">
+      <div class="header">
+        <h4>Conversion rate</h4>
+      </div>
+      <div class="content text-center">
+        <div class="bar_container">
+          <div id="main_container">
+            <div id="pbar" class="progress-pie-chart" data-percent="0">
+              <div class="ppc-progress">
+                <div class="ppc-progress-fill"></div>
+              </div>
+              <div class="ppc-percents">
+                <div class="pcc-percents-wrapper">
+                  <span>%</span>
+                </div>
+              </div>
+            </div>
+              <progress style="display: none" id="progress_bar" value="0" max="10"></progress>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 pl0">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="card" style="height: 140px">
+          <div class="header ">
+            <h4 class="" style="margin-bottom: 20px">Highesh revenue campaign</h4>
+            <h5 class="big pull-right" style="margin-top: 0">1/6</h5>
             <h5 class="big">Facebook</h5>
-</div>
-            <div class="content " style="padding-top: 0px">
-
-               <div class="">
-                  <div class="progress" style="width: 100%;margin-bottom: 10px;margin-top: 10px; height: 12px; border-radius: 35px;">
-                     <div data-percentage="20%" style="width: 50%; background-color: #4E6CC9" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-                  </div>
-               </div>
+          </div>
+          <div class="content " style="padding-top: 0px">
+            <div class="">
+              <div class="progress" style="width: 100%;margin-bottom: 10px;margin-top: 10px; height: 12px; border-radius: 35px;">
+                <div data-percentage="20%" style="width: 50%; background-color: #4E6CC9" class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
             </div>
-         </div>
+          </div>
+        </div>
       </div>
-   
-      <div class="row">
-         <div class="card" style="background: #4E6CC9; color: white; height: 130px">
-            <div class="header text-center">
-              <h4>Most effective refferer</h4>
-             
-            </div>
-            <div class="content text-center">
-                 <span class="verybig" > SOCIAL</span>
-            </div>
-           
-         </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="card" style="background: #4E6CC9; color: white; height: 120px">
+          <div class="header text-center">
+            <h4>Most effective refferer</h4>
+          </div>
+          <div class="content text-center">
+            <span class="verybig" > SOCIAL</span>
+          </div>
+        </div>
       </div>
-   </div>
-</div>
+    </div>
+  </div>
 </div>
 @endsection
 @section('additional')
