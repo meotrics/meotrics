@@ -163,22 +163,25 @@
 @section('content')
 <div class="row">
   <div class="col-md-4 pl0">
-    <div class="card " style="height: 275px;">
+    <div class="card " style="height: 240px;">
       <div class="header">
-      <p>Number of new Signup</p>
-      <p>Average card size</p>
-      <p>Most category</p>
-      <p>User growth rate</p>
+      <h4>General metrics</h4>
+      </div>
+      <div class="content">
+        <p>Number of new Sign Up: 345</p>
+        <p>Average card size: $34.30</p>
+        <p>Most revenue category: Book</p>
+        <p>User growth rate: 5.2</p>
       </div>
     </div>
   </div>
   <div class="col-md-4 pl0">
-    <div class="card " style="height: 275px;">
+    <div class="card " style="height: 240px;">
       <div class="header">
           <h4> Revenue</h4>
       </div>
       <div class="content">
-          <div style="height: 187px">
+          <div style="height: 130px">
             <canvas id="trchart" width="400" height="400"> </canvas>
           </div>
           <p class="text-center" style="margin-top: 5px">Total revenue <b> $ 2 238</b> ($20 per customer) </p>
@@ -188,31 +191,30 @@
   </div>
 
   <div class="col-md-4 pl0">
-      <div class="card" style="height: 275px;">
-         <div class="header">
-            <h4>Visits</h4>
-         </div>
-         <div class="content">
-            <div class="row">
-               <div class="col-sm-5">
-                  <span class="verybig" style="color: #4E6CC9">{{$dashboard->n_new_visitor}}</span> <i class="bigup fa fa-arrow-up"></i><br/>
-                  <span class="verybig" style="color: #8C8C8C">{{$dashboard->n_returning_visitor}}</span> <i class="bigdown fa fa-arrow-down"></i><br/>
-
-               </div>
-               <div class="col-sm-7">
-                <div style="height: 158px">
-                  <canvas id="visitchart" width="400" height="400" ></canvas>
-                  </div>
-                  <div id="visitchartlegend" class="chart-legend"></div>
-               </div>
-            </div>
-            <div class="small mt">
-            <div class="pull-right"> <i class="fa fa-circle" style="color: #8C8C8C"></i> Returning visitor </div>
-             <div > <i class="fa fa-circle" style="color: #4E6CC9"></i> New visitor </div>
-
-            </div>
-         </div>
+    <div class="card" style="height: 240px;">
+      <div class="header">
+        <div class="small pull-right" style="margin-top: 10px">
+          <span style="margin-right: 5px"> <i class="fa fa-circle" style="color: #8C8C8C"></i> Returning visitor </span>
+          <span><i class="fa fa-circle" style="color: #4E6CC9"></i> New visitor</span>
+        </div>
+        <h4>Visitors</h4>
       </div>
+      <div class="content">
+        <div class="row">
+          <div class="col-sm-5 mt">
+            <span class="verybig" style="color: #4E6CC9">{{$dashboard->n_new_visitor}}</span> <i class="bigup fa fa-arrow-up"></i><br/>
+            <span class="verybig" style="color: #8C8C8C">{{$dashboard->n_returning_visitor}}</span> <i class="bigdown fa fa-arrow-down"></i><br/>
+
+          </div>
+          <div class="col-sm-7">
+            <div style="height: 158px">
+              <canvas id="visitchart" width="400" height="400" ></canvas>
+            </div>
+            <div id="visitchartlegend" class="chart-legend"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 <div class="row">

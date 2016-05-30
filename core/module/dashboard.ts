@@ -328,7 +328,6 @@ export class Dashboard {
 	}
 
 	public getDashboard(appid:string, callback:(d:DashboardEntity) => void) {
-
 		let me = this;
 		console.log('get dashboard');
 		function generateDashboard(gcallback:(d:DashboardEntity) => void) {
@@ -356,13 +355,14 @@ export class Dashboard {
 					else dashboard.n_returning_visitor = res[0].count;
 
 					// 2 number of returning visitor
-					todayvismatch[ids._ctime] = {$lt: todaysec};
-					me.db.collection(me.prefix + "app" + appid).aggregate(pipelines, function (err, res) {
-						if (err) throw err;
-						if (res.length === 0)
-							dashboard.n_new_visitor = 0;
-						else dashboard.n_new_visitor = res[0].count;
+					todayvismatch[ids._isUser] = true;
+					todayvismatch[ids._ctime] = {$gte: todaysec};
 
+					me.db.collection(me.prefix + "app" + appid).count(todayvismatch, function (err, res) {
+						if (err) throw err;
+						dashboard.n_new_visitor = res;
+						dashboard.n_returning_visitor -= res;
+						
 						return gcallback(dashboard);
 						// 3 retenstion rate
 						me.getConversionRate(me.db, me.prefix, appid, ids, function (retention_rates:number[]) {

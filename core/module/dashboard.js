@@ -346,14 +346,13 @@ class Dashboard {
                     else
                         dashboard.n_returning_visitor = res[0].count;
                     // 2 number of returning visitor
-                    todayvismatch[ids._ctime] = { $lt: todaysec };
-                    me.db.collection(me.prefix + "app" + appid).aggregate(pipelines, function (err, res) {
+                    todayvismatch[ids._isUser] = true;
+                    todayvismatch[ids._ctime] = { $gte: todaysec };
+                    me.db.collection(me.prefix + "app" + appid).count(todayvismatch, function (err, res) {
                         if (err)
                             throw err;
-                        if (res.length === 0)
-                            dashboard.n_new_visitor = 0;
-                        else
-                            dashboard.n_new_visitor = res[0].count;
+                        dashboard.n_new_visitor = res;
+                        dashboard.n_returning_visitor -= res;
                         return gcallback(dashboard);
                         // 3 retenstion rate
                         me.getConversionRate(me.db, me.prefix, appid, ids, function (retention_rates) {

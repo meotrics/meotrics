@@ -388,7 +388,7 @@ class ActionMgr {
         var user = {
             _isUser: true,
             _segments: [],
-            _stime: Math.round(new Date().getTime() / 1000),
+            _ctime: Math.round(new Date().getTime() / 1000),
             _mtid: 2910
         };
         me.converter.toObject(user, function (user) {
