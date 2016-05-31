@@ -29,11 +29,11 @@ export class WS {
 		if (me.boardcast_clients[appid] !== undefined)
 			for (let client of me.boardcast_clients[appid])
 				if (client.closeDescription !== null)
-					client.sendUTF("changed");
+					client.sendUTF(JSON.stringify({appid: appid, code: code}));
 		if (me.topic_clients[appid] !== undefined && me.topic_clients[appid][code] !== undefined)
 			for (let client of me.topic_clients[appid][code])
 				if (client.closeDescription !== null)
-					client.sendUTF('changed');
+					client.sendUTF(JSON.stringify({appid: appid, code: code}));
 	}
 
 	public run() {
