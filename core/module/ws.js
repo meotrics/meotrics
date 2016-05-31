@@ -1,11 +1,16 @@
 "use strict";
-const http = require('http');
+const https = require('https');
+const fs = require('fs');
 class WS {
-    constructor(port) {
+    constructor(port, keypath, certpath) {
         this.port = port;
         this.clients = {};
-        this.httpserver = http.createServer(function (req, res) {
-            console.log((new Date()) + ' receive request for ' + req.url);
+        var option = {
+            key: fs.readFileSync(keypath),
+            cert: fs.readFileSync(certpath)
+        };
+        this.httpserver = https.createServer(option, function (req, res) {
+            console.log('receive request for ' + req.url);
             res.writeHead(404);
             res.end();
         });
@@ -24,6 +29,9 @@ class WS {
             // put logic here to detect whether the specified origin is allowed.
             return true;
         }
+        wsServer.on('connect', function (request) {
+            console.log('Hello!');
+        });
         wsServer.on('request', function (request) {
             if (!originIsAllowed(request.origin)) {
                 // Make sure we only accept requests from an allowed origin

@@ -1,10 +1,17 @@
-﻿import http = require('http');
+﻿import https = require('https');
+import fs = require('fs');
 
 export class WS {
 	private httpserver;
-	public constructor(private port: number) {
-		this.httpserver = http.createServer(function(req, res){
-			console.log((new Date()) + ' receive request for ' + req.url);
+	public constructor(private port: number, keypath:string, certpath:string) {
+		
+		var option = {
+			key: fs.readFileSync(keypath),
+			cert: fs.readFileSync(certpath)
+		};
+
+		this.httpserver = https.createServer( option,  function(req, res){
+			console.log('receive request for ' + req.url);
 			res.writeHead(404);
 			res.end();
 		});
@@ -29,6 +36,9 @@ export class WS {
 			return true;
 		}
 
+		wsServer.on('connect', function(request) {
+			console.log('Hello!');
+		});
 		wsServer.on('request', function (request) {
 			if (!originIsAllowed(request.origin)) {
 				// Make sure we only accept requests from an allowed origin
@@ -37,6 +47,7 @@ export class WS {
 				return;
 			}
 
+
 			var connection = request.accept('mtdashboard', request.origin);
 			console.log( ' Connection accepted.');
 			connection.on('message', function (message) {
@@ -44,8 +55,7 @@ export class WS {
 				if(message.utf8Data == undefined) // reject if not utf8 encode
 					return;
 				message = message.utf8Data;
-
-
+				
 				if (me.clients[message.code] === undefined)
 					me.clients[message.code] = [];
 
