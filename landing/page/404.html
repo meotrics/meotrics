@@ -20,15 +20,13 @@
 
     <link rel="alternate" hreflang="en-us" href="http://meotrics.com/" />
 
+    <!--BEGIN MEOTRICS TRACKING CODE -->
+<link href="//api.meotrics.com/meotrics" rel="stylesheet" type="text/css"/>
+<script>var mt={appid:'meotrics'}</script>
+<script id="mtmeotrics" src="//meotrics.com/mttrack.js"></script>
+<script src="//meotrics.com/mtend.js" defer async="true"></script>
+<!--END MEOTRICS TRACKING CODE -->
 
-<script>
-var mt=mt||{track:function(t,r){
-mt.rq.push(["track",t,r,new Date])},
-identify:function(t){mt.rq.push(["identify",t])},
-clear:function(){mt.rq.push(["clear"])}};
-mt.rq=mt.rq||[];
-</script>
-<script src="//app.meotrics.com/api/meotrics/code.js" defer></script>
     <style>
         body {
             background-image: url("../img/slide-bg.png");
