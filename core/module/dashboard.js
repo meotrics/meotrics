@@ -255,23 +255,51 @@ class Dashboard {
         });
     }
     getMostPopulerCategory(db, prefix, appid, ids, callback) {
+        let lastweeksec = Math.round(new Date().getTime() / 1000) - 7 * 24 * 3600;
         let pipeline = [
             { $match: {} }, {
                 $group: {
-                    _id: "$_" + ids.cid,
+                    _id: "$" + ids.cid,
                     cname: { $first: "$" + ids.cname },
                     revenue: { $sum: "$" + ids.amount }
                 }
             }, {
                 $sort: { revenue: -1 }
             }, {
-                $limit: 1 }];
+                $limit: 1
+            }];
+        pipeline[0]['$match'][ids._typeid] = 'purchase';
+        pipeline[0]['$match'][ids._ctime] = { $gt: lastweeksec };
         db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
             if (err)
                 throw err;
             if (res.length == 0)
                 return callback(undefined);
             return callback(res[0].cname);
+        });
+    }
+    getHighestRevenueCampaign(db, prefix, appid, ids, callback) {
+        let lastweeksec = Math.round(new Date().getTime() / 1000) - 7 * 24 * 3600;
+        let pipeline = [
+            { $match: {} }, {
+                $group: {
+                    _id: "$" + ids._utm_campaign,
+                    revenue: { $sum: "$" + ids.amount }
+                }
+            }, {
+                $sort: { revenue: -1 }
+            }, {
+                $limit: 1
+            }];
+        pipeline[0]['$match'][ids._typeid] = 'purchase';
+        pipeline[0]['$match'][ids._ctime] = { $gt: lastweeksec };
+        pipeline[0]['$match'][ids._utm_campaign] = { $exists: true, $ne: null };
+        db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
+            if (err)
+                throw err;
+            if (res.length == 0)
+                return callback(undefined);
+            return callback(res[0]._id);
         });
     }
     getRevenuePerCustomer(db, prefix, appid, ids, callback) {
