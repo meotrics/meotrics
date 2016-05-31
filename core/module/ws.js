@@ -1,27 +1,44 @@
 "use strict";
 const https = require('https');
 const fs = require('fs');
+const websocket = require('websocket');
+class Message {
+    constructor(appid, code) {
+        this.appid = appid;
+        this.code = code;
+    }
+}
 class WS {
     constructor(port, keypath, certpath) {
         this.port = port;
-        this.clients = {};
+        this.topic_clients = {};
+        this.boardcast_clients = {};
         var option = {
             key: fs.readFileSync(keypath),
             cert: fs.readFileSync(certpath)
         };
         this.httpserver = https.createServer(option, function (req, res) {
-            console.log('receive request for ' + req.url);
             res.writeHead(404);
             res.end();
         });
     }
+    change(appid, code) {
+        let me = this;
+        if (me.boardcast_clients[appid] !== undefined)
+            for (let client of me.boardcast_clients[appid])
+                if (client.closeDescription !== null)
+                    client.sendUTF("changed");
+        if (me.topic_clients[appid] !== undefined && me.topic_clients[appid][code] !== undefined)
+            for (let client of me.topic_clients[appid][code])
+                if (client.closeDescription !== null)
+                    client.sendUTF('changed');
+    }
     run() {
         let me = this;
-        var WebSocketServer = require('websocket').server;
         this.httpserver.listen(me.port, function () {
             console.log(' Websocket server listing in port ' + me.port);
         });
-        var wsServer = new WebSocketServer({
+        var wsServer = new websocket.server({
             httpServer: me.httpserver,
             autoAcceptConnections: false
         });
@@ -29,32 +46,50 @@ class WS {
             // put logic here to detect whether the specified origin is allowed.
             return true;
         }
-        wsServer.on('connect', function (request) {
-            console.log('Hello!');
-        });
         wsServer.on('request', function (request) {
             if (!originIsAllowed(request.origin)) {
                 // Make sure we only accept requests from an allowed origin
                 request.reject();
-                console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
+                console.log((new Date()) + 'Connection from origin ' + request.origin + ' rejected.');
                 return;
             }
             var connection = request.accept('mtdashboard', request.origin);
-            console.log(' Connection accepted.');
             connection.on('message', function (message) {
                 if (message.utf8Data == undefined)
                     return;
-                message = message.utf8Data;
-                if (me.clients[message.code] === undefined)
-                    me.clients[message.code] = [];
-                for (var client of me.clients[message.code]) {
-                    if (client.readyState === client.OPEN) {
-                        client.sendUTF(JSON.stringify(message));
-                    }
+                let mes = JSON.parse(message.utf8Data.toString());
+                connection['appid'] = mes.appid;
+                // client that listen on all event in app
+                if (mes.code == undefined) {
+                    connection['meotricstype'] = 'boardcast';
+                    if (me.boardcast_clients[mes.appid] == undefined)
+                        me.boardcast_clients[mes.appid] = [];
+                    me.boardcast_clients[mes.appid].push(connection);
+                }
+                else {
+                    // client that only listen on specific event in app
+                    connection['meotricstype'] = 'topic';
+                    if (me.topic_clients[mes.appid] == undefined)
+                        me.topic_clients[mes.appid] = [];
+                    if (me.topic_clients[mes.appid][mes.code] === undefined)
+                        me.topic_clients[mes.appid][mes.code] = [];
+                    me.topic_clients[mes.appid][mes.code].push(connection);
                 }
             });
             connection.on('close', function (reasonCode, description) {
-                //TODO: remove all
+                //remove connection from list
+                if (connection['meotricstype'] == 'boardcast') {
+                    var index = me.boardcast_clients[connection['appid']].indexOf(connection);
+                    me.boardcast_clients[connection['appid']].splice(index, 1);
+                    if (me.boardcast_clients[connection['appid']].length == 0)
+                        delete me.boardcast_clients[connection['appid']];
+                }
+                else {
+                    var index = me.topic_clients[connection['appid']].indexOf(connection);
+                    me.topic_clients[connection['appid']].splice(index, 1);
+                    if (me.topic_clients[connection['appid']].length == 0)
+                        delete me.topic_clients[connection['appid']];
+                }
             });
         });
     }
