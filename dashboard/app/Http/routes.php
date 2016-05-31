@@ -10,7 +10,9 @@ Route::post('/perm/{appcode}/add', 'PermController@add');
 Route::post('/perm/{appcode}/set/{userid}', 'PermController@set');
 Route::post('/perm/{appcode}/delete/{userid}', 'PermController@delete');
 
-
+Route::get('/app/setup_status/{appcode}', 'PermController@setup_status');
+Route::get('/app/count_traffic/{appcode}', 'PermController@count_traffic');
+Route::get('/app/traffic14/{appcode}', 'PermController@traffic14');
 //Route::controller('trend', 'TrendController');
 
 Route::get('/trend/{appcode}/save', 'TrendController@getSave');
@@ -47,6 +49,5 @@ Route::controllers([
 	'password' => 'Auth\PasswordController',
 ]);
 
-Route::get('/app/setup_status/{appcode}', 'PermController@setup_status');
 
 Route::controller('user', 'UserController');

@@ -34,16 +34,29 @@ class PermController extends Controller
 		foreach ($apps as $ap) {
 			$ap->owner = \App\User::find($ap->ownerid);
 			$ap->agencies = DB::table('user_app')->join('users', 'users.id', '=', 'user_app.userid')->where('user_app.appid', $ap->id)->get();
+			$ap->count = MtHttp::get('app/count_traffic/' . $ap->code);
 		}
-
+		
 		return view('app/index', [
 			'apps' => $apps
 		]);
 	}
 
+	public function traffic14(Request $request, $appcode)
+	{
+		$traffic = MtHttp::get('app/traffic14/' . $appcode);
+		return $traffic;
+	}
+
 	public function setup_status(Request $request, $appcode)
 	{
-		$res = MtHttp::get('api/status/' . $appcode);
+		$res = MtHttp::get('app/status/' . $appcode);
+		return $res . '';
+	}
+
+	public function count_traffic(Request $request, $appcode)
+	{
+		$res = MtHttp::get('app/count_traffic/' . $appcode);
 		return $res . '';
 	}
 
