@@ -9,8 +9,10 @@
 		};
 
 		this.countAction = function (appid, callback) {
-			converter.toIDs(['_isUser'], function (ids) {
+			converter.toIDs(['_isUser', '_ctime'], function (ids) {
 				var query = {};
+				var last30day = Math.round(new Date().getTime() / 1000) - 30*24*3600;
+				query[ids._ctime] = {$ge: last30day};
 				query[ids._isUser] = {$exists: false};
 				db.collection(prefix + "app" + appid).count(query, function (err, count) {
 					if (err) throw err;

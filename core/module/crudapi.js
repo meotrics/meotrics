@@ -97,13 +97,13 @@ class CrudApi {
             });
         });
         // count number of action in app
-        app.getEx('/api/counter/:appid', function (req, res) {
+        app.getEx('/app/count_traffic/:appid', function (req, res) {
             me.appmgr.countAction(req.params.appid, function (ret) {
                 res.send(ret + "");
             });
         });
         //check whether user has setup tracking code
-        app.get('/api/status/:appid', function (req, res) {
+        app.getEx('/app/status/:appid', function (req, res) {
             me.appmgr.isSetup(req.params.appid, function (ret) {
                 res.send(ret + "");
                 res.status(200).end();
