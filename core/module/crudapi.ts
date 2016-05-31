@@ -21,26 +21,25 @@ import fs = require('fs');
 import qs = require('querystring');
 import url = require('url');
 export class CrudApi {
-	public  constructor(private db:mongodb.Db, private converter, private prefix, private dashboarddelay)
-	{
+	public  constructor(private db:mongodb.Db, private converter, private prefix, private dashboarddelay) {
 	}
 
 	public dashboard = new Dashboard(this.db, mongodb, this.converter, this.prefix, this.dashboarddelay);
-	public trendMgr= new TrendMgr(this.db, mongodb, async, this.converter, this.prefix, "trend");
-	public propmgr= new PropMgr();
-	public typeCRUD= new CRUD(this.db, mongodb, async, this.converter, this.prefix, "actiontype");
-	public trendCRUD= new CRUD(this.db, mongodb, async, this.converter, this.prefix, "trend");
-	public segCRUD= new CRUD(this.db, mongodb, async, this.converter, this.prefix, "segment");
-	public propCRUD= new CRUD(this.db, mongodb, async, this.converter, this.prefix, "userprop");
-	public camCRUD= new CRUD(this.db, mongodb, async, this.converter, this.prefix, "campaign");
-	public segMgr= new SegMgr(this.db, mongodb, async, this.converter, this.prefix);
+	public trendMgr = new TrendMgr(this.db, mongodb, async, this.converter, this.prefix, "trend");
+	public propmgr = new PropMgr();
+	public typeCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "actiontype");
+	public trendCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "trend");
+	public segCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "segment");
+	public propCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "userprop");
+	public camCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "campaign");
+	public segMgr = new SegMgr(this.db, mongodb, async, this.converter, this.prefix);
 	public valuemgr = new ValueMgr(this.db, this.prefix);
 	public typemgr = new TypeMgr(this.db, mongodb, this.converter, async, this.prefix, this.typeCRUD, "actiontype");
 	public appmgr = new AppMgr(this.db, this.converter, this.prefix, this.typeCRUD, this.segCRUD, this.trendCRUD);
 
 	public route(app):void {
 		var me = this;
-			// CRUD actiontype
+		// CRUD actiontype
 		app.postEx('/actiontype/:appid', this.typemgr.create); // create an actiontype
 		app.getEx('/actiontype/:appid', this.typemgr.list);	// get all actiontypes
 		app.getEx('/actiontype/:appid/:id', this.typemgr.match); // get an actiontype
@@ -103,7 +102,7 @@ export class CrudApi {
 		app.getEx('/campaign/:appid/:id', this.camCRUD.match);
 		app.putEx('/campaign/:appid/:id', this.camCRUD.update);
 		app.deleteEx('/campaign/:appid/:id', this.camCRUD.delete);
-		
+
 		app.get('/app/init/:appid', function (req, res) {
 			me.appmgr.initApp(req.params.appid, function () {
 				res.send('OK');
@@ -117,13 +116,19 @@ export class CrudApi {
 			});
 		});
 
+		app.getEx('/app/trafic14/:appid', function (req, res) {
+			me.appmgr.traffic14(req.params.appid, function (ret) {
+				res.json(ret);
+			});
+		});
+
 		// count number of action in app
 		app.getEx('/app/count_traffic/:appid', function (req, res) {
 			me.appmgr.countAction(req.params.appid, function (ret) {
 				res.send(ret + "");
 			});
 		});
-		
+
 		//check whether user has setup tracking code
 		app.getEx('/app/status/:appid', function (req, res) {
 			me.appmgr.isSetup(req.params.appid, function (ret) {

@@ -96,6 +96,11 @@ class CrudApi {
                 res.json(result);
             });
         });
+        app.getEx('/app/trafic14/:appid', function (req, res) {
+            me.appmgr.traffic14(req.params.appid, function (ret) {
+                res.json(ret);
+            });
+        });
         // count number of action in app
         app.getEx('/app/count_traffic/:appid', function (req, res) {
             me.appmgr.countAction(req.params.appid, function (ret) {
