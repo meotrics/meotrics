@@ -11,26 +11,31 @@
 		onPageLoad(function () {
 
 			function update_status(app) {
-				// ok
-				var $st = $('.status_' + app);
-				$st.empty();
+				$.get('/app/count_traffic', function(data){
+					$('.traffic_' + app).html(data);
+				});
 
-				if (websock.data[app].status == '0') {
-					$st.append('<span class="greendot"></span> CONNECTED');
-				}
+				$.get('/app/setup_status/' + app, function (data) {
+					var $st = $('.status_' + app);
+					$st.empty();
 
-				if (websock.data[app].status == '-1') {
-					$st.appendChild('<span class="reddot"></span> DISCONNECTED')
-				}
+					if (data == '0') {
+						$st.append('<span class="greendot"></span> CONNECTED');
+					}
+
+					if (data == '-1') {
+						$st.appendChild('<span class="reddot"></span> DISCONNECTED')
+					}
+				});
 			}
 
-			//websock.change('status', update_status);
+			websock.change('type.pageview', update_status);
 
 			@foreach($apps as $ap)
-			//	update_status('{{$ap->code}}');
+			update_status('{{$ap->code}}');
 			@endforeach
 
-		$(".sparkline").sparkline([5, 4, 4, 3, 4, 5, 3, 6, 6, 5, 6, 7, 8, 7], {
+		$(".sparkline").sparkline([ 0,0,0,0,0,0,0,0,0,0,0,0,0,0], {
 				type: 'line',
 				lineColor: '#00007f',
 				lineWidth: 1,
@@ -40,6 +45,23 @@
 				highlightSpotColor: undefined,
 				spotRadius: 0
 			});
+		@foreach($apps as $ap)
+
+		$.get('/app/traffic14/{{$ap->code}}', function(data){
+			$spl = $(".spl_{{$ap->code}}");
+			$spl.empty();
+			$spl.sparkline(data, {
+				type: 'line',
+				lineColor: '#00007f',
+				lineWidth: 1,
+				spotColor: undefined,
+				minSpotColor: undefined,
+				maxSpotColor: undefined,
+				highlightSpotColor: undefined,
+				spotRadius: 0
+			});
+		});
+			@endforeach
 
 			$('.id_add').click(function () {
 				$.post('/app/create', {name: $('.id_name').val()}, function (appcode) {
@@ -64,7 +86,7 @@
 		</div>
 		<div class="content col-sm-12">
 			@if(count($apps)>0)
-			<div class="content table-responsive table-full-width col-sm-12">
+				<div class="content table-responsive table-full-width col-sm-12">
 
 					<table class="table table-hover ">
 						<thead>
@@ -82,8 +104,8 @@
 								<td>{{$ap->name}}
 									<br/>
 									<code class="fmonospaced">{{$ap->code}}</code></td>
-								<td>43 953
-									<div class="sparkline"></div>
+								<td><span class="traffic_{{$ap->code}}">$ap->count</span>
+									<div class="spl_{{$ap->code}} sparkline"></div>
 								</td>
 
 								<td class="status_{{$ap->code}}"><span class="greendot"></span> CONNECTED</td>
@@ -105,7 +127,7 @@
 						</tbody>
 					</table>
 
-			</div>@endif
+				</div>@endif
 		</div>
 
 	</div>
