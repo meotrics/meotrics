@@ -1,47 +1,108 @@
-﻿
+﻿import https = require('https');
+import fs = require('fs');
+import * as websocket from 'websocket';
+
+class Message {
+	public  constructor(public appid:string, public code:string) {
+	}
+}
 
 export class WS {
-	public constructor(private url: string, private port: number, private http) {
+	private httpserver;
+	private topic_clients = {};
+	private boardcast_clients = {};
 
+	public constructor(private port:number, keypath:string, certpath:string) {
+		var option = {
+			key: fs.readFileSync(keypath),
+			cert: fs.readFileSync(certpath)
+		};
+
+		this.httpserver = https.createServer(option, function (req, res) {
+			res.writeHead(404);
+			res.end();
+		});
 	}
-	private clients = {}
+
+	public change(appid:string, code:string) {
+		let me = this;
+		if (me.boardcast_clients[appid] !== undefined)
+			for (let client of me.boardcast_clients[appid])
+				if (client.closeDescription !== null)
+					client.sendUTF(JSON.stringify({appid: appid, code: code}));
+		if (me.topic_clients[appid] !== undefined && me.topic_clients[appid][code] !== undefined)
+			for (let client of me.topic_clients[appid][code])
+				if (client.closeDescription !== null)
+					client.sendUTF(JSON.stringify({appid: appid, code: code}));
+	}
+
 	public run() {
 		let me = this;
-		var WebSocketServer = require('websocket').server;
 
-		var wsServer = new WebSocketServer({
-			httpServer: this.http,
+		this.httpserver.listen(me.port, function () {
+			console.log(' Websocket server listing in port ' + me.port);
+		});
+
+		var wsServer = new websocket.server({
+			httpServer: me.httpserver,
 			autoAcceptConnections: false
 		});
 
-		function originIsAllowed(origin) {
+		function originIsAllowed(origin:string) {
 			// put logic here to detect whether the specified origin is allowed.
 			return true;
 		}
 
-		wsServer.on('request', function (request) {
+		wsServer.on('request', function (request ) {
 			if (!originIsAllowed(request.origin)) {
 				// Make sure we only accept requests from an allowed origin
 				request.reject();
-				console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
+				console.log((new Date()) + 'Connection from origin ' + request.origin + ' rejected.');
 				return;
 			}
 
-			var connection = request.accept('echo-protocol', request.origin);
-			console.log((new Date()) + ' Connection accepted.');
+			var connection = request.accept('mtdashboard', request.origin);
+
 			connection.on('message', function (message) {
+				if (message.utf8Data == undefined) // reject if not utf8 encode
+					return;
+				
+				let mes:Message = JSON.parse(message.utf8Data.toString());
 
-				if (me.clients[message.code] === undefined)
-					me.clients[message.code] = [];
+				connection['appid'] = mes.appid;
+				// client that listen on all event in app
+				if (mes.code == undefined) {
+					connection['meotricstype'] = 'boardcast';
+					if (me.boardcast_clients[mes.appid] == undefined)
+						me.boardcast_clients[mes.appid] = [];
+					me.boardcast_clients[mes.appid].push(connection);
+				} else {
+					// client that only listen on specific event in app
+					connection['meotricstype'] = 'topic';
+					if (me.topic_clients[mes.appid] == undefined)
+						me.topic_clients[mes.appid] = [];
 
-				for (var client of me.clients[message.code]) {
-					if (client.readyState === client.OPEN) {
-						client.sendUTF(JSON.stringify(message));
-					}
+					if (me.topic_clients[mes.appid][mes.code] === undefined)
+						me.topic_clients[mes.appid][mes.code] = [];
+
+					me.topic_clients[mes.appid][mes.code].push(connection);
 				}
 			});
 			connection.on('close', function (reasonCode, description) {
-				//TODO: remove all
+				//remove connection from list
+				if (connection['meotricstype'] == 'boardcast') {
+					var index = me.boardcast_clients[connection['appid']].indexOf(connection);
+					me.boardcast_clients[connection['appid']].splice(index, 1);
+
+					if (me.boardcast_clients[connection['appid']].length == 0)
+						delete me.boardcast_clients[connection['appid']];
+				}
+				else {
+					var index = me.topic_clients[connection['appid']].indexOf(connection);
+					me.topic_clients[connection['appid']].splice(index, 1);
+					if (me.topic_clients[connection['appid']].length == 0)
+						delete me.topic_clients[connection['appid']];
+				}
 			});
 		});
 	}

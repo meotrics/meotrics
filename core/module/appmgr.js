@@ -8,9 +8,130 @@
 			});
 		};
 
-		this.countAction = function (appid, callback) {
-			converter.toIDs(['_isUser'], function (ids) {
+		this.traffic14 = function (appid, callback) {
+			converter.toIDs(['_isUser', '_ctime'], function (ids) {
+				var traffic = [];
+				var rightnow = new Date().getTime() / 1000;
+				var last14day = Math.round(rightnow) - 14 * 24 * 3600;
+				var last13day = Math.round(rightnow) - 13 * 24 * 3600;
+				var last12day = Math.round(rightnow) - 12 * 24 * 3600;
+				var last11day = Math.round(rightnow) - 11 * 24 * 3600;
+				var last10day = Math.round(rightnow) - 10 * 24 * 3600;
+				var last9day = Math.round(rightnow) - 9 * 24 * 3600;
+				var last8day = Math.round(rightnow) - 8 * 24 * 3600;
+				var last7day = Math.round(rightnow) - 7 * 24 * 3600;
+				var last6day = Math.round(rightnow) - 6 * 24 * 3600;
+				var last5day = Math.round(rightnow) - 5 * 24 * 3600;
+				var last4day = Math.round(rightnow) - 4 * 24 * 3600;
+				var last3day = Math.round(rightnow) - 3 * 24 * 3600;
+				var last2day = Math.round(rightnow) - 2 * 24 * 3600;
+				var last1day = Math.round(rightnow) - 24 * 3600;
 				var query = {};
+				query[ids._ctime] = {$ge: last14day, $lt: last13day};
+				query[ids._isUser] = {$exists: false};
+				db.collection(prefix + "app" + appid).count(query, function (err, count) {
+					if (err) throw err;
+					traffic[13] = count;
+
+					query[ids._ctime] = {$ge: last13day, $lt: last12day};
+					query[ids._isUser] = {$exists: false};
+					db.collection(prefix + "app" + appid).count(query, function (err, count) {
+						if (err) throw err;
+						traffic[12] = count;
+
+						query[ids._ctime] = {$ge: last12day, $lt: last11day};
+						query[ids._isUser] = {$exists: false};
+						db.collection(prefix + "app" + appid).count(query, function (err, count) {
+							if (err) throw err;
+							traffic[11] = count;
+
+							query[ids._ctime] = {$ge: last11day, $lt: last10day};
+							query[ids._isUser] = {$exists: false};
+							db.collection(prefix + "app" + appid).count(query, function (err, count) {
+								if (err) throw err;
+								traffic[10] = count;
+
+								query[ids._ctime] = {$ge: last10day, $lt: last9day};
+								query[ids._isUser] = {$exists: false};
+								db.collection(prefix + "app" + appid).count(query, function (err, count) {
+									if (err) throw err;
+									traffic[9] = count;
+
+									query[ids._ctime] = {$ge: last9day, $lt: last8day};
+									query[ids._isUser] = {$exists: false};
+									db.collection(prefix + "app" + appid).count(query, function (err, count) {
+										if (err) throw err;
+										traffic[8] = count;
+
+										query[ids._ctime] = {$ge: last8day, $lt: last7day};
+										query[ids._isUser] = {$exists: false};
+										db.collection(prefix + "app" + appid).count(query, function (err, count) {
+											if (err) throw err;
+											traffic[7] = count;
+
+											query[ids._ctime] = {$ge: last7day, $lt: last6day};
+											query[ids._isUser] = {$exists: false};
+											db.collection(prefix + "app" + appid).count(query, function (err, count) {
+												if (err) throw err;
+												traffic[6] = count;
+
+												query[ids._ctime] = {$ge: last6day, $lt: last5day};
+												query[ids._isUser] = {$exists: false};
+												db.collection(prefix + "app" + appid).count(query, function (err, count) {
+													if (err) throw err;
+													traffic[5] = count;
+
+													query[ids._ctime] = {$ge: last5day, $lt: last4day};
+													query[ids._isUser] = {$exists: false};
+													db.collection(prefix + "app" + appid).count(query, function (err, count) {
+														if (err) throw err;
+														traffic[4] = count;
+
+														query[ids._ctime] = {$ge: last4day, $lt: last3day};
+														query[ids._isUser] = {$exists: false};
+														db.collection(prefix + "app" + appid).count(query, function (err, count) {
+															if (err) throw err;
+															traffic[3] = count;
+
+															query[ids._ctime] = {$ge: last3day, $lt: last2day};
+															query[ids._isUser] = {$exists: false};
+															db.collection(prefix + "app" + appid).count(query, function (err, count) {
+																if (err) throw err;
+																traffic[2] = count;
+
+																query[ids._ctime] = {$ge: last2day, $lt: last1day};
+																query[ids._isUser] = {$exists: false};
+																db.collection(prefix + "app" + appid).count(query, function (err, count) {
+																	if (err) throw err;
+																	traffic[1] = count;
+																	query[ids._ctime] = {$ge: last1day};
+																	query[ids._isUser] = {$exists: false};
+																	db.collection(prefix + "app" + appid).count(query, function (err, count) {
+																		if (err) throw err;
+																		traffic[0] = count;
+																		callback(traffic);
+																	});
+																});
+															});
+														});
+													});
+												});
+											});
+										});
+									});
+								});
+							});
+						});
+					});
+				});
+			});
+		};
+
+		this.countAction = function (appid, callback) {
+			converter.toIDs(['_isUser', '_ctime'], function (ids) {
+				var query = {};
+				var last30day = Math.round(new Date().getTime() / 1000) - 30 * 24 * 3600;
+				query[ids._ctime] = {$ge: last30day};
 				query[ids._isUser] = {$exists: false};
 				db.collection(prefix + "app" + appid).count(query, function (err, count) {
 					if (err) throw err;
@@ -195,7 +316,7 @@
 				name: "Login",
 				desc: "User login to site",
 				fields: [],
-				deftrendfields:[
+				deftrendfields: [
 					{pname: "Campaign", pcode: "_utm_campaign"},
 					{pname: "Campaign Source", pcode: "_utm_source"},
 					{pname: "Campaign Medium", pcode: "_utm_medium"},
@@ -228,24 +349,24 @@
 				description: "All visitor in site",
 				condition: [{}]
 			};
-/*
-			converter.toIDs(['_mtid', '_isUser', '_typeid'], function (ids) {
-				var keys = {};
-				keys[ids._mtid] = 1;
-				db.collection(prefix + appid, keys, {sparse: true});
+			/*
+			 converter.toIDs(['_mtid', '_isUser', '_typeid'], function (ids) {
+			 var keys = {};
+			 keys[ids._mtid] = 1;
+			 db.collection(prefix + appid, keys, {sparse: true});
 
-				keys = {};
-				keys._id = 1;
-				db.collection(prefix + appid, keys, {sparse: true});
+			 keys = {};
+			 keys._id = 1;
+			 db.collection(prefix + appid, keys, {sparse: true});
 
-				keys = {};
-				keys[ids.ctime] = 1;
-				keys[ids._segments] = 1;
-				keys[ids._typeid] = 1;
+			 keys = {};
+			 keys[ids.ctime] = 1;
+			 keys[ids._segments] = 1;
+			 keys[ids._typeid] = 1;
 
-				db.collection(prefix + appid, keys, {sparse: true});
-			});
-	*/
+			 db.collection(prefix + appid, keys, {sparse: true});
+			 });
+			 */
 			//db.collection(prefix + appid).createIndex()
 			typeCrud.createRaw(appid, purchase, function () {
 				typeCrud.createRaw(appid, pageview, function () {

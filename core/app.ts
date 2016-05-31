@@ -7,7 +7,7 @@ import * as CrudApi from './module/crudapi';
 import bodyParser = require('body-parser');
 var converter = require('./utils/fakeidmanager.js');
 var appException = require('./module/appException.js');
-import http = require('http');
+import * as http  from 'http';
 
 var HttpApi = require('./module/httpapi.js').HttpApi;
 
@@ -17,8 +17,6 @@ function buildconnstr():string {
 	var database = config.get("mongod.database") || "test";
 	return "mongodb://" + host + ":" + port + "/" + database;
 }
-
-//<<<<<<<<<<<<THE ENTRY POINT
 
 //Using connection pool. Initialize mongodb once
 var option:mongodb.MongoClientOptions = {};
@@ -43,15 +41,22 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err:mongodb.MongoE
 		console.log('Meotrics CORE API is listening at port ' + crudport);
 	});
 
-	var httpport = config.get('apiserver.port') || 1711;
+	var httpport = config.get<number>('apiserver.port') || 1711;
 	var httpapi = new HttpApi(db,converter, prefix,config.get('apiserver.codepath'), crudapi.valuemgr);
 	var server = http.createServer(function (req:http.ServerRequest, res:http.ServerResponse) {
 		httpapi.route(req, res);
 	});
+
 	server.listen(httpport, function () {
 		console.log("HTTP API SERVER is running at port " + httpport);
 	});
 
-	var ws = new WS.WS('/ws', 80, server);
+	let wsport = config.get<number>('websocket.port') || 2910;
+	let keypath = config.get<string>('websocket.key');
+	let certpath = config.get<string>('websocket.cert');
+	var ws = new WS.WS( wsport, keypath, certpath );
+
+	// bind change event
+	httpapi.onchange = ws.change;
 	ws.run();
 });

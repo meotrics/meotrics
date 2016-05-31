@@ -23,7 +23,7 @@ var userid = userid || 0;
 	var branch = {};
 
 	function start() {
-		var conn = new WebSocket('ws://' + window.location + '/ws?appid=' + userid);
+		var conn = new WebSocket('ws://' + window.location.host + '/ws?appid=' + userid, "mtdashboard");
 
 		conn.onopen = function (e) {
 			//connected

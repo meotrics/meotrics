@@ -92,103 +92,78 @@ Trong hệ thống Window, sửa file, `Windows\\System32\\drivers\\etc\\host`, 
 ### Cài đặt web server
 Có thể chạy hệ thống bằng apache hoặc nginx, với mỗi server, copy và sửa các đoạn config như dưới
 #### APACHE
-**Chú ý** : Đảm bảo các module dưới đều được load trong file `httpd.conf`
+**Chú ý** : Chỉ support Apache phiên bản lớn hơn 2.4, đảm bảo các module dưới đều được load trong file `httpd.conf`
 
 ```apache
 LoadModule proxy_module modules/mod_proxy.so
-LoadModule proxy_ftp_module modules/mod_proxy_ftp.so
 LoadModule proxy_http_module modules/mod_proxy_http.so
 LoadModule proxy_ajp_module modules/mod_proxy_ajp.so
 LoadModule proxy_connect_module modules/mod_proxy_connect.so
+LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so
 ```
 
-1.  Apache from 2.2, 2.4, 2.6, ...
-  ```apache
-  <VirtualHost *:80>
-    DocumentRoot "E:\workspace\nodemeotrics\meotrics\dashboard\public"
-    ServerName app.meotrics.dev
-
-    ErrorLog "logs/meotrics.dev-error.log"
-    CustomLog "logs/meotrics.dev-access.log" common
-
+```apache
+<VirtualHost *:80>
+    ServerName api.meotrics.com
     ProxyPreserveHost On
-    ProxyPass /api http://127.0.0.1:1711/api
-    ProxyPassReverse /api http://127.0.0.1:1711/api
-    <Directory />
-      Require all granted
-      AllowOverride FileInfo Options=MultiViews
-    </Directory>
-  </VirtualHost>
+    ProxyPass / http://127.0.0.1:1711/
+    ProxyPassReverse / http://127.0.0.1:1711/
+</VirtualHost>
 
-  <VirtualHost *:80>
-    DocumentRoot "E:\workspace\nodemeotrics\meotrics\landing"
-    ServerName meotrics.dev
+<VirtualHost *:443>
+  ServerName app.meotrics.com
+  SSLProxyEngine on
+  ErrorLog "logs/meotrics.dev-error443.log"
+  CustomLog "logs/meotrics.dev-access443.log" common
 
-    ErrorLog "logs/meotricslanding.dev-error.log"
-    CustomLog "logs/meotricslanding.dev-access.log" common
+  SSLEngine on
+  SSLCertificateFile E:/key/chained.pem
+  SSLCertificateKeyFile E:/key/domain.key
+  
+  ProxyPreserveHost On
+  ProxyPass /ws wss://127.0.0.1:2910/
+  ProxyPassReverse /ws wss://127.0.0.1:2910/
+</VirtualHost>
 
-    <Directory />
-      Require all granted
-      AllowOverride FileInfo Options=MultiViews
-    </Directory>
-  </VirtualHost>
+<VirtualHost *:80>
+  DocumentRoot "E:\workspace\nodemeotrics\meotrics\dashboard\public"
+  ServerName app.meotrics.dev
 
-  <VirtualHost *:80>
-    DocumentRoot "E:\workspace\nodemeotrics\meotrics\client\client.com"
-    ServerName client.meotrics.dev
+  ErrorLog "logs/meotrics.dev-error.log"
+  CustomLog "logs/meotrics.dev-access.log" common
+  
+  <Directory />
+    Require all granted
+    AllowOverride FileInfo Options=MultiViews
+  </Directory>
+</VirtualHost>
 
-    ErrorLog "logs/client.meotrics.dev-error.log"
-    CustomLog "logs/client.meotrics.dev-access.log" common
+<VirtualHost *:80>
+  DocumentRoot "E:\workspace\nodemeotrics\meotrics\landing"
+  ServerName meotrics.dev
 
-    <Directory />
-      Require all granted
-      AllowOverride FileInfo Options=MultiViews
-    </Directory>
-  </VirtualHost>
-  ```
-2. Apache before 2.2
-  ```apache
-  <VirtualHost *:80>
-    DocumentRoot "E:\workspace\nodemeotrics\meotrics\dashboard\public"
-    ServerName app.meotrics.dev
+  ErrorLog "logs/meotricslanding.dev-error.log"
+  CustomLog "logs/meotricslanding.dev-access.log" common
 
-    ErrorLog "logs/meotrics.dev-error.log"
-    CustomLog "logs/meotrics.dev-access.log" common
-      
-    ProxyPreserveHost On
-    ProxyPass /api http://127.0.0.1:1711/api
-    ProxyPassReverse /api http://127.0.0.1:1711/api
+  <Directory />
+    Require all granted
+    AllowOverride FileInfo Options=MultiViews
+  </Directory>
+</VirtualHost>
 
-    <Directory />
-      AllowOverride FileInfo Options=MultiViews
-    </Directory>
-  </VirtualHost>
+<VirtualHost *:80>
+  DocumentRoot "E:\workspace\nodemeotrics\meotrics\client\client.com"
+  ServerName client.meotrics.dev
 
-  <VirtualHost *:80>
-    DocumentRoot "E:\workspace\nodemeotrics\meotrics\landing"
-    ServerName meotrics.dev
+  ErrorLog "logs/client.meotrics.dev-error.log"
+  CustomLog "logs/client.meotrics.dev-access.log" common
 
-    ErrorLog "logs/meotricslanding.dev-error.log"
-    CustomLog "logs/meotricslanding.dev-access.log" common
-   
-    <Directory />
-      AllowOverride FileInfo Options=MultiViews
-    </Directory>
-  </VirtualHost>
-
-  <VirtualHost *:80>
-    DocumentRoot "E:\workspace\nodemeotrics\meotrics\client\client.com"
-    ServerName client.meotrics.dev
-	      
-    ErrorLog "logs/client.meotrics.dev-error.log"
-    CustomLog "logs/client.meotrics.dev-access.log" common
-    
-    <Directory />
-      AllowOverride FileInfo Options=MultiViews
-    </Directory>
-  </VirtualHost>
-  ```
-
+  <Directory />
+    Require all granted
+    AllowOverride FileInfo Options=MultiViews
+  </Directory>
+</VirtualHost>
+```
 #### Nginx
 
 ```nginx

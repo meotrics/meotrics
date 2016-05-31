@@ -18,6 +18,12 @@
 		"port": 6379,
 		"password": ""
 	},
+	"websocket":
+	{
+		"key": "/etc/ssl/private/domain.key",
+		"cert": "/etc/ssl/certs/chained.pem",
+		"port" : "2910"
+	},
 	"dashboard": {
 		"delay": 60
 	}

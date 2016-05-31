@@ -15,7 +15,6 @@ function buildconnstr() {
     var database = config.get("mongod.database") || "test";
     return "mongodb://" + host + ":" + port + "/" + database;
 }
-//<<<<<<<<<<<<THE ENTRY POINT
 //Using connection pool. Initialize mongodb once
 var option = {};
 option.server = {};
@@ -44,7 +43,12 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err, db) {
     server.listen(httpport, function () {
         console.log("HTTP API SERVER is running at port " + httpport);
     });
-    var ws = new WS.WS('/ws', 80, server);
+    let wsport = config.get('websocket.port') || 2910;
+    let keypath = config.get('websocket.key');
+    let certpath = config.get('websocket.cert');
+    var ws = new WS.WS(wsport, keypath, certpath);
+    // bind change event
+    httpapi.onchange = ws.change;
     ws.run();
 });
 //# sourceMappingURL=app.js.map

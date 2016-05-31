@@ -10,6 +10,8 @@ var ActionMgr = require('./actionmgr');
 exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 	var code;
 	var actionmgr =  new ActionMgr.ActionMgr(db, converter, prefix, "mapping", valuemgr);
+	var me = this;
+	this.onchange = function(){};
 
 	function loadCode(appid, actionid, callback) {
 		// cache mtcode in code for minimize disk usage, lazy load
@@ -35,8 +37,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 	function trackBasic(request) {
 		var useragent = request.headers['user-agent'];
 		var r = ua.parse(useragent);
-		var uri = request.params._url || "";
-
+		var uri = request.params._url || '';
 		var md = new MD(useragent);
 		var devicetype;
 		if (md.tablet() !== null)
@@ -46,7 +47,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 		else
 			devicetype = 'desktop';
 
-		if (uri === "" || uri.startsWith(request.headers.referer) === false) uri = request.headers.referer;
+		if (uri === "" || uri.startsWith(request.headers.referer) === false) uri = request.headers.referer || '';
 		var res = {
 			_url: uri,
 			_ref: request.params._ref,
@@ -115,6 +116,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 		getMtid(req, appid, res, function (mtid) {
 			data._mtid = mtid;
 			actionmgr.saveRaw(appid, data, function (actionid) {
+				me.onchange(appid, "type." + data._typeid);
 				res.setHeader('Content-Type', 'text/plain');
 				res.end("//" + actionid);
 			});
@@ -188,6 +190,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 			data._typeid = 'pageview';
 
 			actionmgr.saveRaw(appid, data, function (actionid) {
+				me.onchange(appid, 'type.pageview');
 				// return code
 				loadCode(appid, actionid, function (code) {
 					res.end(code);
