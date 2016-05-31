@@ -1,16 +1,26 @@
-﻿
+﻿import http = require('http');
 
 export class WS {
-	public constructor(private url: string, private port: number, private http) {
+	private httpserver;
+	public constructor(private port: number) {
+		this.httpserver = http.createServer(function(req, res){
+			console.log((new Date()) + ' receive request for ' + req.url);
+			res.writeHead(404);
+			res.end();
+		});
 
 	}
-	private clients = {}
+	private clients = {};
 	public run() {
 		let me = this;
 		var WebSocketServer = require('websocket').server;
 
+		this.httpserver.listen(me.port, function(){
+			console.log(' Websocket server listing in port ' + me.port);
+		});
+
 		var wsServer = new WebSocketServer({
-			httpServer: this.http,
+			httpServer: me.httpserver,
 			autoAcceptConnections: false
 		});
 
@@ -27,9 +37,14 @@ export class WS {
 				return;
 			}
 
-			var connection = request.accept('echo-protocol', request.origin);
-			console.log((new Date()) + ' Connection accepted.');
+			var connection = request.accept('mtdashboard', request.origin);
+			console.log( ' Connection accepted.');
 			connection.on('message', function (message) {
+
+				if(message.utf8Data == undefined) // reject if not utf8 encode
+					return;
+				message = message.utf8Data;
+
 
 				if (me.clients[message.code] === undefined)
 					me.clients[message.code] = [];

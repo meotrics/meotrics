@@ -18,6 +18,10 @@
 		"port": 6379,
 		"password": ""
 	},
+	"websocket":
+	{
+		"port" : "2910"
+	},
 	"dashboard": {
 		"delay": 60
 	}

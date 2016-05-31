@@ -43,7 +43,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err:mongodb.MongoE
 		console.log('Meotrics CORE API is listening at port ' + crudport);
 	});
 
-	var httpport = config.get('apiserver.port') || 1711;
+	var httpport = config.get<number>('apiserver.port') || 1711;
 	var httpapi = new HttpApi(db,converter, prefix,config.get('apiserver.codepath'), crudapi.valuemgr);
 	var server = http.createServer(function (req:http.ServerRequest, res:http.ServerResponse) {
 		httpapi.route(req, res);
@@ -51,7 +51,6 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err:mongodb.MongoE
 	server.listen(httpport, function () {
 		console.log("HTTP API SERVER is running at port " + httpport);
 	});
-
-	var ws = new WS.WS('/ws', 80, server);
-	ws.run();
+	let wsport = config.get<number>('websocket.port') || 2910;
+	new WS.WS( wsport ).run();
 });

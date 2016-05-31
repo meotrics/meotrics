@@ -1,16 +1,23 @@
 "use strict";
+const http = require('http');
 class WS {
-    constructor(url, port, http) {
-        this.url = url;
+    constructor(port) {
         this.port = port;
-        this.http = http;
         this.clients = {};
+        this.httpserver = http.createServer(function (req, res) {
+            console.log((new Date()) + ' receive request for ' + req.url);
+            res.writeHead(404);
+            res.end();
+        });
     }
     run() {
         let me = this;
         var WebSocketServer = require('websocket').server;
+        this.httpserver.listen(me.port, function () {
+            console.log(' Websocket server listing in port ' + me.port);
+        });
         var wsServer = new WebSocketServer({
-            httpServer: this.http,
+            httpServer: me.httpserver,
             autoAcceptConnections: false
         });
         function originIsAllowed(origin) {
@@ -24,9 +31,12 @@ class WS {
                 console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
                 return;
             }
-            var connection = request.accept('echo-protocol', request.origin);
-            console.log((new Date()) + ' Connection accepted.');
+            var connection = request.accept('mtdashboard', request.origin);
+            console.log(' Connection accepted.');
             connection.on('message', function (message) {
+                if (message.utf8Data == undefined)
+                    return;
+                message = message.utf8Data;
                 if (me.clients[message.code] === undefined)
                     me.clients[message.code] = [];
                 for (var client of me.clients[message.code]) {

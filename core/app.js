@@ -44,7 +44,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err, db) {
     server.listen(httpport, function () {
         console.log("HTTP API SERVER is running at port " + httpport);
     });
-    var ws = new WS.WS('/ws', 80, server);
-    ws.run();
+    let wsport = config.get('websocket.port') || 2910;
+    new WS.WS(wsport).run();
 });
 //# sourceMappingURL=app.js.map
