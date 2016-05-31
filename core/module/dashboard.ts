@@ -20,6 +20,36 @@ export class Dashboard {
 	public constructor(private db:mongo.Db, private converter, private prefix:string, private delaysec:number) {
 	}
 
+	private getGrowRate(db:mongo.Db, prefix:string, appid:string, ids, callback:(a:number)=>void) {
+		var nowsec = Math.round(new Date().getTime() / 1000);
+		var last24hsec = nowsec - 24 * 3600;
+		var last48hsec = nowsec - 48 * 3600;
+
+		var pipeline = [{$match: {}}, {$group: {_id: "$" + ids._mtid}}, {
+			$group: {
+				_id: null, count: {$sum: 1}
+			}
+		}];
+
+		//count unique today visitor
+		pipeline[0]['$match'][ids._ctime] = {$ge: last24hsec};
+		pipeline[0]['$match'][ids._isUser] = {$exists: false};
+		db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
+			if (err) throw err;
+			if (res.length == 0) return callback(0);
+			else {
+				let todayvisitcount = res[0].count;
+				//count yesterday unique visitor
+				pipeline[0]['$match'][ids._ctime] = {$ge: last48hsec, $lt: last24hsec};
+				db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
+					if (err) throw err;
+					if (res.length == 0) return callback(todayvisitcount);
+					return callback(1.0 * todayvisitcount - res[0].count / res[0].count * 100);
+				});
+			}
+		});
+	}
+
 	private getTotalRevenue(db:mongo.Db, prefix:string, appid:string, ids, callback:(a:number[])=>void) {
 		//3 retension rate = number of user purchase within 7 days/ total number of visitor
 		//get alltime visitor
@@ -239,7 +269,7 @@ export class Dashboard {
 			var dashboard:DashboardEntity = new DashboardEntity();
 			me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid"], function (ids) {
 				var now = new Date();
-				var today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+				var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
 				let todaysec = Math.round(today.getTime() / 1000);
 				let seventhdaybefore = todaysec - 7 * 24 * 3600;

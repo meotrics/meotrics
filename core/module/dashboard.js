@@ -11,6 +11,37 @@ class Dashboard {
         this.Lock = require('lock');
         this.lock = this.Lock();
     }
+    getGrowRate(db, prefix, appid, ids, callback) {
+        var nowsec = Math.round(new Date().getTime() / 1000);
+        var last24hsec = nowsec - 24 * 3600;
+        var last48hsec = nowsec - 48 * 3600;
+        var pipeline = [{ $match: {} }, { $group: { _id: "$" + ids._mtid } }, {
+                $group: {
+                    _id: null, count: { $sum: 1 }
+                }
+            }];
+        //count unique today visitor
+        pipeline[0]['$match'][ids._ctime] = { $ge: last24hsec };
+        pipeline[0]['$match'][ids._isUser] = { $exists: false };
+        db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
+            if (err)
+                throw err;
+            if (res.length == 0)
+                return callback(0);
+            else {
+                let todayvisitcount = res[0].count;
+                //count yesterday unique visitor
+                pipeline[0]['$match'][ids._ctime] = { $ge: last48hsec, $lt: last24hsec };
+                db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
+                    if (err)
+                        throw err;
+                    if (res.length == 0)
+                        return callback(todayvisitcount);
+                    return callback(1.0 * todayvisitcount - res[0].count / res[0].count * 100);
+                });
+            }
+        });
+    }
     getTotalRevenue(db, prefix, appid, ids, callback) {
         //3 retension rate = number of user purchase within 7 days/ total number of visitor
         //get alltime visitor
@@ -258,7 +289,7 @@ class Dashboard {
                         else
                             dashboard.n_new_visitor = res[0].count;
                         // 3 retenstion rate
-                        me.getRetensionRate(me.db, me.prefix, appid, ids, function (retention_rates) {
+                        me.getConversionRate(me.db, me.prefix, appid, ids, function (retention_rates) {
                             dashboard.retention_rates = retention_rates;
                             //4 highest campaign
                             var highestcampaing_project = {};
