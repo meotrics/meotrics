@@ -28,11 +28,11 @@ export class WS {
 		var me = this;
 		if (me.boardcast_clients[appid] !== undefined)
 			for (let client of me.boardcast_clients[appid])
-				if (client.closeDescription !== null)
+				if (client.closeDescription == null)
 					client.sendUTF(JSON.stringify({appid: appid, code: code}));
 		if (me.topic_clients[appid] !== undefined && me.topic_clients[appid][code] !== undefined)
 			for (let client of me.topic_clients[appid][code])
-				if (client.closeDescription !== null)
+				if (client.closeDescription == null)
 					client.sendUTF(JSON.stringify({appid: appid, code: code}));
 	}
 
@@ -74,7 +74,8 @@ export class WS {
 					connection['meotricstype'] = 'boardcast';
 					if (me.boardcast_clients[mes.appid] == undefined)
 						me.boardcast_clients[mes.appid] = [];
-					me.boardcast_clients[mes.appid].push(connection);
+					if (me.boardcast_clients[mes.appid].indexOf(connection) == -1)
+						me.boardcast_clients[mes.appid].push(connection);
 				} else {
 					// client that only listen on specific event in app
 					connection['meotricstype'] = 'topic';
@@ -84,7 +85,8 @@ export class WS {
 					if (me.topic_clients[mes.appid][mes.code] === undefined)
 						me.topic_clients[mes.appid][mes.code] = [];
 
-					me.topic_clients[mes.appid][mes.code].push(connection);
+					if (me.topic_clients[mes.appid][mes.code].indexOf(connection) == -1)
+						me.topic_clients[mes.appid][mes.code].push(connection);
 				}
 			});
 			connection.on('close', function (reasonCode, description) {
@@ -96,7 +98,7 @@ export class WS {
 					if (me.boardcast_clients[connection['appid']].length == 0)
 						delete me.boardcast_clients[connection['appid']];
 				}
-				else if (connection['meotricstype' == 'topic' && me.topic_clients[connection['appid']] !== undefined) {
+				else if (connection['meotricstype'] == 'topic' && me.topic_clients[connection['appid']] !== undefined) {
 					var index = me.topic_clients[connection['appid']].indexOf(connection);
 					me.topic_clients[connection['appid']].splice(index, 1);
 					if (me.topic_clients[connection['appid']].length == 0)
