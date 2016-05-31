@@ -29,10 +29,9 @@
 				});
 			}
 
-			websock.change('type.pageview', update_status);
-
 			@foreach($apps as $ap)
 			update_status('{{$ap->code}}');
+			websock.appChange('{{$ap->code}}','type.pageview', update_status);
 			@endforeach
 
 		$(".sparkline").sparkline([ 0,0,0,0,0,0,0,0,0,0,0,0,0,0], {
