@@ -32,31 +32,33 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err:mongodb.MongoE
 	app.use(bodyParser.json()); // parse application/json
 	converter = new converter.IdManager();
 	var prefix:string = config.get<string>("mongod.prefix") || "meotrics_";
-	var crudapi = new CrudApi.CrudApi(db,converter,prefix, config.get("dashboard.delay"));
+	var crudapi = new CrudApi.CrudApi(db, converter, prefix, config.get("dashboard.delay"));
 	crudapi.route(app); //bind route
-	
+
 	//run the backend bashboard
 	var crudport = config.get("port") || 2108;
 	app.listen(crudport, function () {
-		console.log('Meotrics CORE API is listening at port ' + crudport);
+		console.log('Meotrics CORE API / OK / ' + crudport);
 	});
 
 	var httpport = config.get<number>('apiserver.port') || 1711;
-	var httpapi = new HttpApi(db,converter, prefix,config.get('apiserver.codepath'), crudapi.valuemgr);
+	var httpapi = new HttpApi(db, converter, prefix, config.get('apiserver.codepath'), crudapi.valuemgr);
 	var server = http.createServer(function (req:http.ServerRequest, res:http.ServerResponse) {
 		httpapi.route(req, res);
 	});
 
 	server.listen(httpport, function () {
-		console.log("HTTP API SERVER is running at port " + httpport);
+		console.log("HTTP API SERVER / OK / " + httpport);
 	});
 
 	let wsport = config.get<number>('websocket.port') || 2910;
 	let keypath = config.get<string>('websocket.key');
 	let certpath = config.get<string>('websocket.cert');
-	var ws = new WS.WS( wsport, keypath, certpath );
+	var ws = new WS.WS(wsport, keypath, certpath);
 
 	// bind change event
-	httpapi.onchange = ws.change;
+	httpapi.onchange = function (appid, code) {
+		ws.change(appid, code)
+	};
 	ws.run();
 });

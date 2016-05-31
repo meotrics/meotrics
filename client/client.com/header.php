@@ -18,11 +18,11 @@
 		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 		<![endif]-->
 		
-<!--BEGIN MEOTRICS TRACKING CODE -->
+
+
+    <!--BEGIN MEOTRICS TRACKING CODE -->
 <link href="//api.meotrics.com/speedyapply" rel="stylesheet" type="text/css"/>
+<script>var mt={appid:'speedyapply'}</script>
 <script id="mtspeedyapply" src="//meotrics.com/mttrack.js"></script>
-<script>mt.appid='speedyapply';
-var s=getComputedStyle(document.getElementById('mt'+mt.appid),null);
-mt.actionid = s.content.substr(1,s.content.length-2);</script>
 <script src="//meotrics.com/mtend.js" defer async="true"></script>
 <!--END MEOTRICS TRACKING CODE -->

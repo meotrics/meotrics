@@ -193,6 +193,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 				me.onchange(appid, 'type.pageview');
 				// return code
 				loadCode(appid, actionid, function (code) {
+					res.setHeader('Content-Type', 'text/css');
 					res.end(code);
 				});
 			});

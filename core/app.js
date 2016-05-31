@@ -33,7 +33,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err, db) {
     //run the backend bashboard
     var crudport = config.get("port") || 2108;
     app.listen(crudport, function () {
-        console.log('Meotrics CORE API is listening at port ' + crudport);
+        console.log('Meotrics CORE API / OK / ' + crudport);
     });
     var httpport = config.get('apiserver.port') || 1711;
     var httpapi = new HttpApi(db, converter, prefix, config.get('apiserver.codepath'), crudapi.valuemgr);
@@ -41,14 +41,16 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err, db) {
         httpapi.route(req, res);
     });
     server.listen(httpport, function () {
-        console.log("HTTP API SERVER is running at port " + httpport);
+        console.log("HTTP API SERVER / OK / " + httpport);
     });
     let wsport = config.get('websocket.port') || 2910;
     let keypath = config.get('websocket.key');
     let certpath = config.get('websocket.cert');
     var ws = new WS.WS(wsport, keypath, certpath);
     // bind change event
-    httpapi.onchange = ws.change;
+    httpapi.onchange = function (appid, code) {
+        ws.change(appid, code);
+    };
     ws.run();
 });
 //# sourceMappingURL=app.js.map
