@@ -27,84 +27,84 @@
 				var last2day = Math.round(rightnow) - 2 * 24 * 3600;
 				var last1day = Math.round(rightnow) - 24 * 3600;
 				var query = {};
-				query[ids._ctime] = {$ge: last14day, $lt: last13day};
+				query[ids._ctime] = {$gte: last14day, $lt: last13day};
 				query[ids._isUser] = {$exists: false};
 				db.collection(prefix + "app" + appid).count(query, function (err, count) {
 					if (err) throw err;
 					traffic[13] = count;
 
-					query[ids._ctime] = {$ge: last13day, $lt: last12day};
+					query[ids._ctime] = {$gte: last13day, $lt: last12day};
 					query[ids._isUser] = {$exists: false};
 					db.collection(prefix + "app" + appid).count(query, function (err, count) {
 						if (err) throw err;
 						traffic[12] = count;
 
-						query[ids._ctime] = {$ge: last12day, $lt: last11day};
+						query[ids._ctime] = {$gte: last12day, $lt: last11day};
 						query[ids._isUser] = {$exists: false};
 						db.collection(prefix + "app" + appid).count(query, function (err, count) {
 							if (err) throw err;
 							traffic[11] = count;
 
-							query[ids._ctime] = {$ge: last11day, $lt: last10day};
+							query[ids._ctime] = {$gte: last11day, $lt: last10day};
 							query[ids._isUser] = {$exists: false};
 							db.collection(prefix + "app" + appid).count(query, function (err, count) {
 								if (err) throw err;
 								traffic[10] = count;
 
-								query[ids._ctime] = {$ge: last10day, $lt: last9day};
+								query[ids._ctime] = {$gte: last10day, $lt: last9day};
 								query[ids._isUser] = {$exists: false};
 								db.collection(prefix + "app" + appid).count(query, function (err, count) {
 									if (err) throw err;
 									traffic[9] = count;
 
-									query[ids._ctime] = {$ge: last9day, $lt: last8day};
+									query[ids._ctime] = {$gte: last9day, $lt: last8day};
 									query[ids._isUser] = {$exists: false};
 									db.collection(prefix + "app" + appid).count(query, function (err, count) {
 										if (err) throw err;
 										traffic[8] = count;
 
-										query[ids._ctime] = {$ge: last8day, $lt: last7day};
+										query[ids._ctime] = {$gte: last8day, $lt: last7day};
 										query[ids._isUser] = {$exists: false};
 										db.collection(prefix + "app" + appid).count(query, function (err, count) {
 											if (err) throw err;
 											traffic[7] = count;
 
-											query[ids._ctime] = {$ge: last7day, $lt: last6day};
+											query[ids._ctime] = {$gte: last7day, $lt: last6day};
 											query[ids._isUser] = {$exists: false};
 											db.collection(prefix + "app" + appid).count(query, function (err, count) {
 												if (err) throw err;
 												traffic[6] = count;
 
-												query[ids._ctime] = {$ge: last6day, $lt: last5day};
+												query[ids._ctime] = {$gte: last6day, $lt: last5day};
 												query[ids._isUser] = {$exists: false};
 												db.collection(prefix + "app" + appid).count(query, function (err, count) {
 													if (err) throw err;
 													traffic[5] = count;
 
-													query[ids._ctime] = {$ge: last5day, $lt: last4day};
+													query[ids._ctime] = {$gte: last5day, $lt: last4day};
 													query[ids._isUser] = {$exists: false};
 													db.collection(prefix + "app" + appid).count(query, function (err, count) {
 														if (err) throw err;
 														traffic[4] = count;
 
-														query[ids._ctime] = {$ge: last4day, $lt: last3day};
+														query[ids._ctime] = {$gte: last4day, $lt: last3day};
 														query[ids._isUser] = {$exists: false};
 														db.collection(prefix + "app" + appid).count(query, function (err, count) {
 															if (err) throw err;
 															traffic[3] = count;
 
-															query[ids._ctime] = {$ge: last3day, $lt: last2day};
+															query[ids._ctime] = {$gte: last3day, $lt: last2day};
 															query[ids._isUser] = {$exists: false};
 															db.collection(prefix + "app" + appid).count(query, function (err, count) {
 																if (err) throw err;
 																traffic[2] = count;
 
-																query[ids._ctime] = {$ge: last2day, $lt: last1day};
+																query[ids._ctime] = {$gte: last2day, $lt: last1day};
 																query[ids._isUser] = {$exists: false};
 																db.collection(prefix + "app" + appid).count(query, function (err, count) {
 																	if (err) throw err;
 																	traffic[1] = count;
-																	query[ids._ctime] = {$ge: last1day};
+																	query[ids._ctime] = {$gte: last1day};
 																	query[ids._isUser] = {$exists: false};
 																	db.collection(prefix + "app" + appid).count(query, function (err, count) {
 																		if (err) throw err;
@@ -131,7 +131,7 @@
 			converter.toIDs(['_isUser', '_ctime'], function (ids) {
 				var query = {};
 				var last30day = Math.round(new Date().getTime() / 1000) - 30 * 24 * 3600;
-				query[ids._ctime] = {$ge: last30day};
+				query[ids._ctime] = {$gte: last30day};
 				query[ids._isUser] = {$exists: false};
 				db.collection(prefix + "app" + appid).count(query, function (err, count) {
 					if (err) throw err;

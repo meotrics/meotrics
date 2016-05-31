@@ -32,7 +32,7 @@ export class Dashboard {
 		}];
 
 		//count unique today visitor
-		pipeline[0]['$match'][ids._ctime] = {$ge: last24hsec};
+		pipeline[0]['$match'][ids._ctime] = {$gte: last24hsec};
 		pipeline[0]['$match'][ids._isUser] = {$exists: false};
 		db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
 			if (err) throw err;
@@ -40,7 +40,7 @@ export class Dashboard {
 			else {
 				let todayvisitcount = res[0].count;
 				//count yesterday unique visitor
-				pipeline[0]['$match'][ids._ctime] = {$ge: last48hsec, $lt: last24hsec};
+				pipeline[0]['$match'][ids._ctime] = {$gte: last48hsec, $lt: last24hsec};
 				db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
 					if (err) throw err;
 					if (res.length == 0) return callback(todayvisitcount);
@@ -88,38 +88,38 @@ export class Dashboard {
 
 		revenue_pipeline[0]['$match'][ids._typeid] = "purchase";
 		revenue_pipeline[0]['$match'][ids._ctime] = {};
-		revenue_pipeline[0]['$match'][ids._ctime].$ge = b6;
+		revenue_pipeline[0]['$match'][ids._ctime].$gte = b6;
 		revenue_pipeline[0]['$match'][ids._ctime].$lt = b5;
 		db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 			if (err) throw err;
 			revenues.push(res.length === 0 ? 0 : res[0].sum);
 
-			revenue_pipeline[0]['$match'][ids._ctime].$ge = b5;
+			revenue_pipeline[0]['$match'][ids._ctime].$gte = b5;
 			revenue_pipeline[0]['$match'][ids._ctime].$lt = b4;
 			db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 				if (err) throw err;
 				revenues.push(res.length === 0 ? 0 : res[0].sum);
-				revenue_pipeline[0]['$match'][ids._ctime].$ge = b4;
+				revenue_pipeline[0]['$match'][ids._ctime].$gte = b4;
 				revenue_pipeline[0]['$match'][ids._ctime].$lt = b3;
 				db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 					if (err) throw err;
 					revenues.push(res.length === 0 ? 0 : res[0].sum);
-					revenue_pipeline[0]['$match'][ids._ctime].$ge = b3;
+					revenue_pipeline[0]['$match'][ids._ctime].$gte = b3;
 					revenue_pipeline[0]['$match'][ids._ctime].$lt = b2;
 					db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 						if (err) throw err;
 						revenues.push(res.length === 0 ? 0 : res[0].sum);
-						revenue_pipeline[0]['$match'][ids._ctime].$ge = b2;
+						revenue_pipeline[0]['$match'][ids._ctime].$gte = b2;
 						revenue_pipeline[0]['$match'][ids._ctime].$lt = b1;
 						db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 							if (err) throw err;
 							revenues.push(res.length === 0 ? 0 : res[0].sum);
-							revenue_pipeline[0]['$match'][ids._ctime].$ge = b1;
+							revenue_pipeline[0]['$match'][ids._ctime].$gte = b1;
 							revenue_pipeline[0]['$match'][ids._ctime].$lt = b0;
 							db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 								if (err) throw err;
 								revenues.push(res.length === 0 ? 0 : res[0].sum);
-								revenue_pipeline[0]['$match'][ids._ctime] = {$ge: b0};
+								revenue_pipeline[0]['$match'][ids._ctime] = {$gte: b0};
 								db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 									if (err) throw err;
 									revenues.push(res.length === 0 ? 0 : res[0].sum);
@@ -202,38 +202,38 @@ export class Dashboard {
 
 									retension_pipelines[0]['$match'][ids._typeid] = "purchase";
 									retension_pipelines[0]['$match'][ids._ctime] = {};
-									retension_pipelines[0]['$match'][ids._ctime].$ge = b12;
+									retension_pipelines[0]['$match'][ids._ctime].$gte = b12;
 									retension_pipelines[0]['$match'][ids._ctime].$lt = b5;
 									db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
 										if (err) throw err;
 										n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
-										retension_pipelines[0]['$match'][ids._ctime].$ge = b11;
+										retension_pipelines[0]['$match'][ids._ctime].$gte = b11;
 										retension_pipelines[0]['$match'][ids._ctime].$lt = b4;
 										db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
 											if (err) throw err;
 											n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
-											retension_pipelines[0]['$match'][ids._ctime].$ge = b10;
+											retension_pipelines[0]['$match'][ids._ctime].$gte = b10;
 											retension_pipelines[0]['$match'][ids._ctime].$lt = b3;
 											db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
 												if (err) throw err;
 												n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
-												retension_pipelines[0]['$match'][ids._ctime].$ge = b9;
+												retension_pipelines[0]['$match'][ids._ctime].$gte = b9;
 												retension_pipelines[0]['$match'][ids._ctime].$lt = b2;
 												db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
 													if (err) throw err;
 													n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
-													retension_pipelines[0]['$match'][ids._ctime].$ge = b8;
+													retension_pipelines[0]['$match'][ids._ctime].$gte = b8;
 													retension_pipelines[0]['$match'][ids._ctime].$lt = b1;
 													db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
 														if (err) throw err;
 														n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
-														retension_pipelines[0]['$match'][ids._ctime].$ge = b7;
+														retension_pipelines[0]['$match'][ids._ctime].$gte = b7;
 														retension_pipelines[0]['$match'][ids._ctime].$lt = b0;
 														db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
 															if (err) throw err;
 															n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
 															retension_pipelines[0]['$match'][ids._ctime] = {};
-															retension_pipelines[0]['$match'][ids._ctime].$ge = b6;
+															retension_pipelines[0]['$match'][ids._ctime].$gte = b6;
 															db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
 																if (err) throw err;
 																n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
@@ -341,7 +341,7 @@ export class Dashboard {
 				//1 number of new visitor today
 				var todayvismatch = {};
 				todayvismatch[ids._isUser] = {$exists: false};
-				todayvismatch[ids._ctime] = {$ge: todaysec};
+				todayvismatch[ids._ctime] = {$gte: todaysec};
 
 				var pipelines = [{$match: todayvismatch}, {$group: {_id: "$" + ids._mtid}}, {
 					$group: {
