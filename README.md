@@ -110,16 +110,27 @@ LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so
     ProxyPassReverse / http://127.0.0.1:1711/
 </VirtualHost>
 
+<VirtualHost *:443>
+  ServerName app.meotrics.com
+  SSLProxyEngine on
+  ErrorLog "logs/meotrics.dev-error443.log"
+  CustomLog "logs/meotrics.dev-access443.log" common
+
+  SSLEngine on
+  SSLCertificateFile E:/key/chained.pem
+  SSLCertificateKeyFile E:/key/domain.key
+  
+  ProxyPreserveHost On
+  ProxyPass /ws wss://127.0.0.1:2910/
+  ProxyPassReverse /ws wss://127.0.0.1:2910/
+</VirtualHost>
+
 <VirtualHost *:80>
   DocumentRoot "E:\workspace\nodemeotrics\meotrics\dashboard\public"
   ServerName app.meotrics.dev
 
   ErrorLog "logs/meotrics.dev-error.log"
   CustomLog "logs/meotrics.dev-access.log" common
-
-  ProxyPreserveHost On
-  ProxyPass /ws ws://127.0.0.1:2910/
-  ProxyPassReverse /ws ws://127.0.0.1:2910/
   
   <Directory />
     Require all granted
