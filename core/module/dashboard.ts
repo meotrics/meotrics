@@ -261,6 +261,26 @@ export class Dashboard {
 		});
 	}
 
+	public getMostPopulerCategory(db:mongo.Db, prefix:string, appid:string, ids, callback:(cat:string)=>void) {
+		let pipeline = [
+			{$match: {}}, {
+				$group: {
+					_id: "$_" + ids.cid,
+					cname: {$first: "$" + ids.cname},
+					revenue: {$sum: "$" + ids.amount}
+				}
+			}, {
+				$sort: {revenue: -1}
+			}, {
+				$limit: 1}];
+
+		db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
+			if (err) throw err;
+			if (res.length == 0) return callback(undefined);
+			return callback(res[0].cname);
+		})
+	}
+
 	public getRevenuePerCustomer(db:mongo.Db, prefix:string, appid:string, ids, callback:(a:number)=>void) {
 		let totaluserpipeline = [{$match: {}}, {$group: {_id: "$_" + ids._mtid}}, {
 			$group: {

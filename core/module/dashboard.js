@@ -254,6 +254,26 @@ class Dashboard {
             });
         });
     }
+    getMostPopulerCategory(db, prefix, appid, ids, callback) {
+        let pipeline = [
+            { $match: {} }, {
+                $group: {
+                    _id: "$_" + ids.cid,
+                    cname: { $first: "$" + ids.cname },
+                    revenue: { $sum: "$" + ids.amount }
+                }
+            }, {
+                $sort: { revenue: -1 }
+            }, {
+                $limit: 1 }];
+        db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
+            if (err)
+                throw err;
+            if (res.length == 0)
+                return callback(undefined);
+            return callback(res[0].cname);
+        });
+    }
     getRevenuePerCustomer(db, prefix, appid, ids, callback) {
         let totaluserpipeline = [{ $match: {} }, { $group: { _id: "$_" + ids._mtid } }, {
                 $group: {
