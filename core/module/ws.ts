@@ -25,7 +25,7 @@ export class WS {
 	}
 
 	public change(appid:string, code:string) {
-		let me = this;
+		var me = this;
 		if (me.boardcast_clients[appid] !== undefined)
 			for (let client of me.boardcast_clients[appid])
 				if (client.closeDescription !== null)
@@ -37,10 +37,10 @@ export class WS {
 	}
 
 	public run() {
-		let me = this;
+		var me = this;
 
 		this.httpserver.listen(me.port, function () {
-			console.log(' Websocket server listing in port ' + me.port);
+			console.log('Websocket server / OK  / ' + me.port);
 		});
 
 		var wsServer = new websocket.server({
@@ -53,7 +53,7 @@ export class WS {
 			return true;
 		}
 
-		wsServer.on('request', function (request ) {
+		wsServer.on('request', function (request) {
 			if (!originIsAllowed(request.origin)) {
 				// Make sure we only accept requests from an allowed origin
 				request.reject();
@@ -62,11 +62,10 @@ export class WS {
 			}
 
 			var connection = request.accept('mtdashboard', request.origin);
-
 			connection.on('message', function (message) {
 				if (message.utf8Data == undefined) // reject if not utf8 encode
 					return;
-				
+
 				let mes:Message = JSON.parse(message.utf8Data.toString());
 
 				connection['appid'] = mes.appid;
@@ -90,14 +89,14 @@ export class WS {
 			});
 			connection.on('close', function (reasonCode, description) {
 				//remove connection from list
-				if (connection['meotricstype'] == 'boardcast') {
+				if (connection['meotricstype'] == 'boardcast' && undefined !== me.boardcast_clients[connection['appid']]) {
 					var index = me.boardcast_clients[connection['appid']].indexOf(connection);
 					me.boardcast_clients[connection['appid']].splice(index, 1);
 
 					if (me.boardcast_clients[connection['appid']].length == 0)
 						delete me.boardcast_clients[connection['appid']];
 				}
-				else {
+				else if (connection['meotricstype' == 'topic' && me.topic_clients[connection['appid']] !== undefined) {
 					var index = me.topic_clients[connection['appid']].indexOf(connection);
 					me.topic_clients[connection['appid']].splice(index, 1);
 					if (me.topic_clients[connection['appid']].length == 0)
