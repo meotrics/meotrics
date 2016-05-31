@@ -15,9 +15,9 @@ class MtHttp
 
 	}
 
-	public static function get($url, $data = null)
+	public static function getRaw($url, $data)
 	{
-		$url = "http://" . MtHttp::$host . ":" . MtHttp::$port . '/' . $url;
+		$url = "http://" . self::$host . ":" . self::$port . '/' . $url;
 		if ($data !== null)
 			$options = array('http' => array(
 				'header' => "Content-type: application/x-www-form-urlencoded\r\n",
@@ -30,12 +30,16 @@ class MtHttp
 				'method' => 'GET'
 			));
 		$context = stream_context_create($options);
-		return MtHttp::json_decodeEx(file_get_contents($url, false, $context));
+		return file_get_contents($url, false, $context);
+	}
+	public static function get($url, $data = null)
+	{
+		return self::json_decodeEx(self::getRaw($url, $data));
 	}
 
 	public static function post($url, $data = null)
 	{
-		$url = "http://" . MtHttp::$host . ":" . MtHttp::$port . '/' . $url;
+		$url = "http://" . self::$host . ":" . self::$port . '/' . $url;
 		if ($data !== null)
 			$options = array('http' => array(
 				'header' => "Content-type: application/json\r\n",
@@ -48,12 +52,12 @@ class MtHttp
 				'method' => 'POST'
 			));
 		$context = stream_context_create($options);
-		return MtHttp::json_decodeEx(file_get_contents($url, false, $context));
+		return self::json_decodeEx(file_get_contents($url, false, $context));
 	}
 
 	public static function put($url, $data)
 	{
-		$url = "http://" . MtHttp::$host . ":" . MtHttp::$port . '/' . $url;
+		$url = "http://" . self::$host . ":" . self::$port . '/' . $url;
 		if ($data !== null)
 			$options = array('http' => array(
 				'header' => "Content-type: application/json\r\n",
@@ -66,12 +70,12 @@ class MtHttp
 				'method' => 'PUT'
 			));
 		$context = stream_context_create($options);
-		return MtHttp::json_decodeEx(file_get_contents($url, false, $context));
+		return self::json_decodeEx(file_get_contents($url, false, $context));
 	}
 
 	public static function delete($url, $data)
 	{
-		$url = "http://" . MtHttp::$host . ":" . MtHttp::$port . '/' . $url;
+		$url = "http://" . self::$host . ":" . self::$port . '/' . $url;
 		if ($data !== null)
 			$options = array('http' => array(
 				'header' => "Content-type: application/json\r\n",
@@ -84,13 +88,13 @@ class MtHttp
 				'method' => 'DELETE'
 			));
 		$context = stream_context_create($options);
-		return MtHttp::json_decodeEx(file_get_contents($url, false, $context));
+		return self::json_decodeEx(file_get_contents($url, false, $context));
 	}
 
 	public static function init()
 	{
-		MtHttp::$host = env('CORE_HOST', '127.0.0.1');
-		MtHttp::$port = env('CORE_PORT', 2108);
+		self::$host = env('CORE_HOST', '127.0.0.1');
+		self::$port = env('CORE_PORT', 2108);
 	}
 }
 
