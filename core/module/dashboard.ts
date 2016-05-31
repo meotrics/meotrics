@@ -261,8 +261,24 @@ export class Dashboard {
 		});
 	}
 
-	public
-	getDashboard(appid:string, callback:(d:DashboardEntity) => void) {
+	public getRevenuePerCustomer(db:mongo.Db, prefix:string, appid:string, ids, callback:(a:number)=>void) {
+		let totaluserpipeline = [{$match: {}}, {$group: {_id: "$_" + ids._mtid}}, {
+			$group: {
+				_id: null,
+				revenue: {$sum: "$" + ids.revenue}, count: {$sum: 1}
+			}
+		}];
+		totaluserpipeline[0]['$match'][ids._isUser] = true;
+		totaluserpipeline[0]['$match'][ids.signup] = true;
+
+		db.collection(prefix + "app" + appid).aggregate(totaluserpipeline, function (err, res) {
+			if (err) throw err;
+			if (res.length == 0) return callback(0);
+			return callback(res.revenue * 1.0 / res.count);
+		});
+	}
+
+	public getDashboard(appid:string, callback:(d:DashboardEntity) => void) {
 		let me = this;
 
 		function generateDashboard(gcallback:(d:DashboardEntity) => void) {
