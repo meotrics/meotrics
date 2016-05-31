@@ -24,7 +24,7 @@
 					}
 
 					if (data == 'false') {
-						$st.appendChild('<span class="reddot"></span> DISCONNECTED')
+						$st.append('<span class="reddot"></span> NOT CONNECTED')
 					}
 				});
 			}

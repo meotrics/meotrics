@@ -9,13 +9,13 @@ class MtHttp
 	public static function json_decodeEx($data)
 	{
 		//unction isJson($string) {
-			$ret = json_decode($data);
-			return (json_last_error() != JSON_ERROR_NONE) ? $data : $ret;
+		$ret = json_decode($data);
+		return (json_last_error() != JSON_ERROR_NONE) ? $data : $ret;
 		//}
 
 	}
 
-	public static function getRaw($url, $data)
+	public static function getRaw($url, $data = null)
 	{
 		$url = "http://" . self::$host . ":" . self::$port . '/' . $url;
 		if ($data !== null)
@@ -32,6 +32,7 @@ class MtHttp
 		$context = stream_context_create($options);
 		return file_get_contents($url, false, $context);
 	}
+
 	public static function get($url, $data = null)
 	{
 		return self::json_decodeEx(self::getRaw($url, $data));
