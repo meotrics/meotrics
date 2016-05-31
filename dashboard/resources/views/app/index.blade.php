@@ -11,7 +11,7 @@
 		onPageLoad(function () {
 
 			function update_status(app) {
-				$.get('/app/count_traffic', function(data){
+				$.get('/app/count_traffic/' + app, function(data){
 					$('.traffic_' + app).html(data);
 				});
 
@@ -19,11 +19,11 @@
 					var $st = $('.status_' + app);
 					$st.empty();
 
-					if (data == '0') {
+					if (data == 'true') {
 						$st.append('<span class="greendot"></span> CONNECTED');
 					}
 
-					if (data == '-1') {
+					if (data == 'false') {
 						$st.appendChild('<span class="reddot"></span> DISCONNECTED')
 					}
 				});
@@ -104,7 +104,7 @@
 								<td>{{$ap->name}}
 									<br/>
 									<code class="fmonospaced">{{$ap->code}}</code></td>
-								<td><span class="traffic_{{$ap->code}}">$ap->count</span>
+								<td><span class="traffic_{{$ap->code}}">{{$ap->count}}</span>
 									<div class="spl_{{$ap->code}} sparkline"></div>
 								</td>
 

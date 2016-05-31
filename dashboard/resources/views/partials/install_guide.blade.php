@@ -107,7 +107,7 @@
 			if (response == "true" || response == 1) {
 				//'Integrated !'
 			} else {
-				showCodeDialog(appcode);
+				showCodeDialog({{$appcode}});
 			}
 		}).fail(function (err) {
 			_helper.notification.error('Failed to check installation !')

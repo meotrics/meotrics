@@ -50,7 +50,7 @@ class PermController extends Controller
 
 	public function setup_status(Request $request, $appcode)
 	{
-		$res = MtHttp::get('app/status/' . $appcode);
+		$res = MtHttp::getRaw('app/status/' . $appcode);
 		return $res . '';
 	}
 
