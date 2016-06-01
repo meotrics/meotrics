@@ -26,6 +26,7 @@ export class WS {
 
 	public change(appid:string, code:string) {
 		var me = this;
+		//console.log('\n',appid, code, me.boardcast_clients[appid].length,'\n');
 		if (me.boardcast_clients[appid] !== undefined)
 			for (let client of me.boardcast_clients[appid])
 				if (client.closeDescription == null)
@@ -67,7 +68,6 @@ export class WS {
 					return;
 
 				let mes:Message = JSON.parse(message.utf8Data.toString());
-
 				connection['appid'] = mes.appid;
 				// client that listen on all event in app
 				if (mes.code == undefined) {

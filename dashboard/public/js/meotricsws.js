@@ -15,10 +15,8 @@ var userid = userid || 0;
 
 			branch[appcode][code].push(callback);
 
-			//if(conn.readyState !== 1)
-			//	stack.push({appid: appcode, code: code});	
-			//else
-			//	conn.send(JSON.stringify({appid: appcode, code: code}));
+			if(conn.readyState == 1)
+				conn.send(JSON.stringify({appid: appcode, code: code}));
 		}
 	};
 	// boardcast event

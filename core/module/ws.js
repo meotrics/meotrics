@@ -24,6 +24,7 @@ class WS {
     }
     change(appid, code) {
         var me = this;
+        //console.log('\n',appid, code, me.boardcast_clients[appid].length,'\n');
         if (me.boardcast_clients[appid] !== undefined)
             for (let client of me.boardcast_clients[appid])
                 if (client.closeDescription == null)
