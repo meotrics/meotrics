@@ -85,7 +85,7 @@
 		}
 	}
 	function getIntegrationCode(appcode) {
-		$.get('//meotrics/track.html', function (response) {
+		$.get('//meotrics.com/track.html', function (response) {
 			var html = $('<div/>').text(response).html();
 			$('#guideline').find('textarea').html(html.replace(/\$APPID\$/g, appcode));
 		}).fail(function (err) {

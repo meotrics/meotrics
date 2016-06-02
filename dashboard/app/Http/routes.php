@@ -28,7 +28,7 @@ Route::get('/trend/{appcode}/update/{id}', 'TrendController@getUpdate');
 Route::delete('/trend/{appcode}/remove/{id}', 'TrendController@deleteRemove');
 Route::get('/trend/{appcode}/{trendid?}', 'TrendController@getIndex');
 
-Route::resource('actiontype', 'TypeController');
+Route::get('/actiontype/{appcode}', 'TypeController@index');
 
 Route::post('/actiontype/{appid}/create', 'TypeController@create');
 

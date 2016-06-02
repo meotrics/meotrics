@@ -12,16 +12,15 @@ class TypeController extends Controller
 		$this->middleware('auth');
   }
 
-	public function index(Request $request)
+	public function index(Request $request, $appid)
 	{
-		$app_id = \Auth::user()->id;
-		$result = MtHttp::get('actiontype/' . $app_id);
+		$result = MtHttp::get('actiontype/' . $appid);
 		return view('actiontype/index', [
 			'actiontypes' => $result
 		]);
 	}
 
-	public function show($id)
+	public function show(Request $request, $id)
 	{
 		$app_id = \Auth::user()->id;
 		$result = MtHttp::get('actiontype/' . $app_id . '/' . $id);
