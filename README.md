@@ -56,17 +56,17 @@ Trong hệ thống Window, sửa file, `Windows\\System32\\drivers\\etc\\host`, 
     ```
   * Với môi trường Mac
     Cài đặt mcrypt trước, sau đó gõ
-   
+
     ```bash
     brew update
     brew upgrade
     brew tap homebrew/dupes
     brew tap josegonzalez/homebrew-php
     brew install php54-mcrypt
-    php --version // To Test your php 
+    php --version // To Test your php
     sudo composer update
     ```
-   
+
 2. Khởi tạo Laravel framework
   Chuyển vào thư mục dashboard (`meotrics/dashboard`), tạo thư mục database, gõ
 
@@ -119,10 +119,10 @@ LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so
   SSLEngine on
   SSLCertificateFile E:/key/chained.pem
   SSLCertificateKeyFile E:/key/domain.key
-  
+
   ProxyPreserveHost On
-  ProxyPass /ws wss://127.0.0.1:2910/
-  ProxyPassReverse /ws wss://127.0.0.1:2910/
+  ProxyPass /ws ws://127.0.0.1:2910/
+  ProxyPassReverse /ws ws://127.0.0.1:2910/
 </VirtualHost>
 
 <VirtualHost *:80>
@@ -131,7 +131,7 @@ LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so
 
   ErrorLog "logs/meotrics.dev-error.log"
   CustomLog "logs/meotrics.dev-access.log" common
-  
+
   <Directory />
     Require all granted
     AllowOverride FileInfo Options=MultiViews
@@ -168,83 +168,167 @@ LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so
 
 ```nginx
 server {
-  charset utf-8;
   listen 80;
+  charset utf-8;
+  client_max_body_size 128M;
 
-  server_name app.meotrics.dev;
-  root        /home/thanhpk/space/meotrics/dashboard/public/;
-  index       index.php;
+  server_name meotrics.com;
+  return 301 https://$host$request_uri;
+}
 
-  access_log  /home/thanhpk/tmp/meotrics-access.log;
-  error_log   /home/thanhpk/tmp/meotrics-error.log;
+server {
+  listen 80;
+  server_name www.meotrics.com;
+  return 301 http://meotrics.com$request_uri;
+}
 
-  location /api {
+server {
+  listen 443;
+  server_name www.meotrics.com meotrics.com;
+  ssl on;
+  ssl_certificate /etc/ssl/certs/chained.pem;
+  ssl_certificate_key /etc/ssl/private/domain.key;
+  ssl_session_timeout 5m;
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  ssl_ciphers ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-G$
+  ssl_session_cache shared:SSL:50m;
+  ssl_dhparam /etc/ssl/certs/dhparam.pem;
+  ssl_prefer_server_ciphers on;
+
+  root /home/thanhpk/meotrics/landing/;
+
+  location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+    expires 1y;
+    log_not_found off;
+  }
+  server_tokens off;
+  #more_set_headers "Server: Meotrics";
+
+  index index.html;
+  location ~ /\.(ht|svn|git) {
+    deny all;
+  }
+
+  # Common bandwidth hoggers and hacking tools.
+  if ($http_user_agent ~ "libwww-perl") {
+    set $block_user_agents 1;
+  }
+
+  if ($http_user_agent ~ "GetRight") {
+    set $block_user_agents 1;
+  }
+
+  if ($http_user_agent ~ "GetWeb!") {
+    set $block_user_agents 1;
+  }
+
+  if ($http_user_agent ~ "Go!Zilla") {
+    set $block_user_agents 1;
+  }
+
+  if ($http_user_agent ~ "Download Demon") {
+    set $block_user_agents 1;
+  }
+
+  if ($http_user_agent ~ "Go-Ahead-Got-It") {
+    set $block_user_agents 1;
+  }
+
+  if ($http_user_agent ~ "TurnitinBot") {
+    set $block_user_agents 1;
+  }
+
+  if ($http_user_agent ~ "GrabNet") {
+    set $block_user_agents 1;
+  }
+
+  if ($block_user_agents = 1) {
+    return 403;
+  }
+}
+
+server {
+  listen 80;
+  server_name api.meotrics.com;
+
+  location / {
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header Host $http_host;
     proxy_pass http://127.0.0.1:1711/api;
   }
+}
+
+server {
+  listen 443;
+  server_name api.meotrics.com;
+
+  ssl on;
+  ssl_certificate /etc/ssl/certs/chained.pem;
+  ssl_certificate_key /etc/ssl/private/domain.key;
+  ssl_session_timeout 5m;
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  ssl_ciphers ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA;
+  ssl_session_cache shared:SSL:50m;
+  ssl_dhparam /etc/ssl/certs/dhparam.pem;
+  ssl_prefer_server_ciphers on;
+
+  large_client_header_buffers 8 32k;
 
   location / {
-    try_files $uri $uri/ /index.php?$args;
-  }
-
-  location ~ \.php$ {
-    include fastcgi_params;
-    fastcgi_param REMOTE_ADDR $http_x_real_ip;
-    fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
-    fastcgi_pass   unix:/var/run/php5-fpm.sock;
-    try_files $uri =404;
-  }
-
-  location ~ /\.(ht|svn|git) {
-    deny all;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host $http_host;
+    proxy_pass http://127.0.0.1:1711/api;
   }
 }
 
 server {
-  charset utf-8;
   listen 80;
-
-  server_name meotrics.dev;
-  root        /home/thanhpk/space/meotrics/landing/;
-  index       index.html;
-
-  access_log  /home/thanhpk/tmp/meotricslanding-access.log;
-  error_log   /home/thanhpk/tmp/meotricslanding-error.log;
-
-  location / {
-    try_files $uri $uri/ /index.php?$args;
-  }
-
-  location ~ \.php$ {
-    include fastcgi_params;
-    fastcgi_param REMOTE_ADDR $http_x_real_ip;
-    fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;
-    fastcgi_pass   unix:/var/run/php5-fpm.sock;
-    try_files $uri =404;
-  }
-
-  location ~ /\.(ht|svn|git) {
-    deny all;
-  }
+  server_name app.meotrics.com;
+  return 301 https://$server_name$request_uri;
 }
-	
+
+map $http_upgrade $connection_upgrade{
+  default upgrade;
+  '' close;
+}
+
+upstream websocket {
+  server 127.0.0.1:2910;
+}
+
 server {
   charset utf-8;
-  listen 80;
-	
-  server_name client.meotrics.dev;
-  root        /home/thanhpk/space/meotrics/dashboard/public/;
+  listen 443;
+
+  server_name app.meotrics.com;
+  root        /home/thanhpk/meotrics/dashboard/public/;
   index       index.php;
-	
-  access_log  /home/thanhpk/tmp/client.meotrics-access.log;
-  error_log   /home/thanhpk/tmp/client.meotrics-error.log;
-	
+  ssl on;
+  ssl_certificate /etc/ssl/certs/chained.pem;
+  ssl_certificate_key /etc/ssl/private/domain.key;
+  ssl_session_timeout 5m;
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  ssl_ciphers ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA;
+  ssl_session_cache shared:SSL:50m;
+  ssl_dhparam /etc/ssl/certs/dhparam.pem;
+  ssl_prefer_server_ciphers on;
+
+  access_log  /home/thanhpk/tmp/meotrics-access443.log;
+  error_log   /home/thanhpk/tmp/meotrics-error443.log;
+
+  location /ws {
+    proxy_pass http://websocket;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+  }
+
   location / {
     try_files $uri $uri/ /index.php?$args;
   }
-	
+
   location ~ \.php$ {
     include fastcgi_params;
     fastcgi_param REMOTE_ADDR $http_x_real_ip;
@@ -252,7 +336,7 @@ server {
     fastcgi_pass   unix:/var/run/php5-fpm.sock;
     try_files $uri =404;
   }
-	
+          
   location ~ /\.(ht|svn|git) {
     deny all;
   }
@@ -265,7 +349,7 @@ server {
 * MySql
 
   Tạo tài khoản mysql có tên `meotrics/meotrics123`
-  
+
   Import database từ file  `\resources\meotrics_dashboard.sql`
 
 Chạy chương trình
