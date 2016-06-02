@@ -253,5 +253,5 @@
 
 	@yield('additional')
 	@yield('script')
-	@include('partials/install_guide')
+	@include('partials.install_guide')
 @endsection

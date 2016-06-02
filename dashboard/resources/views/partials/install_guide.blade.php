@@ -85,9 +85,9 @@
 		}
 	}
 	function getIntegrationCode(appcode) {
-		$.get('/mt.min.html', function (response) {
+		$.get('//meotrics/track.html', function (response) {
 			var html = $('<div/>').text(response).html();
-			$('#guideline').find('textarea').html(html.replace('$APPID$', appcode));
+			$('#guideline').find('textarea').html(html.replace(/\$APPID\$/g, appcode));
 		}).fail(function (err) {
 			_helper.notification.error(err.statusText)
 		});

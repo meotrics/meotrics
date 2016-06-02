@@ -103,4 +103,5 @@
 @section('footer-script')
 	@yield('additional')
 	@yield('script')
+	@include('partials.install_guide')
 @endsection
