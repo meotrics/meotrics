@@ -16,6 +16,7 @@ class TypeController extends Controller
 	{
 		$result = MtHttp::get('actiontype/' . $appid);
 		return view('actiontype/index', [
+			'appcode' => $appid,
 			'actiontypes' => $result
 		]);
 	}
@@ -25,6 +26,7 @@ class TypeController extends Controller
 		$result = MtHttp::get('actiontype/' . $appid . '/' . $id);
 		if($result){
 			return view('actiontype/edit', [
+				'appcode' => $appid,
 				'type' => $result
 			]);
 		} else {
@@ -54,7 +56,7 @@ class TypeController extends Controller
 
 	public function create($request, $appcode)
 	{	
-		return view('actiontype/create');
+		return view('actiontype/create', ['appcode' => $appcode]);
 	}
 
 	public function store($request, $appcode){
