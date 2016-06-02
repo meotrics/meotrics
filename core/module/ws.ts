@@ -11,7 +11,7 @@ export class WS {
 	private topic_clients = {};
 	private boardcast_clients = {};
 
-	public constructor(private port:number) {
+	public constructor(private port) {
 
 		this.httpserver = http.createServer(function (req, res) {
 			res.writeHead(404);

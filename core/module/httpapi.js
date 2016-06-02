@@ -182,7 +182,8 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 	}
 
 	function pageview(req, res) {
-		var appid = req.appid;
+	    var appid = req.appid;
+	    console.log('appid + ' + appid);
 		// record an new pageview
 		var data = trackBasic(req);
 		getMtid(req, appid, res, function (mtid) {

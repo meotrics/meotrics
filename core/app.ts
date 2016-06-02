@@ -54,7 +54,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err:mongodb.MongoE
 	let wsport = config.get<number>('websocket.port') || 2910;
 	let keypath = config.get<string>('websocket.key');
 	let certpath = config.get<string>('websocket.cert');
-	var ws = new WS.WS(wsport, keypath, certpath);
+	var ws = new WS.WS(wsport);
 
 	// bind change event
 	httpapi.onchange = function (appid, code) {
