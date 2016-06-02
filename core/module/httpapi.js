@@ -221,6 +221,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 			}
 
 			function handle(req, res, path) {
+			    console.log(path);
 				var parts = path.split('/');
 				res.statusCode = 200;
 				req['appid'] = parts[1];
