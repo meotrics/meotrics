@@ -29,6 +29,11 @@ Route::delete('/trend/{appcode}/remove/{id}', 'TrendController@deleteRemove');
 Route::get('/trend/{appcode}/{trendid?}', 'TrendController@getIndex');
 
 Route::get('/actiontype/{appcode}', 'TypeController@index');
+Route::post('/actiontype/{appcode}/update/{id}', 'TypeController@update');
+Route::get('/actiontype/{appcode}/show/{id}', 'TypeController@show');
+Route::get('/actiontype/{appcode}/create', 'TypeController@create');
+Route::post('/actiontype/{appcode}/store', 'TypeController@store');
+Route::delete('/actiontype/{appcode}/{id}', 'TypeController@destroy');
 
 Route::post('/actiontype/{appid}/create', 'TypeController@create');
 

@@ -20,10 +20,9 @@ class TypeController extends Controller
 		]);
 	}
 
-	public function show(Request $request, $id)
+	public function show(Request $request, $appid, $id)
 	{
-		$app_id = \Auth::user()->id;
-		$result = MtHttp::get('actiontype/' . $app_id . '/' . $id);
+		$result = MtHttp::get('actiontype/' . $appid . '/' . $id);
 		if($result){
 			return view('actiontype/edit', [
 				'type' => $result
@@ -33,9 +32,8 @@ class TypeController extends Controller
 		}
 	}
 	
-	public function update($id)
+	public function update($request, $appid, $id)
 	{
-		$app_id = \Auth::user()->id;
 		$p = $this->request->all();
 		$p['fields'] = array();
 		for($i = 0; $i < count($p['pcodes']); $i++){
@@ -50,17 +48,16 @@ class TypeController extends Controller
 		unset($p['pcodes']);
 		unset($p['pnames']);
 		unset($p['_method']);
-		MtHttp::put('actiontype/' . $app_id . '/' . $id, $p);
+		MtHttp::put('actiontype/' . $appid . '/' . $id, $p);
 		return Redirect::action('TypeController@show', $id)->with('success', 'Action type saved !');;
 	}
 
-	public function create()
+	public function create($request, $appcode)
 	{	
 		return view('actiontype/create');
 	}
 
-	public function store(){
-		$app_id = \Auth::user()->id;
+	public function store($request, $appcode){
 		$p = $this->request->all();
 		$p['fields'] = array();
 		for($i = 0; $i < count($p['pcodes']); $i++){
@@ -75,14 +72,13 @@ class TypeController extends Controller
 		unset($p['pcodes']);
 		unset($p['pnames']);
 		unset($p['_method']);
-		$result = MtHttp::post('actiontype/' . $app_id, $p);
+		$result = MtHttp::post('actiontype/' . $appcode, $p);
 		return Redirect::action('TypeController@index');
 	}
 
-	public function destroy($id)
+	public function destroy($request, $appcode, $id)
 	{
-		$app_id = \Auth::user()->id;
-		$result = MtHttp::delete('actiontype/' . $app_id . '/' . $id, array());
+		$result = MtHttp::delete('actiontype/' . $appcode . '/' . $id, array());
 		return Redirect::action('TypeController@index');
 	}
 

@@ -37,7 +37,7 @@
 
 	<div class="card row">
 		<div class="content col-sm-12">
-			<form action="/actiontype" method="POST">
+			<form action="/actiontype/{{appcode}}/store" method="POST">
 				<div class="row">
 					<div class="col-sm-2 ">
 						<h6 class="pull-right " >Code</h6>

@@ -42,7 +42,7 @@
 			<form method="POST">
 				<input type="hidden" name="_method" value="PUT">
 				<div>
-					<a href="{{ URL::to('actiontype') }}">
+					<a href="/actiontype/{{appcode}}">
 						<small class="text-muted pull-left uppercase">
 							<b><i class="fa fa-chevron-left"></i>Action type</b>
 						</small>
