@@ -132,7 +132,7 @@
 
 		$('#trend').on('change', function () {
 			var that = $(this);
-			$.post('/trend/currenttrend/' + that.val(), function () {
+			$.post('/trend/{{$appcode}}/currenttrend/' + that.val(), function () {
 				location.reload();
 			});
 
