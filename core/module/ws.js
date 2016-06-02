@@ -1,6 +1,5 @@
 "use strict";
-const https = require('https');
-const fs = require('fs');
+const http = require('http');
 const websocket = require('websocket');
 class Message {
     constructor(appid, code) {
@@ -9,15 +8,11 @@ class Message {
     }
 }
 class WS {
-    constructor(port, keypath, certpath) {
+    constructor(port) {
         this.port = port;
         this.topic_clients = {};
         this.boardcast_clients = {};
-        var option = {
-            key: fs.readFileSync(keypath),
-            cert: fs.readFileSync(certpath)
-        };
-        this.httpserver = https.createServer(option, function (req, res) {
+        this.httpserver = http.createServer(function (req, res) {
             res.writeHead(404);
             res.end();
         });
@@ -37,7 +32,7 @@ class WS {
     run() {
         var me = this;
         this.httpserver.listen(me.port, function () {
-            console.log('Websocket server / OK  / ' + me.port);
+            console.log('Websocket server / OK /       ' + me.port);
         });
         var wsServer = new websocket.server({
             httpServer: me.httpserver,

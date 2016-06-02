@@ -1,5 +1,4 @@
-﻿import https = require('https');
-import fs = require('fs');
+﻿import * as http from 'http';
 import * as websocket from 'websocket';
 
 class Message {
@@ -12,13 +11,9 @@ export class WS {
 	private topic_clients = {};
 	private boardcast_clients = {};
 
-	public constructor(private port:number, keypath:string, certpath:string) {
-		var option = {
-			key: fs.readFileSync(keypath),
-			cert: fs.readFileSync(certpath)
-		};
+	public constructor(private port:number) {
 
-		this.httpserver = https.createServer(option, function (req, res) {
+		this.httpserver = http.createServer(function (req, res) {
 			res.writeHead(404);
 			res.end();
 		});
@@ -41,7 +36,7 @@ export class WS {
 		var me = this;
 
 		this.httpserver.listen(me.port, function () {
-			console.log('Websocket server / OK  / ' + me.port);
+			console.log('Websocket server / OK /       ' + me.port);
 		});
 
 		var wsServer = new websocket.server({

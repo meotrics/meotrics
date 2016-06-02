@@ -357,7 +357,7 @@ export class Dashboard {
 					// 2 number of returning visitor
 					todayvismatch[ids._isUser] = true;
 					todayvismatch[ids._ctime] = {$gte: todaysec};
-
+					
 					me.db.collection(me.prefix + "app" + appid).count(todayvismatch, function (err, res) {
 						if (err) throw err;
 						dashboard.n_new_visitor = res;
