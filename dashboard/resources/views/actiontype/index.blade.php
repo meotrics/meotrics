@@ -40,8 +40,8 @@
 								@endforeach
 							</td>
 							<td class="row">
-								<a class="btn btn-primary btn-sm btn-fill" href="/actiontype/{{appcode}}/{{$type->_id}}/show"><i class="fa fa-edit"></i></a>
-								<form method="DELETE" action="/actiontype/{{appcode}}/{{$type->_id}}" style="display: inline-block" onsubmit="return confirmDelete('{{ $type->codename }}')">
+								<a class="btn btn-primary btn-sm btn-fill" href="/actiontype/{{$appcode}}/{{$type->_id}}/show"><i class="fa fa-edit"></i></a>
+								<form method="DELETE" action="/actiontype/{{$appcode}}/{{$type->_id}}" style="display: inline-block" onsubmit="return confirmDelete('{{ $type->codename }}')">
 									<input type="hidden" name="_method" value="DELETE">
 									<button type="submit" class="btn btn-danger  btn-sm btn-fill">
 										<i class="fa fa-trash"></i>
