@@ -13,7 +13,7 @@
 	var url = 'mongodb://' + config.get('mongod.host') + ':' + config.get('mongod.port') + '/' + config.get('mongod.database');
 	var prefix = config.get('mongod.prefix');
 	var appid = process.argv[2];
-	var collection = prefix + appid;
+	var collection = prefix + "app" + appid;
 	var nusers = process.argv[3] || 2000;
 	var npageviews = process.argv[4] || 100000;
 	var npurchases = process.argv[5] || 5000;
