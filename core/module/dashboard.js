@@ -145,6 +145,68 @@ class Dashboard {
             });
         });
     }
+    getUniqueVisitor(db, prefix, appid, ids, callback) {
+        var now = new Date();
+        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        var uniquevisitors = [];
+        let todaysec = Math.round(today.getTime() / 1000);
+        let b0 = todaysec;
+        let b1 = b0 - 24 * 3600;
+        let b2 = b1 - 24 * 3600;
+        let b3 = b2 - 24 * 3600;
+        let b4 = b3 - 24 * 3600;
+        let b5 = b4 - 24 * 3600;
+        let b6 = b5 - 24 * 3600;
+        var pipeline = [{ $match: {} }, { $group: { _id: "$" + ids._mtid } }, {
+                $group: {
+                    _id: null, count: { $sum: 1 }
+                }
+            }];
+        pipeline[0]['$match'][ids._typeid] = "pageview";
+        pipeline[0]['$match'][ids._ctime] = { $gte: b6, $lt: b5 };
+        db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
+            if (err)
+                throw err;
+            uniquevisitors.push(res.length == 0 ? 0 : res.length);
+            pipeline[0]['$match'][ids._ctime] = { $gte: b5, $lt: b4 };
+            db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
+                if (err)
+                    throw err;
+                uniquevisitors.push(res.length == 0 ? 0 : res.length);
+                pipeline[0]['$match'][ids._ctime] = { $gte: b4, $lt: b3 };
+                db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
+                    if (err)
+                        throw err;
+                    uniquevisitors.push(res.length == 0 ? 0 : res.length);
+                    pipeline[0]['$match'][ids._ctime] = { $gte: b3, $lt: b2 };
+                    db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
+                        if (err)
+                            throw err;
+                        uniquevisitors.push(res.length == 0 ? 0 : res.length);
+                        pipeline[0]['$match'][ids._ctime] = { $gte: b2, $lt: b1 };
+                        db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
+                            if (err)
+                                throw err;
+                            uniquevisitors.push(res.length == 0 ? 0 : res.length);
+                            pipeline[0]['$match'][ids._ctime] = { $gte: b1, $lt: b0 };
+                            db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
+                                if (err)
+                                    throw err;
+                                uniquevisitors.push(res.length == 0 ? 0 : res.length);
+                                pipeline[0]['$match'][ids._ctime] = { $gte: b0 };
+                                db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
+                                    if (err)
+                                        throw err;
+                                    uniquevisitors.push(res.length == 0 ? 0 : res.length);
+                                    callback(uniquevisitors);
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
     getRetensionRates(db, prefix, appid, ids, callback) {
         //3 retension rate = number of user purchase within 7 days/ total number of visitor
         //get alltime visitor
@@ -155,20 +217,17 @@ class Dashboard {
         let todaysec = Math.round(today.getTime() / 1000);
         let seventhdaybefore = todaysec - 7 * 24 * 3600;
         let b0 = todaysec;
-        let b1 = b0 - 24 * 3600;
-        let b2 = b1 - 24 * 3600;
-        let b3 = b2 - 24 * 3600;
-        let b4 = b3 - 24 * 3600;
-        let b5 = b4 - 24 * 3600;
-        let b6 = b5 - 24 * 3600;
-        let b7 = b6 - 24 * 3600;
-        let b8 = b7 - 24 * 3600;
-        let b9 = b8 - 24 * 3600;
-        let b10 = b9 - 24 * 3600;
-        let b11 = b10 - 24 * 3600;
-        let b12 = b11 - 24 * 3600;
-        //let b13 = b12 - 24 * 3600;
-        //let b14 = b13 - 24 * 3600;
+        let b6 = b0 - 6 * 24 * 3600;
+        // get all to day visitor
+        var retension_pipelines = [{ $match: {} }, { $group: { _id: "$" + ids._mtid } }, {
+                $group: {
+                    _id: null, count: { $sum: 1 }
+                }
+            }];
+        retension_pipelines[0]['$match'][ids._typeid] = "pageview";
+        retension_pipelines[0]['$match'][ids._ctime] = {};
+        retension_pipelines[0]['$match'][ids._ctime].$gte = b6;
+        retension_pipelines[0]['$match'][ids._ctime].$lt = b5;
         let alltimecount = {};
         alltimecount[ids._isUser] = { $exists: false };
         alltimecount[ids._ctime] = { $lt: b5 };
