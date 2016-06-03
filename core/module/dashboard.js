@@ -208,6 +208,7 @@ class Dashboard {
         });
     }
     getRetensionRates(db, prefix, appid, ids, callback) {
+        var me = this;
         var now = new Date();
         var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         let todaysec = Math.round(today.getTime() / 1000);
@@ -509,8 +510,10 @@ class Dashboard {
                 throw err;
             if (res.length == 0)
                 return callback(0);
-            return callback(res.revenue * 1.0 / res.count);
+            return callback(res.revenue / res.count);
         });
+    }
+    getMostEffectiveReferal(db, prefix, appid, ids, callback) {
     }
     getDashboard(appid, callback) {
         let me = this;
@@ -553,26 +556,29 @@ class Dashboard {
                                 var sumrevnue = revenues.reduce((pv, cv) => pv + cv, 0);
                                 dashboard.n_avgcartsize = n_purchase == 0 ? sumrevnue : sumrevnue / n_purchase;
                                 gcallback(dashboard);
-                                me.getGrowRate(me.db, me.prefix, app, ids, function (growrate) {
+                                me.getGrowRate(me.db, me.prefix, appid, ids, function (growrate) {
                                     dashboard.usergrowth_rate = growrate;
                                 });
                                 me.getConversionRate(me.db, me.prefix, appid, ids, function (cs) {
-                                    dashboard.conversion_rate;
+                                    dashboard.conversion_rate = cs;
+                                    me.getRetensionRates(me.db, me.prefix, appid, ids, function (rates) {
+                                        dashboard.retention_rates = rates;
+                                        me.getRevenuePerCustomer(me.db, me.prefix, appid, ids, function (v) {
+                                            dashboard.revenue_per_customer = v;
+                                            me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, function (campaign) {
+                                                dashboard.highest_revenue_campaign = campaign;
+                                                me.getMostPopulerCategory(me.db, me.prefix, appid, ids, function (cat) {
+                                                    dashboard.most_popular_category = cat;
+                                                    me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, function (ref) {
+                                                        dashboard.most_effective_ref = ref;
+                                                        gcallback(d);
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
                                 });
                             });
-                        });
-                        return;
-                        // 3 retenstion rate
-                        me.getConversionRate(me.db, me.prefix, appid, ids, function (retention_rates) {
-                            dashboard.retention_rates = retention_rates;
-                            //4 highest campaign
-                            var highestcampaing_project = {};
-                            highestcampaing_project[ids._ctime] = 1;
-                            highestcampaing_project[ids._isUser] = 1;
-                            highestcampaing_project[ids._revenue] = 1;
-                            var hc_match = {};
-                            hc_match[ids._isUser] = true;
-                            //	me.db.collection(me.prefix + appid).aggregate([], {$: ''}
                         });
                     });
                 });

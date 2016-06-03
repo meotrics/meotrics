@@ -8,14 +8,13 @@ export class DashboardEntity {
 	public n_new_signup:number;
 	public n_avgcartsize:number;
 	public total_revenues:number[];
-
-	public total_revenues_per_user:number[];
+	public revenue_per_customer:number;
 	public retention_rates:number[];
 	public usergrowth_rate:number;
 	public conversion_rate:number;
 	public highest_revenue_campaign:string;
 	public most_effective_ref:string;
-
+	public most_popular_category: string;
 }
 export class Dashboard {
 	private Lock = require('lock');
@@ -70,7 +69,7 @@ export class Dashboard {
 		});
 	}
 
-	private getTotalRevenue(db:mongo.Db, prefix:string, appid:string, ids, callback:(a:number[], b:number)=>void) {
+	private getTotalRevenue(db:mongo.Db, prefix:string, appid:string, ids, callback:(revenue:number[], numberofpurchase:number)=>void) {
 		var n_users:number[] = [];
 		var n_users_purchase:number[] = [];
 		var n_purchase = 0;
@@ -228,6 +227,7 @@ export class Dashboard {
 	}
 
 	private getRetensionRates(db:mongo.Db, prefix:string, appid:string, ids, callback:(rates:number[])=>void) {
+		var me = this;
 		var now = new Date();
 		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 		let todaysec = Math.round(today.getTime() / 1000);
@@ -305,13 +305,11 @@ export class Dashboard {
 																for (var i = 0; i < 7; i++) {
 																	var rates = [];
 
-																	if(n_users[i-6] == 0)
-																	{
+																	if (n_users[i - 6] == 0) {
 																		rates.push(0);
 																	}
-																	else
-																	{
-																		rates.push( (visitors[i]  - n_users[i])  / n_users[i-6] );
+																	else {
+																		rates.push((visitors[i] - n_users[i]) / n_users[i - 6]);
 																	}
 																}
 																callback(rates);
@@ -331,8 +329,7 @@ export class Dashboard {
 		});
 	}
 
-
-	private getConversionRate(db:mongo.Db, prefix:string, appid:string, ids, callback:(a:number[]) => void) {
+	private getConversionRate(db:mongo.Db, prefix:string, appid:string, ids, callback:(a:number) => void) {
 		//3 retension rate = number of user purchase within 7 days/ total number of visitor
 		//get alltime visitor
 
@@ -521,8 +518,12 @@ export class Dashboard {
 		db.collection(prefix + "app" + appid).aggregate(totaluserpipeline, function (err, res) {
 			if (err) throw err;
 			if (res.length == 0) return callback(0);
-			return callback(res.revenue * 1.0 / res.count);
+			return callback(res.revenue / res.count);
 		});
+	}
+
+	public getMostEffectiveReferal(db: mongo.Db, prefix:string, appid:string, ids, callback:(ref:string)=>void){
+
 	}
 
 	public getDashboard(appid:string, callback:(d:DashboardEntity) => void) {
@@ -570,37 +571,35 @@ export class Dashboard {
 								dashboard.n_avgcartsize = n_purchase == 0 ? sumrevnue : sumrevnue / n_purchase;
 								gcallback(dashboard);
 
-								me.getGrowRate(me.db, me.prefix, app, ids, function (growrate:number) {
+								me.getGrowRate(me.db, me.prefix, appid, ids, function (growrate:number) {
 									dashboard.usergrowth_rate = growrate;
-								})
+								});
+								me.getConversionRate(me.db, me.prefix, appid, ids, function(cs:number) {
+									dashboard.conversion_rate = cs;
+									me.getRetensionRates(me.db, me.prefix, appid, ids, function (rates:number[]) {
+										dashboard.retention_rates = rates;
+										me.getRevenuePerCustomer(me.db, me.prefix, appid, ids, function (v:number) {
+											dashboard.revenue_per_customer = v;
 
-								me.getConversionRate(me.db, me.prefix, appid, ids, function (cs:numbers) {
-									dashboard.conversion_rate
-								})
+											me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, function(campaign: string){
+												dashboard.highest_revenue_campaign = campaign;
+
+												me.getMostPopulerCategory(me.db, me.prefix, appid, ids, function(cat:string){
+													dashboard.most_popular_category = cat;
+
+													me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, function(ref: string){
+														dashboard.most_effective_ref = ref;
+														gcallback(d);
+													});
+												});
+											});
+										});
+									});
+								});
 							});
-
 						});
-						return;
-						// 3 retenstion rate
-						me.getConversionRate(me.db, me.prefix, appid, ids, function (retention_rates:number[]) {
-							dashboard.retention_rates = retention_rates;
-
-							//4 highest campaign
-							var highestcampaing_project = {};
-							highestcampaing_project[ids._ctime] = 1;
-							highestcampaing_project[ids._isUser] = 1;
-							highestcampaing_project[ids._revenue] = 1;
-
-							var hc_match = {};
-							hc_match[ids._isUser] = true;
-							//	me.db.collection(me.prefix + appid).aggregate([], {$: ''}
-
-
-						});
-
 					});
 				});
-
 			});
 		}
 
