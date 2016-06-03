@@ -5,14 +5,17 @@ export class DashboardEntity {
 	public appid:string;
 	public n_new_visitor:number;
 	public n_returning_visitor:number;
+	public n_new_signup: number;
+	public n_avgcartsize : number;
 	public total_revenues:number[];
+
 	public total_revenues_per_user:number[];
 	public retention_rates:number[];
 	public usergrowth_rate:number;
 	public conversion_rate:number;
 	public highest_revenue_campaign:string;
 	public most_effective_ref:string;
-	public n_new_signup: number;
+
 }
 export class Dashboard {
 	private Lock = require('lock');
@@ -67,13 +70,10 @@ export class Dashboard {
 		});
 	}
 
-	private getTotalRevenue(db:mongo.Db, prefix:string, appid:string, ids, callback:(a:number[])=>void) {
-		//3 retension rate = number of user purchase within 7 days/ total number of visitor
-		//get alltime visitor
-
+	private getTotalRevenue(db:mongo.Db, prefix:string, appid:string, ids, callback:(a:number[],b : number)=>void) {
 		var n_users:number[] = [];
 		var n_users_purchase:number[] = [];
-
+		var n_purchase = 0;
 		var now = new Date();
 		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
@@ -99,7 +99,7 @@ export class Dashboard {
 		var revenues:number[] = [];
 		var revenue_pipeline = [{$match: {}}, {
 			$group: {
-				_id: null, sum: {$sum: "$amount"}
+				_id: null, sum: {$sum: "$amount"}, count: {$sum: 1}
 			}
 		}];
 
@@ -110,38 +110,50 @@ export class Dashboard {
 		db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 			if (err) throw err;
 			revenues.push(res.length === 0 ? 0 : res[0].sum);
+			n_purchase+= res[0].count;
 
 			revenue_pipeline[0]['$match'][ids._ctime].$gte = b5;
 			revenue_pipeline[0]['$match'][ids._ctime].$lt = b4;
 			db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 				if (err) throw err;
 				revenues.push(res.length === 0 ? 0 : res[0].sum);
+				n_purchase+= res[0].count;
+
 				revenue_pipeline[0]['$match'][ids._ctime].$gte = b4;
 				revenue_pipeline[0]['$match'][ids._ctime].$lt = b3;
 				db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 					if (err) throw err;
 					revenues.push(res.length === 0 ? 0 : res[0].sum);
+					n_purchase+= res[0].count;
+
 					revenue_pipeline[0]['$match'][ids._ctime].$gte = b3;
 					revenue_pipeline[0]['$match'][ids._ctime].$lt = b2;
 					db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 						if (err) throw err;
 						revenues.push(res.length === 0 ? 0 : res[0].sum);
+						n_purchase+= res[0].count;
+
 						revenue_pipeline[0]['$match'][ids._ctime].$gte = b2;
 						revenue_pipeline[0]['$match'][ids._ctime].$lt = b1;
 						db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 							if (err) throw err;
 							revenues.push(res.length === 0 ? 0 : res[0].sum);
+							n_purchase+= res[0].count;
+
 							revenue_pipeline[0]['$match'][ids._ctime].$gte = b1;
 							revenue_pipeline[0]['$match'][ids._ctime].$lt = b0;
 							db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 								if (err) throw err;
 								revenues.push(res.length === 0 ? 0 : res[0].sum);
+								n_purchase+= res[0].count;
+
 								revenue_pipeline[0]['$match'][ids._ctime] = {$gte: b0};
 								db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 									if (err) throw err;
 									revenues.push(res.length === 0 ? 0 : res[0].sum);
+									n_purchase+= res[0].count;
 
-									callback(revenues);
+									callback(revenues, n_purchase);
 								});
 							});
 						});
@@ -150,6 +162,134 @@ export class Dashboard {
 			});
 		});
 	}
+
+	private getRetensionRates(db: mongo.Db, prefix:string, appid:string, ids, callback:(rates: number[])=>void)
+{
+	//3 retension rate = number of user purchase within 7 days/ total number of visitor
+	//get alltime visitor
+
+	var n_users:number[] = [];
+	var n_users_purchase:number[] = [];
+
+	var now = new Date();
+	var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+	let todaysec = Math.round(today.getTime() / 1000);
+	let seventhdaybefore = todaysec - 7 * 24 * 3600;
+	let b0 = todaysec;
+	let b1 = b0 - 24 * 3600;
+	let b2 = b1 - 24 * 3600;
+	let b3 = b2 - 24 * 3600;
+	let b4 = b3 - 24 * 3600;
+	let b5 = b4 - 24 * 3600;
+	let b6 = b5 - 24 * 3600;
+	let b7 = b6 - 24 * 3600;
+	let b8 = b7 - 24 * 3600;
+	let b9 = b8 - 24 * 3600;
+	let b10 = b9 - 24 * 3600;
+	let b11 = b10 - 24 * 3600;
+	let b12 = b11 - 24 * 3600;
+	//let b13 = b12 - 24 * 3600;
+	//let b14 = b13 - 24 * 3600;
+
+	let alltimecount = {};
+	alltimecount[ids._isUser] = {$exists: false};
+	alltimecount[ids._ctime] = {$lt: b5};
+	db.collection(prefix + appid).count(alltimecount, function (err, res) {
+		if (err) throw err;
+		n_users.push(res);
+		alltimecount[ids._ctime] = {$lt: b4};
+		db.collection(prefix + appid).count(alltimecount, function (err, res) {
+			if (err) throw err;
+			n_users.push(res);
+			alltimecount[ids._ctime] = {$lt: b3};
+			db.collection(prefix + appid).count(alltimecount, function (err, res) {
+				if (err) throw err;
+				n_users.push(res);
+				alltimecount[ids._ctime] = {$lt: b2};
+				db.collection(prefix + appid).count(alltimecount, function (err, res) {
+					if (err) throw err;
+					n_users.push(res);
+					alltimecount[ids._ctime] = {$lt: b1};
+					db.collection(prefix + appid).count(alltimecount, function (err, res) {
+						if (err) throw err;
+						n_users.push(res);
+						alltimecount[ids._ctime] = {$lt: b0};
+						db.collection(prefix + appid).count(alltimecount, function (err, res) {
+							if (err) throw err;
+							n_users.push(res);
+							db.collection(prefix + appid).count(alltimecount, function (err, res) {
+								if (err) throw err;
+								n_users.push(res);
+
+								// number of user purchase within 7 days of 7 days
+
+								var retension_pipelines = [{$match: {}}, {$group: {_id: "$" + ids._mtid}}, {
+									$group: {
+										_id: null, count: {$sum: 1}
+									}
+								}];
+
+								retension_pipelines[0]['$match'][ids._typeid] = "purchase";
+								retension_pipelines[0]['$match'][ids._ctime] = {};
+								retension_pipelines[0]['$match'][ids._ctime].$gte = b12;
+								retension_pipelines[0]['$match'][ids._ctime].$lt = b5;
+								db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
+									if (err) throw err;
+									n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
+									retension_pipelines[0]['$match'][ids._ctime].$gte = b11;
+									retension_pipelines[0]['$match'][ids._ctime].$lt = b4;
+									db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
+										if (err) throw err;
+										n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
+										retension_pipelines[0]['$match'][ids._ctime].$gte = b10;
+										retension_pipelines[0]['$match'][ids._ctime].$lt = b3;
+										db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
+											if (err) throw err;
+											n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
+											retension_pipelines[0]['$match'][ids._ctime].$gte = b9;
+											retension_pipelines[0]['$match'][ids._ctime].$lt = b2;
+											db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
+												if (err) throw err;
+												n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
+												retension_pipelines[0]['$match'][ids._ctime].$gte = b8;
+												retension_pipelines[0]['$match'][ids._ctime].$lt = b1;
+												db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
+													if (err) throw err;
+													n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
+													retension_pipelines[0]['$match'][ids._ctime].$gte = b7;
+													retension_pipelines[0]['$match'][ids._ctime].$lt = b0;
+													db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
+														if (err) throw err;
+														n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
+														retension_pipelines[0]['$match'][ids._ctime] = {};
+														retension_pipelines[0]['$match'][ids._ctime].$gte = b6;
+														db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
+															if (err) throw err;
+															n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
+
+															let retension_rates = [];
+															for (let i = 0; i < 6; i++) {
+																retension_rates.push(n_users[i] === 0 ? 0 : n_users_purchase[i] / n_users[i]);
+															}
+
+															callback(retension_rates);
+														});
+													});
+												});
+											});
+										});
+									});
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+
+	});
+}
 
 	private getConversionRate(db:mongo.Db, prefix:string, appid:string, ids, callback:(a:number[]) => void) {
 		//3 retension rate = number of user purchase within 7 days/ total number of visitor
@@ -382,7 +522,22 @@ export class Dashboard {
 
 						me.getNewSignup(me.db, me.prefix, appid,ids,function(ret){
 							dashboard.n_new_signup = ret;
-							gcallback(dashboard);
+
+							me.getTotalRevenue(me.db, me.prefix, appid, ids, function (revenues, n_purchase) {
+								dashboard.total_revenues = revenues;
+								var  sumrevnue = revenues.reduce((pv, cv) => pv+cv, 0);
+								dashboard.n_avgcartsize = n_purchase == 0 ? sumrevnue : sumrevnue / n_purchase;
+								gcallback(dashboard);
+
+								me.getGrowRate(me.db,me.prefix, app, ids, function(growrate: number){
+									dashboard.usergrowth_rate = growrate;
+								})
+
+								me.getConversionRate(me.db, me.prefix, appid, ids, function(cs: numbers){
+									dashboard.conversion_rate
+								})
+							});
+
 						});
 						return;
 						// 3 retenstion rate
