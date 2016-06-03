@@ -208,117 +208,100 @@ class Dashboard {
         });
     }
     getRetensionRates(db, prefix, appid, ids, callback) {
-        //3 retension rate = number of user purchase within 7 days/ total number of visitor
-        //get alltime visitor
-        var n_users = [];
-        var n_users_purchase = [];
         var now = new Date();
         var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         let todaysec = Math.round(today.getTime() / 1000);
-        let seventhdaybefore = todaysec - 7 * 24 * 3600;
         let b0 = todaysec;
-        let b6 = b0 - 6 * 24 * 3600;
-        // get all to day visitor
-        var retension_pipelines = [{ $match: {} }, { $group: { _id: "$" + ids._mtid } }, {
-                $group: {
-                    _id: null, count: { $sum: 1 }
-                }
-            }];
-        retension_pipelines[0]['$match'][ids._typeid] = "pageview";
-        retension_pipelines[0]['$match'][ids._ctime] = {};
-        retension_pipelines[0]['$match'][ids._ctime].$gte = b6;
-        retension_pipelines[0]['$match'][ids._ctime].$lt = b5;
+        let b1 = b0 - 24 * 3600;
+        let b2 = b1 - 24 * 3600;
+        let b3 = b2 - 24 * 3600;
+        let b4 = b3 - 24 * 3600;
+        let b5 = b4 - 24 * 3600;
+        let b6 = b5 - 24 * 3600;
+        let b7 = b6 - 24 * 3600;
+        let b8 = b7 - 24 * 3600;
+        let b9 = b8 - 24 * 3600;
+        let b10 = b9 - 24 * 3600;
+        let b11 = b10 - 24 * 3600;
+        var n_users = [];
         let alltimecount = {};
-        alltimecount[ids._isUser] = { $exists: false };
-        alltimecount[ids._ctime] = { $lt: b5 };
+        alltimecount[ids._isUser] = true;
+        alltimecount[ids._ctime] = { $lt: b11 };
         db.collection(prefix + appid).count(alltimecount, function (err, res) {
             if (err)
                 throw err;
             n_users.push(res);
-            alltimecount[ids._ctime] = { $lt: b4 };
+            alltimecount[ids._ctime] = { $lt: b10 };
             db.collection(prefix + appid).count(alltimecount, function (err, res) {
                 if (err)
                     throw err;
                 n_users.push(res);
-                alltimecount[ids._ctime] = { $lt: b3 };
+                alltimecount[ids._ctime] = { $lt: b9 };
                 db.collection(prefix + appid).count(alltimecount, function (err, res) {
                     if (err)
                         throw err;
                     n_users.push(res);
-                    alltimecount[ids._ctime] = { $lt: b2 };
+                    alltimecount[ids._ctime] = { $lt: b8 };
                     db.collection(prefix + appid).count(alltimecount, function (err, res) {
                         if (err)
                             throw err;
                         n_users.push(res);
-                        alltimecount[ids._ctime] = { $lt: b1 };
+                        alltimecount[ids._ctime] = { $lt: b7 };
                         db.collection(prefix + appid).count(alltimecount, function (err, res) {
                             if (err)
                                 throw err;
                             n_users.push(res);
-                            alltimecount[ids._ctime] = { $lt: b0 };
+                            alltimecount[ids._ctime] = { $lt: b6 };
                             db.collection(prefix + appid).count(alltimecount, function (err, res) {
                                 if (err)
                                     throw err;
                                 n_users.push(res);
+                                alltimecount[ids._ctime] = { $lt: b5 };
                                 db.collection(prefix + appid).count(alltimecount, function (err, res) {
                                     if (err)
                                         throw err;
                                     n_users.push(res);
-                                    // number of user purchase within 7 days of 7 days
-                                    var retension_pipelines = [{ $match: {} }, { $group: { _id: "$" + ids._mtid } }, {
-                                            $group: {
-                                                _id: null, count: { $sum: 1 }
-                                            }
-                                        }];
-                                    retension_pipelines[0]['$match'][ids._typeid] = "purchase";
-                                    retension_pipelines[0]['$match'][ids._ctime] = {};
-                                    retension_pipelines[0]['$match'][ids._ctime].$gte = b12;
-                                    retension_pipelines[0]['$match'][ids._ctime].$lt = b5;
-                                    db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
+                                    alltimecount[ids._ctime] = { $lt: b4 };
+                                    db.collection(prefix + appid).count(alltimecount, function (err, res) {
                                         if (err)
                                             throw err;
-                                        n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
-                                        retension_pipelines[0]['$match'][ids._ctime].$gte = b11;
-                                        retension_pipelines[0]['$match'][ids._ctime].$lt = b4;
-                                        db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
+                                        n_users.push(res);
+                                        alltimecount[ids._ctime] = { $lt: b3 };
+                                        db.collection(prefix + appid).count(alltimecount, function (err, res) {
                                             if (err)
                                                 throw err;
-                                            n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
-                                            retension_pipelines[0]['$match'][ids._ctime].$gte = b10;
-                                            retension_pipelines[0]['$match'][ids._ctime].$lt = b3;
-                                            db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
+                                            n_users.push(res);
+                                            alltimecount[ids._ctime] = { $lt: b2 };
+                                            db.collection(prefix + appid).count(alltimecount, function (err, res) {
                                                 if (err)
                                                     throw err;
-                                                n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
-                                                retension_pipelines[0]['$match'][ids._ctime].$gte = b9;
-                                                retension_pipelines[0]['$match'][ids._ctime].$lt = b2;
-                                                db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
+                                                n_users.push(res);
+                                                alltimecount[ids._ctime] = { $lt: b1 };
+                                                db.collection(prefix + appid).count(alltimecount, function (err, res) {
                                                     if (err)
                                                         throw err;
-                                                    n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
-                                                    retension_pipelines[0]['$match'][ids._ctime].$gte = b8;
-                                                    retension_pipelines[0]['$match'][ids._ctime].$lt = b1;
-                                                    db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
+                                                    n_users.push(res);
+                                                    alltimecount[ids._ctime] = { $lt: b0 };
+                                                    db.collection(prefix + appid).count(alltimecount, function (err, res) {
                                                         if (err)
                                                             throw err;
-                                                        n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
-                                                        retension_pipelines[0]['$match'][ids._ctime].$gte = b7;
-                                                        retension_pipelines[0]['$match'][ids._ctime].$lt = b0;
-                                                        db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
+                                                        n_users.push(res);
+                                                        alltimecount[ids._ctime] = { $gte: b0 };
+                                                        db.collection(prefix + appid).count(alltimecount, function (err, res) {
                                                             if (err)
                                                                 throw err;
-                                                            n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
-                                                            retension_pipelines[0]['$match'][ids._ctime] = {};
-                                                            retension_pipelines[0]['$match'][ids._ctime].$gte = b6;
-                                                            db.collection(prefix + appid).aggregate(retension_pipelines, function (err, res) {
-                                                                if (err)
-                                                                    throw err;
-                                                                n_users_purchase.push(res.length === 0 ? 0 : res[0].count);
-                                                                let retension_rates = [];
-                                                                for (let i = 0; i < 6; i++) {
-                                                                    retension_rates.push(n_users[i] === 0 ? 0 : n_users_purchase[i] / n_users[i]);
+                                                            n_users.push(res);
+                                                            me.getUniqueVisitor(db, prefix, appid, ids, function (visitors) {
+                                                                for (var i = 0; i < 7; i++) {
+                                                                    var rates = [];
+                                                                    if (n_users[i - 6] == 0) {
+                                                                        rates.push(0);
+                                                                    }
+                                                                    else {
+                                                                        rates.push((visitors[i] - n_users[i]) / n_users[i - 6]);
+                                                                    }
                                                                 }
-                                                                callback(retension_rates);
+                                                                callback(rates);
                                                             });
                                                         });
                                                     });
