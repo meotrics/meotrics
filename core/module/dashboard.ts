@@ -12,12 +12,29 @@ export class DashboardEntity {
 	public conversion_rate:number;
 	public highest_revenue_campaign:string;
 	public most_effective_ref:string;
+	public n_new_signup: number;
 }
 export class Dashboard {
 	private Lock = require('lock');
 	private lock = this.Lock();
 
 	public constructor(private db:mongo.Db, private converter, private prefix:string, private delaysec:number) {
+	}
+
+	private getNewSignup(db:mongo.Db, prefix:string, appid:string, ids, callback:(a:number)=>void) {
+		var nowsec = Math.round(new Date().getTime() / 1000);
+		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		let todaysec = Math.round(today.getTime() / 1000);
+
+		let me = this;
+		let match = {};
+		match[ids._ctime] = {$gte: todaysec};
+		match[ids._typeid] = 'signup';
+		match[ids._isUser] = {$exists: false};
+		db.collection(prefix + "app" + appid).count(match, function (err, res) {
+			if (err) throw err;
+			callback(res);
+		});
 	}
 
 	private getGrowRate(db:mongo.Db, prefix:string, appid:string, ids, callback:(a:number)=>void) {
@@ -278,7 +295,7 @@ export class Dashboard {
 
 		pipeline[0]['$match'][ids._typeid] = 'purchase';
 		pipeline[0]['$match'][ids._ctime] = {$gt: lastweeksec};
-		
+
 		db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
 			if (err) throw err;
 			if (res.length == 0) return callback(undefined);
@@ -291,7 +308,7 @@ export class Dashboard {
 		let pipeline = [
 			{$match: {}}, {
 				$group: {
-					_id:  "$" + ids._utm_campaign,
+					_id: "$" + ids._utm_campaign,
 					revenue: {$sum: "$" + ids.amount}
 				}
 			}, {
@@ -302,7 +319,7 @@ export class Dashboard {
 
 		pipeline[0]['$match'][ids._typeid] = 'purchase';
 		pipeline[0]['$match'][ids._ctime] = {$gt: lastweeksec};
-		pipeline[0]['$match'][ids._utm_campaign] = {$exists: true , $ne: null};
+		pipeline[0]['$match'][ids._utm_campaign] = {$exists: true, $ne: null};
 		db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
 			if (err) throw err;
 			if (res.length == 0) return callback(undefined);
@@ -357,13 +374,17 @@ export class Dashboard {
 					// 2 number of returning visitor
 					todayvismatch[ids._isUser] = true;
 					todayvismatch[ids._ctime] = {$gte: todaysec};
-					
+
 					me.db.collection(me.prefix + "app" + appid).count(todayvismatch, function (err, res) {
 						if (err) throw err;
 						dashboard.n_new_visitor = res;
 						dashboard.n_returning_visitor -= res;
-						
-						return gcallback(dashboard);
+
+						me.getNewSignup(me.db, me.prefix, appid,ids,function(ret){
+							dashboard.n_new_signup = ret;
+							gcallback(dashboard);
+						});
+						return;
 						// 3 retenstion rate
 						me.getConversionRate(me.db, me.prefix, appid, ids, function (retention_rates:number[]) {
 							dashboard.retention_rates = retention_rates;
@@ -428,7 +449,7 @@ export class Dashboard {
 
 			if (deltaT > me.delaysec) {
 				console.log('lock 2');
-				me.lock("c_" + appid , function (release) {
+				me.lock("c_" + appid, function (release) {
 					console.log('getin lock 2');
 					me.db.collection(me.prefix + "dashboard").find({appid: appid}).limit(1).toArray(function (err, res) {
 						if (err) throw err;
@@ -442,7 +463,7 @@ export class Dashboard {
 								dash.appid = appid + "";
 								dash.ctime = Math.round(new Date().getTime() / 1000);
 								me.db.collection(me.prefix + "dashboard").updateOne({appid: appid + ""}, dash, {upsert: true}, function (err) {
-									release(function(){
+									release(function () {
 									})();
 									if (err) throw err;
 								});

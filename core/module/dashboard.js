@@ -11,6 +11,21 @@ class Dashboard {
         this.Lock = require('lock');
         this.lock = this.Lock();
     }
+    getNewSignup(db, prefix, appid, ids, callback) {
+        var nowsec = Math.round(new Date().getTime() / 1000);
+        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        let todaysec = Math.round(today.getTime() / 1000);
+        let me = this;
+        let match = {};
+        match[ids._ctime] = { $gte: todaysec };
+        match[ids._typeid] = 'signup';
+        match[ids._isUser] = { $exists: false };
+        db.collection(prefix + "app" + appid).count(match, function (err, res) {
+            if (err)
+                throw err;
+            callback(res);
+        });
+    }
     getGrowRate(db, prefix, appid, ids, callback) {
         var nowsec = Math.round(new Date().getTime() / 1000);
         var last24hsec = nowsec - 24 * 3600;
@@ -353,7 +368,11 @@ class Dashboard {
                             throw err;
                         dashboard.n_new_visitor = res;
                         dashboard.n_returning_visitor -= res;
-                        return gcallback(dashboard);
+                        me.getNewSignup(me.db, me.prefix, appid, ids, function (ret) {
+                            dashboard.n_new_signup = ret;
+                            gcallback(dashboard);
+                        });
+                        return;
                         // 3 retenstion rate
                         me.getConversionRate(me.db, me.prefix, appid, ids, function (retention_rates) {
                             dashboard.retention_rates = retention_rates;
