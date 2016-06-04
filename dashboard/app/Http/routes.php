@@ -51,7 +51,17 @@ Route::post('/auth/googlesignin', 'Auth\AuthController@googlesignin');
 Route::get('auth/signout', 'UserController@signout');
 
 Route::get('auth/confirm/{email}/{time}/{salt}/{hash}', 'Auth\AuthController@getConfirm');
-Route::post('auth/confirm/{email}/{time}/{salt}/{password}/{hash}', 'Auth\AuthController@confirm');
+Route::post('auth/confirm/{email}/{time}/{salt}/{hash}/{password}', 'Auth\AuthController@confirm');
+
+
+Route::get('auth/reset', function(){
+	return View::make('auth.reset');
+});
+
+Route::post('auth/reset', 'Auth\AuthController@generatePasswordReset');
+Route::get('auth/reset/{email}/{time}/{salt}/{hash}', 'Auth\AuthController@newpw');
+Route::post('auth/reset/{email}/{time}/{salt}/{hash}', 'Auth\AuthController@reset');
+
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',

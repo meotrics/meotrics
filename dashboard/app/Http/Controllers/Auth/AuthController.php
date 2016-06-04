@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Util\MailSender;
 use App\Util\MtHttp;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\Registrar;
@@ -59,7 +60,7 @@ class AuthController extends Controller
 		}
 	}
 
-	public function getConfirm($request, $email, $time, $salt, $hash)
+	public function getConfirm(Request $request, $email, $time, $salt, $hash)
 	{
 		if ($time > time()) abort(500, 'wrong time');
 		$valid = $this->validLink($email, $time, $salt, $hash);
@@ -68,7 +69,7 @@ class AuthController extends Controller
 
 		// check in db
 		$user = DB::table('users')->where('email', $email)->first();
-		if ($user->is_validated == 1) abort(500, 'expired link');
+		if ($user->verified == 1) abort(500, 'expired link');
 
 		return view('auth/confirm', ['email' => $email, 'time' => $time, 'salt' => $salt, 'hash' => $hash]);
 	}
@@ -82,19 +83,17 @@ class AuthController extends Controller
 
 		// check in db
 		$user = DB::table('users')->where('email', $email)->first();
-		if ($user->is_validated == 1) abort(500, 'expired link');
+		if ($user->verified == 1) abort(500, 'expired link');
 
-
-		$user = DB::table('users')->where('email', $email)->update(['password' => bcrypt($password), 'is_validated' => 1]);
+		$user = DB::table('users')->where('email', $email)->update(['password' => bcrypt($password), 'verified' => 1]);
 
 		\Auth::loginUsingId($user->id);
 		return view('/app');
 	}
 
-	public function reset($request, $email, $time, $salt, $hash, $newpass)
+	public function newpw(Request $request, $email, $time, $salt, $hash)
 	{
 		if ($time > time()) abort(500, 'wrong time');
-		$diff = (time() - $time);
 
 		$valid = $this->validLink($email, $time, $salt, $hash);
 		if ($valid == false)
@@ -102,25 +101,81 @@ class AuthController extends Controller
 
 		// check in db
 		$user = DB::table('users')->where('email', $email)->first();
+
+		// email ton tai trong he thong
+		if ($user == null)
+			abort(500, 'User not found');
+
+		if ($user->verified == 0)
+			abort(500, 'Email not verified');
+
+		if ($user->password == null)
+			abort(500, "Wrong account type");
+
 		if (isset($user->resetpwhash) && strcmp($user->resetpwhash, $hash) == 0) {
-			$user = DB::table('users')->where('email', $email)->update(['resetpwhash' => null]);
-			if ($diff > 1800) // 30 min -> valid
-			{
-
-				abort(500, 'expired time');
-			}
-
-			$user = DB::table('users')->where('email', $email)->update(['password' => bcrypt($newpass)]);
-			return view('/auth/login');
+			return view('auth.newpw', ['email' => $email, 'time' => $time, 'salt' => $salt, 'hash' => $hash]);
 		}
+		abort(500, "Wrong user token");
+
 	}
 
-	public function generatePasswordReset($email)
+	public function reset(Request $request, $email, $time, $salt, $hash)
 	{
-		//check db to see if password has send
+		$password = $request->input('password');
+		if ($time > time()) abort(500, 'wrong time');
+
+		$valid = $this->validLink($email, $time, $salt, $hash);
+		if ($valid == false)
+			return view('auth.newpw', ['error' => 'Wrong hash']);
+
+		// check in db
 		$user = DB::table('users')->where('email', $email)->first();
+
+		// email ton tai trong he thong
+		if ($user == null)
+			return view('auth.newpw', ['error' => 'User not found']);
+
+		if ($user->verified == 0)
+			return view('auth.newpw', ['error' => 'Email not verified']);
+
+		if ($user->password == null)
+			return view('auth.newpw', ['error' => 'Wrong account type']);
+
+		if (isset($user->resetpwhash) && strcmp($user->resetpwhash, $hash) == 0) {
+			$user = DB::table('users')->where('email', $email)->update(['resetpwhash' => null]);
+			$diff = (time() - $time);
+			if ($diff > 1800) // 30 min -> valid
+			{
+				return view('auth.newpw', ['error' => 'Expired time']);
+			}
+
+			DB::table('users')->where('email', $email)->update(['password' => bcrypt($password)]);
+			return view('auth.login');
+		}
+		return view('auth.newpw', ['error' => 'Wrong user token']);
+	}
+
+	public function generatePasswordReset(Request $request)
+	{
+		$email = $request->input('email');
+		$user = DB::table('users')->where('email', $email)->first();
+
+		// email ton tai trong he thong
+		if ($user == null)
+			return view('/auth/reset', ['error' => "0x1905 User not found"]);
+
+		// nguoi dung da verify
+		if ($user->verified == 0)
+			return view('/auth/reset', ['error' => "0x0703 Email not verified"]);
+
+		// truong password khac null
+		if ($user->password == null)
+			return view('/auth/reset', ['error' => "0x4992 Wrong account type"]);
+
+		//check db to see if password has send
+
 		if ($user->resetpwhash != null) {
-			return;
+			return view('/auth/reset', ['error' => "0x2710 Reset link has already been sent"]);
 		} else {
 			$characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
 			$string = '';
@@ -136,8 +191,8 @@ class AuthController extends Controller
 			$user = DB::table('users')->where('email', $email)->update(['resetpwhash' => $hash]);
 
 			// send reset password mail
-			MailSender::send($email, 'resetpw', [link => "https://" + $host . '/auth/reset/' . $param . '/' . $hash]);
-			return;
+			MailSender::send($email, 'resetpw', ['link' => "https://" . $host . '/auth/reset/' . $param . '/' . $hash]);
+			return view('/auth/reset', ['success' => true]);
 		}
 	}
 
@@ -164,7 +219,7 @@ class AuthController extends Controller
 
 		$hash = hash(self::$hashalgo, $param, FALSE);
 		$host = env('HOSTNAME', 'app.meotrics.com');
-		return "https://" + $host . '/auth/confirm/' . $param . '/' . $hash;
+		return "https://" . $host . '/auth/confirm/' . $param . '/' . $hash;
 	}
 
 	public function googlesignin(Request $request)
