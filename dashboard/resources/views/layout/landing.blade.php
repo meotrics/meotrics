@@ -162,7 +162,7 @@
 	</script>
 
 	@yield('script')
-
+	<script src="/js/app.js"></script>
 </head>
 <body>
 @yield('content')
