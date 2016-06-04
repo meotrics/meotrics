@@ -44,6 +44,34 @@ class AuthController extends Controller
 		$this->middleware('guest', ['except' => 'getLogout']);
 	}
 
+	public function generatePasswordReset($email)
+	{
+		//check db to see if password has send
+		$user = DB::table('users')->where('email', $email)->first();
+		if($user->resetpwhash != null )
+		{
+			return;
+		} else 
+		{
+			$characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+		$string = '';
+ 		for ($i = 0; $i < 10; $i++) {
+      		$string .= $characters[rand(0, strlen($characters) - 1)];
+ 		}
+
+		$param = urlencode($email) . '/' . time() . '/' . $string;
+		$hash = hash(self::$hashalgo, $param, FALSE);
+		$host = env('HOSTNAME', 'app.meotrics.com');
+
+			// store hash into db
+			$user = DB::table('users')->where('email', $email)->update(['resetpwhash' => $hash]);
+
+			// send reset password mail
+			MailSender::send($email, 'resetpw', [link=> "https://" + $host . '/auth/reset/' . $param . '/' . $hash ]);
+			return;
+		}
+	}
+
 	public function validLink($email, $time, $salt, $hash)
 	{
 		$myparam = urlencode($email) . '/' . $time . '/' . $salt;
@@ -66,8 +94,8 @@ class AuthController extends Controller
 		$param = urlencode($email) . '/' . time() . '/' . $string;
 
 		$hash = hash(self::$hashalgo, $param, FALSE);
-		$host = env('HOSTNAME', 'app.meotrics.com'),
-		return "https://" + $host . '/' . $param . '/' . $hash;
+		$host = env('HOSTNAME', 'app.meotrics.com');
+		return "https://" + $host . '/auth/confirm/' . $param . '/' . $hash;
 	}
 
 	public function googlesignin(Request $request)
