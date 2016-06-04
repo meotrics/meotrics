@@ -89,7 +89,7 @@
 								<div id="login" class="tab-pane fade in active col-sm-12">
 
 									<form role="form" class="form-inputs col-sm-8 col-sm-offset-2" method="POST" action="/auth/login">
-										<h1 id="name" class="login-msg">Hey Buddy, welcome back!</h1>
+										<h1 class="login-msg">Hey Buddy, welcome back!</h1>
 										<button class=" button " id="gsin" style="vertical-align: top; background: white">
 										<span class="label"> <i class="fa fa-google-plus" style="vertical-align: baseline; color: #E00000; text-shadow: none;"></i>
 											<span id="ggmes" class="ml">Sign up/Sign in with Google Account</span>
@@ -129,7 +129,7 @@
 													<label for="rem" style="margin-bottom: 0px">	Remember me</label>
 
 												<p style="margin-bottom: 0;">
-													<a class="" href="/password/email">Forgotten Your Password?</a>
+													<a class="" href="/auth/reset">Forgotten Your Password?</a>
 												</p>
 											</div>
 										</div>

@@ -1,59 +1,48 @@
-@extends('app')
+@extends('layout.landing')
+@section('title', 'Reset password')
 
 @section('content')
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-md-8 col-md-offset-2">
-			<div class="panel panel-default">
-				<div class="panel-heading">Reset Password</div>
-				<div class="panel-body">
-					@if (count($errors) > 0)
-						<div class="alert alert-danger">
-							<strong>Whoops!</strong> There were some problems with your input.<br><br>
-							<ul>
-								@foreach ($errors->all() as $error)
-									<li>{{ $error }}</li>
-								@endforeach
+	<section>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3">
+					<div class="login-box ">
+						<div class="login-box-header">
+							<a class="logo" href="/">
+								<img alt="Brand" src="../img/logo.png">
+							</a>
+							<ul class="login-navbar">
+								<li><a href="/auth/register">Register</a></li>
+								<li class="active"><a href="">Login</a></li>
 							</ul>
 						</div>
-					@endif
+						<div class="login-box-body">
+							<div class="tab-content row">
+								<div id="login" class="tab-pane fade in active col-sm-12">
 
-					<form class="form-horizontal" role="form" method="POST" action="{{ url('/password/reset') }}">
-						<input type="hidden" name="_token" value="{{ csrf_token() }}">
-						<input type="hidden" name="token" value="{{ $token }}">
+									<form role="form" class="form-inputs col-sm-8 col-sm-offset-2" method="POST" action="/auth/reset">
+										<h1 class="login-msg">Forgot your password ?</h1>
 
-						<div class="form-group">
-							<label class="col-md-4 control-label">E-Mail Address</label>
-							<div class="col-md-6">
-								<input type="email" class="form-control" name="email" value="{{ old('email') }}">
+										<p>Enter your email address below and we will send you password reset instructions.</p>
+										<div class="form-group">
+											<input type="email" placeholder="Email" class="minput email"
+											       name="email" value="{{ old('email') }}" required>
+										</div>
+										<div class="form-group text-left" style="margin-top: 20px;">
+											<button class="button action blue" style="vertical-align: top;">
+												<span class="label">Reset password</span>
+											</button>
+
+										</div>
+										<p class="text-muted" style="margin-bottom: 30px; margin-top:15px">Note that we only
+											able to reset your password if you login to meotrics using email &amp; password. </p>
+									</form>
+								</div>
 							</div>
 						</div>
-
-						<div class="form-group">
-							<label class="col-md-4 control-label">Password</label>
-							<div class="col-md-6">
-								<input type="password" class="form-control" name="password">
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label class="col-md-4 control-label">Confirm Password</label>
-							<div class="col-md-6">
-								<input type="password" class="form-control" name="password_confirmation">
-							</div>
-						</div>
-
-						<div class="form-group">
-							<div class="col-md-6 col-md-offset-4">
-								<button type="submit" class="btn btn-primary">
-									Reset Password
-								</button>
-							</div>
-						</div>
-					</form>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-</div>
+	</section>
 @endsection
