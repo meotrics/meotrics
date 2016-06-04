@@ -90,10 +90,10 @@
 									<h1 id="name" class="login-msg">Hey Buddy, welcome back!</h1>
 
 
-									<button class=" button action red" id="gsin" style="vertical-align: top;">
+									<button class=" button " id="gsin" style="vertical-align: top; background: white">
 										<span class="label"> <i class="fa fa-google-plus"
-										                        style="vertical-align: baseline; margin-right: 20px"></i>
-											<span id="ggmes">Sign up or sign in using your Google Account</span>
+										                        style="vertical-align: baseline; color: #E00000; text-shadow: none;"></i>
+											<span id="ggmes" class="ml">Sign up/Sign in using your Google Account</span>
 											</span>
 									</button>
 

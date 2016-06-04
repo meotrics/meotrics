@@ -29,7 +29,9 @@
 	/**
 	 * Login Modal
 	 */
-
+	.ml {
+		margin-left: 10px;
+	}
 
 	.modal-content{
 		border-radius: 0;
