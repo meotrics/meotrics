@@ -39,6 +39,21 @@ class AuthController extends Controller
 		$this->middleware('guest', ['except' => 'getLogout']);
 	}
 
+	public function getConfirmLink($email)
+	{
+		$characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+		$string = '';
+ 		for ($i = 0; $i < 10; $i++) {
+      		$string .= $characters[rand(0, strlen($characters) - 1)];
+ 		}
+
+		$param = urlencode($email) . '/' . time() . '/' . $string
+
+		$hash = hash('sha384', $param, FALSE);
+		$host = env('HOSTNAME', 'app.meotrics.com'),
+		return "https://" + $host . '/' . $param . '/' . $hash;
+	}
+
 	public function googlesignin(Request $request)
 	{
 		$tokenid = $request->input('id_token');
