@@ -1,7 +1,19 @@
 @extends('layout.landing')
 @section('title', 'Reset password')
-
+@section('script')
+<script>
+	$('#newpw').submit(function() {
+		// DO STUFF
+		if($('input[name="password"]').val() !== $('input[name="pwconf"]').val()) {
+			alert('passwords not match');
+			return false;
+		}
+		return true; // return false to cancel form action
+	});
+</script>
+@endsection
 @section('content')
+	<?php $param = Route::current()->parameters()?>
 	<section>
 		<div class="container">
 			<div class="row">
@@ -9,7 +21,7 @@
 					<div class="login-box ">
 						<div class="login-box-header">
 							<a class="logo" href="/">
-								<img alt="Brand" src="../img/logo.png">
+								<img alt="Brand" src="/img/logo.png">
 							</a>
 							<ul class="login-navbar">
 								<li><a href="/auth/register">Register</a></li>
@@ -18,9 +30,15 @@
 						</div>
 						<div class="login-box-body">
 							<div class="tab-content row">
-								<div id="login" class="tab-pane fade in active col-sm-12">
-
-									<form role="form" class="form-inputs col-sm-8 col-sm-offset-2" method="POST" action="/auth/newpw">
+								<div id="newpw" class="tab-pane fade in active col-sm-12">
+									<form role="form" class="form-inputs col-sm-8 col-sm-offset-2" method="POST"
+									      action="/auth/reset/{{$param['email']}}/{{$param['time']}}/{{$param['salt']}}/{{$param['hash']}}">
+										@if(isset($error))
+											<div class="alert alert-danger">
+												<button type="button" aria-hidden="true" class="close">×</button>
+												<span>{{$error}}</span>
+											</div>
+										@endif
 										<h1 class="login-msg">Choose your password </h1>
 
 										<p>Please enter your new password below</p>

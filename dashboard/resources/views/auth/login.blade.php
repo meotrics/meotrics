@@ -15,7 +15,6 @@
 	</script>
 @endsection
 
-
 @section('content')
 	<section>
 		<script>
@@ -77,7 +76,7 @@
 					<div class="login-box ">
 						<div class="login-box-header">
 							<a class="logo" href="/">
-								<img alt="Brand" src="../img/logo.png">
+								<img alt="Brand" src="/img/logo.png">
 							</a>
 							<ul class="login-navbar">
 								<li><a href="/auth/register">Register</a></li>
@@ -100,7 +99,6 @@
 											password</h1>
 
 
-										<input type="hidden" name="_token" value="{{ csrf_token() }}">
 										@if(count($errors) > 0)
 											<div class="text-danger">
 												<ul>

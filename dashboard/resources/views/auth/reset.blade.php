@@ -1,5 +1,13 @@
 @extends('layout.landing')
 @section('title', 'Reset password')
+@section('script')<script>
+	$('#reset').submit(function() {
+		$('.id_bt').removeClass('blue');
+		$('.id_bt').prop('type', 'button');
+		$('.id_bt').find('.label').html('Loading ...');
+		$('.id_bt').css('cursor', 'default');
+	});</script>
+@endsection
 
 @section('content')
 	<section>
@@ -9,7 +17,7 @@
 					<div class="login-box ">
 						<div class="login-box-header">
 							<a class="logo" href="/">
-								<img alt="Brand" src="../img/logo.png">
+								<img alt="Brand" src="/img/logo.png">
 							</a>
 							<ul class="login-navbar">
 								<li><a href="/auth/register">Register</a></li>
@@ -18,15 +26,14 @@
 						</div>
 						<div class="login-box-body">
 							<div class="tab-content row">
-								<div id="login" class="tab-pane fade in active col-sm-12">
+								<div id="reset" class="tab-pane fade in active col-sm-12">
 
 									<form role="form" class="form-inputs col-sm-8 col-sm-offset-2" method="POST" action="/auth/reset">
 
 										@if(isset($success))
 											<h1 class="login-msg">Your email has been sent.</h1>
-											<p>You can now close this window and go check your inbox for more instructions.</p>
+											<p style="margin-bottom: 30px;">You can now close this window and go check your inbox for more instructions.</p>
 										@else
-
 											<h1 class="login-msg">Forgot your password ?</h1>
 											@if(isset($error))
 												<div class="alert alert-danger">
@@ -39,8 +46,8 @@
 												<input type="email" placeholder="Email" class="minput email" name="email" required>
 											</div>
 											<div class="form-group text-left" style="margin-top: 20px;">
-												<button class="button action blue" style="vertical-align: top;">
-													<span class="label">Reset password</span>
+												<button class="id_bt button action blue" style="vertical-align: top;">
+													<span class="label ">Reset password</span>
 												</button>
 											</div>
 											<p class="text-muted" style="margin-bottom: 30px; margin-top:15px">Note that we only

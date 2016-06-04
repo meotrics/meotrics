@@ -326,8 +326,7 @@ header .navbar-brand > img {
 	color: #8492af;
 }
 
-#login > form input,
-#register > form input {
+form input {
 	background-size: 15px;
 	text-indent: 30px;
 }
