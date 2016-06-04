@@ -10,7 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
+	private static $hashalgo;
 
+	public static function init()
+	{
+		self::$hashalgo = 'sha384';
+	}
 	/*
 	|--------------------------------------------------------------------------
 	| Registration & Login Controller
@@ -39,6 +44,17 @@ class AuthController extends Controller
 		$this->middleware('guest', ['except' => 'getLogout']);
 	}
 
+	public function validLink($email, $time, $salt, $hash)
+	{
+		$myparam = urlencode($email) . '/' . $time . '/' . $salt;
+		$myhash = hash(self::$hashalgo, $param);
+		if(strcmp($myhash, $hash) == 0) // valid
+		{
+			return true;
+		}
+		return false;
+	}
+
 	public function getConfirmLink($email)
 	{
 		$characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -47,9 +63,9 @@ class AuthController extends Controller
       		$string .= $characters[rand(0, strlen($characters) - 1)];
  		}
 
-		$param = urlencode($email) . '/' . time() . '/' . $string
+		$param = urlencode($email) . '/' . time() . '/' . $string;
 
-		$hash = hash('sha384', $param, FALSE);
+		$hash = hash(self::$hashalgo, $param, FALSE);
 		$host = env('HOSTNAME', 'app.meotrics.com'),
 		return "https://" + $host . '/' . $param . '/' . $hash;
 	}
@@ -93,3 +109,4 @@ class AuthController extends Controller
 	}
 
 }
+AuthController::init();
