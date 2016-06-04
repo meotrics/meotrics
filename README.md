@@ -1,6 +1,9 @@
-![](http://blog.meotrics.com/wp-content/uploads/2016/03/Logo_Blue_word-1.png)
+Hệ thống thu thập và phân tích hành vi người dùng
 
-Hệ thống phân tích website
+[![](http://blog.meotrics.com/wp-content/uploads/2016/03/Logo_Blue_word-1.png)](http://meotrics.com) [![License](https://img.shields.io/crates/l/rustc-serialize.svg)](https://opensource.org/licenses/Apache-2.0) ![](http://d1va5oqn59yrvt.cloudfront.net/uploads/2014/10/hiring-header.png)
+Please contact meotrics@gmail.com
+
+
 * * *
 
 Cài đặt môi trường DEV
