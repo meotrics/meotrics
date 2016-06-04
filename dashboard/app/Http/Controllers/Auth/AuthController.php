@@ -49,12 +49,16 @@ class AuthController extends Controller
 		if($time > time()) abort(500, 'wrong time');
 		$diff = (time() - $time);
 
-		if($diff > 1800) // 30 min -> valid
-		abort(500, 'expired time');
-
 		$valid = $this->validLink($email, $time, $salt, $hash);
 		if($valid == false)
 		abort(500, 'wrong hash');
+
+
+		if($diff > 1800) // 30 min -> valid
+		{
+			$user = DB::table('users')->where('email', $email)->update(['resetpwhash' => null]);
+			abort(500, 'expired time');
+		}
 
 		// check in db
 		$user = DB::table('users')->where('email', $email)->first();
@@ -62,6 +66,24 @@ class AuthController extends Controller
 		{
 			return view('auth/reset');
 		}
+	}
+
+	public function confirm($request, $email, $time, $salt, $hash, $password)
+	{
+		if($time > time()) abort(500, 'wrong time');
+		$valid = $this->validLink($email, $time, $salt, $hash);
+		if($valid == false)
+			abort(500, 'wrong hash');
+
+		// check in db
+		$user = DB::table('users')->where('email', $email)->first();
+		if($user->is_validated == 1) abort(500, 'expired link');
+
+
+		$user = DB::table('users')->where('email', $email)->update(['password' => bcrypt($password), 'is_validated'=> 1]);
+
+		\Auth::loginUsingId($user->id);
+		return view('/app');
 	}
 
 	public function reset($request, $email, $time, $salt, $hash, $newpass)
