@@ -44,6 +44,51 @@ class AuthController extends Controller
 		$this->middleware('guest', ['except' => 'getLogout']);
 	}
 
+	public function getReset($request, $email, $time, $salt, $hash)
+	{
+		if($time > time()) abort(500, 'wrong time');
+		$diff = (time() - $time);
+
+		if($diff > 1800) // 30 min -> valid
+		abort(500, 'expired time');
+
+		$valid = $this->validLink($email, $time, $salt, $hash);
+		if($valid == false)
+		abort(500, 'wrong hash');
+
+		// check in db
+		$user = DB::table('users')->where('email', $email)->first();
+		if(isset($user->resetpwhash) && strcmp($user->resetpwhash, $hash) == 0)
+		{
+			return view('auth/reset');
+		}
+	}
+
+	public function reset($request, $email, $time, $salt, $hash, $newpass)
+	{
+		if($time > time()) abort(500, 'wrong time');
+		$diff = (time() - $time);
+
+		$valid = $this->validLink($email, $time, $salt, $hash);
+		if($valid == false)
+		abort(500, 'wrong hash');
+
+		// check in db
+		$user = DB::table('users')->where('email', $email)->first();
+		if(isset($user->resetpwhash) && strcmp($user->resetpwhash, $hash) == 0)
+		{
+			$user = DB::table('users')->where('email', $email)->update(['resetpwhash' => null]);
+			if($diff > 1800) // 30 min -> valid
+			{
+				
+				abort(500, 'expired time');
+			}
+
+			$user = DB::table('users')->where('email', $email)->update(['password' => bcrypt($newpass)]);
+			return view('/auth/login');
+		}
+	}
+
 	public function generatePasswordReset($email)
 	{
 		//check db to see if password has send
