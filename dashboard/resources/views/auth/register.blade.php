@@ -99,6 +99,17 @@
 				});
 			});
 
+			function changePurpose(radio) {
+				if (radio.value == "2") {
+					$('.siteinfo').addClass('hidden');
+				}
+				else {
+					$('.siteinfo').removeClass('hidden');
+				}
+
+
+			}
+
 			function onSignIn(googleUser) {
 				var profile = googleUser.getBasicProfile();
 
@@ -130,32 +141,34 @@
 						<div class="login-box-body">
 							<div class="tab-content row">
 								<div id="register" class="tab-pane active text-center col-xs-12">
-									<form role="form" class="form-inputs col-xs-10 col-xs-offset-1 " method="POST"
+									<form role="form" class="form-inputs col-xs-8 col-xs-offset-2 " method="POST"
 									      action="{{ url('/auth/register') }}" style="margin-bottom: 30px">
-										<h1 class="login-msg text-left">Buddy, ready to take your adventure ?</h1>
+										<h1 class="login-msg text-left">Ready for your adventure ?</h1>
 										<div class="text-left">
 											<div class='form-group '>
-												<input type='radio' id='newsite' name='radio' checked>
+												<input type='radio' id='newsite' name='radio' onclick="changePurpose(this)" checked value="1">
 												<label for="newsite">I would like to track a new site</label>
-												</br>
-												<input type='radio' id='oldsite' name='radio'>
-												<label for="oldsite">I am joining partner site</label>
+												<br/>
+												<input type='radio' id='oldsite' name='radio' onclick="changePurpose(this)" value="2">
+												<label for="oldsite">I&rsquo;m joining partner&rsquo;s site</label>
 											</div>
 										</div>
 
-										<div class="form-group">
-											<input type="text" placeholder="Site name" class="minput username"
-											       name="name" value="{{ old('name') }}">
-										</div>
-										<div class="form-group">
-											<input type="text" placeholder="Site Address (http://example.com)" class="minput psw"
-											       name="name" value="{{ old('name') }}">
+										<div class="siteinfo" style="margin-bottom: 30px">
+											<div class="form-group">
+												<input type="text" placeholder="Site name" class="minput username"
+												       name="sitename" value="{{ old('name') }}" required>
+											</div>
+											<div class="form-group">
+												<input type="text" placeholder="Site Address (http://example.com)" class="minput psw"
+												       name="siteurl" value="{{ old('name') }}" required>
+											</div>
 										</div>
 
-										<div class='form-group' style="margin-top: 30px">
+										<div class='form-group text-left' >
 											<input type='checkbox' id='input4' required>
 											<label for="input4"><strong class="text-left">
-													By click on this box you agree with Meotrics&rsquo;s
+													I agree with Meotrics&rsquo;s
 													<a href="" data-toggle="modal" data-target="#privacy_dialog">Policy</a>
 													and
 													<a href="" data-toggle="modal" data-target="#terms_dialog">Terms</a>
@@ -163,18 +176,15 @@
 										</div>
 
 
-										<div class="form-group row">
-											<div class="col-sm-4 text-left">
-												<p>Sign up with Google</p>
-												<button class="button" id="gsin" style="vertical-align: top; background: white">
+										<div class="form-group  text-left">
+
+											<p>Sign up with <button class="button action red" id="gsin" style=" vertical-align: middle;height: 32px;">
 											<span class="label"> <i class="fa fa-google-plus"
-											                        style="vertical-align: baseline; color: #E00000; text-shadow: none;"></i>
-												<span id="ggmes" class="ml"> Sign up</span>
+											                        style="vertical-align: baseline; text-shadow: none;"></i>
+												<span id="ggmes" class="ml">Google</span>
 											</span>
-												</button>
-											</div>
-											<div class="col-sm-8" style="border-left: 2px dashed #E4E4E4;">
-												<p class="text-left">Or using your email</p>
+												</button> Or use your email address</p>
+
 												<input type="hidden" name="_token" value="{{ csrf_token() }}">
 												@if (count($errors) > 0)
 													<div class="text-danger">
@@ -201,9 +211,7 @@
 														<span class="label">Sign up</span>
 													</button>
 												</div>
-											</div>
 										</div>
-
 
 
 									</form>

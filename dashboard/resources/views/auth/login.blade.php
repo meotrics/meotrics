@@ -86,18 +86,20 @@
 						</div>
 						<div class="login-box-body">
 							<div class="tab-content row">
-								<div id="login" class="tab-pane fade in active text-center col-sm-12">
-									<h1 id="name" class="login-msg">Hey Buddy, welcome back!</h1>
-									<button class=" button " id="gsin" style="vertical-align: top; background: white">
+								<div id="login" class="tab-pane fade in active col-sm-12">
+
+									<form role="form" class="form-inputs col-sm-8 col-sm-offset-2" method="POST" action="/auth/login">
+										<h1 id="name" class="login-msg">Hey Buddy, welcome back!</h1>
+										<button class=" button " id="gsin" style="vertical-align: top; background: white">
 										<span class="label"> <i class="fa fa-google-plus" style="vertical-align: baseline; color: #E00000; text-shadow: none;"></i>
 											<span id="ggmes" class="ml">Sign up/Sign in with Google Account</span>
 											</span>
-									</button>
+										</button>
 
-									<h1 class="login-msg" style="margin-bottom: 0; margin-bottom: 10px; margin-top:35px">Or, use your
-										password</h1>
+										<h1 class="login-msg" style="margin-bottom: 0; margin-bottom: 10px; margin-top:30px">Or, use your
+											password</h1>
 
-									<form role="form" class="col-sm-8 col-sm-offset-2" method="POST" action="/auth/login">
+
 										<input type="hidden" name="_token" value="{{ csrf_token() }}">
 										@if(count($errors) > 0)
 											<div class="text-danger">
@@ -122,20 +124,15 @@
 												<span class="label">Sign in</span>
 											</button>
 											<div class="ml" style="display: inline-block; margin-left: 20px">
-												<label style="margin-bottom: 0">
-													<input type="checkbox" data-toggle="checkbox" name="remember" style="margin-top: 0">
-													Remember me
-												</label>
+
+													<input id="rem" type="checkbox" data-toggle="checkbox" name="remember" style="margin-top: 0">
+													<label for="rem" style="margin-bottom: 0px">	Remember me</label>
+
 												<p style="margin-bottom: 0;">
 													<a class="" href="/password/email">Forgotten Your Password?</a>
 												</p>
 											</div>
 										</div>
-										<p class="text-left" style="margin-bottom: 30px;">
-											<i>
-												Not yet got Meotrics account?
-												<a class="toregister" href="/auth/register">Register here</a></i>
-										</p>
 									</form>
 								</div>
 							</div>

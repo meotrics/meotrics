@@ -2,8 +2,8 @@
 	position: relative;
 }
 .form-inputs label {
-	color: #555555;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	/* color: #555555; */
+	/* font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; */
 	font-weight: 400;
 	cursor: text;
 	-webkit-transform: translate(0, 0);
@@ -50,9 +50,9 @@
 	left: 0;
 	display: block;
 	content: "";
-	border: 2px solid #555555;
-	height: 20px;
-	width: 20px;
+	border: 2px solid #D8D8D8;
+	height: 17px;
+	width: 17px;
 	border-radius: 2px;
 	background: #ffffff;
 	-webkit-transition: all 0.3s ease;
@@ -63,8 +63,8 @@
 	position: absolute;
 	display: block;
 	content: "";
-	bottom: 5px;
-	left: 7px;
+	bottom: 7px;
+	left: 6px;
 	width: 6px;
 	height: 13px;
 	-webkit-transform: rotate(45deg);
@@ -77,12 +77,9 @@
 	transition-delay: 0.1s;
 	box-sizing: border-box;
 }
-.form-inputs input[type='checkbox']:focus + label:before {
-	box-shadow: 0 0 5px #337ab7;
-}
 .form-inputs input[type='checkbox']:checked + label:before {
-	background: #337ab7;
-	border-color: #337ab7;
+	background: #498BF4;
+	border-color: #4A8DF8;
 }
 .form-inputs input[type='checkbox']:checked + label:after {
 	border-right: 2px solid #ffffff;
@@ -104,11 +101,11 @@
 .form-inputs input[type='radio'] + label:before,
 .form-inputs input[type='radio'] + label:after {
 	position: absolute;
-	left: 3px;
+	left: 0px;
 	bottom: 3px;
 	display: block;
 	content: "";
-	border: 2px solid #555555;
+	border: 2px solid #D8D8D8;
 	height: 16px;
 	width: 16px;
 	border-radius: 50%;
@@ -118,7 +115,7 @@
 	background-clip: padding-box;
 }
 .form-inputs input[type='radio'] + label:after {
-	background: #337ab7;
+	background: #4889F0;
 	border: 2px solid #ffffff;
 	-webkit-transform: scale(0);
 	-ms-transform: scale(0);
@@ -126,12 +123,7 @@
 	-webkit-transition: all 0.3s ease;
 	transition: all 0.3s ease;
 }
-.form-inputs input[type='radio']:focus + label:before {
-	box-shadow: 0 0 5px #337ab7;
-}
-.form-inputs input[type='radio']:checked + label:before {
-	border-color: #337ab7;
-}
+
 .form-inputs input[type='radio']:checked + label:after {
 	-webkit-transform: scale(0.75, 0.75);
 	-ms-transform: scale(0.75, 0.75);

@@ -93,12 +93,6 @@
 			text-indent: 30px;
 		}
 
-		#login > form > button,
-		#register > form > button {
-			width: 180px;
-			margin-top: 30px;
-			margin-bottom: 10px;
-		}
 
 		#login > form > i,
 		#register > form > i {
