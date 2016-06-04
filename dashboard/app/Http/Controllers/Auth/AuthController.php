@@ -113,7 +113,7 @@ class AuthController extends Controller
 			abort(500, "Wrong account type");
 
 		if (isset($user->resetpwhash) && strcmp($user->resetpwhash, $hash) == 0) {
-			return view('auth.newpw', ['email' => $email, 'time' => $time, 'salt' => $salt, 'hash' => $hash]);
+			return view('auth.newpw');
 		}
 		abort(500, "Wrong user token");
 
