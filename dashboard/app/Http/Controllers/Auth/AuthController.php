@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\Controller;
 use App\Util\MtHttp;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\Registrar;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+// This controller handles the registration of new users, as well as the
+// authentication of existing users
 class AuthController extends Controller
 {
 	private static $hashalgo;
@@ -16,16 +18,6 @@ class AuthController extends Controller
 	{
 		self::$hashalgo = 'sha384';
 	}
-	/*
-	|--------------------------------------------------------------------------
-	| Registration & Login Controller
-	|--------------------------------------------------------------------------
-	|
-	| This controller handles the registration of new users, as well as the
-	| authentication of existing users. By default, this controller uses
-	| a simple trait to add these behaviors. Why don't you explore it?
-	|
-	*/
 
 	use AuthenticatesAndRegistersUsers;
 
@@ -46,15 +38,15 @@ class AuthController extends Controller
 
 	public function getReset($request, $email, $time, $salt, $hash)
 	{
-		if($time > time()) abort(500, 'wrong time');
+		if ($time > time()) abort(500, 'wrong time');
 		$diff = (time() - $time);
 
 		$valid = $this->validLink($email, $time, $salt, $hash);
-		if($valid == false)
-		abort(500, 'wrong hash');
+		if ($valid == false)
+			abort(500, 'wrong hash');
 
 
-		if($diff > 1800) // 30 min -> valid
+		if ($diff > 1800) // 30 min -> valid
 		{
 			$user = DB::table('users')->where('email', $email)->update(['resetpwhash' => null]);
 			abort(500, 'expired time');
@@ -62,25 +54,38 @@ class AuthController extends Controller
 
 		// check in db
 		$user = DB::table('users')->where('email', $email)->first();
-		if(isset($user->resetpwhash) && strcmp($user->resetpwhash, $hash) == 0)
-		{
+		if (isset($user->resetpwhash) && strcmp($user->resetpwhash, $hash) == 0) {
 			return view('auth/reset');
 		}
 	}
 
-	public function confirm($request, $email, $time, $salt, $hash, $password)
+	public function getConfirm($request, $email, $time, $salt, $hash)
 	{
-		if($time > time()) abort(500, 'wrong time');
+		if ($time > time()) abort(500, 'wrong time');
 		$valid = $this->validLink($email, $time, $salt, $hash);
-		if($valid == false)
+		if ($valid == false)
 			abort(500, 'wrong hash');
 
 		// check in db
 		$user = DB::table('users')->where('email', $email)->first();
-		if($user->is_validated == 1) abort(500, 'expired link');
+		if ($user->is_validated == 1) abort(500, 'expired link');
+
+		return view('auth/confirm', ['email' => $email, 'time' => $time, 'salt' => $salt, 'hash' => $hash]);
+	}
+
+	public function confirm($request, $email, $time, $salt, $hash, $password)
+	{
+		if ($time > time()) abort(500, 'wrong time');
+		$valid = $this->validLink($email, $time, $salt, $hash);
+		if ($valid == false)
+			abort(500, 'wrong hash');
+
+		// check in db
+		$user = DB::table('users')->where('email', $email)->first();
+		if ($user->is_validated == 1) abort(500, 'expired link');
 
 
-		$user = DB::table('users')->where('email', $email)->update(['password' => bcrypt($password), 'is_validated'=> 1]);
+		$user = DB::table('users')->where('email', $email)->update(['password' => bcrypt($password), 'is_validated' => 1]);
 
 		\Auth::loginUsingId($user->id);
 		return view('/app');
@@ -88,21 +93,20 @@ class AuthController extends Controller
 
 	public function reset($request, $email, $time, $salt, $hash, $newpass)
 	{
-		if($time > time()) abort(500, 'wrong time');
+		if ($time > time()) abort(500, 'wrong time');
 		$diff = (time() - $time);
 
 		$valid = $this->validLink($email, $time, $salt, $hash);
-		if($valid == false)
-		abort(500, 'wrong hash');
+		if ($valid == false)
+			abort(500, 'wrong hash');
 
 		// check in db
 		$user = DB::table('users')->where('email', $email)->first();
-		if(isset($user->resetpwhash) && strcmp($user->resetpwhash, $hash) == 0)
-		{
+		if (isset($user->resetpwhash) && strcmp($user->resetpwhash, $hash) == 0) {
 			$user = DB::table('users')->where('email', $email)->update(['resetpwhash' => null]);
-			if($diff > 1800) // 30 min -> valid
+			if ($diff > 1800) // 30 min -> valid
 			{
-				
+
 				abort(500, 'expired time');
 			}
 
@@ -115,26 +119,24 @@ class AuthController extends Controller
 	{
 		//check db to see if password has send
 		$user = DB::table('users')->where('email', $email)->first();
-		if($user->resetpwhash != null )
-		{
+		if ($user->resetpwhash != null) {
 			return;
-		} else 
-		{
+		} else {
 			$characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-		$string = '';
- 		for ($i = 0; $i < 10; $i++) {
-      		$string .= $characters[rand(0, strlen($characters) - 1)];
- 		}
+			$string = '';
+			for ($i = 0; $i < 10; $i++) {
+				$string .= $characters[rand(0, strlen($characters) - 1)];
+			}
 
-		$param = urlencode($email) . '/' . time() . '/' . $string;
-		$hash = hash(self::$hashalgo, $param, FALSE);
-		$host = env('HOSTNAME', 'app.meotrics.com');
+			$param = urlencode($email) . '/' . time() . '/' . $string;
+			$hash = hash(self::$hashalgo, $param, FALSE);
+			$host = env('HOSTNAME', 'app.meotrics.com');
 
 			// store hash into db
 			$user = DB::table('users')->where('email', $email)->update(['resetpwhash' => $hash]);
 
 			// send reset password mail
-			MailSender::send($email, 'resetpw', [link=> "https://" + $host . '/auth/reset/' . $param . '/' . $hash ]);
+			MailSender::send($email, 'resetpw', [link => "https://" + $host . '/auth/reset/' . $param . '/' . $hash]);
 			return;
 		}
 	}
@@ -142,8 +144,8 @@ class AuthController extends Controller
 	public function validLink($email, $time, $salt, $hash)
 	{
 		$myparam = urlencode($email) . '/' . $time . '/' . $salt;
-		$myhash = hash(self::$hashalgo, $param);
-		if(strcmp($myhash, $hash) == 0) // valid
+		$myhash = hash(self::$hashalgo, $myparam);
+		if (strcmp($myhash, $hash) == 0) // valid
 		{
 			return true;
 		}
@@ -154,9 +156,9 @@ class AuthController extends Controller
 	{
 		$characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
 		$string = '';
- 		for ($i = 0; $i < 10; $i++) {
-      		$string .= $characters[rand(0, strlen($characters) - 1)];
- 		}
+		for ($i = 0; $i < 10; $i++) {
+			$string .= $characters[rand(0, strlen($characters) - 1)];
+		}
 
 		$param = urlencode($email) . '/' . time() . '/' . $string;
 
@@ -192,7 +194,7 @@ class AuthController extends Controller
 					'verified' => 1]);
 			} else {
 				// update verified token
-				DB::table('users')->where('email', $data->email)->update(['verified'=> 1]);
+				DB::table('users')->where('email', $data->email)->update(['verified' => 1]);
 				$userid = $user->id;
 			}
 
@@ -204,4 +206,5 @@ class AuthController extends Controller
 	}
 
 }
+
 AuthController::init();

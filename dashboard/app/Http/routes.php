@@ -49,10 +49,15 @@ Route::get('/segment/{appcode}/{segid?}', 'SegmentController@getIndex');
 
 Route::post('/auth/googlesignin', 'Auth\AuthController@googlesignin');
 Route::get('auth/signout', 'UserController@signout');
+
+Route::get('auth/confirm/{email}/{time}/{salt}/{hash}', 'Auth\AuthController@getConfirm');
+Route::post('auth/confirm/{email}/{time}/{salt}/{password}/{hash}', 'Auth\AuthController@confirm');
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',
 ]);
+
+
 
 
 Route::controller('user', 'UserController');
