@@ -17,10 +17,11 @@
   <!-- Fonts and icons -->
   <link href="{{asset('css/font-awesome.min.css')}}" rel="stylesheet">
   <link href="{{asset('css/fg.menu.css')}}" rel="stylesheet"/> <!-- QUESTION: ??? -->
-  <link href="{{asset('css/daterangepicker.css')}}"/>
-  <link href="{{asset('css/sweetalert.css')}}"/>
+  {{--<link href="{{asset('css/daterangepicker.css')}}"/>--}}
+  {{--<link href="{{asset('css/sweetalert.css')}}"/>--}}
   <!-- App's styles -->
   <link href="{{asset('css/landing.css')}}" rel="stylesheet"/>
+	<link href="{{asset('css/css3-buttons.css')}}" rel="stylesheet" />
 <style>
 	section {
 		padding-top: 40px;
