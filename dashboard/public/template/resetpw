@@ -42,10 +42,16 @@
 <td></td>
 </tr>
 <tr>
-<td style=" color: #003366; font-size: 26px; text-align:left;" valign="middle">Password reset</td>
+<td style=" color: #003366; font-size: 26px; text-align:left;" valign="middle">Reset password</td>
 </tr>
 <tr valign="top" >
-<td style=" font-size:13px; color: #404040; line-height:18px; text-align:left; padding-top:10px;" valign="top">We're excited that you've chosen Meotrics to get more insight on your customer. We've put together some great resources to get you up and running quickly, so your team can focus on the right customer.</td>
+<td style=" font-size:13px; color: #404040; line-height:18px; text-align:left; padding-top:10px;" valign="top">You recently requested to reset your password for your Meotrics account. Click the link below to reset it.
+<br/>
+<a href="{link}">{link}</a>
+</br>
+If you did not request a password reset, please ignore this email or reply to let us know. This password reset is only valid for the next 30 minutes.
+
+</td>
 </tr>
 </tbody>
 </table>
@@ -84,62 +90,6 @@
 </tr>
 <tr valign="top">
 <td style="border:1px solid #E5E5E5" width="528">
-<table bgcolor="#F8F8F8" border="0" cellpadding="0" cellspacing="0" width="526">
-<tbody>
-<tr valign="top">
-<td colspan="3"><img style="display:block;opacity: 0" src="" alt="" border="0" height="15" width="1"></td>
-</tr>
-<tr valign="top">
-<td width="15"><img style="display:block;opacity: 0" src="" alt="" border="0" height="1" width="15"></td>
-<td width="480">
-<table border="0" cellpadding="0" cellspacing="0" width="480">
-<tbody>
-<tr valign="top">
-<td style=" font-size:15px; color: #003366;  text-align:left;">Email validation</td>
-</tr>
-<tr valign="top">
-<td><img style="display:block;opacity: 0" src="" alt="" border="0" height="5" width="1"></td>
-</tr>
-<tr valign="top">
-<td style=" font-size:13px; color: #404040; line-height:18px; text-align:left;">
-To secure your data and able to login next time, please confirm your email address by opening the following link 
-<a href="#" style=" font-size:13px; color:#4c9ac9; text-decoration:none;" href="{link}">{link}
-</a> </td>
-</tr>
-<tr valign="top">
-<td><img style="display:block;opacity: 0" src="" alt="" border="0" height="15" width="1"></td>
-</tr>
-<tr valign="top">
-<td style=" font-size:15px; color: #003366; text-align:left;">Meotrics 101</td>
-</tr>
-<tr valign="top">
-<td><img style="display:block;opacity: 0" src="" alt="" border="0" height="5" width="1"></td>
-</tr>
-<tr valign="top">
-<td style=" font-size:13px; color: #404040; line-height:18px; text-align:left;">Everything you need to know to <a href="http://docs.meotrics.com" title="get started using Meotrics" style=" font-size:13px; color:#4c9ac9; text-decoration:none;">get started using Meotrics</a>, but were afraid to ask.</td>
-</tr>
-<tr valign="top">
-<td><img style="display:block;opacity: 0" src="" alt="" border="0" height="15" width="1"></td>
-</tr>
-<tr valign="top">
-<td style=" font-size:15px; color: #003366; text-align:left;">Follow us</td>
-</tr>
-<tr valign="top">
-<td><img style="display:block;opacity: 0" src="" alt="" border="0" height="5" width="1"></td>
-</tr>
-<tr valign="top">
-<td style=" font-size:13px; color: #404040; line-height:18px; text-align:left;">Keep up with the latest Meotrics improvements and news, as well as tips for tracking your campaign, on the <a href="//blog.meotrics.com" style=" font-size:13px; color:#4c9ac9; text-decoration:none;">Meotrics blog</a> or <a href="https://facebook.com/meotrics" style=" font-size:13px; color:#4c9ac9; text-decoration:none;">Facebook page</a>.</td>
-</tr>
-</tbody>
-</table>
-</td>
-<td width="23"><img style="display:block;opacity: 0" src="" alt="" border="0" height="1" width="23"></td>
-</tr>
-<tr valign="top">
-<td colspan="3"><img style="display:block;opacity: 0" src="" alt="" border="0" height="15" width="1"></td>
-</tr>
-</tbody>
-</table>
 </td>
 </tr>
 
