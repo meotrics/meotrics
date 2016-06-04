@@ -19,6 +19,7 @@
 @section('content')
 	<section>
 		<script>
+
 			function loading() {
 				$('.signinbtn').removeClass('blue');
 				$('.signinbtn').prop('type', 'button');
@@ -55,7 +56,6 @@
 				});
 			});
 
-
 			function onSignIn(googleUser) {
 				var profile = googleUser.getBasicProfile();
 
@@ -88,12 +88,9 @@
 							<div class="tab-content row">
 								<div id="login" class="tab-pane fade in active text-center col-sm-12">
 									<h1 id="name" class="login-msg">Hey Buddy, welcome back!</h1>
-
-
 									<button class=" button " id="gsin" style="vertical-align: top; background: white">
-										<span class="label"> <i class="fa fa-google-plus"
-										                        style="vertical-align: baseline; color: #E00000; text-shadow: none;"></i>
-											<span id="ggmes" class="ml">Sign up/Sign in using your Google Account</span>
+										<span class="label"> <i class="fa fa-google-plus" style="vertical-align: baseline; color: #E00000; text-shadow: none;"></i>
+											<span id="ggmes" class="ml">Sign up/Sign in with Google Account</span>
 											</span>
 									</button>
 
@@ -101,8 +98,6 @@
 										password</h1>
 
 									<form role="form" class="col-sm-8 col-sm-offset-2" method="POST" action="/auth/login">
-
-
 										<input type="hidden" name="_token" value="{{ csrf_token() }}">
 										@if(count($errors) > 0)
 											<div class="text-danger">

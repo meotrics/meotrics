@@ -4,7 +4,15 @@
 	<meta name="google-signin-scope" content="profile email">
 	<meta name="google-signin-client_id"
 	      content="102248826764-hvb3ej6gj2cn04upgtfrs8eja7djb6bu.apps.googleusercontent.com">
-	<script src="https://apis.google.com/js/platform.js" async defer></script>
+	<script src="//apis.google.com/js/platform.js" async defer></script>
+	<script>
+		function onPageLoad(fn) {
+			if (window.addEventListener)
+				window.addEventListener('load', fn, false);
+			else if (window.attachEvent)
+				window.attachEvent('onload', fn);
+		}
+	</script>
 @endsection
 @section('style')
 	<style>
@@ -55,13 +63,60 @@
 					window.location.href = url;
 				});
 			}
+			function loading() {
+				$('.signinbtn').removeClass('blue');
+				$('.signinbtn').prop('type', 'button');
+				$('.signinbtn').find('.label').html('Loading ...');
+				$('.signinbtn').css('cursor', 'default');
+			}
+
+			function ready() {
+				$('.signinbtn').addClass('blue');
+				$('.signinbtn').prop('type', 'submit');
+				$('.signinbtn').find('.label').html('Sign in');
+				$('.signinbtn').css('cursor', 'pointer');
+			}
+
+			function error(err) {
+				alert("Oh snap, Meotrics just crash, please send this 'JSON.stringify(err, undefined, 2)' to support@meotrics.com, thanks");
+			}
+
+			onPageLoad(function () {
+				loading();
+				gapi.load('auth2', function () {
+					auth2 = gapi.auth2.init({
+						client_id: '102248826764-hvb3ej6gj2cn04upgtfrs8eja7djb6bu.apps.googleusercontent.com',
+						scope: 'profile'
+					});
+
+					if (auth2.isSignedIn.get()) {
+						onSignIn(auth2.currentUser.get());
+						return;
+					}
+					else ready();
+
+					auth2.attachClickHandler(document.getElementById('gsin'), {}, onSignIn, error);
+				});
+			});
+
+			function onSignIn(googleUser) {
+				var profile = googleUser.getBasicProfile();
+
+				document.getElementById('ggmes').innerText = 'Signing in, please wait, ' + googleUser.getBasicProfile().getName();
+				$.post('/auth/googlesignin', {
+					id: profile.getId(),
+					id_token: googleUser.getAuthResponse().id_token
+				}, function (url) {
+					window.location.href = url;
+				});
+			}
 		</script>
 
 	</section>
 	<section>
 		<div class="container">
 			<div class="row">
-				<div class="col-md-6 col-md-offset-3">
+				<div class="col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3">
 					<div class="login-box ">
 						<div class="login-box-header">
 							<a class="logo" href="{{ URL::to('/') }}">
@@ -74,63 +129,83 @@
 						</div>
 						<div class="login-box-body">
 							<div class="tab-content row">
-								<div id="register" class="tab-pane active text-center col-md-12">
-									<h1 class="login-msg">Hey Buddy, ready to take your adventure?</h1>
-
-									<div>
-										<div class=" g-signin2" data-onsuccess="onSignIn"></div>
-									</div>
-
-
-									<form role="form" class="col-sm-8 col-sm-offset-2" method="POST" action="{{ url('/auth/register') }}">
-										<input type="hidden" name="_token" value="{{ csrf_token() }}">
-										@if (count($errors) > 0)
-											<div class="text-danger">
-												<ul>
-													@foreach ($errors->all() as $error)
-														<li>{{ $error }}</li>
-													@endforeach
-												</ul>
-											</div>
-										@endif
-										<div class="form-group">
-											<input type="text" placeholder="Display name" class="minput username"
-											       name="name" value="{{ old('name') }}" required>
-										</div>
-
-										<div class="form-group">
-											<input type="email" class="minput email" placeholder="Email"
-											       name="email" value="{{ old('email') }}" required>
-										</div>
-
-										<div class="form-group">
-											<input type="password" class="minput psw" placeholder="Password"
-											       name="password" required>
-										</div>
-
-										<div class="form-group">
-											<input type="password" class="minput psw" placeholder="Password confirmation"
-											       class="form-control" name="password_confirmation" required>
-										</div>
-
-										<div class="form-group">
-											<div class="checkbox">
-												<label>
-													<input type="checkbox" value="check" required>
-													<strong class="text-left">
-														By click on this box you agree with Meotrics&rsquo;s
-														<a href="" data-toggle="modal" data-target="#privacy_dialog">Policy</a>
-														and
-														<a href="" data-toggle="modal" data-target="#terms_dialog">Terms</a>
-													</strong>
-												</label>
+								<div id="register" class="tab-pane active text-center col-xs-12">
+									<form role="form" class="form-inputs col-xs-10 col-xs-offset-1 " method="POST"
+									      action="{{ url('/auth/register') }}" style="margin-bottom: 30px">
+										<h1 class="login-msg text-left">Buddy, ready to take your adventure ?</h1>
+										<div class="text-left">
+											<div class='form-group '>
+												<input type='radio' id='newsite' name='radio' checked>
+												<label for="newsite">I would like to track a new site</label>
+												</br>
+												<input type='radio' id='oldsite' name='radio'>
+												<label for="oldsite">I am joining partner site</label>
 											</div>
 										</div>
-										<button class="mbtn mbtn-primary" type="submit">
-											<span>I am ready</span>
-										</button>
-										<i class="fa fa-chevron-right" style="font-size:"></i>
-										<br><br>
+
+										<div class="form-group">
+											<input type="text" placeholder="Site name" class="minput username"
+											       name="name" value="{{ old('name') }}">
+										</div>
+										<div class="form-group">
+											<input type="text" placeholder="Site Address (http://example.com)" class="minput psw"
+											       name="name" value="{{ old('name') }}">
+										</div>
+
+										<div class='form-group' style="margin-top: 30px">
+											<input type='checkbox' id='input4' required>
+											<label for="input4"><strong class="text-left">
+													By click on this box you agree with Meotrics&rsquo;s
+													<a href="" data-toggle="modal" data-target="#privacy_dialog">Policy</a>
+													and
+													<a href="" data-toggle="modal" data-target="#terms_dialog">Terms</a>
+												</strong></label>
+										</div>
+
+
+										<div class="form-group row">
+											<div class="col-sm-4 text-left">
+												<p>Sign up with Google</p>
+												<button class="button" id="gsin" style="vertical-align: top; background: white">
+											<span class="label"> <i class="fa fa-google-plus"
+											                        style="vertical-align: baseline; color: #E00000; text-shadow: none;"></i>
+												<span id="ggmes" class="ml"> Sign up</span>
+											</span>
+												</button>
+											</div>
+											<div class="col-sm-8" style="border-left: 2px dashed #E4E4E4;">
+												<p class="text-left">Or using your email</p>
+												<input type="hidden" name="_token" value="{{ csrf_token() }}">
+												@if (count($errors) > 0)
+													<div class="text-danger">
+														<ul>
+															@foreach ($errors->all() as $error)
+																<li>{{ $error }}</li>
+															@endforeach
+														</ul>
+													</div>
+												@endif
+
+												<div class="form-group">
+													<input type="email" class="minput email" placeholder="Email"
+													       name="email" value="{{ old('email') }}" required>
+												</div>
+
+												<div class="form-group">
+													<input type="email" class="minput email" placeholder="Confirm Email"
+													       name="email" value="{{ old('email') }}" required>
+												</div>
+
+												<div class="form-group text-left" style="margin-top: 20px; margin-bottom: 0px">
+													<button class="signinbtn button action blue" style="vertical-align: top;">
+														<span class="label">Sign up</span>
+													</button>
+												</div>
+											</div>
+										</div>
+
+
+
 									</form>
 								</div>
 							</div>
