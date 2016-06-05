@@ -38,7 +38,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err:mongodb.MongoE
 	//run the backend bashboard
 	var crudport = config.get("port") || 2108;
 	app.listen(crudport, function () {
-		console.log('Meotrics CORE API / OK / ' + crudport);
+		console.log('Meotrics CORE API / OK /      ' + crudport);
 	});
 
 	var httpport = config.get<number>('apiserver.port') || 1711;
@@ -48,7 +48,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err:mongodb.MongoE
 	});
 
 	server.listen(httpport, function () {
-		console.log("HTTP API SERVER / OK / " + httpport);
+		console.log("HTTP API SERVER / OK /        " + httpport);
 	});
 
 	let wsport = config.get<number>('websocket.port') || 2910;

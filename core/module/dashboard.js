@@ -12,6 +12,7 @@ class Dashboard {
         this.lock = this.Lock();
     }
     getNewSignup(db, prefix, appid, ids, callback) {
+        var now = new Date();
         var nowsec = Math.round(new Date().getTime() / 1000);
         var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         let todaysec = Math.round(today.getTime() / 1000);
@@ -94,48 +95,55 @@ class Dashboard {
             if (err)
                 throw err;
             revenues.push(res.length === 0 ? 0 : res[0].sum);
-            n_purchase += res[0].count;
+            if (res.length !== 0)
+                n_purchase += res[0].count;
             revenue_pipeline[0]['$match'][ids._ctime].$gte = b5;
             revenue_pipeline[0]['$match'][ids._ctime].$lt = b4;
             db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
                 if (err)
                     throw err;
                 revenues.push(res.length === 0 ? 0 : res[0].sum);
-                n_purchase += res[0].count;
+                if (res.length !== 0)
+                    n_purchase += res[0].count;
                 revenue_pipeline[0]['$match'][ids._ctime].$gte = b4;
                 revenue_pipeline[0]['$match'][ids._ctime].$lt = b3;
                 db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
                     if (err)
                         throw err;
                     revenues.push(res.length === 0 ? 0 : res[0].sum);
-                    n_purchase += res[0].count;
+                    if (res.length !== 0)
+                        n_purchase += res[0].count;
                     revenue_pipeline[0]['$match'][ids._ctime].$gte = b3;
                     revenue_pipeline[0]['$match'][ids._ctime].$lt = b2;
                     db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
                         if (err)
                             throw err;
                         revenues.push(res.length === 0 ? 0 : res[0].sum);
-                        n_purchase += res[0].count;
+                        if (res.length !== 0)
+                            n_purchase += res[0].count;
                         revenue_pipeline[0]['$match'][ids._ctime].$gte = b2;
                         revenue_pipeline[0]['$match'][ids._ctime].$lt = b1;
                         db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
                             if (err)
                                 throw err;
                             revenues.push(res.length === 0 ? 0 : res[0].sum);
-                            n_purchase += res[0].count;
+                            if (res.length !== 0)
+                                n_purchase += res[0].count;
                             revenue_pipeline[0]['$match'][ids._ctime].$gte = b1;
                             revenue_pipeline[0]['$match'][ids._ctime].$lt = b0;
                             db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
                                 if (err)
                                     throw err;
                                 revenues.push(res.length === 0 ? 0 : res[0].sum);
-                                n_purchase += res[0].count;
+                                if (res.length !== 0)
+                                    n_purchase += res[0].count;
                                 revenue_pipeline[0]['$match'][ids._ctime] = { $gte: b0 };
                                 db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
                                     if (err)
                                         throw err;
                                     revenues.push(res.length === 0 ? 0 : res[0].sum);
-                                    n_purchase += res[0].count;
+                                    if (res.length !== 0)
+                                        n_purchase += res[0].count;
                                     callback(revenues, n_purchase);
                                 });
                             });
@@ -517,7 +525,6 @@ class Dashboard {
     }
     getDashboard(appid, callback) {
         let me = this;
-        console.log('get dashboard');
         function generateDashboard(gcallback) {
             var dashboard = new DashboardEntity();
             me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid"], function (ids) {
@@ -589,9 +596,7 @@ class Dashboard {
                 throw err;
             // cache not existed
             if (res.length === 0) {
-                console.log('waiting lock 1');
                 me.lock("c_" + appid, function (release) {
-                    console.log('getin lock 1');
                     // recheck because cache could be create after the lock
                     me.db.collection(me.prefix + "dashboard").find({ appid: appid }).limit(1).toArray(function (err, res) {
                         if (err)
@@ -625,9 +630,7 @@ class Dashboard {
             var dash = res[0];
             var deltaT = Math.round(new Date().getTime() / 1000) - dash.ctime;
             if (deltaT > me.delaysec) {
-                console.log('lock 2');
                 me.lock("c_" + appid, function (release) {
-                    console.log('getin lock 2');
                     me.db.collection(me.prefix + "dashboard").find({ appid: appid }).limit(1).toArray(function (err, res) {
                         if (err)
                             throw err;
