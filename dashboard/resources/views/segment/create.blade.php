@@ -10,15 +10,16 @@
 				datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
 				queryTokenizer: Bloodhound.tokenizers.whitespace,
 				remote: {
-					url: '/api/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
+					url: '//api.meotrics.com/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
 					wildcard: '%QUERY'
 				}
 			});
 
-			$dom.typeahead(null, {
+			$dom.typeahead({minLength: 0, highlight: true}, {
 				name: 'best-pictures',
 				display: 'value',
-				source: source
+				source: source,
+				limit: 10
 			});
 		}
 
@@ -27,7 +28,7 @@
 		}
 
 
-		var appid = "{{\Auth::user()->id}}";
+		var appid = "{{$appcode}}";
 		<?php $i = 0; ?>
 		@foreach($conditions as $condition)
 				@if($condition->select_type == 'user')
