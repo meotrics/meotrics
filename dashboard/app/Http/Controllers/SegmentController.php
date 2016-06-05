@@ -10,11 +10,9 @@ use Illuminate\Support\Facades\View;
 
 class SegmentController extends Controller
 {
-
 	public function __construct()
 	{
 		$this->middleware('auth');
-
 	}
 
 	public function getExecute(Request $request, $app_id)
@@ -29,20 +27,18 @@ class SegmentController extends Controller
 		//run querry on field
 		//MtHttp::get(':3000/segment/query')
 
-
 		return json_encode([]);
 	}
 
-	public function getIndex(Request $request, $appcode, $segid=null)
+	public function getIndex(Request $request, $appcode, $segid = null)
 	{
 		$props = MtHttp::get('prop/' . $appcode);
-
 		$segments = MtHttp::get('segment/' . $appcode);
 
 		//check if segment exist
-		if($segid !== null) {
+		if ($segid !== null) {
 			$seg = MtHttp::get('segment/' . $appcode . '/' . $segid);
-			if($seg == null)
+			if ($seg == null)
 				return view('segment/notfound');
 		}
 		return view('segment/index', [
@@ -201,7 +197,7 @@ class SegmentController extends Controller
 		if ($model) {
 			return $model;
 		} else {
-			App::abort(404, 'Segment not found');
+			abort(404, 'Segment not found');
 		}
 	}
 
@@ -318,104 +314,6 @@ class SegmentController extends Controller
 		return $result;
 	}
 
-	public function getCharts(Request $request, $app_id)
-	{
-		$result = ['success' => false];
-		if ($request->input('segment_id') && $request->input('field1') && $request->input('field2')) {
-//            $charts = MtHtml::get('segment/query/'.$app_id.'/'.$request->input('field1').'/'.$request->input('field2'));
-			$tmp_charts = [
-				(object)[
-					'count' => 0,
-					'key' => (object)[
-						'to' => 18,
-					],
-				],
-				(object)[
-					'count' => 122,
-					'key' => (object)[
-						'from' => 18,
-						'to' => 24,
-					],
-				],
-				(object)[
-					'count' => 385,
-					'key' => (object)[
-						'from' => 24,
-						'to' => 34,
-					],
-				],
-				(object)[
-					'count' => 255,
-					'key' => (object)[
-						'from' => 34,
-					],
-				],
-			];
-			$labels = [];
-			$datasets = [];
-			$flag = '';
-			if ($tmp_charts) {
-				$tmp_charts_first = $tmp_charts[0];
-				if (property_exists($tmp_charts_first, 'key')) {// 1 field
-					if (is_string($tmp_charts_first->key)) {
-						$flag = 'one_string';
-						$tmp_data = [];
-						foreach ($tmp_charts as $tmp_chart) {
-							$labels[] = $tmp_chart->key;
-							$tmp_data[] = $tmp_chart->count;
-						}
-						$datasets[0] = (object)[
-							'data' => $tmp_data,
-						];
-					} elseif (is_array($tmp_charts_first->key)) {
-						$flag = 'one_array';
-						$tmp_data = [];
-						foreach ($tmp_charts as $tmp_chart) {
-							foreach ($tmp_chart->key as $tmp_label) {
-								if (!in_array($tmp_label, $labels)) {
-									$labels[] = $tmp_label;
-									$tmp_data[$tmp_label] = 0;
-								}
-								$tmp_data[$tmp_label] += (int)$tmp_chart->count;
-							}
-						}
-						$chart_data = [];
-						foreach ($labels as $label) {
-							$chart_data[] = $tmp_data[$label];
-						}
-						$datasets[0] = (object)[
-							'data' => $chart_data,
-						];
-					} else {
-						$flag = 'one_object';
-						foreach ($tmp_charts as $tmp_chart) {
-							$tmp_label = '';
-							$tmp_label = property_exists($tmp_chart->key, 'from') ? ('from ' . $tmp_chart->key->from) : '';
-							$tmp_label .= property_exists($tmp_chart->key, 'to') ? (' to ' . $tmp_chart->key->to) : '';
-							$labels[] = trim($tmp_label);
-							$tmp_data[] = $tmp_chart->count;
-						}
-						$datasets[0] = (object)[
-							'data' => $tmp_data,
-						];
-					}
-				} else {// 2 fields
-				}
-
-				if ($flag == 'one_string') {
-
-				} else {
-
-				}
-			}
-
-			$result['labels'] = $labels;
-			$result['datasets'] = $datasets;
-			$result['success'] = true;
-		}
-		return $result;
-	}
-
 	public function getChartonefield(Request $request, $app_id)
 	{
 		$result = ['success' => false];
@@ -440,19 +338,19 @@ class SegmentController extends Controller
 			$datasets_labels = [];
 			if ($tmp_charts && is_array($tmp_charts)) {
 				$tmp_charts_first = $tmp_charts[0];
-				if (property_exists($tmp_charts_first, 'key') && (is_string($tmp_charts_first->key) || $tmp_charts_first->key == null)) {
+				if (isset($tmp_charts_first->key) && (is_string($tmp_charts_first->key) || $tmp_charts_first->key == null)) {
 					foreach ($tmp_charts as $tmp_chart) {
-						if (property_exists($tmp_chart, 'values')) {
+						if (isset($tmp_chart->values)) {
 							$convert_data = $this->convertData($tmp_chart->values);
 							$labels = isset($convert_data['labels']) ? $convert_data['labels'] : [];
 							$datasets = array_merge($datasets, (isset($convert_data['datasets']) ? $convert_data['datasets'] : []));
 							$datasets_labels[] = $tmp_chart->key;
 						}
 					}
-				} elseif (property_exists($tmp_charts_first, 'key') && is_array($tmp_charts_first->key)) {
+				} elseif (isset($tmp_charts_first->key) && is_array($tmp_charts_first->key)) {
 					$tmp_datasets = [];
 					foreach ($tmp_charts as $tmp_chart) {
-						if (property_exists($tmp_chart, 'values')) {
+						if (isset($tmp_chart->values)) {
 							$convert_data = $this->convertData($tmp_chart->values);
 							$labels = isset($convert_data['labels']) ? $convert_data['labels'] : [];
 							foreach ($tmp_chart->key as $tc_key => $tc_value) {
@@ -469,19 +367,16 @@ class SegmentController extends Controller
 								$tmp_data[$tv_key] = isset($tmp_data[$tv_key]) ? $tmp_data[$tv_key] + $tv_data : $tv_data;
 							}
 						}
-						$datasets[] = (object)[
-							'data' => $tmp_data,
-						];
+						$datasets[] = $tmp_data;
 					}
 				} else {
 					foreach ($tmp_charts as $tmp_chart) {
-						if (property_exists($tmp_chart, 'values')) {
+						if (isset($tmp_chart->values)) {
 							$convert_data = $this->convertData($tmp_chart->values);
 							$labels = isset($convert_data['labels']) ? $convert_data['labels'] : [];
 							$datasets = array_merge($datasets, (isset($convert_data['datasets']) ? $convert_data['datasets'] : []));
-							$tmp_label = '';
-							$tmp_label = property_exists($tmp_chart->key, 'from') ? ('from ' . $tmp_chart->key->from) : '';
-							$tmp_label .= property_exists($tmp_chart->key, 'to') ? (' to ' . $tmp_chart->key->to) : '';
+							$tmp_label = isset($tmp_chart->key->from) ? ('from ' . $tmp_chart->key->from) : '';
+							$tmp_label .= isset($tmp_chart->key->to) ? (' to ' . $tmp_chart->key->to) : '';
 							$datasets_labels[] = $tmp_label;
 						}
 					}
@@ -510,14 +405,13 @@ class SegmentController extends Controller
 		$result = ['datasets' => [], 'labels' => []];
 		$labels = [];
 		$datasets = [];
-		$dataset_labels = [];
+		$tmp_data = [];
 		if (is_array($charts) && $charts) {
 			$tmp_charts_first = $charts[0];
 			if (!isset($tmp_charts_first->key))
 				$tmp_charts_first->key = "N/A";
 			if (property_exists($tmp_charts_first, 'key') && is_string($tmp_charts_first->key)) {
-				$flag = 'one_string';
-				$tmp_data = [];
+
 				foreach ($charts as $tmp_chart) {
 					$labels[] = $tmp_chart->key;
 					$tmp_data[] = $tmp_chart->count;
@@ -526,7 +420,6 @@ class SegmentController extends Controller
 					'data' => $tmp_data,
 				];
 			} elseif (property_exists($tmp_charts_first, 'key') && is_array($tmp_charts_first->key)) {
-				$flag = 'one_array';
 				$tmp_data = [];
 				foreach ($charts as $tmp_chart) {
 					foreach ($tmp_chart->key as $tmp_label) {
@@ -545,9 +438,7 @@ class SegmentController extends Controller
 					'data' => $chart_data,
 				];
 			} else {
-				$flag = 'one_object';
 				foreach ($charts as $tmp_chart) {
-					$tmp_label = '';
 					if (!isset($tmp_chart->key))
 						$tmp_chart->key = "N/A";
 
@@ -565,5 +456,4 @@ class SegmentController extends Controller
 		$result['labels'] = $labels;
 		return $result;
 	}
-
 }
