@@ -167,7 +167,6 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 		var data = trackBasic(req);
 		getMtid(req, appid, res, function (mtid) {
 			data._mtid = mtid;
-			console.log(appid,actionid, lastactionid, data);
 			actionmgr.fixRaw(appid, actionid, lastactionid, data, function () {
 				res.end();
 			});
@@ -177,13 +176,18 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 	function suggest(req, res) {
 		valuemgr.suggest(req.appid + "", req.typeid + "", req.field + "", req.qr + "", function (results) {
 			res.setHeader('Content-Type', 'application/json');
+			res.setHeader('Access-Control-Allow-Origin', '*');
+			//res.setHeader('Access-Control-Allow-Origin', 'https://app.meotrics.com env=HTTPS');
+
+			res.setHeader('Access-Control-Allow-Methods', 'GET');
+			res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+			res.setHeader('Access-Control-Allow-Credentials', true);
 			res.end(JSON.stringify(results));
 		});
 	}
 
 	function pageview(req, res) {
 	    var appid = req.appid;
-	    console.log('appid + ' + appid);
 		// record an new pageview
 		var data = trackBasic(req);
 		getMtid(req, appid, res, function (mtid) {
@@ -221,7 +225,6 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 			}
 
 			function handle(req, res, path) {
-			    console.log(path);
 				var parts = path.split('/');
 				res.statusCode = 200;
 				req['appid'] = parts[1];
