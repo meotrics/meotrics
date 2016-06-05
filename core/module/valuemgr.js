@@ -18,9 +18,17 @@ exports.ValueMgr = function (db, prefix) {
 			typeid: (typeid + "").toLowerCase(),
 			field: (field + "").toLowerCase(),
 			value: new RegExp(regesc(query), "i")
-		}, {value: 1, _id: 0}).limit(10).toArray(function (err, ret) {
-			if (err) throw err;
-			callback(ret);
+		}, {value: 1, _id: 0}).limit(50).toArray(function (err, ret) {
+		    if (err) throw err;
+            
+            // delete invalid element
+		    var ret2 = []
+		    for (var i in ret) if (ret.hasOwnProperty(i)) {
+		        if (ret[i].value == '' || ret[i].value == null || ret[i].value == undefined) continue;
+		        rets.push(ret[i]);
+		    }
+
+			callback(ret2);
 		});
 	};
 
