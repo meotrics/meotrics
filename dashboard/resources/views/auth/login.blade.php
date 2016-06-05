@@ -23,6 +23,7 @@
 				$('.signinbtn').removeClass('blue');
 				$('.signinbtn').prop('type', 'button');
 				$('.signinbtn').find('.label').html('Loading ...');
+				$('.ggmes').html('Loading ...');
 				$('.signinbtn').css('cursor', 'default');
 			}
 
@@ -30,6 +31,7 @@
 				$('.signinbtn').addClass('blue');
 				$('.signinbtn').prop('type', 'submit');
 				$('.signinbtn').find('.label').html('Sign in');
+				$('.ggmes').html('Sign up/Sign in with Google Account');
 				$('.signinbtn').css('cursor', 'pointer');
 			}
 
@@ -40,11 +42,12 @@
 			onPageLoad(function () {
 				loading();
 				gapi.load('auth2', function () {
-					auth2 = gapi.auth2.init({
+					var auth2 = gapi.auth2.init({
 						client_id: '102248826764-hvb3ej6gj2cn04upgtfrs8eja7djb6bu.apps.googleusercontent.com',
 						scope: 'profile'
 					});
 
+					auth2.then(function(){
 					if (auth2.isSignedIn.get()) {
 						onSignIn(auth2.currentUser.get());
 						return;
@@ -52,6 +55,10 @@
 					else ready();
 
 					auth2.attachClickHandler(document.getElementById('gsin'), {}, onSignIn, error);
+
+					});
+
+					
 				});
 			});
 
@@ -89,7 +96,7 @@
 
 									<form role="form" class="form-inputs col-sm-8 col-sm-offset-2" method="POST" action="/auth/login">
 										<h1 class="login-msg">Hey Buddy, welcome back!</h1>
-										<button class=" button " id="gsin" style="vertical-align: top; background: white">
+										<button class=" button " type="button" id="gsin" style="vertical-align: top; background: white">
 										<span class="label"> <i class="fa fa-google-plus" style="vertical-align: baseline; color: #E00000; text-shadow: none;"></i>
 											<span id="ggmes" class="ml">Sign up/Sign in with Google Account</span>
 											</span>

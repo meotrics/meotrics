@@ -89,6 +89,8 @@
 						scope: 'profile'
 					});
 
+					auth2.then(function(){
+
 					if (auth2.isSignedIn.get()) {
 						onSignIn(auth2.currentUser.get());
 						return;
@@ -96,7 +98,8 @@
 					else ready();
 
 					auth2.attachClickHandler(document.getElementById('gsin'), {}, onSignIn, error);
-				});
+					});
+				})
 			});
 
 			function changePurpose(radio) {
@@ -178,7 +181,7 @@
 
 										<div class="form-group  text-left">
 
-											<p>Sign up with <button class="button action red" id="gsin" style=" vertical-align: middle;height: 32px;">
+											<p>Sign up with <button class="button action red" type="button" id="gsin" style=" vertical-align: middle;height: 32px;">
 											<span class="label"> <i class="fa fa-google-plus"
 											                        style="vertical-align: baseline; text-shadow: none;"></i>
 												<span id="ggmes" class="ml">Google</span>
