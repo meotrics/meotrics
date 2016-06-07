@@ -39,7 +39,7 @@
 
 	<div class="card row">
 		<div class="content col-sm-12">
-			<form method="POST">
+			<form method="POST" action="/actiontype/{{$appcode}}/update/{{$type->_id}}">
 				<input type="hidden" name="_method" value="PUT">
 				<div>
 					<a href="/actiontype/{{$appcode}}">
@@ -47,7 +47,6 @@
 							<b><i class="fa fa-chevron-left"></i>Action type</b>
 						</small>
 					</a>
-					<small class="text-muted pull-right uppercase"><b>{{ $type->_id }}</b></small>
 				<br><br>
 				@if(session('success'))
           <center class="text-success">

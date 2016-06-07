@@ -12,7 +12,7 @@
 	<div class="card row">
 		<div class="header col-sm-12">
 			<h3>Action type </h3>
-			<a href="/actiontype/create" class="button action blue"><span class="label">Add new</span></a>
+			<a href="/actiontype/{{$appcode}}/create" class="button action blue"><span class="label">Add new</span></a>
 
 		</div>
 		<div class="content col-sm-12">
