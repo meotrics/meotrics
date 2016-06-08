@@ -132,6 +132,8 @@
 
 		$('#trend').on('change', function () {
 			var that = $(this);
+			location.href = "/trend/{{$appcode}}/" + that.val();
+return;
 			$.post('/trend/{{$appcode}}/currenttrend/' + that.val(), function () {
 				location.reload();
 			});
