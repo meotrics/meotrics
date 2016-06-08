@@ -304,14 +304,14 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 			reduceinitcode += "returnObject.f" + ind + "=0;";
 			reduceaggcode += "if(value.f" + ind + "===undefined) value.f" + ind + "=0;returnObject.f" + ind + "+=value.f" + ind + ";";
 			defvalcode += "value.f" + ind + "=0;";
-			finalizecode += "(returnObject.f" + ind + element.operator + JSON.stringify(element.value) + ")";
+			finalizecode += "(value.f" + ind + element.operator + JSON.stringify(element.value) + ") &&";
 			finalizeinitcode += "if(value.f" + ind + "==null) value.f" + ind + "=0;";
 		} else if (element.f === "sum") {
 			code += "value.f" + ind + "=(" + inlineconditions + ")?this." + element_field + ":0;";
 			reduceinitcode += "returnObject.f" + ind + "=0;";
 			reduceaggcode += "if(value.f" + ind + "===undefined) value.f" + ind + "=0;returnObject.f" + ind + "+=value.f" + ind + ";";
 			defvalcode += "value.f" + ind + "=0;";
-			finalizecode += "(returnObject.f" + ind + element.operator + JSON.stringify(element.value) + ")";
+			finalizecode += "(value.f" + ind + element.operator + JSON.stringify(element.value) + ") &&";
 			finalizeinitcode += "if(value.f" + ind + "==null) value.f" + ind + "=0;";
 		} else if (element.f === "avg") {
 			code += "value.f" + ind + "_1=(" + inlineconditions + ")?this." + element_field + ":0;";
@@ -322,7 +322,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 			reduceaggcode += "if(value.f" + ind + "_2===undefined) value.f" + ind + "_2=0;returnObject.f" + ind + "_2+=value.f" + ind + "_2;";
 			defvalcode += "value.f" + ind + "_1=0;";
 			defvalcode += "value.f" + ind + "_2=0;";
-			finalizecode += "(1.0*value.f" + ind + "_1/value.f" + ind + "_2" + element.operator + JSON.stringify(element.value) + ")";
+			finalizecode += "(1.0*value.f" + ind + "_1/value.f" + ind + "_2" + element.operator + JSON.stringify(element.value) + ") &&";
 			finalizeinitcode += "if(value.f" + ind + "_1==null) value.f" + ind + "_1=0;";
 			finalizeinitcode += "if(value.f" + ind + "_2==null || value.f" + ind + "_2==0) value.f" + ind + "_2=1;";
 		} else throw "wrong operator " + element;
@@ -386,8 +386,9 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 			var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true){userid=this["' + ids._mtid + '"];value._hasUser=true;}else{userid=this["' + ids._mtid + '"];';
 			mapfunccode = mapinitcode + mapfunccode + "}emit(userid,value);}";
 			var reducefunccode = "function(key,values){var returnObject={};" + reduceinitcode + "for(var i in values){var value=values[i];if(value._hasUser!==undefined)returnObject._hasUser=true;" + reduceaggcode + "};return returnObject;}";
-			finalizecode = 'function(key, value){' + finalizeinitcode + 'return ' + finalizecode + (finalizecode.length > 0 ? "&&" : "") + 'value._hasUser?1:0}';
-			if (callback !== undefined)
+			finalizecode = 'function(key, value){' + finalizeinitcode + 'return ' + finalizecode  + 'value._hasUser?1:0}';
+
+if (callback !== undefined)
 				callback({
 					map: mapfunccode,
 					reduce: reducefunccode,
