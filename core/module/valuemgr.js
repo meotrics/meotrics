@@ -25,7 +25,7 @@ exports.ValueMgr = function (db, prefix) {
 		    var ret2 = []
 		    for (var i in ret) if (ret.hasOwnProperty(i)) {
 		        if (ret[i].value == '' || ret[i].value == null || ret[i].value == undefined) continue;
-		        rets.push(ret[i]);
+		        ret2.push(ret[i]);
 		    }
 
 			callback(ret2);
