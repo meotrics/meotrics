@@ -59,6 +59,8 @@ Route::get('auth/reset', function(){
 });
 
 Route::post('auth/reset', 'Auth\AuthController@generatePasswordReset');
+Route::get('auth/confirm/{email}/{time}/{salt}/{hash}', 'Auth\AuthController@getConfirm');
+Route::post('auth/confirm/{email}/{time}/{salt}/{hash}', 'Auth\AuthController@confirm');
 Route::get('auth/reset/{email}/{time}/{salt}/{hash}', 'Auth\AuthController@newpw');
 Route::post('auth/reset/{email}/{time}/{salt}/{hash}', 'Auth\AuthController@reset');
 Route::post('auth/register', 'Auth\AuthController@register');

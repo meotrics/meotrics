@@ -26,8 +26,8 @@ class AuthController extends Controller
 	public function register(Request $request)
 	{
 		$isAdmin = $request->input('radio') == 1;
-		$email = $request->input('email') == 1;
-		
+		$email = $request->input('email');
+
 		// create a new user
 		// generate new hash
 		$characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -38,36 +38,40 @@ class AuthController extends Controller
 
 		$param = urlencode($email) . '/' . time() . '/' . $string;
 		$hash = hash(self::$hashalgo, $param, FALSE);
-		
+
+		// make sure user not existed
+		$userid = DB::table('users')->where('email', $email)->first();
+		if($userid !== null)
+		{
+			return view('auth/register', ['error'=> "Email '$email' has already existed in the system. If you forgot your password, please follow the instruction in login page."]);
+		}
+
 		$userid = DB::table('users')->insertGetId(['password' => '',
 			'email' => $email,
 			'status' => 10,
 			'created_at' => date("Y"),
 			'updated_at' => date("Y"),
 			'verified' => 0,
-			'resetpwhash'=> $hash]);
+			'resetpwhash' => $hash]);
 
 		//gui mail chao mung
 		$host = env('HOSTNAME', 'app.meotrics.com');
-		MailSender::send($email, 'register', ['link' => "https://" . $host . '/auth/reset/' . $param . '/' . $hash]);
-		
-		if($isAdmin)
-		{
+		MailSender::send($email, 'registry', ['link' => "https://" . $host . '/auth/confirm/' . $param . '/' . $hash]);
+		\Auth::loginUsingId($userid);
+		if ($isAdmin) {
 			$appname = $request->input('sitename');
 			$appurl = $request->input('siteurl');
 
 			// create new app
-			$code = PermController::createApp($userid,$appname, $appurl);
-			//nhay thang vao dashboard
-			return  redirect('dashboard/' . $code);
+			$code = PermController::createApp($userid, $appname, $appurl);
+			// jump right to dashboard
+
+			return redirect('dashboard/' . $code);
+		} else {
+			return redirect('app/');
 		}
-		else
-		{
-			
-		}
-		
-		
 	}
+
 	/**
 	 * Create a new authentication controller instance.
 	 *
@@ -109,32 +113,59 @@ class AuthController extends Controller
 	public function getConfirm(Request $request, $email, $time, $salt, $hash)
 	{
 		if ($time > time()) abort(500, 'wrong time');
+
 		$valid = $this->validLink($email, $time, $salt, $hash);
 		if ($valid == false)
 			abort(500, 'wrong hash');
 
 		// check in db
 		$user = DB::table('users')->where('email', $email)->first();
-		if ($user->verified == 1) abort(500, 'expired link');
 
-		return view('auth/confirm', ['email' => $email, 'time' => $time, 'salt' => $salt, 'hash' => $hash]);
+		// email ton tai trong he thong
+		if ($user == null)
+			abort(500, 'User not found');
+
+		if ($user->verified == 1)
+			abort(500, 'Email already verified');
+
+		if (isset($user->resetpwhash) && strcmp($user->resetpwhash, $hash) == 0) {
+			return view('auth.newpw', ['confirm'=> true]);
+		}
+		abort(500, "Wrong user token");
 	}
 
-	public function confirm($request, $email, $time, $salt, $hash, $password)
+	public function confirm(Request $request, $email, $time, $salt, $hash)
 	{
+		$password = $request->input('password');
 		if ($time > time()) abort(500, 'wrong time');
+
 		$valid = $this->validLink($email, $time, $salt, $hash);
 		if ($valid == false)
-			abort(500, 'wrong hash');
+			return view('auth.newpw', ['error' => 'Wrong hash']);
 
 		// check in db
 		$user = DB::table('users')->where('email', $email)->first();
-		if ($user->verified == 1) abort(500, 'expired link');
 
-		$user = DB::table('users')->where('email', $email)->update(['password' => bcrypt($password), 'verified' => 1]);
+		// email ton tai trong he thong
+		if ($user == null)
+			return view('auth.newpw', ['error' => 'User not found']);
 
-		\Auth::loginUsingId($user->id);
-		return view('/app');
+		if ($user->verified == 1)
+			return view('auth.newpw', ['error' => 'Email already verified']);
+
+		if (isset($user->resetpwhash) && strcmp($user->resetpwhash, $hash) == 0) {
+			$user = DB::table('users')->where('email', $email)->update(['resetpwhash' => null]);
+			$diff = (time() - $time);
+			if ($diff > 86400) //  1 day -> valid
+			{
+				return view('auth.newpw', ['error' => 'Expired time']);
+			}
+
+			DB::table('users')->where('email', $email)->update(['password' => bcrypt($password), 'verified'=>1]);
+			\Auth::loginUsingId($user->id);
+			return redirect('/app');
+		}
+		return view('auth.newpw', ['error' => 'Wrong user token']);
 	}
 
 	public function newpw(Request $request, $email, $time, $salt, $hash)

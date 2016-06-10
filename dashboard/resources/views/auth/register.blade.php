@@ -82,6 +82,14 @@
 			}
 
 			onPageLoad(function () {
+				if($('#oldsite').attr('checked') == true)
+				{
+					changePurpose({value: '2'})}
+				else {
+
+					changePurpose({value: '1'})
+				}
+
 				loading();
 				gapi.load('auth2', function () {
 					auth2 = gapi.auth2.init({
@@ -192,13 +200,11 @@
 												</button> Or use your email address</p>
 
 												<input type="hidden" name="_token" value="{{ csrf_token() }}">
-												@if (count($errors) > 0)
+												@if (isset($error))
 													<div class="text-danger">
-														<ul>
-															@foreach ($errors->all() as $error)
-																<li>{{ $error }}</li>
-															@endforeach
-														</ul>
+
+																<p>{{ $error }}</p>
+
 													</div>
 												@endif
 
@@ -207,10 +213,6 @@
 													       name="email" value="{{ old('email') }}" required>
 												</div>
 
-												<div class="form-group">
-													<input type="email" class="minput email" placeholder="Confirm Email"
-													       name="email" value="{{ old('email') }}" required>
-												</div>
 
 												<div class="form-group text-left" style="margin-top: 20px; margin-bottom: 0px">
 													<button class="signinbtn button action blue" style="vertical-align: top;">

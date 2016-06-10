@@ -32,7 +32,12 @@
 							<div class="tab-content row">
 								<div id="newpw" class="tab-pane fade in active col-sm-12">
 									<form role="form" class="form-inputs col-sm-8 col-sm-offset-2" method="POST"
-									      action="/auth/reset/{{$param['email']}}/{{$param['time']}}/{{$param['salt']}}/{{$param['hash']}}">
+									      @if(isset($confirm))
+									      action="/auth/reset/{{$param['email']}}/{{$param['time']}}/{{$param['salt']}}/{{$param['hash']}}"
+												@else
+									      action="/auth/confirm/{{$param['email']}}/{{$param['time']}}/{{$param['salt']}}/{{$param['hash']}}"
+													@endif
+									>
 										@if(isset($error))
 											<div class="alert alert-danger">
 												<button type="button" aria-hidden="true" class="close">×</button>
