@@ -81,10 +81,13 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 	function getMtid(req, appid, res, callback) {
 		var mtid = getCookie(req, "mtid");
 		if (mtid === undefined) {
-			return actionmgr.setupRaw(appid, function (mtid) {
-				setCookie(res, "mtid", mtid, appid);
-				callback(mtid);
-			});
+		    mtid = req.params._mtid;
+		    if (mtid === undefined) {
+		        return actionmgr.setupRaw(appid, function (mtid) {
+		            setCookie(res, "mtid", mtid, appid);
+		            callback(mtid);
+		        });
+		    }
 		}
 
 		// check if mtid is valid
@@ -118,11 +121,13 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 			actionmgr.saveRaw(appid, data, function (actionid) {
 				me.onchange(appid, "type." + data._typeid);
 				res.setHeader('Content-Type', 'text/plain');
-				res.end("//" + actionid);
+				res.end(mtid);
 			});
 		});
 	}
 
+    // identify an user
+    // if mtid not exists in the parameter ->create one
 	function info(req, res) {
 		var appid = req.appid;
 		getMtid(req, appid, res, function (mtid) {
@@ -136,7 +141,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 				setCookie(res, "mtid", mtid,  appid);
 				res.setHeader('Content-Type', 'text/plain');
 
-				res.end("//" + mtid);
+				res.end(""+mtid);
 			});
 		});
 	}
@@ -250,7 +255,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 					fix(req, res);
 				} else {
 					res.statusCode = 404;
-					res.end('action "' + action + '" not found, action must be one of [code, clear, ingo, fix, track]');
+					res.end('action "' + action + '" not found, action must be one of [x, clear, info, fix, track]');
 				}
 			}
 		}, function (err) {
