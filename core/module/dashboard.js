@@ -567,7 +567,7 @@ class Dashboard {
                                     dashboard.usergrowth_rate = growrate;
                                 });
                                 me.getConversionRate(me.db, me.prefix, appid, ids, function (cs) {
-                                    dashboard.conversion_rate = cs;
+                                    dashboard.conversion_rates = cs;
                                     me.getRetensionRates(me.db, me.prefix, appid, ids, function (rates) {
                                         dashboard.retention_rates = rates;
                                         me.getRevenuePerCustomer(me.db, me.prefix, appid, ids, function (v) {
@@ -578,7 +578,7 @@ class Dashboard {
                                                     dashboard.most_popular_category = cat;
                                                     me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, function (ref) {
                                                         dashboard.most_effective_ref = ref;
-                                                        gcallback(d);
+                                                        gcallback(dashboard);
                                                     });
                                                 });
                                             });

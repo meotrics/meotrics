@@ -15,6 +15,8 @@ export class DashboardEntity {
 	public highest_revenue_campaign:string;
 	public most_effective_ref:string;
 	public most_popular_category: string;
+
+	public conversion_rates: number[]
 }
 export class Dashboard {
 	private Lock = require('lock');
@@ -330,7 +332,7 @@ export class Dashboard {
 		});
 	}
 
-	private getConversionRate(db:mongo.Db, prefix:string, appid:string, ids, callback:(a:number) => void) {
+	private getConversionRate(db:mongo.Db, prefix:string, appid:string, ids, callback:(a:number[]) => void) {
 		//3 retension rate = number of user purchase within 7 days/ total number of visitor
 		//get alltime visitor
 
@@ -574,8 +576,8 @@ export class Dashboard {
 								me.getGrowRate(me.db, me.prefix, appid, ids, function (growrate:number) {
 									dashboard.usergrowth_rate = growrate;
 								});
-								me.getConversionRate(me.db, me.prefix, appid, ids, function(cs:number) {
-									dashboard.conversion_rate = cs;
+								me.getConversionRate(me.db, me.prefix, appid, ids, function(cs:number[]) {
+									dashboard.conversion_rates = cs;
 									me.getRetensionRates(me.db, me.prefix, appid, ids, function (rates:number[]) {
 										dashboard.retention_rates = rates;
 										me.getRevenuePerCustomer(me.db, me.prefix, appid, ids, function (v:number) {
@@ -589,7 +591,7 @@ export class Dashboard {
 
 													me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, function(ref: string){
 														dashboard.most_effective_ref = ref;
-														gcallback(d);
+														gcallback(dashboard);
 													});
 												});
 											});
