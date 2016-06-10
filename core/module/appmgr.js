@@ -4,7 +4,7 @@
 		var me = this;
 		this.isSetup = function (appid, callback) {
 			me.countAction(appid, function (count) {
-				callback(count > 1);
+				callback(count > 0);
 			});
 		};
 

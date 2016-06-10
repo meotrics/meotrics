@@ -101,16 +101,17 @@
 		$('#guideline').modal('show');
 		getIntegrationCode(appcode);
 	}
-
-	$(document).ready(function () {
-		$.get('/app/setup_status/{{$appcode}}', function (response) {
-			if (response == "true" || response == 1) {
-				//'Integrated !'
-			} else {
-				showCodeDialog('{{$appcode}}');
-			}
-		}).fail(function (err) {
-			_helper.notification.error('Failed to check installation !')
+	@if(isset($appcode) && $appcode != '')
+		$(document).ready(function () {
+			$.get('/app/setup_status/{{$appcode}}', function (response) {
+				if (response == "true" || response == 1) {
+					//'Integrated !'
+				} else {
+					showCodeDialog('{{$appcode}}');
+				}
+			}).fail(function (err) {
+				_helper.notification.error('Failed to check installation !')
+			});
 		});
-	});
+	@endif
 </script>
