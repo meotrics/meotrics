@@ -66,16 +66,20 @@
 		var data = JSON.parse(event.data);
 		mt.actionid = data.actionid;
 		if(data.lastactionid !== undefined)
-			ajax('fix', {
+		{
+			var o1 = {
 				actionid : data.actionid, 
-				lastactionid: data.lastactionid, 
-				data: addVisitorPlatform({})
-			});
+				lastactionid: data.lastactionid
+			}
+			addVisitorPlatform(o1);
+			ajax('fix',o1);
+		}
 		else
-			ajax('fix', {
-				actionid : data.actionid, 
-				data: addVisitorPlatform({})
-			});
+		{
+			var o2 = {actionid : data.actionid};
+			addVisitorPlatform(o2);
+			ajax('fix', o2);
+		}
 		cleanRequest();// excute delayed request in queue
 	}
 
