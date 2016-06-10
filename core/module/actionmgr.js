@@ -328,7 +328,7 @@ class ActionMgr {
                     // user exist
                     var ide_mtid = r.value._id;
                     // check for case 1
-                    if (themtid === ide_mtid)
+                    if (themtid.toHexString() === ide_mtid.toHexString())
                         return updateUserInfo(me.db, themtid, userx, callback);
                     // case 2
                     // add to mapping collection

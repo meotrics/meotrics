@@ -297,7 +297,7 @@ export class ActionMgr {
 				userex[p] = user[p];
 		user = userex;
 
-		var themtid = new mongodb.ObjectID(data.mtid);
+		var themtid: mongodb.ObjectID = new mongodb.ObjectID(data.mtid);
 		me.converter.toIDs(['_isUser', 'userid', '_mtid'], function (ids) {
 			me.valuemgr.cineObject(appid, 'user', user);
 			me.converter.toObject(user, function (userx) {
@@ -314,9 +314,9 @@ export class ActionMgr {
 					if (r.value === null) return updateUserInfo(me.db, themtid, userx, callback);
 
 					// user exist
-					var ide_mtid = r.value._id;
+					var ide_mtid: mongodb.ObjectID = r.value._id;
 					// check for case 1
-					if (themtid === ide_mtid) return updateUserInfo(me.db, themtid, userx, callback);
+					if (themtid.toHexString() === ide_mtid.toHexString()) return updateUserInfo(me.db, themtid, userx, callback);
 
 					// case 2
 					// add to mapping collection
