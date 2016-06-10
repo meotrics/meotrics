@@ -63,7 +63,7 @@
 			@endforeach
 
 			$('.id_add').click(function () {
-				$.post('/app/create', {name: $('.id_name').val()}, function (appcode) {
+				$.post('/app/create', {name: $('.id_name').val(), url:$('.id_url').val()}, function (appcode) {
 					showCodeDialog(appcode, function () {
 						location.reload();
 					});
@@ -154,6 +154,16 @@
 							<input type="text" class="form-control id_name" placeholder="App Name" required>
 						</div>
 					</div>
+
+					<div class="row pt pb10">
+						<div class="col-sm-4 ">
+							<h6 class="pull-right">url of the app</h6>
+						</div>
+						<div class="col-sm-7">
+							<input type="text" class="form-control id_url" placeholder="App URL" >
+						</div>
+					</div>
+
 				</div>
 				<div class="modal-footer">
 					<button type="button" data-dismiss="modal" class="button action ">

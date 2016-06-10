@@ -31,11 +31,22 @@
 							<h5>Name</h5>
 						</div>
 						<div class="col-sm-5">
-							<input type="text" name="name" class="form-control" id="exampleInputEmail1"
+							<input type="text" name="name" class="form-control"
 							       placeholder=" Display Name" required
 							       value="{{ $ap->name }}">
 						</div>
 					</div>
+					<div class="row">
+						<div class="col-sm-1">
+							<h5>Url</h5>
+						</div>
+						<div class="col-sm-5">
+							<input type="text" name="url" class="form-control"
+							       placeholder="App Url"
+							       value="{{ $ap->url }}">
+						</div>
+					</div>
+
 					<div class="row mt">
 						<div class="col-sm-2">
 							<h5 style="margin-bottom: 0">Access control</h5>

@@ -80,13 +80,15 @@ class PermController extends Controller
 	public function postedit(Request $request, $appcode)
 	{
 		$name = $request->input('name');
+		$url = $request->input('url');
+		
 		if ($name == null || $name == '')
 			abort(500, 'name must not be empty');
 
 		$ap = DB::table('apps')->where('apps.code', $appcode)->first();
 		if ($ap == null) abort(500, 'cannot find app: ' . $appcode);
 
-		DB::table('apps')->where('id', $ap->id)->update(['name' => $name]);
+		DB::table('apps')->where('id', $ap->id)->update(['name' => $name, 'url'=>$url]);
 
 		return redirect('/');
 	}
@@ -100,10 +102,8 @@ class PermController extends Controller
 		else abort(403, 'Unauthorized action');
 	}
 
-	public function create(Request $request)
+	public static function createApp($uid, $name, $url ='')
 	{
-		$uid = \Auth::user()->id;
-		$name = $request->input('name');
 		if ($name == null || $name == '') abort(500, 'name must not be empty');
 
 		// lock thread
@@ -113,7 +113,8 @@ class PermController extends Controller
 		DB::table('apps')->insert(array(
 				'name' => $name,
 				'code' => $code,
-				'ownerid' => $uid
+				'ownerid' => $uid,
+				'url'=>$url
 			)
 		);
 
@@ -124,7 +125,14 @@ class PermController extends Controller
 		Access::setPerm($uid, $uid, $code, 1, 1, 1);
 		// init app in backend
 		MtHttp::get('app/init/' . $code);
+		return $code;
+	}
 
+	public function create(Request $request)
+	{
+		$uid = \Auth::user()->id;
+		$name = $request->input('name');
+		$code = self::createApp($uid, $name);
 		return new Response($code);
 	}
 
