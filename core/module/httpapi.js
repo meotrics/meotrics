@@ -121,7 +121,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 			actionmgr.saveRaw(appid, data, function (actionid) {
 				me.onchange(appid, "type." + data._typeid);
 				res.setHeader('Content-Type', 'text/plain');
-				res.end(mtid);
+				res.end("\"" + mtid + "\"");
 			});
 		});
 	}
@@ -141,7 +141,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
 				setCookie(res, "mtid", mtid,  appid);
 				res.setHeader('Content-Type', 'text/plain');
 
-				res.end(""+mtid);
+				res.end("\""+mtid + "\"");
 			});
 		});
 	}

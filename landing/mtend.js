@@ -24,6 +24,7 @@
 	}
 
 	mt.info = function (data, callback, callback2, callback3) {
+		if(typeof data == 'string') data = {userid: data};
 		return isready ? ajax('info', data, callback || callback3) : request_queue2.push(['info', data]);
 	};
 
