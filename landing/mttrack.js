@@ -3,8 +3,8 @@ var event;
 mt.track = function(t,r){
 	mt.rq.push(["track",t,r,new Date])
 };
-mt.identify = function(t){
-	mt.rq.push(["identify",t])
+mt.info = function(t){
+	mt.rq.push(["info",t])
 }
 mt.clear = function(){
 	mt.rq.push(["clear"])

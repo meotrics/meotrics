@@ -78,10 +78,10 @@
 		cleanRequest();// excute delayed request in queue
 	}
 
-	var ifm = document.createElement('iframe');
+	var ifm = doc.createElement('iframe');
 	ifm.style.display="none";
 	ifm.src = "//meotrics.com/iframe.html?x=" + mt.appid + '-' + mt.actionid;
-	document.body.appendChild(ifm);
+	doc.body.appendChild(ifm);
 
 	mt.onready();
 })();
