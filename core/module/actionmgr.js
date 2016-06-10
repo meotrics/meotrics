@@ -315,7 +315,7 @@ class ActionMgr {
             me.converter.toObject(user, function (userx) {
                 // check for case 4
                 if (userid === undefined)
-                    return updateUserInfo(themtid, userx, callback);
+                    return updateUserInfo(me.db, themtid, userx, callback);
                 var query = {};
                 query[ids._isUser] = true;
                 query[ids.userid] = userid;
@@ -324,12 +324,12 @@ class ActionMgr {
                         throw err;
                     // case 3 : user doesn't exist
                     if (r.value === null)
-                        return updateUserInfo(themtid, userx, callback);
+                        return updateUserInfo(me.db, themtid, userx, callback);
                     // user exist
                     var ide_mtid = r.value._id;
                     // check for case 1
                     if (themtid === ide_mtid)
-                        return updateUserInfo(themtid, userx, callback);
+                        return updateUserInfo(me.db, themtid, userx, callback);
                     // case 2
                     // add to mapping collection
                     me.db.collection(collectionmapping).insertOne({
@@ -352,18 +352,18 @@ class ActionMgr {
                     // delete ano-mtid record IF EXISTED
                     me.db.collection(collection).deleteOne({ _id: themtid }, function () {
                     });
-                    return updateUserInfo(ide_mtid, userx, callback);
+                    return updateUserInfo(me.db, ide_mtid, userx, callback);
                 });
             });
         });
         // purpose: update info which mtid is mtid
-        function updateUserInfo(mtid, userx, callback) {
-            let me = this;
+        function updateUserInfo(db, mtid, userx, callback) {
             callback(mtid);
-            me.db.collection(collection).updateOne({ _id: mtid }, { $set: userx }, function (err, result) {
-                if (err)
-                    throw err;
-            });
+            if (Object.keys(userx).length !== 0)
+                db.collection(collection).updateOne({ _id: mtid }, { $set: userx }, function (err, result) {
+                    if (err)
+                        throw err;
+                });
         }
     }
     // purposer: phương thức này dùng để báo cho hệ thống biết một anonymous
