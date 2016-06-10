@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\PermController;
 use App\Util\MailSender;
 use App\Util\MtHttp;
 use Illuminate\Contracts\Auth\Guard;
@@ -22,6 +23,51 @@ class AuthController extends Controller
 
 	use AuthenticatesAndRegistersUsers;
 
+	public function register(Request $request)
+	{
+		$isAdmin = $request->input('radio') == 1;
+		$email = $request->input('email') == 1;
+		
+		// create a new user
+		// generate new hash
+		$characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+		$string = '';
+		for ($i = 0; $i < 10; $i++) {
+			$string .= $characters[rand(0, strlen($characters) - 1)];
+		}
+
+		$param = urlencode($email) . '/' . time() . '/' . $string;
+		$hash = hash(self::$hashalgo, $param, FALSE);
+		
+		$userid = DB::table('users')->insertGetId(['password' => '',
+			'email' => $email,
+			'status' => 10,
+			'created_at' => date("Y"),
+			'updated_at' => date("Y"),
+			'verified' => 0,
+			'resetpwhash'=> $hash]);
+
+		//gui mail chao mung
+		$host = env('HOSTNAME', 'app.meotrics.com');
+		MailSender::send($email, 'register', ['link' => "https://" . $host . '/auth/reset/' . $param . '/' . $hash]);
+		
+		if($isAdmin)
+		{
+			$appname = $request->input('sitename');
+			$appurl = $request->input('siteurl');
+
+			// create new app
+			$code = PermController::createApp($userid,$appname, $appurl);
+			//nhay thang vao dashboard
+			return  redirect('dashboard/' . $code);
+		}
+		else
+		{
+			
+		}
+		
+		
+	}
 	/**
 	 * Create a new authentication controller instance.
 	 *

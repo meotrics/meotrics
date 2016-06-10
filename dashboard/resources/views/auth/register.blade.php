@@ -73,7 +73,7 @@
 			function ready() {
 				$('.signinbtn').addClass('blue');
 				$('.signinbtn').prop('type', 'submit');
-				$('.signinbtn').find('.label').html('Sign in');
+				$('.signinbtn').find('.label').html('Sign up');
 				$('.signinbtn').css('cursor', 'pointer');
 			}
 
@@ -105,12 +105,15 @@
 			function changePurpose(radio) {
 				if (radio.value == "2") {
 					$('.siteinfo').addClass('hidden');
+					$('input[name="sitename"]').removeProp('required');
+					$('input[name="siteurl"]').removeProp('required');
+
 				}
 				else {
 					$('.siteinfo').removeClass('hidden');
+					$('input[name="sitename"]').removeProp('required',true);
+					$('input[name="siteurl"]').removeProp('required', true);
 				}
-
-
 			}
 
 			function onSignIn(googleUser) {
@@ -215,8 +218,6 @@
 													</button>
 												</div>
 										</div>
-
-
 									</form>
 								</div>
 							</div>

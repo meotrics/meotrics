@@ -132,7 +132,8 @@ class PermController extends Controller
 	{
 		$uid = \Auth::user()->id;
 		$name = $request->input('name');
-		$code = self::createApp($uid, $name);
+		$url = $request->input('url');
+		$code = self::createApp($uid, $name,$url);
 		return new Response($code);
 	}
 
