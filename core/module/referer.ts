@@ -308,6 +308,8 @@ export class RefererType {
 		"zoo.gr"];
 
 	private isPaidSearch(url_string: string, referer: string): boolean {
+		url_string = url_string || "";
+		referer = referer || "";
 				var url_parts = url.parse(url_string, true);
 
 				var medium = url_parts.query.utm_medium;
@@ -323,6 +325,8 @@ export class RefererType {
 	}
 
 	private isOrganicSearch(referer: string): boolean {
+
+		referer = referer || "";
 				var url_parts = url.parse(referer, true);
 				for (var l of this.organicsearchs)
 			if (url_parts.hostname.endsWith(l))
@@ -332,6 +336,7 @@ export class RefererType {
 	}
 
 	private isEmail(url_string: string): boolean {
+		url_string = url_string || "";
 		var url_parts = url.parse(url_string, true);
 				var medium = url_parts.query.utm_medium;
 				if (medium == "email" || medium == "emailmarketing" || medium == "email marketing" || medium == "email-marketing" )
@@ -339,6 +344,7 @@ export class RefererType {
 	}
 
 	private isReferal(url_string: string): boolean {
+		url_string = url_string || "";
 		var url_parts = url.parse(url_string, true);
 				var medium = url_parts.query.utm_medium;
 				if (medium == "Referral")
@@ -347,6 +353,8 @@ export class RefererType {
 	}
 
 	private isDirect(url_string: string, referer: string) {
+		url_string = url_string || "";
+		referer = referer || "";
 		if (referer == undefined || referer == '')
 			return true;
 		var url_parts = url.parse(url_string, true);
@@ -358,6 +366,8 @@ export class RefererType {
 				return false;
 	}
 	private isSocial(url_string: string, referer: string): boolean {
+		url_string = url_string || "";
+		referer = referer || "";
 		var url_parts = url.parse(url_string, true);
 				var medium = url_parts.query.utm_medium;
 				if (medium == "Social" || medium == "social" || medium == "social-network" || medium == "social-media" || medium == "sm" || medium == "social network" || medium == "social media")
@@ -372,6 +382,8 @@ export class RefererType {
 	}
 
 	public getRefType(url_string: string, referer: string): number {
+		url_string = url_string || "";
+		referer = referer || "";
 		if (this.isPaidSearch(url_string, referer))
 			return 1;
 
