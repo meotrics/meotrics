@@ -308,6 +308,7 @@ export class RefererType {
 		"zoo.gr"];
 
 	private isPaidSearch(url_string: string, referer: string): boolean {
+		
 		url_string = url_string || "";
 		referer = referer || "";
 				var url_parts = url.parse(url_string, true);
@@ -318,7 +319,7 @@ export class RefererType {
 
 		url_parts = url.parse(referer, true);
 				for (var l of this.paidSearchs)
-			if (url_parts.hostname.endsWith(l))
+					if (url_parts.hostname != null && url_parts.hostname.endsWith(l))
 				return true;
 
 				return false;
@@ -329,7 +330,7 @@ export class RefererType {
 		referer = referer || "";
 				var url_parts = url.parse(referer, true);
 				for (var l of this.organicsearchs)
-			if (url_parts.hostname.endsWith(l))
+					if (url_parts.hostname != null && url_parts.hostname.endsWith(l))
 				return true;
 
 				return false;
@@ -375,7 +376,7 @@ export class RefererType {
 
 		url_parts = url.parse(referer, true);
 				for (var l of this.paidSearchs)
-			if (url_parts.hostname.endsWith(l))
+					if (url_parts.hostname != null && url_parts.hostname.endsWith(l))
 				return true;
 
 				return false;

@@ -1,9 +1,9 @@
 ﻿import * as mongodb from 'mongodb';
 import * as url from 'url';
 import * as express from 'express';
-
+import * as referer from './referer';
 export class ActionMgr {
-	constructor(private db: mongodb.Db, private converter, private prefix: string, private mapping: string, private valuemgr) {
+	constructor(private db: mongodb.Db, private converter, private prefix: string, private mapping: string, private valuemgr, private referer: referer.RefererType) {
 	}
 
 	// purpose: check if an mtid is valid
@@ -86,6 +86,10 @@ export class ActionMgr {
 				if (err) throw err;
 				if (r.length !== 0) mtid = r[0].idemtid;
 				me.valuemgr.cineObject(appid, data._typeid, data);
+
+				// set referal type
+				data._reftype = me.referer.getRefType(data._url, data._ref);
+
 				me.converter.toObject(data, function (datax) {
 					me.db.collection(collection).insertOne(datax, function (err, r) {
 						if (err) throw err;
@@ -98,7 +102,7 @@ export class ActionMgr {
 						var user = ret[0];
 						if (user === undefined) throw "mtid " + mtid + " did not match any user";
 						var typeid = data._typeid;
-						me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid',
+						me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
 							'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed'], function (ids) {
 								// increase revenue
 								var simpleprop = {};
@@ -226,8 +230,12 @@ export class ActionMgr {
 		return store();
 
 		function store() {
+			
+
 			me.updateChainCampaign(appid, actionids, data);
 			me.valuemgr.cineObject(appid, "pageview", data);
+			// set referal type
+			data._reftype = me.referer.getRefType(data._url, data._ref);
 			me.converter.toObject(data, function (datax) {
 				me.db.collection(collection).updateOne({ _id: actionid }, { $set: datax }, function (err, r) {
 					if (err) throw err;

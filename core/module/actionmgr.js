@@ -1,12 +1,13 @@
 "use strict";
 const mongodb = require('mongodb');
 class ActionMgr {
-    constructor(db, converter, prefix, mapping, valuemgr) {
+    constructor(db, converter, prefix, mapping, valuemgr, referer) {
         this.db = db;
         this.converter = converter;
         this.prefix = prefix;
         this.mapping = mapping;
         this.valuemgr = valuemgr;
+        this.referer = referer;
     }
     // purpose: check if an mtid is valid
     // a mtid is valid if there is one user record based on mtid
@@ -95,6 +96,8 @@ class ActionMgr {
                 if (r.length !== 0)
                     mtid = r[0].idemtid;
                 me.valuemgr.cineObject(appid, data._typeid, data);
+                // set referal type
+                data._reftype = me.referer.getRefType(data._url, data._ref);
                 me.converter.toObject(data, function (datax) {
                     me.db.collection(collection).insertOne(datax, function (err, r) {
                         if (err)
@@ -109,7 +112,7 @@ class ActionMgr {
                         if (user === undefined)
                             throw "mtid " + mtid + " did not match any user";
                         var typeid = data._typeid;
-                        me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid',
+                        me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
                             '_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed'], function (ids) {
                             // increase revenue
                             var simpleprop = {};
@@ -239,6 +242,8 @@ class ActionMgr {
         function store() {
             me.updateChainCampaign(appid, actionids, data);
             me.valuemgr.cineObject(appid, "pageview", data);
+            // set referal type
+            data._reftype = me.referer.getRefType(data._url, data._ref);
             me.converter.toObject(data, function (datax) {
                 me.db.collection(collection).updateOne({ _id: actionid }, { $set: datax }, function (err, r) {
                     if (err)

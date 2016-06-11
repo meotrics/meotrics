@@ -316,7 +316,7 @@ class RefererType {
             return true;
         url_parts = url.parse(referer, true);
         for (var l of this.paidSearchs)
-            if (url_parts.hostname.endsWith(l))
+            if (url_parts.hostname != null && url_parts.hostname.endsWith(l))
                 return true;
         return false;
     }
@@ -324,7 +324,7 @@ class RefererType {
         referer = referer || "";
         var url_parts = url.parse(referer, true);
         for (var l of this.organicsearchs)
-            if (url_parts.hostname.endsWith(l))
+            if (url_parts.hostname != null && url_parts.hostname.endsWith(l))
                 return true;
         return false;
     }
@@ -366,7 +366,7 @@ class RefererType {
             return true;
         url_parts = url.parse(referer, true);
         for (var l of this.paidSearchs)
-            if (url_parts.hostname.endsWith(l))
+            if (url_parts.hostname != null && url_parts.hostname.endsWith(l))
                 return true;
         return false;
     }
