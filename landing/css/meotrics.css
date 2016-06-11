@@ -381,3 +381,15 @@ header .navbar-brand > img{
 	    margin: 0 20px;
 	}
 }
+.header-career{
+	margin-bottom: 186px;
+	font-family: 'Roboto', sans-serif;
+	margin-top: 100px;
+}
+.fix-height-apply{
+	height: 160px;
+}
+.disable-width-plan-item .plan-item
+{
+	max-width: none;
+}
