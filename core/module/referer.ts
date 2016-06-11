@@ -331,6 +331,34 @@ export class RefererType {
 				return false;
 	}
 
+	private isEmail(url_string: string): boolean {
+		var url_parts = url.parse(url_string, true);
+				var medium = url_parts.query.utm_medium;
+				if (medium == "email" || medium == "emailmarketing" || medium == "email marketing" || medium == "email-marketing" )
+			return true;
+	}
+
+	private isReferal(url_string: string): boolean {
+		var url_parts = url.parse(url_string, true);
+				var medium = url_parts.query.utm_medium;
+				if (medium == "Referral")
+					return true;
+				return false;
+	
+
+	}
+
+	private isDirect(url_string: string, referer: string) {
+		if (referer == undefined || referer == '')
+			return true;
+		var url_parts = url.parse(url_string, true);
+				var medium = url_parts.query.utm_medium;
+				if (medium == "(not set)" || medium == "(none)" )
+					return true;
+				var source = url_parts.query.utm_source;
+				if (source == "(direct)") return true;
+				return false;
+	}
 	private isSocial(url_string: string, referer: string): boolean {
 		var url_parts = url.parse(url_string, true);
 				var medium = url_parts.query.utm_medium;
