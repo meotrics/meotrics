@@ -143,25 +143,24 @@
 
 		});
 
-		function drawVisitNumber()
-		{
+		function drawVisitNumber() {
 			var canvas = document.getElementById("visitchart");
 			var ctx = canvas.getContext("2d");
 			ctx.font = "22px Roboto";
 			ctx.fillStyle = "black";
 			ctx.textAlign = "center";
-			ctx.fillText("{{$dashboard->n_new_visitor + $dashboard->n_returning_visitor}}",canvas.width/2, canvas.height/2);
+			ctx.fillText("{{$dashboard->n_new_visitor + $dashboard->n_returning_visitor}}", canvas.width / 2, canvas.height / 2);
 			ctx.font = "14px Roboto";
 			ctx.fillStyle = "black";
 			ctx.textAlign = "center";
-			ctx.fillText("visitors",canvas.width/2, canvas.height/2+20);
+			ctx.fillText("visitors", canvas.width / 2, canvas.height / 2 + 20);
 
 		}
 
 		Chart.pluginService.register({
 			afterDraw: function (chart, easing) {
 
-				if(chart == visitChart) {
+				if (chart == visitChart) {
 					drawVisitNumber();
 				}
 
@@ -188,11 +187,70 @@
 		drawVisitNumber();
 
 
-
-
 	</script>
 @endsection
 @section('content')
+	<div class="row">
+		<div class="col-sm-4 ">
+			<div class="row">
+				<div class="col-md-12 pl0">
+					<div class="card" style="height: 140px;">
+						<div style="padding-left: 12px">
+							<div class="row">
+
+								<div class="col-sm-6" style="font-size: 12px">
+									<h6 style="margin-bottom:0; margin-top:20px;  color: gray">TRAFFIC</h6>
+									<div class=""><i class="fa fa-circle" style="color: #4E6CC9"></i> New visitor</div>
+									<div class="medium text-center" style="color: #4E6CC9">{{$dashboard->n_new_visitor}}</div>
+									<div style="margin-top: 10px"><i class="fa fa-circle" style="color: #8C8C8C"></i> Returning visitor
+									</div>
+									<div class="medium text-center" style="color: #8C8C8C;">{{$dashboard->n_returning_visitor}}</div>
+
+								</div>
+								<div class="col-sm-6">
+									<div style="height: 110px; width: 105px; margin-top: 20px">
+										<canvas id="visitchart" width="400" height="400"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+			<div class="row">
+				<div class="col-sm-12 pl0 ">
+					<div class="card" style="height: 100px">
+						<div class="" style="">
+							<div class="header text-center">
+								<h6 style="margin: 0; color: gray">NEW SIGNUP</h6>
+							</div>
+							<div class="content text-center" style="padding-top: 0">
+								<span class="verybig"> 37</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-8 pl0">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="card " style="height: 255px;">
+						<div class="header">
+							<h6 style="margin:0; color: gray"> USER GROWTH RATE</h6>
+						</div>
+						<div class="content">
+							<div style="height: 200px">
+								<canvas id="trchart" width="400" height="400"></canvas>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div class="row">
 		<div class="col-sm-3 pl0">
 			<div class="card" style="background: #4E6CC9; color: white; height: 85px">
@@ -235,95 +293,22 @@
 			</div>
 		</div>
 	</div>
-	<div class="row">
-		<div class="col-sm-4 ">
-			<div class="row">
-				<div class="col-md-12 pl0">
-					<div class="card" style="height: 120px;">
-						<div style="padding-left: 12px">
-							<div class="row">
-								<div class="col-sm-6" style="font-size: 12px">
-									<div class="mt"><i class="fa fa-circle" style="color: #4E6CC9"></i> New visitor</div>
-									<div class="medium text-center" style="color: #4E6CC9">{{$dashboard->n_new_visitor}}</div>
-									<div style="margin-top: 10px"> <i class="fa fa-circle" style="color: #8C8C8C"></i> Returning visitor </div>
-									<div class="medium text-center" style="color: #8C8C8C;">{{$dashboard->n_returning_visitor}}</div>
 
-								</div>
-								<div class="col-sm-6">
-									<div style="height: 110px; width: 110px; margin-top: 5px">
-										<canvas id="visitchart" width="400" height="400"></canvas>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-
-				<div class="col-sm-12 pl0 ">
-					<div class="card" style="height: 120px">
-
-						<div style="width: 20%; height: 120px;background: #4E6CC9; color: white; display: inline-block"></div>
-						<div class="pull-right" style="width: 80%; ">
-							<div class="header text-center">
-								<h5>UNIQUE VISITOR</h5>
-							</div>
-							<div class="content text-center" style="padding-top: 0px">
-								<span class="verybig"> 928</span>
-							</div>
-						</div>
-					</div>
-				</div>
-
-			</div>
-			<div class="row">
-				<div class="col-sm-12 pl0 ">
-					<div class="card" style="height: 120px">
-
-						<div style="width: 20%; height: 120px;background: #4E6CC9; color: white; display: inline-block"></div>
-						<div class="pull-right" style="width: 80%; ">
-							<div class="header text-center">
-								<h5>NEW SIGNUP</h5>
-							</div>
-							<div class="content text-center" style="padding-top: 0px">
-								<span class="verybig"> 37</span>
-							</div>
-						</div>
-					</div>
-				</div>
-
-			</div>
-		</div>
-		<div class="col-sm-8 pl0">
-			<div class="row">
-				<div class="col-md-12">
-					<div class="card " style="height: 258px;">
-						<div class="header">
-							<h4> USER GROWTH RATE</h4>
-						</div>
-						<div class="content">
-							<div style="height: 190px">
-								<canvas id="trchart" width="400" height="400"></canvas>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 
 	<div class="row">
-
 		<div class="col-sm-9 pl0">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="card " style="height: 258px;">
+					<div class="card " style="height: 285px;">
 						<div class="header">
-							<h4>TOTAL SALE</h4>
+							<h6 class="pull-right" style="margin:0; color: gray">REVENUER PER CUSTOM <span class="medium" style="color: #4e6cc9">$59.00</span></h6>
+
+							<h6 style="margin:0; color:gray">TOTAL REVENUE <span class="medium" style="color: #4e6cc9">$46, 238.00</span></h6>
+
 						</div>
 						<div class="content">
 							<div style="height: 190px">
-								<canvas id="trchart" width="400" height="400"></canvas>
+								<canvas id="trchart" width="100%" height="100%"></canvas>
 							</div>
 						</div>
 					</div>
@@ -333,39 +318,42 @@
 
 		<div class="col-sm-3 pl0">
 			<div class="row">
-				<div class="col-sm-12 pl0">
+				<div class="col-sm-12 ">
 					<div class="card" style=" height: 85px">
 						<div class="header text-center">
 							<h5 style="margin: 0; text-align: right;color: #353535;font-size: 13px;">MOST POPULAR CATEGORY</h5>
 						</div>
 						<div class="content text-center pull-right mr">
-							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0px;"> Woman Fashion & Accessories</h6>
+							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0px;">
+								Woman Fashion & Accessories</h6>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="row">
-				<div class="col-sm-12 pl0">
+				<div class="col-sm-12 ">
 					<div class="card" style=" height: 85px">
 						<div class="header text-center">
 							<h5 style="margin: 0; text-align: right;color: #353535;font-size: 13px;">HIGHEST REVENUE CAMPAIGN</h5>
 						</div>
 						<div class="content text-center pull-right mr">
-							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0px;"> Facebook</h6>
+							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0px;">
+								Facebook</h6>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="row">
-				<div class="col-sm-12 pl0">
+				<div class="col-sm-12 ">
 					<div class="card" style=" height: 85px">
 						<div class="header text-center">
 							<h5 style=" margin: 0; text-align: right;color: #353535;font-size: 13px;">MOST EFFECTIVE REFERAL</h5>
 						</div>
 						<div class="content text-center pull-right mr">
-							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0px;">Organic search</h6>
+							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0px;">
+								Organic search</h6>
 						</div>
 					</div>
 				</div>
@@ -373,114 +361,7 @@
 		</div>
 	</div>
 
-	<div class="row">
-		<div class="col-md-3 pl0">
-			<div class="card " style="height: 240px;">
-				<div class="header">
-					<h4>General metrics</h4>
-				</div>
-				<div class="content">
-					<p>Number of new Sign Up: 345</p>
-					<p>Average card size: $34.30</p>
-					<p>Most revenue category: Book</p>
-					<p>User growth rate: 5.2</p>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-4 pl0">
-			<div class="card " style="height: 240px;">
-				<div class="header">
-					<h4> Revenue</h4>
-				</div>
-				<div class="content">
-					<div style="height: 130px">
-						<canvas id="trchart" width="400" height="400"></canvas>
-					</div>
-					<p class="text-center" style="margin-top: 5px">Total revenue <b> $ 2 238</b> ($20 per customer) </p>
 
-				</div>
-			</div>
-		</div>
-
-
-	</div>
-	<div class="row">
-		<div class="col-md-4 pl0">
-			<div class="card">
-				<div class="header">
-					<h4>Retension rate</h4>
-				</div>
-				<div class="content" style="padding-top: 0px">
-					<div class="row">
-						<div class="col-sm-12">
-							<p class="text-muted">This week</p>
-							<div style="height: 100px">
-								<canvas id="retenratechart" width="400" height="40"></canvas>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-4 pl0">
-			<div class="card" style="  height: 275px;">
-				<div class="header">
-					<h4>Conversion rate</h4>
-				</div>
-				<div class="content text-center">
-					<div class="bar_container">
-						<div id="main_container">
-							<div id="pbar" class="progress-pie-chart" data-percent="0">
-								<div class="ppc-progress">
-									<div class="ppc-progress-fill"></div>
-								</div>
-								<div class="ppc-percents">
-									<div class="pcc-percents-wrapper">
-										<span>%</span>
-									</div>
-								</div>
-							</div>
-							<progress style="display: none" id="progress_bar" value="0" max="10"></progress>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-4 pl0">
-			<div class="row">
-				<div class="col-sm-12">
-					<div class="card" style="height: 140px">
-						<div class="header ">
-							<h4 class="" style="margin-bottom: 20px">Highesh revenue campaign</h4>
-							<h5 class="big pull-right" style="margin-top: 0">1/6</h5>
-							<h5 class="big">Facebook</h5>
-						</div>
-						<div class="content " style="padding-top: 0px">
-							<div class="">
-								<div class="progress"
-								     style="width: 100%;margin-bottom: 10px;margin-top: 10px; height: 12px; border-radius: 35px;">
-									<div data-percentage="20%" style="width: 50%; background-color: #4E6CC9" class="progress-bar"
-									     role="progressbar" aria-valuemin="0" aria-valuemax="100"></div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-sm-12">
-					<div class="card" style="background: #4E6CC9; color: white; height: 120px">
-						<div class="header text-center">
-							<h4>Most effective refferer</h4>
-						</div>
-						<div class="content text-center">
-							<span class="verybig"> SOCIAL</span>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 @endsection
 @section('additional')
 
