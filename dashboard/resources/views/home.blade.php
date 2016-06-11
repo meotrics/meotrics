@@ -36,6 +36,7 @@
 		});
 
 		var options = {
+			tooltips: {enabled: false},
 			legend: {display: false},
 			animation: false,
 			segmentShowStroke: false,
@@ -142,6 +143,30 @@
 
 		});
 
+		function drawVisitNumber()
+		{
+			var canvas = document.getElementById("visitchart");
+			var ctx = canvas.getContext("2d");
+			ctx.font = "22px Roboto";
+			ctx.fillStyle = "black";
+			ctx.textAlign = "center";
+			ctx.fillText("{{$dashboard->n_new_visitor + $dashboard->n_returning_visitor}}",canvas.width/2, canvas.height/2);
+			ctx.font = "14px Roboto";
+			ctx.fillStyle = "black";
+			ctx.textAlign = "center";
+			ctx.fillText("visitors",canvas.width/2, canvas.height/2+20);
+
+		}
+
+		Chart.pluginService.register({
+			afterDraw: function (chart, easing) {
+
+				if(chart == visitChart) {
+					drawVisitNumber();
+				}
+
+			}
+		});
 
 		var visitChart = new Chart($("#visitchart"), {
 			type: 'doughnut',
@@ -160,6 +185,11 @@
 			},
 			options: options
 		});
+		drawVisitNumber();
+
+
+
+
 	</script>
 @endsection
 @section('content')
@@ -206,9 +236,30 @@
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-sm-3 ">
-
+		<div class="col-sm-4 ">
 			<div class="row">
+				<div class="col-md-12 pl0">
+					<div class="card" style="height: 120px;">
+						<div style="padding-left: 12px">
+							<div class="row">
+								<div class="col-sm-6" style="font-size: 12px">
+									<div class="mt"><i class="fa fa-circle" style="color: #4E6CC9"></i> New visitor</div>
+									<div class="medium text-center" style="color: #4E6CC9">{{$dashboard->n_new_visitor}}</div>
+									<div style="margin-top: 10px"> <i class="fa fa-circle" style="color: #8C8C8C"></i> Returning visitor </div>
+									<div class="medium text-center" style="color: #8C8C8C;">{{$dashboard->n_returning_visitor}}</div>
+
+								</div>
+								<div class="col-sm-6">
+									<div style="height: 110px; width: 110px; margin-top: 5px">
+										<canvas id="visitchart" width="400" height="400"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
 				<div class="col-sm-12 pl0 ">
 					<div class="card" style="height: 120px">
 
@@ -243,7 +294,7 @@
 
 			</div>
 		</div>
-		<div class="col-sm-9 pl0">
+		<div class="col-sm-8 pl0">
 			<div class="row">
 				<div class="col-md-12">
 					<div class="card " style="height: 258px;">
@@ -351,35 +402,7 @@
 			</div>
 		</div>
 
-		<div class="col-md-4 pl0">
-			<div class="card" style="height: 240px;">
-				<div class="header">
-					<div class="small pull-right" style="margin-top: 10px">
-						<span style="margin-right: 5px"> <i class="fa fa-circle"
-						                                    style="color: #8C8C8C"></i> Returning visitor </span>
-						<span><i class="fa fa-circle" style="color: #4E6CC9"></i> New visitor</span>
-					</div>
-					<h4>Visitors</h4>
-				</div>
-				<div class="content">
-					<div class="row">
-						<div class="col-sm-5 mt">
-							<span class="verybig" style="color: #4E6CC9">{{$dashboard->n_new_visitor}}</span> <i
-											class="bigup fa fa-arrow-up"></i><br/>
-							<span class="verybig" style="color: #8C8C8C">{{$dashboard->n_returning_visitor}}</span> <i
-											class="bigdown fa fa-arrow-down"></i><br/>
 
-						</div>
-						<div class="col-sm-7">
-							<div style="height: 158px">
-								<canvas id="visitchart" width="400" height="400"></canvas>
-							</div>
-							<div id="visitchartlegend" class="chart-legend"></div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
 	</div>
 	<div class="row">
 		<div class="col-md-4 pl0">
