@@ -54,7 +54,7 @@ export class CrudApi {
 		app.deleteEx('/trend/:appid/:id', this.trendCRUD.delete);
 		// Query trend
 
-		app.get('/trend/query/:appid/:id/:segid?/:starttime?/:endtime?', this.trendMgr.query);
+		app.get('/trend/query/:appid/:id/:segid?/:starttime?/:endtime?', function (req, res) { me.trendMgr.query(req, res) });
 
 		// CRUD segment
 		app.postEx('/segment/:appid', function (req, res) {

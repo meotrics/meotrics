@@ -19,9 +19,9 @@ class TrendMgr {
             if (segid !== undefined && segid !== '' && segid !== '_')
                 trenddoc._segment = segid;
             if (starttime !== undefined)
-                trenddoc.startTime = Math.round(new Date(starttime).getTime() / 1000);
+                trenddoc.startTime = starttime;
             if (endtime !== undefined)
-                trenddoc.endTime = Math.round(new Date(endtime).getTime() / 1000 + 86400);
+                trenddoc.endTime = endtime;
             me.getQueryTrending(trenddoc, function (query) {
                 var collection = me.prefix + "app" + appid;
                 me.db.collection(collection).aggregate(query).toArray(function (err, results) {
@@ -45,8 +45,8 @@ class TrendMgr {
         var appid = req.params.appid;
         var trid = req.params.id;
         var segid = req.params.segid;
-        var starttime = req.params.starttime;
-        var endtime = req.params.endtime;
+        var starttime = parseInt(req.params.starttime);
+        var endtime = parseInt(req.params.endtime);
         this.queryRaw(appid, trid, segid, starttime, endtime, function (results) {
             if (results === null)
                 return res.status(404).end();
@@ -65,16 +65,16 @@ class TrendMgr {
             // -- START MATCH CLAUSE
             query.push(match);
             if (object._segment !== undefined) {
-                match[ids._segments] = { $in: [new mongodb.ObjectID(object._segment)] };
+                match.$match[ids._segments] = { $in: [new mongodb.ObjectID(object._segment)] };
             }
             if (object.startTime !== undefined) {
-                match[ids._ctime] = { $gte: object.startTime };
+                match.$match[ids._ctime] = { $gte: object.startTime };
             }
             if (object.endTime !== undefined) {
-                if (match[ids._ctime] !== undefined)
-                    match[ids._ctime].$lte = object.endTime;
+                if (match.$match[ids._ctime] !== undefined)
+                    match.$match[ids._ctime].$lte = object.endTime;
                 else
-                    match[ids._ctime] = { $lte: object.endTime };
+                    match.$match[ids._ctime] = { $lte: object.endTime };
             }
             // -- END OF MATCH CLAUSE
             // -- START GROUP FUNCTION
