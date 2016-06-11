@@ -6,7 +6,7 @@
 		<div class="card col-md-12">
 			<div class="row">
 				<div class="header col-md-12">
-					<form class="form-horizontal pb10" method="post" action="{{URL::to('trend/'. $appcode.'/write')}}">
+					<form class="form-horizontal pb10" method="post" action="/trend/{{$appcode}}/write">
 						<input type="hidden" name="Trend[_id]" value="{{$trend->_id}}"/>
 						<div class="row">
 							<div class="col-md-2">
@@ -14,7 +14,7 @@
 							</div>
 							<div class="col-md-6">
 								<input type="text" class="form-control " name="Trend[name]" required=""
-								       value="{{isset($trend->name) ? $trend->name: ""}}"/>
+								       value="{{$trend->name or ""}}"/>
 								@if($errors->any())
 									<p class="errror">{{$errors->first('name')}}</p>
 								@endif
@@ -27,7 +27,7 @@
 							</div>
 							<div class="col-md-6">
 								<input type="text" class="form-control " name="Trend[desc]"
-								       value="{{isset($trend->desc) ? $trend->desc: ""}}"/>
+								       value="{{ $trend->desc or ""}}"/>
 							</div>
 						</div>
 
@@ -37,8 +37,8 @@
 							</div>
 							<div class="col-md-2">
 								<select class="form-control" id="order" name="Trend[order]">
-									<option value="1" {{$trend->order == 1 ? 'selected=""' : ''}}>TOP</option>
-									<option value="-1" {{$trend->order == -1 ? 'selected=""' : ''}}>LEAST</option>
+									<option value="-1" {{$trend->order == -1 ? 'selected=""' : ''}}>TOP</option>
+									<option value="1" {{$trend->order == 1 ? 'selected=""' : ''}}>LEAST</option>
 								</select>
 							</div>
 							<div class="col-md-2">

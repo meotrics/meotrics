@@ -83,7 +83,6 @@ class TrendController extends Controller
 				return view('trend/notfound');
 		}
 
-
 		if ($trends) {
 			$queryurl = 'trend/query/' . $app_id;
 			if ($trendid != null) {
@@ -119,7 +118,6 @@ class TrendController extends Controller
 				} else {
 					$queryurl .= '/_';
 				}
-
 
 				if (isset($st)) {
 					$queryurl .= '/' . $st . '/' . $et;
@@ -229,11 +227,12 @@ class TrendController extends Controller
 			if (isset($data_post['name'])) $data['name'] = $data_post['name'];
 
 			if (isset($data_post['_id']) && $data_post['_id']) {
-				$trendid = MtHttp::put('trend/' . $app_id . '/' . $data_post['_id'], $data);
+				MtHttp::put('trend/' . $app_id . '/' . $data_post['_id'], $data);
+				$trendid  = $data_post['_id'];
 			} else {
 				$trendid = MtHttp::post('trend/' . $app_id, $data);
 			}
-			return redirect('trend/' . $app_id . '/' . $trendid);
+			return  redirect('trend/' . $app_id . '/' . $trendid);
 		}
 		return false;
 	}
