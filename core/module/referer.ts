@@ -344,8 +344,6 @@ export class RefererType {
 				if (medium == "Referral")
 					return true;
 				return false;
-	
-
 	}
 
 	private isDirect(url_string: string, referer: string) {
@@ -373,7 +371,25 @@ export class RefererType {
 				return false;
 	}
 
-	public getRefType(referer: string, medium: string): string {
-		return "";
+	public getRefType(url_string: string, referer: string): number {
+		if (this.isPaidSearch(url_string, referer))
+			return 1;
+
+		if (this.isOrganicSearch(referer))
+			return 2;
+
+		if (this.isSocial(url_string, referer))
+			return 3;
+
+		if (this.isReferal(url_string))
+			return 4;
+
+		if (this.isEmail(url_string))
+			return 5;
+
+		if (this.isDirect(url_string, referer))
+			return 6;
+
+		return 0; //other advertising
 	}
 }
