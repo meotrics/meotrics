@@ -4,7 +4,7 @@ const async = require('async');
 var trycatch = require('trycatch');
 var CRUD = require('./crud.js').CRUD;
 var appException = require('./appException.js');
-var TrendMgr = require('./trendmgr.js').TrendMgr;
+const TrendMgr = require('./trendmgr');
 var PropMgr = require('./propmgr.js').PropMgr;
 var AppMgr = require('./appmgr.js').AppMgr;
 var SegMgr = require('./segment.js').SegmentExr;
@@ -18,7 +18,7 @@ class CrudApi {
         this.prefix = prefix;
         this.dashboarddelay = dashboarddelay;
         this.dashboard = new Dashboard.Dashboard(this.db, this.converter, this.prefix, this.dashboarddelay);
-        this.trendMgr = new TrendMgr(this.db, mongodb, async, this.converter, this.prefix, "trend");
+        this.trendMgr = new TrendMgr.TrendMgr(this.db, this.converter, this.prefix, "trend");
         this.propmgr = new PropMgr();
         this.typeCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "actiontype");
         this.trendCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "trend");

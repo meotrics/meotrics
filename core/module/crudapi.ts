@@ -6,7 +6,7 @@ import bodyParser = require('body-parser');
 var CRUD = require('./crud.js').CRUD;
 
 var appException = require('./appException.js');
-var TrendMgr = require('./trendmgr.js').TrendMgr;
+import * as TrendMgr from './trendmgr';
 //var ActionMgr = require('./module/actionmgr.js').ActionMgr;
 import * as ActionMgr from './actionmgr';
 var PropMgr = require('./propmgr.js').PropMgr;
@@ -25,7 +25,7 @@ export class CrudApi {
 	}
 
 	public dashboard = new Dashboard.Dashboard(this.db, this.converter, this.prefix, this.dashboarddelay);
-	public trendMgr = new TrendMgr(this.db, mongodb, async, this.converter, this.prefix, "trend");
+	public trendMgr = new TrendMgr.TrendMgr(this.db, this.converter, this.prefix, "trend");
 	public propmgr = new PropMgr();
 	public typeCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "actiontype");
 	public trendCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "trend");
