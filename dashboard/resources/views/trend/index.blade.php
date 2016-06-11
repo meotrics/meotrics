@@ -62,10 +62,9 @@
 									@foreach($segments as $segment)
 										@if( $segmentid == $segment->_id)
 											<?php $trend_segment = $segment ?>
-											<option selected
-											        value="{{$segment->_id}}">{{ isset($segment->name) ? $segment->name : "unnamed"}}</option>
+											<option value="{{$segment->_id}}">{{  $segment->name or "unnamed"}} selected</option>
 										@else
-											<option value="{{$segment->_id}}">{{ isset($segment->name) ? $segment->name : "unnamed"}}</option>
+											<option value="{{$segment->_id}}">{{  $segment->name or "unnamed"}}</option>
 										@endif
 									@endforeach
 								</select>
@@ -103,7 +102,7 @@
 			//load segment time range
 
 			@if(isset($starttime))
-			$('#segment-date-range').data('dateRangePicker').setDateRange('{{$starttime}}', '{{$endtime}}');
+			$tp.data('dateRangePicker').setDateRange('{{$starttime}}', '{{$endtime}}');
 			@else
 			// 30 ngay truoc do
 			var today = new Date().toISOString().substr(0, 10);
@@ -113,14 +112,14 @@
 			// bind event
 			$('#segpick').on('change', function () {
 				var val = $(this).val();
-				$.post('/trend/currentsegment/', {'segmentid': val}, function () {
+				$.post('/trend/{{$appcode}}/currentsegment/', {'segmentid': val}, function () {
 					location.reload();
 				});
 			});
 
 			tp.bind('datepicker-change', function (event, obj) {
 				var val = $(this).val();
-				$.post('/trend/currenttime/', {'endTime': val.split(' ')[2], 'startTime': val.split(' ')[0]}, function () {
+				$.post('/trend/{{$appcode}}/currenttime', {'endTime': val.split(' ')[2], 'startTime': val.split(' ')[0]}, function () {
 					location.reload();
 				});
 			});
@@ -133,7 +132,7 @@
 		$('#trend').on('change', function () {
 			var that = $(this);
 			location.href = "/trend/{{$appcode}}/" + that.val();
-return;
+			return;
 			$.post('/trend/{{$appcode}}/currenttrend/' + that.val(), function () {
 				location.reload();
 			});
@@ -146,7 +145,7 @@ return;
 				$.ajax({
 					type: 'DELETE',
 					dataType: 'JSON',
-					url: '{{ URL::to('trend/'.$appcode .'/remove') }}' + '/' + $('#trend').val(),
+					url: '/trend/{{$appcode}}/remove/' + $('#trend').val(),
 					success: function (data) {
 						if (data.success) {
 							location.reload();

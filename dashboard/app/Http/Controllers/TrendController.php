@@ -10,17 +10,12 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
 use stdClass;
 
-//use function redirect;
-//use function response;
-//use function view;
-
 class TrendController extends Controller
 {
 	private $request;
 
 	public function __construct(Request $request)
 	{
-		$this->request = $request;
 		$this->middleware('auth');
 	}
 
@@ -50,46 +45,48 @@ class TrendController extends Controller
 	public function postCurrenttime(Request $request, $appid)
 	{
 		$response = new Response();
-		$st = $this->request->input('startTime', null);
-		$et = $this->request->input('endTime', null);
-		$response->withCookie(cookie('currenttrendstarttime', $st, 2147483647, '/trend/' . $appid . '/'));
-		$response->withCookie(cookie('currenttrendendtime', $et, 2147483647, '/trend/' . $appid . '/'));
+		$st = $request->input('startTime', null);
+		$et = $request->input('endTime', null);
+		$response->withCookie(cookie('currenttrendstarttime', $st, 9147483, "/trend/$appid"));
+		$response->withCookie(cookie('currenttrendendtime', $et, 9147483, "/trend/$appid"));
 		return $response;
 	}
 
 	public function postCurrentsegment(Request $request, $appid)
 	{
 		$response = new Response();
-		$segmentid = $this->request->input('segmentid', '');
-		return $response->withCookie(cookie('currentsegmentid', $segmentid, 2147483647, '/trend/' . $appid . '/'));
+		$segmentid = $request->input('segmentid', '');
+		return $response->withCookie(cookie('currentsegmentid', $segmentid, 9147483, '/trend/' . $appid ));
 	}
 
 	public function postCurrenttrend(Request $request, $appid, $trendid)
 	{
 		$response = new Response();
-		return $response->withCookie(cookie('currenttrendid', $trendid, 2147483647, '/'. $appid . '/'));
+		return $response->withCookie(cookie('currenttrendid', $trendid, 9147483, '/trend/' . $appid ));
 	}
 
 	public function getIndex(Request $request, $app_id, $trendid = null)
 	{
 		$actiontypes = MtHttp::get('actiontype/' . $app_id);
 
-		$segid = $this->request->cookie('currentsegmentid');
-		$st = $this->request->cookie('currenttrendstarttime');
-		$et = $this->request->cookie('currenttrendendtime');
+		$segid = $request->cookie('currentsegmentid');
+		$st = $request->cookie('currenttrendstarttime');
+		$et = $request->cookie('currenttrendendtime');
 
+		///var_dump($st);
+		//die($st);
 		$trends = MtHttp::get('trend/' . $app_id);
 
-		if($trendid !== null) {
+		if ($trendid !== null) {
 			$tre = MtHttp::get('trend/' . $app_id . '/' . $trendid);
-			if($tre == null)
+			if ($tre == null)
 				return view('trend/notfound');
 		}
-		
-		
+
+
 		if ($trends) {
 			$queryurl = 'trend/query/' . $app_id;
-			if ($trendid!= null) {
+			if ($trendid != null) {
 				$queryurl .= '/' . $trendid;
 			} else {
 				$trend = reset($trends);
@@ -103,6 +100,11 @@ class TrendController extends Controller
 			}
 
 			if (isset($st)) {
+				$pieces = explode("-", $st);
+				$st = strtotime($pieces[1] . '/' . $pieces[2] . '/' . $pieces[0]);
+
+				$pieces = explode("-", $et);
+				$et  = strtotime($pieces[1] . '/' . $pieces[2] . '/' . $pieces[0]);
 				$queryurl .= '/' . $st . '/' . $et;
 			}
 
@@ -118,6 +120,7 @@ class TrendController extends Controller
 					$queryurl .= '/_';
 				}
 
+
 				if (isset($st)) {
 					$queryurl .= '/' . $st . '/' . $et;
 				}
@@ -130,9 +133,9 @@ class TrendController extends Controller
 		$segments = MtHttp::get('segment/' . $app_id);
 
 		return view('trend/index', [
-			'segmentid' => $this->request->cookie('currentsegmentid'),
-			'startTime' => $this->request->cookie('currenttrendstarttime'),
-			'endTime' => $this->request->cookie('currenttrendendtime'),
+			'segmentid' => $request->cookie('currentsegmentid'),
+			'starttime' => $request->cookie('currenttrendstarttime'),
+			'endtime' => $request->cookie('currenttrendendtime'),
 			'segments' => $segments,
 			'trendid' => $trendid,
 			'types' => json_encode($actiontypes),
