@@ -29,6 +29,12 @@
 	@yield('header-script')
 </head>
 <body>
+@if($verified == 0)
+<div class="alert alert-danger id_ver" style="    position: relative; margin-bottom: 0">
+	<button type="button" aria-hidden="true" class="close" style="color:red">×</button>
+	<span>A confirm email has already sent into your inbox, please confirm your email address. Don't get it ?, please check your spam box or <a style="color:#164dff" onclick="$('.id_ver').addClass('hidden'); $.post('/auth/resent').fail(function(){alert('cannot resent')});" href="#">resent it</a></span>
+</div>
+@endif
 @yield('body')
 
 <script src="{{asset('js/he.js')}}" type="text/javascript"></script>

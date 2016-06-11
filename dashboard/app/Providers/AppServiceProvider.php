@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
 		View::composer('*', function ($view) {
 			if (\Auth::user() == null) return;
 			$userid = \Auth::user()->id;
-
+			$veri  =  \Auth::user()->verified;
 			//abort(400, Request::route()->currentRouteName() );
 
 			$param = Route::current()->parameters();
@@ -42,6 +42,7 @@ class AppServiceProvider extends ServiceProvider
 
 			$view->with('userid', $userid);
 			$view->with('appcode', $appcode);
+			$view->with('verified', $veri);
 		});
 
 		View::composer('layout.master', function ($view) {

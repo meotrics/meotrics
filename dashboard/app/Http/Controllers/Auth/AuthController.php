@@ -37,6 +37,31 @@ class AuthController extends Controller
 
 	}
 
+	public function resent(Request $request)
+	{
+		if (\Auth::user() == null) return redirect('auth/login');
+		$userid = \Auth::user()->id;
+		// generate new hash
+		$characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+		$string = '';
+		for ($i = 0; $i < 10; $i++) {
+			$string .= $characters[rand(0, strlen($characters) - 1)];
+		}
+
+		$user = DB::table('users')->where('id', $userid)->first();
+		if($user == null) abort(500, "user not found");
+		$param = urlencode($user->email) . '/' . time() . '/' . $string;
+		$hash = hash(self::$hashalgo, $param, FALSE);
+
+		DB::table('users')->where('id', $userid)->update(['resetpwhash' => $hash]);
+
+		//gui mail chao mung
+		$host = env('HOSTNAME', 'app.meotrics.com');
+		MailSender::send($user->email, 'registry', ['link' => "https://" . $host . '/auth/confirm/' . $param . '/' . $hash]);
+
+		return 'sent';
+	}
+
 	public function register(Request $request)
 	{
 		$isAdmin = $request->input('radio') == 1;
