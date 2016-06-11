@@ -522,6 +522,7 @@ class Dashboard {
         });
     }
     getMostEffectiveReferal(db, prefix, appid, ids, callback) {
+        callback("no");
     }
     getDashboard(appid, callback) {
         let me = this;
@@ -562,23 +563,23 @@ class Dashboard {
                                 dashboard.total_revenues = revenues;
                                 var sumrevnue = revenues.reduce((pv, cv) => pv + cv, 0);
                                 dashboard.n_avgcartsize = n_purchase == 0 ? sumrevnue : sumrevnue / n_purchase;
-                                gcallback(dashboard);
+                                //gcallback(dashboard);
                                 me.getGrowRate(me.db, me.prefix, appid, ids, function (growrate) {
                                     dashboard.usergrowth_rate = growrate;
-                                });
-                                me.getConversionRate(me.db, me.prefix, appid, ids, function (cs) {
-                                    dashboard.conversion_rates = cs;
-                                    me.getRetensionRates(me.db, me.prefix, appid, ids, function (rates) {
-                                        dashboard.retention_rates = rates;
-                                        me.getRevenuePerCustomer(me.db, me.prefix, appid, ids, function (v) {
-                                            dashboard.revenue_per_customer = v;
-                                            me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, function (campaign) {
-                                                dashboard.highest_revenue_campaign = campaign;
-                                                me.getMostPopulerCategory(me.db, me.prefix, appid, ids, function (cat) {
-                                                    dashboard.most_popular_category = cat;
-                                                    me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, function (ref) {
-                                                        dashboard.most_effective_ref = ref;
-                                                        gcallback(dashboard);
+                                    me.getConversionRate(me.db, me.prefix, appid, ids, function (cs) {
+                                        dashboard.conversion_rates = cs;
+                                        me.getRetensionRates(me.db, me.prefix, appid, ids, function (rates) {
+                                            dashboard.retention_rates = rates;
+                                            me.getRevenuePerCustomer(me.db, me.prefix, appid, ids, function (v) {
+                                                dashboard.revenue_per_customer = v;
+                                                me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, function (campaign) {
+                                                    dashboard.highest_revenue_campaign = campaign;
+                                                    me.getMostPopulerCategory(me.db, me.prefix, appid, ids, function (cat) {
+                                                        dashboard.most_popular_category = cat;
+                                                        me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, function (ref) {
+                                                            dashboard.most_effective_ref = ref;
+                                                            gcallback(dashboard);
+                                                        });
                                                     });
                                                 });
                                             });
