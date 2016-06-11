@@ -1,6 +1,47 @@
 ﻿//const url = require('url');
 import * as url from 'url';
 export class RefererType {
+	private organicsearchs = [
+		"daum.net",
+		"eniro.se",
+		"naver.com",
+		"google.com",
+		"yahoo.com",
+		"msn.com",
+		"bing.com",
+		"aol.com",
+		"aol.com",
+		"lycos.com",
+		"ask.com",
+		"altavista.com",
+		"ch.netscape.com",
+		"cnn.com",
+		"about.com",
+		"mamma.com",
+		"alltheweb.com",
+		"voila.fr",
+		"search.virgilio.it",
+		"bing.com",
+		"baidu.com",
+		"alice.com",
+		"yandex.com",
+		"najdi.org.mk",
+		"aol.com",
+		"mamma.com",
+		"seznam.cz",
+		"search.com",
+		"wp.pl",
+		"online.onetcenter.org",
+		"szukacz.pl",
+		"yam.com",
+		"pchome.com",
+		"kvasir.no",
+		"sesam.no",
+		"ozu.es",
+		"terra.com",
+		"mynet.com",
+		"ekolay.net",
+		"rambler.ru"];
 
 	private paidSearchs = [
 				"alexa.com",
@@ -67,6 +108,16 @@ export class RefererType {
 		
 		return false;
 	}
+
+	private isOrganicSearch(referer: string): boolean
+	{
+		var url_parts = url.parse(referer, true);
+		for (var l of this.organicsearchs)
+			if (url_parts.hostname.endsWith(l))
+				return true;
+
+		return false;
+	 }
 
 	public getRefType(referer: string, medium: string): string {
 				return "";
