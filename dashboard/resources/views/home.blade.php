@@ -178,7 +178,7 @@
 					{
 						data: [{{$dashboard->n_new_visitor}}, {{$dashboard->n_returning_visitor == 0 ? 1 : $dashboard->n_returning_visitor}}],
 						backgroundColor: ["#4E6CC9", "#8C8C8C"],
-						hoverBackgroundColor: ["#4E6CC9", "#8C8C8C",]
+						hoverBackgroundColor: ["#4E6CC9", "#8C8C8C"]
 					}
 				]
 			},
@@ -221,13 +221,13 @@
 			</div>
 			<div class="row">
 				<div class="col-sm-12 pl0 ">
-					<div class="card" style="height: 100px">
+					<div class="card" style="height: 70px">
 						<div class="" style="">
 							<div class="header text-center">
 								<h6 style="margin: 0; color: gray">NEW SIGNUP</h6>
 							</div>
 							<div class="content text-center" style="padding-top: 0">
-								<span class="verybig"> 37</span>
+								<span class="big"> 37</span>
 							</div>
 						</div>
 					</div>
@@ -237,12 +237,12 @@
 		<div class="col-sm-8 pl0">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="card " style="height: 255px;">
+					<div class="card " style="height: 225px;">
 						<div class="header">
 							<h6 style="margin:0; color: gray"> USER GROWTH RATE</h6>
 						</div>
 						<div class="content">
-							<div style="height: 200px">
+							<div style="height: 175px">
 								<canvas id="trchart" width="400" height="400"></canvas>
 							</div>
 						</div>
@@ -253,7 +253,7 @@
 	</div>
 	<div class="row">
 		<div class="col-sm-3 pl0">
-			<div class="card" style="background: #4E6CC9; color: white; height: 85px">
+			<div class="card" style="background: #4E6CC9; color: white; height: 80px">
 				<div class="header text-center">
 					<h6 style="margin: 0; color: white">RETENSION RATE</h6>
 				</div>
@@ -263,7 +263,7 @@
 			</div>
 		</div>
 		<div class="col-sm-3 pl0">
-			<div class="card" style="background: #4E6CC9; color: white; height: 85px">
+			<div class="card" style="background: #4E6CC9; color: white; height: 80px">
 				<div class="header text-center">
 					<h6 style="margin: 0; color: white">AVERAGE CART SIZE</h6>
 				</div>
@@ -273,7 +273,7 @@
 			</div>
 		</div>
 		<div class="col-sm-3 pl0">
-			<div class="card" style="background: #4E6CC9; color: white; height: 85px">
+			<div class="card" style="background: #4E6CC9; color: white; height: 80px">
 				<div class="header text-center">
 					<h6 style="margin: 0; color: white">PURCHASE CONVERSION RATE</h6>
 				</div>
@@ -283,7 +283,7 @@
 			</div>
 		</div>
 		<div class="col-sm-3 pl0">
-			<div class="card" style="background: #4E6CC9; color: white; height: 85px">
+			<div class="card" style="background: #4E6CC9; color: white; height: 80px">
 				<div class="header text-center">
 					<h6 style="margin: 0;  color: white">ABANDONMENT RATE</h6>
 				</div>
@@ -299,7 +299,7 @@
 		<div class="col-sm-9 pl0">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="card " style="height: 285px;">
+					<div class="card " style="height: 240px;">
 						<div class="header">
 							<h6 class="pull-right" style="margin:0; color: gray">REVENUER PER CUSTOM <span class="medium" style="color: #4e6cc9">$59.00</span></h6>
 
@@ -308,7 +308,7 @@
 						</div>
 						<div class="content">
 							<div style="height: 190px">
-								<canvas id="trchart" width="100%" height="100%"></canvas>
+								<canvas id="retenratechart" width="100%" height="100%"></canvas>
 							</div>
 						</div>
 					</div>
@@ -319,7 +319,7 @@
 		<div class="col-sm-3 pl0">
 			<div class="row">
 				<div class="col-sm-12 ">
-					<div class="card" style=" height: 85px">
+					<div class="card" style=" height: 70px">
 						<div class="header text-center">
 							<h5 style="margin: 0; text-align: right;color: #353535;font-size: 13px;">MOST POPULAR CATEGORY</h5>
 						</div>
@@ -333,7 +333,7 @@
 
 			<div class="row">
 				<div class="col-sm-12 ">
-					<div class="card" style=" height: 85px">
+					<div class="card" style=" height: 70px">
 						<div class="header text-center">
 							<h5 style="margin: 0; text-align: right;color: #353535;font-size: 13px;">HIGHEST REVENUE CAMPAIGN</h5>
 						</div>
@@ -347,7 +347,7 @@
 
 			<div class="row">
 				<div class="col-sm-12 ">
-					<div class="card" style=" height: 85px">
+					<div class="card" style=" height: 70px">
 						<div class="header text-center">
 							<h5 style=" margin: 0; text-align: right;color: #353535;font-size: 13px;">MOST EFFECTIVE REFERAL</h5>
 						</div>
