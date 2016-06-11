@@ -355,7 +355,7 @@ class AuthController extends Controller
 			}
 
 			\Auth::loginUsingId($userid);
-			return;
+			return "/app";
 		} else {
 			return view("errors.500", ['error'=>'wrong tokenid']);
 		}
