@@ -30,7 +30,10 @@ class AppServiceProvider extends ServiceProvider
 			if ($param == null)
 				$appcode = null;
 			else
+				if(array_key_exists( 'appcode',$param))
 				$appcode = $param['appcode'];
+			else
+				$appcode = '';
 			/*
 						if ($appcode == null || $appcode == '') // first time with no app
 						{

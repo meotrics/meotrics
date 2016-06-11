@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 // authentication of existing users
 class AuthController extends Controller
 {
+
 	private static $hashalgo;
 
 	public static function init()
@@ -22,6 +23,19 @@ class AuthController extends Controller
 	}
 
 	use AuthenticatesAndRegistersUsers;
+
+	/**
+	 * Create a new authentication controller instance.
+	 *
+	 * @param  \Illuminate\Contracts\Auth\Guard $auth
+	 * @param  \Illuminate\Contracts\Auth\Registrar $registrar
+	 * @return void
+	 */
+	public function __construct(Guard $auth, Registrar $registrar)
+	{
+		$this->auth = $auth;
+
+	}
 
 	public function register(Request $request)
 	{
@@ -72,22 +86,7 @@ class AuthController extends Controller
 		}
 	}
 
-	/**
-	 * Create a new authentication controller instance.
-	 *
-	 * @param  \Illuminate\Contracts\Auth\Guard $auth
-	 * @param  \Illuminate\Contracts\Auth\Registrar $registrar
-	 * @return void
-	 */
-	public function __construct(Guard $auth, Registrar $registrar)
-	{
-		$this->auth = $auth;
-		$this->registrar = $registrar;
-
-		$this->middleware('guest', ['except' => 'getLogout']);
-	}
-
-	public function getReset($request, $email, $time, $salt, $hash)
+	public function getReset(Request $request, $email, $time, $salt, $hash)
 	{
 		if ($time > time()) return view("errors.500", ['error'=> 'wrong time']);
 		$diff = (time() - $time);
@@ -112,7 +111,7 @@ class AuthController extends Controller
 
 	public function getConfirm(Request $request, $email, $time, $salt, $hash)
 	{
-		if ($time > time()) abort(500, 'wrong time');
+		if ($time > time()) return view("errors.500", ['error'=>'wrong time']);
 
 		$valid = $this->validLink($email, $time, $salt, $hash);
 		if ($valid == false)
@@ -154,7 +153,7 @@ class AuthController extends Controller
 			return view('auth.newpw', ['error' => 'Email already verified']);
 
 		if (isset($user->resetpwhash) && strcmp($user->resetpwhash, $hash) == 0) {
-			$user = DB::table('users')->where('email', $email)->update(['resetpwhash' => null]);
+			DB::table('users')->where('email', $email)->update(['resetpwhash' => null]);
 			$diff = (time() - $time);
 			if ($diff > 86400) //  1 day -> valid
 			{

@@ -50,13 +50,6 @@ Route::get('/segment/{appcode}/{segid?}', 'SegmentController@getIndex');
 Route::post('/auth/googlesignin', 'Auth\AuthController@googlesignin');
 Route::get('auth/signout', 'UserController@signout');
 
-Route::get('auth/confirm/{email}/{time}/{salt}/{hash}', 'Auth\AuthController@getConfirm');
-Route::post('auth/confirm/{email}/{time}/{salt}/{hash}/{password}', 'Auth\AuthController@confirm');
-
-
-Route::get('auth/reset', function(){
-	return View::make('auth.reset');
-});
 
 Route::post('auth/reset', 'Auth\AuthController@generatePasswordReset');
 Route::get('auth/confirm/{email}/{time}/{salt}/{hash}', 'Auth\AuthController@getConfirm');
@@ -69,7 +62,9 @@ Route::controllers([
 	'password' => 'Auth\PasswordController',
 ]);
 
-
+Route::get('auth/reset', function(){
+	return View::make('auth.reset');
+});
 
 
 Route::controller('user', 'UserController');
