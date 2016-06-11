@@ -119,8 +119,8 @@
 				}
 				else {
 					$('.siteinfo').removeClass('hidden');
-					$('input[name="sitename"]').removeProp('required',true);
-					$('input[name="siteurl"]').removeProp('required', true);
+					$('input[name="sitename"]').prop('required',true);
+					$('input[name="siteurl"]').prop('required', true);
 				}
 			}
 

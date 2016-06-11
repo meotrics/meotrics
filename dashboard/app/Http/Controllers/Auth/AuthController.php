@@ -89,18 +89,18 @@ class AuthController extends Controller
 
 	public function getReset($request, $email, $time, $salt, $hash)
 	{
-		if ($time > time()) abort(500, 'wrong time');
+		if ($time > time()) return view("errors.500", ['error'=> 'wrong time']);
 		$diff = (time() - $time);
 
 		$valid = $this->validLink($email, $time, $salt, $hash);
 		if ($valid == false)
-			abort(500, 'wrong hash');
+			return view("errors.500", ['error'=>'wrong hash']);
 
 
 		if ($diff > 1800) // 30 min -> valid
 		{
 			$user = DB::table('users')->where('email', $email)->update(['resetpwhash' => null]);
-			abort(500, 'expired time');
+			return view("errors.500", ['error'=>'expired time']);
 		}
 
 		// check in db
@@ -116,28 +116,28 @@ class AuthController extends Controller
 
 		$valid = $this->validLink($email, $time, $salt, $hash);
 		if ($valid == false)
-			abort(500, 'wrong hash');
+			return view("errors.500", ['error'=> 'wrong hash']);
 
 		// check in db
 		$user = DB::table('users')->where('email', $email)->first();
 
 		// email ton tai trong he thong
 		if ($user == null)
-			abort(500, 'User not found');
+			return view("errors.500", ['error'=> 'User not found']);
 
 		if ($user->verified == 1)
-			abort(500, 'Email already verified');
+			return view("errors.500", ['error'=> 'Email already verified']);
 
 		if (isset($user->resetpwhash) && strcmp($user->resetpwhash, $hash) == 0) {
 			return view('auth.newpw', ['confirm'=> true]);
 		}
-		abort(500, "Wrong user token");
+		return view("errors.500", ['error'=> "Wrong user token"]);
 	}
 
 	public function confirm(Request $request, $email, $time, $salt, $hash)
 	{
 		$password = $request->input('password');
-		if ($time > time()) abort(500, 'wrong time');
+		if ($time > time()) return view("errors.500", ['error'=> 'wrong time']);
 
 		$valid = $this->validLink($email, $time, $salt, $hash);
 		if ($valid == false)
@@ -170,36 +170,36 @@ class AuthController extends Controller
 
 	public function newpw(Request $request, $email, $time, $salt, $hash)
 	{
-		if ($time > time()) abort(500, 'wrong time');
+		if ($time > time()) return view("errors.500", ['error'=> 'wrong time']);
 
 		$valid = $this->validLink($email, $time, $salt, $hash);
 		if ($valid == false)
-			abort(500, 'wrong hash');
+			return view("errors.500", ['error'=>'wrong hash']);
 
 		// check in db
 		$user = DB::table('users')->where('email', $email)->first();
 
 		// email ton tai trong he thong
 		if ($user == null)
-			abort(500, 'User not found');
+			return view("errors.500", ['error'=>'User not found']);
 
 		if ($user->verified == 0)
-			abort(500, 'Email not verified');
+			return view("errors.500", ['error'=>'Email not verified']);
 
 		if ($user->password == null)
-			abort(500, "Wrong account type");
+			return view("errors.500", ['error'=> "Wrong account type"]);
 
 		if (isset($user->resetpwhash) && strcmp($user->resetpwhash, $hash) == 0) {
 			return view('auth.newpw');
 		}
-		abort(500, "Wrong user token");
+		return view("errors.500", ['error'=>"Wrong user token"]);
 
 	}
 
 	public function reset(Request $request, $email, $time, $salt, $hash)
 	{
 		$password = $request->input('password');
-		if ($time > time()) abort(500, 'wrong time');
+		if ($time > time()) return view("errors.500", ['error'=> 'wrong time']);
 
 		$valid = $this->validLink($email, $time, $salt, $hash);
 		if ($valid == false)
@@ -333,7 +333,7 @@ class AuthController extends Controller
 			\Auth::loginUsingId($userid);
 			return;
 		} else {
-			abort(500, 'wrong tokenid');
+			return view("errors.500", ['error'=>'wrong tokenid']);
 		}
 	}
 
