@@ -339,7 +339,7 @@ class RefererType {
         url_string = url_string || "";
         var url_parts = url.parse(url_string, true);
         var medium = url_parts.query.utm_medium;
-        if (medium == "Referral")
+        if (medium == "referral")
             return true;
         return false;
     }
@@ -369,6 +369,9 @@ class RefererType {
             if (url_parts.hostname != null && url_parts.hostname.endsWith(l))
                 return true;
         return false;
+    }
+    getTypeName(code) {
+        var names = ["Unknown", "Organice Search", "Social Network", "Referral", "Email", "Direct"];
     }
     getRefType(url_string, referer) {
         url_string = url_string || "";

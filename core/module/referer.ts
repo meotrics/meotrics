@@ -330,8 +330,7 @@ export class RefererType {
 		referer = referer || "";
 				var url_parts = url.parse(referer, true);
 				for (var l of this.organicsearchs)
-					if (url_parts.hostname != null && url_parts.hostname.endsWith(l))
-				return true;
+					if (url_parts.hostname != null && url_parts.hostname.endsWith(l)) return true;
 
 				return false;
 	}
@@ -348,7 +347,7 @@ export class RefererType {
 		url_string = url_string || "";
 		var url_parts = url.parse(url_string, true);
 				var medium = url_parts.query.utm_medium;
-				if (medium == "Referral")
+				if (medium == "referral")
 					return true;
 				return false;
 	}
@@ -380,6 +379,11 @@ export class RefererType {
 				return true;
 
 				return false;
+	}
+
+	public getTypeName(code: number)
+	{
+		var names = ["Unknown", "Organice Search", "Social Network", "Referral", "Email", "Direct"];
 	}
 
 	public getRefType(url_string: string, referer: string): number {
