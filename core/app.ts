@@ -23,43 +23,73 @@ var option: mongodb.MongoClientOptions = {};
 option.server = {};
 option.server.poolSize = 40;
 
+function ensureIndex(db: mongodb.Db, prefix: string, callback: () => void) {
+	console.log('indexing ...');
+	db.collection(prefix + "actiontype").createIndex({ _appid: 1 }, function () {
+		db.collection(prefix + "actiontype").createIndex({ _appid: 1, _id: 1 }, function () {
+			db.collection(prefix + "dashboard").createIndex({ appid: 1, starttime: 1, endtime: 1 }, function () {
+				db.collection(prefix + "ip").createIndex({ ip: 1 }, function () {
+					db.collection(prefix + "mapping").createIndex({ anomtid: 1 }, function () {
+						db.collection(prefix + "mapping").createIndex({ idemtid: 1 }, function () {
+							db.collection(prefix + "mapping").createIndex({ idemtid: 1 }, function () {
+								db.collection(prefix + "segment").createIndex({ _appid: 1, _id: 1 }, function () {
+									db.collection(prefix + "segment").createIndex({ _appid: 1 }, function () {
+										db.collection(prefix + "trend").createIndex({ _appid: 1, _id: 1 }, function () {
+											db.collection(prefix + "trend").createIndex({ _appid: 1 }, function () {
+												db.collection(prefix + "valuedomain").createIndex({ appid: 1, typeid: 1, field: 1 }, function () {
+													callback();
+												});
+											});
+										});
+									});
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+}
+
 mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.MongoError, db: mongodb.Db) {
 	if (err) throw err;
-
-	var ref = new referer.RefererType();
-	//set up new express application
-	var app = express();
-	appException(app);
-	app.use(bodyParser.json()); // parse application/json
-	converter = new converter.IdManager();
 	var prefix: string = config.get<string>("mongod.prefix") || "meotrics_";
-	var crudapi = new CrudApi.CrudApi(db, converter, prefix, ref, config.get("dashboard.delay"));
-	crudapi.route(app); //bind route
+	ensureIndex(db, prefix, function () {
+		var ref = new referer.RefererType();
+		//set up new express application
+		var app = express();
+		appException(app);
+		app.use(bodyParser.json()); // parse application/json
+		converter = new converter.IdManager();
+		var crudapi = new CrudApi.CrudApi(db, converter, prefix, ref, config.get("dashboard.delay"));
+		crudapi.route(app); //bind route
 
-	//run the backend bashboard
-	var crudport = config.get("port") || 2108;
-	app.listen(crudport, function () {
-		console.log('Meotrics CORE API / OK /      ' + crudport);
+		//run the backend bashboard
+		var crudport = config.get("port") || 2108;
+		app.listen(crudport, function () {
+			console.log('Meotrics CORE API   | OK |    ' + crudport);
+		});
+
+		var httpport = config.get<number>('apiserver.port') || 1711;
+		var httpapi = new HttpApi(db, converter, prefix, config.get('apiserver.codepath'), ref, crudapi.valuemgr);
+		var server = http.createServer(function (req: http.ServerRequest, res: http.ServerResponse) {
+			httpapi.route(req, res);
+		});
+
+		server.listen(httpport, function () {
+			console.log("HTTP API SERVER     | OK |    " + httpport);
+		});
+
+		let wsport = config.get<number>('websocket.port') || 2910;
+		let keypath = config.get<string>('websocket.key');
+		let certpath = config.get<string>('websocket.cert');
+		var ws = new WS.WS(wsport);
+
+		// bind change event
+		httpapi.onchange = function (appid, code) {
+			ws.change(appid, code)
+		};
+		ws.run();
 	});
-
-	var httpport = config.get<number>('apiserver.port') || 1711;
-	var httpapi = new HttpApi(db, converter, prefix, config.get('apiserver.codepath'), ref, crudapi.valuemgr);
-	var server = http.createServer(function (req: http.ServerRequest, res: http.ServerResponse) {
-		httpapi.route(req, res);
-	});
-
-	server.listen(httpport, function () {
-		console.log("HTTP API SERVER / OK /        " + httpport);
-	});
-
-	let wsport = config.get<number>('websocket.port') || 2910;
-	let keypath = config.get<string>('websocket.key');
-	let certpath = config.get<string>('websocket.cert');
-	var ws = new WS.WS(wsport);
-
-	// bind change event
-	httpapi.onchange = function (appid, code) {
-		ws.change(appid, code)
-	};
-	ws.run();
 });
