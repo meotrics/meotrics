@@ -1,27 +1,34 @@
 //very light script to load first
-var event;
-mt.track = function(t,r){
+var mt ={
+track : function(t,r){
 	mt.rq.push(["track",t,r,new Date])
-};
-mt.info = function(t){
+},
+info : function(t){
 	mt.rq.push(["info",t])
-}
-mt.clear = function(){
+},
+clear : function(){
 	mt.rq.push(["clear"])
+},
+onready : function(){
+	if(mt.event) mt.excute(mt.event)
+},
+rq : []
 }
-mt.onready = function(){
-	if(event) mt.excute(event)
-}
-mt.rq = [];
-
 (function(){
 	addEventListener("message", function(ev){
-		var origin = event.origin || event.originalEvent.origin
+		var origin = ev.origin || ev.originalEvent.origin
 		if (origin.split('/')[2] !== "meotrics.com") return;
-		event = ev
-		if(mt.excute) mt.excute(ev);
-	}, false);
+		mt.event = ev
+		if(mt.excute) mt.excute(ev)
+	}, false)
 
-	var s = getComputedStyle(document.getElementById('mt' + mt.appid), null);
-	mt.actionid = s['font-family'].substr(1, s['font-family'].length - 2);
-})();
+	var s = getComputedStyle(document.getElementById('meotrics29101992'), null)
+	var cs = s['font-family'].substr(1, s['font-family'].length - 2).split('-')
+	mt.appid = cs[0]
+	mt.actionid = cs[1]
+	var script = document.createElement('script')
+	script.setAttribute('src','//meotrics.com/mtfull.js')
+	script.setAttribute('defer', 'defer')
+	script.setAttribute('async', true)
+	document.head.appendChild(script)
+})()
