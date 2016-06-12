@@ -60,16 +60,16 @@ class Dashboard {
         });
     }
     getGrowthRate(db, prefix, appid, ids, time, callback) {
-        var nowsec = time;
-        var last24hsec = nowsec - 24 * 3600;
-        var last48hsec = nowsec - 48 * 3600;
+        var now = new Date(time * 1000);
+        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        let todaysec = Math.round(today.getTime() / 1000);
         var pipeline = [{ $match: {} }, { $group: { _id: "$" + ids._mtid } }, {
                 $group: {
                     _id: null, count: { $sum: 1 }
                 }
             }];
         //count unique today visitor
-        pipeline[0]['$match'][ids._ctime] = { $gte: last24hsec };
+        pipeline[0]['$match'][ids._ctime] = { $gte: todaysec, $lt: todaysec + 86400 };
         pipeline[0]['$match'][ids._isUser] = { $exists: false };
         db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
             if (err)
@@ -79,7 +79,7 @@ class Dashboard {
             else {
                 let todayvisitcount = res[0].count;
                 //count yesterday unique visitor
-                pipeline[0]['$match'][ids._ctime] = { $gte: last48hsec, $lt: last24hsec };
+                pipeline[0]['$match'][ids._ctime] = { $gte: todaysec - 86400, $lt: todaysec };
                 db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
                     if (err)
                         throw err;

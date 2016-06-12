@@ -24,8 +24,7 @@ export class Dashboard {
 	private N: number = 22; //max number of node
 
 	//get time scale between two date
-	private getTimeRange(starttime: number, endtime: number) : number[]
-	{
+	private getTimeRange(starttime: number, endtime: number): number[] {
 		if (endtime < starttime) throw "wrong time input";
 		var me = this;
 		var ret = [];
@@ -35,12 +34,10 @@ export class Dashboard {
 		if (daydiff == 1) return [starttime, endtime];
 
 		// if not enough day for node, then return all day
-		if (daydiff < me.N)
-		{
+		if (daydiff < me.N) {
 			ret.push(starttime);
 			var st = starttime;
-			while (st < endtime)
-			{
+			while (st < endtime) {
 				st += 86400;
 				ret.push(st);
 			}
@@ -79,9 +76,9 @@ export class Dashboard {
 	}
 
 	private getGrowthRate(db: mongo.Db, prefix: string, appid: string, ids, time, callback: (a: number) => void) {
-		var nowsec =time;
-		var last24hsec = nowsec - 24 * 3600;
-		var last48hsec = nowsec - 48 * 3600;
+		var now = new Date(time * 1000);
+		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		let todaysec = Math.round(today.getTime() / 1000);
 
 		var pipeline = [{ $match: {} }, { $group: { _id: "$" + ids._mtid } }, {
 			$group: {
@@ -90,7 +87,7 @@ export class Dashboard {
 		}];
 
 		//count unique today visitor
-		pipeline[0]['$match'][ids._ctime] = { $gte: last24hsec };
+		pipeline[0]['$match'][ids._ctime] = { $gte: todaysec, $lt: todaysec + 86400 };
 		pipeline[0]['$match'][ids._isUser] = { $exists: false };
 		db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
 			if (err) throw err;
@@ -98,7 +95,7 @@ export class Dashboard {
 			else {
 				let todayvisitcount = res[0].count;
 				//count yesterday unique visitor
-				pipeline[0]['$match'][ids._ctime] = { $gte: last48hsec, $lt: last24hsec };
+				pipeline[0]['$match'][ids._ctime] = { $gte: todaysec - 86400, $lt: todaysec };
 				db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
 					if (err) throw err;
 					if (res.length == 0) return callback(todayvisitcount);
@@ -108,13 +105,12 @@ export class Dashboard {
 		});
 	}
 
-	private getGrowthRates(db: mongo.Db, prefix: string, appid: string, ids, startime:number, endtime:number, callback: (a: number[]) => void) {
+	private getGrowthRates(db: mongo.Db, prefix: string, appid: string, ids, startime: number, endtime: number, callback: (a: number[]) => void) {
 		let me = this;
 		var rates = [];
 		var time = me.getTimeRange(startime, endtime);
 		var c = time.length;
-		for (let i = 0; i < time.length; i++)
-		{
+		for (let i = 0; i < time.length; i++) {
 			me.getGrowthRate(db, prefix, appid, ids, i, function (rate) {
 				c--;
 				rates[i] = rate;
@@ -124,24 +120,26 @@ export class Dashboard {
 			});
 		}
 	}
+
 	private getTotalRevenue(db: mongo.Db, prefix: string, appid: string, ids, time: number, callback: (revenue: number, numberofpurchase: number) => void) {
+
 	}
 
 	private getRevenue(db: mongo.Db, prefix: string, appid: string, ids, time: number, callback: (revenue: number, numberofpurchase: number) => void) {
-		var now = new Date(time*1000);
+		var now = new Date(time * 1000);
 		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
 		let todaysec = Math.round(today.getTime() / 1000);
 		let seventhdaybefore = todaysec - 7 * 24 * 3600;
-	
-	
+
+
 		var revenue_pipeline = [{ $match: {} }, {
 			$group: {
 				_id: null, sum: { $sum: "$amount" }, count: { $sum: 1 }
 			}
 		}];
 
-		revenue_pipeline[0]['$match'][ids._isUser] = {$exists: false};
+		revenue_pipeline[0]['$match'][ids._isUser] = { $exists: false };
 		revenue_pipeline[0]['$match'][ids._typeid] = "purchase";
 		revenue_pipeline[0]['$match'][ids._ctime] = { $gte: todaysec, $lt: todaysec + 86000 };
 
@@ -153,8 +151,7 @@ export class Dashboard {
 		});
 	}
 
-	private getRevenues(db: mongo.Db, prefix: string, appid: string, ids, starttime: number, endtime: number, callback: (revenues: number[], purchases: number[]) => void)
-	{
+	private getRevenues(db: mongo.Db, prefix: string, appid: string, ids, starttime: number, endtime: number, callback: (revenues: number[], purchases: number[]) => void) {
 		let me = this;
 		var revenues = [];
 		var purchases = [];
@@ -242,7 +239,7 @@ export class Dashboard {
 		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 		let todaysec = Math.round(today.getTime() / 1000);
 		let b6 = todaysec - 24 * 6 * 3600;
-		
+
 		me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "userid"], function (ids) {
 			var n_newuser, n6_user;
 
@@ -255,32 +252,32 @@ export class Dashboard {
 
 				alltimecount[ids._ctime] = { $gte: b6 };
 				db.collection(prefix + appid).count(alltimecount, function (err, res) {
-				if (err) throw err;
-				n_newuser = res;
-				//get today user visit
-				var todayuservisitq = [];
-				todayuservisitq[0]['$match'] = { $or: [] };
-				todayuservisitq[0]['$match']['$or'][0][ids._isUser] = true;
-				todayuservisitq[0]['$match']['$or'][1][ids._isUser] = { $exists: false };
-				todayuservisitq[0]['$match']['$or'][1][ids._ctime] = { $gte: todaysec };
-				todayuservisitq[1]['$project'] = {};
-				todayuservisitq[1]['$project'][ids._mtid] = 1;
-				todayuservisitq[1]['$project'][ids.userid] = { $cond: { if: { $ifNull: ["$userid", false] }, then: 1, else: 0 } };
-				todayuservisitq[2]['$group'] = { _id: "$" + ids._mtid, userid: { $sum: "$" + ids.userid }, count: { $sum: 1 } };
-				todayuservisitq[3]['$match'] = { userid: { $gt: 0 }, count: { $gt: 1 } };
-				todayuservisitq[3]['$group'] = { _id: null, count: {$sum: 1} };
-
-				console.log("todayuservisitq", todayuservisitq);
-				me.db.collection(me.prefix + "app" + appid).aggregate(todayuservisitq, function (err, res) {
 					if (err) throw err;
-					var count = 0;
-					if (res.length !== 0)
-						count = res[0].count;
-					var rate = (count - n_newuser) / n6_user ;
-					callback(rate);
+					n_newuser = res;
+					//get today user visit
+					var todayuservisitq = [];
+					todayuservisitq[0]['$match'] = { $or: [] };
+					todayuservisitq[0]['$match']['$or'][0][ids._isUser] = true;
+					todayuservisitq[0]['$match']['$or'][1][ids._isUser] = { $exists: false };
+					todayuservisitq[0]['$match']['$or'][1][ids._ctime] = { $gte: todaysec };
+					todayuservisitq[1]['$project'] = {};
+					todayuservisitq[1]['$project'][ids._mtid] = 1;
+					todayuservisitq[1]['$project'][ids.userid] = { $cond: { if: { $ifNull: ["$userid", false] }, then: 1, else: 0 } };
+					todayuservisitq[2]['$group'] = { _id: "$" + ids._mtid, userid: { $sum: "$" + ids.userid }, count: { $sum: 1 } };
+					todayuservisitq[3]['$match'] = { userid: { $gt: 0 }, count: { $gt: 1 } };
+					todayuservisitq[3]['$group'] = { _id: null, count: { $sum: 1 } };
+
+					console.log("todayuservisitq", todayuservisitq);
+					me.db.collection(me.prefix + "app" + appid).aggregate(todayuservisitq, function (err, res) {
+						if (err) throw err;
+						var count = 0;
+						if (res.length !== 0)
+							count = res[0].count;
+						var rate = (count - n_newuser) / n6_user;
+						callback(rate);
+					});
 				});
 			});
-		});
 		});
 	}
 
@@ -484,9 +481,8 @@ export class Dashboard {
 
 	public getDashboard(appid: string, startime, endtime, callback: (d: DashboardEntity) => void) {
 		let me = this;
-		if (startime === undefined)
-		{
-			endtime  = Math.floor(new Date().getTime() / 1000);
+		if (startime === undefined) {
+			endtime = Math.floor(new Date().getTime() / 1000);
 			startime = endtime - 30 * 86400;
 		}
 
@@ -531,7 +527,7 @@ export class Dashboard {
 								dashboard.n_avgcartsize = n_purchase == 0 ? sumrevnue : sumrevnue / n_purchase;
 								//gcallback(dashboard);
 
-								me.getGrowthRates(me.db, me.prefix, appid, ids, startime, endtime,function (growrates: number[]) {
+								me.getGrowthRates(me.db, me.prefix, appid, ids, startime, endtime, function (growrates: number[]) {
 									dashboard.usergrowth_rates = growrates;
 
 									me.getConversionRate(me.db, me.prefix, appid, ids, function (cs: number[]) {
