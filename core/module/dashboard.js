@@ -10,6 +10,38 @@ class Dashboard {
         this.delaysec = delaysec;
         this.Lock = require('lock');
         this.lock = this.Lock();
+        this.N = 22; //max number of node
+    }
+    //get time scale between two date
+    getTimeRange(starttime, endtime) {
+        if (endtime < starttime)
+            throw "wrong time input";
+        var me = this;
+        var ret = [];
+        var daydiff = Math.floor((endtime - starttime) / 86400);
+        if (daydiff == 0)
+            return [endtime - 86400, endtime];
+        if (daydiff == 1)
+            return [starttime, endtime];
+        // if not enough day for node, then return all day
+        if (daydiff < me.N) {
+            ret.push(starttime);
+            var st = starttime;
+            while (st < endtime) {
+                st += 86400;
+                ret.push(st);
+            }
+            ret.push(endtime);
+            return ret;
+        }
+        // return specific days in all day
+        // arary alway start with starttime and end with endtime
+        var d = Math.ceil((daydiff - 2) / (me.N - 2));
+        ret.push(starttime);
+        for (var i = 1; i < me.N - 1; i++)
+            ret.push(starttime + i * d * 86400);
+        ret.push(endtime);
+        return ret;
     }
     getNewSignup(db, prefix, appid, ids, callback) {
         var now = new Date();
