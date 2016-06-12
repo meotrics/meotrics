@@ -27,7 +27,7 @@ class Dashboard {
             callback(res);
         });
     }
-    getGrowRate(db, prefix, appid, ids, callback) {
+    getGrowRates(db, prefix, appid, ids, callback) {
         var nowsec = Math.round(new Date().getTime() / 1000);
         var last24hsec = nowsec - 24 * 3600;
         var last48hsec = nowsec - 48 * 3600;
@@ -215,112 +215,47 @@ class Dashboard {
             });
         });
     }
-    getRetensionRates(db, prefix, appid, ids, callback) {
+    getRetensionRate(db, prefix, appid, ids, callback) {
         var me = this;
         var now = new Date();
         var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         let todaysec = Math.round(today.getTime() / 1000);
-        let b0 = todaysec;
-        let b1 = b0 - 24 * 3600;
-        let b2 = b1 - 24 * 3600;
-        let b3 = b2 - 24 * 3600;
-        let b4 = b3 - 24 * 3600;
-        let b5 = b4 - 24 * 3600;
-        let b6 = b5 - 24 * 3600;
-        let b7 = b6 - 24 * 3600;
-        let b8 = b7 - 24 * 3600;
-        let b9 = b8 - 24 * 3600;
-        let b10 = b9 - 24 * 3600;
-        let b11 = b10 - 24 * 3600;
-        var n_users = [];
-        let alltimecount = {};
-        alltimecount[ids._isUser] = true;
-        alltimecount[ids._ctime] = { $lt: b11 };
-        db.collection(prefix + appid).count(alltimecount, function (err, res) {
-            if (err)
-                throw err;
-            n_users.push(res);
-            alltimecount[ids._ctime] = { $lt: b10 };
+        let b6 = todaysec - 24 * 6 * 3600;
+        me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "userid"], function (ids) {
+            var n_newuser, n6_user;
+            let alltimecount = {};
+            alltimecount[ids._isUser] = true;
+            alltimecount[ids._ctime] = { $lt: b6 };
             db.collection(prefix + appid).count(alltimecount, function (err, res) {
                 if (err)
                     throw err;
-                n_users.push(res);
-                alltimecount[ids._ctime] = { $lt: b9 };
+                n6_user = res;
+                alltimecount[ids._ctime] = { $gte: b6 };
                 db.collection(prefix + appid).count(alltimecount, function (err, res) {
                     if (err)
                         throw err;
-                    n_users.push(res);
-                    alltimecount[ids._ctime] = { $lt: b8 };
-                    db.collection(prefix + appid).count(alltimecount, function (err, res) {
+                    n_newuser = res;
+                    //get today user visit
+                    var todayuservisitq = [];
+                    todayuservisitq[0]['$match'] = { $or: [] };
+                    todayuservisitq[0]['$match']['$or'][0][ids._isUser] = true;
+                    todayuservisitq[0]['$match']['$or'][1][ids._isUser] = { $exists: false };
+                    todayuservisitq[0]['$match']['$or'][1][ids._ctime] = { $gte: todaysec };
+                    todayuservisitq[1]['$project'] = {};
+                    todayuservisitq[1]['$project'][ids._mtid] = 1;
+                    todayuservisitq[1]['$project'][ids.userid] = { $cond: { if: { $ifNull: ["$userid", false] }, then: 1, else: 0 } };
+                    todayuservisitq[2]['$group'] = { _id: "$" + ids._mtid, userid: { $sum: "$" + ids.userid }, count: { $sum: 1 } };
+                    todayuservisitq[3]['$match'] = { userid: { $gt: 0 }, count: { $gt: 1 } };
+                    todayuservisitq[3]['$group'] = { _id: null, count: { $sum: 1 } };
+                    console.log("todayuservisitq", todayuservisitq);
+                    me.db.collection(me.prefix + "app" + appid).aggregate(todayuservisitq, function (err, res) {
                         if (err)
                             throw err;
-                        n_users.push(res);
-                        alltimecount[ids._ctime] = { $lt: b7 };
-                        db.collection(prefix + appid).count(alltimecount, function (err, res) {
-                            if (err)
-                                throw err;
-                            n_users.push(res);
-                            alltimecount[ids._ctime] = { $lt: b6 };
-                            db.collection(prefix + appid).count(alltimecount, function (err, res) {
-                                if (err)
-                                    throw err;
-                                n_users.push(res);
-                                alltimecount[ids._ctime] = { $lt: b5 };
-                                db.collection(prefix + appid).count(alltimecount, function (err, res) {
-                                    if (err)
-                                        throw err;
-                                    n_users.push(res);
-                                    alltimecount[ids._ctime] = { $lt: b4 };
-                                    db.collection(prefix + appid).count(alltimecount, function (err, res) {
-                                        if (err)
-                                            throw err;
-                                        n_users.push(res);
-                                        alltimecount[ids._ctime] = { $lt: b3 };
-                                        db.collection(prefix + appid).count(alltimecount, function (err, res) {
-                                            if (err)
-                                                throw err;
-                                            n_users.push(res);
-                                            alltimecount[ids._ctime] = { $lt: b2 };
-                                            db.collection(prefix + appid).count(alltimecount, function (err, res) {
-                                                if (err)
-                                                    throw err;
-                                                n_users.push(res);
-                                                alltimecount[ids._ctime] = { $lt: b1 };
-                                                db.collection(prefix + appid).count(alltimecount, function (err, res) {
-                                                    if (err)
-                                                        throw err;
-                                                    n_users.push(res);
-                                                    alltimecount[ids._ctime] = { $lt: b0 };
-                                                    db.collection(prefix + appid).count(alltimecount, function (err, res) {
-                                                        if (err)
-                                                            throw err;
-                                                        n_users.push(res);
-                                                        alltimecount[ids._ctime] = { $gte: b0 };
-                                                        db.collection(prefix + appid).count(alltimecount, function (err, res) {
-                                                            if (err)
-                                                                throw err;
-                                                            n_users.push(res);
-                                                            me.getUniqueVisitor(db, prefix, appid, ids, function (visitors) {
-                                                                for (var i = 0; i < 7; i++) {
-                                                                    var rates = [];
-                                                                    if (n_users[i - 6] == 0) {
-                                                                        rates.push(0);
-                                                                    }
-                                                                    else {
-                                                                        rates.push((visitors[i] - n_users[i]) / n_users[i - 6]);
-                                                                    }
-                                                                }
-                                                                callback(rates);
-                                                            });
-                                                        });
-                                                    });
-                                                });
-                                            });
-                                        });
-                                    });
-                                });
-                            });
-                        });
+                        var count = 0;
+                        if (res.length !== 0)
+                            count = res[0].count;
+                        var rate = (count - n_newuser) / n6_user;
+                        callback(rate);
                     });
                 });
             });
@@ -535,7 +470,6 @@ class Dashboard {
                 let seventhdaybefore = todaysec - 7 * 24 * 3600;
                 //1 number of new visitor today
                 var todayvismatch = {};
-                todayvismatch[ids._isUser] = { $exists: false };
                 todayvismatch[ids._ctime] = { $gte: todaysec };
                 var pipelines = [{ $match: todayvismatch }, { $group: { _id: "$" + ids._mtid } }, {
                         $group: {
@@ -564,8 +498,8 @@ class Dashboard {
                                 var sumrevnue = revenues.reduce((pv, cv) => pv + cv, 0);
                                 dashboard.n_avgcartsize = n_purchase == 0 ? sumrevnue : sumrevnue / n_purchase;
                                 //gcallback(dashboard);
-                                me.getGrowRate(me.db, me.prefix, appid, ids, function (growrate) {
-                                    dashboard.usergrowth_rate = growrate;
+                                me.getGrowRates(me.db, me.prefix, appid, ids, function (growrates) {
+                                    dashboard.usergrowth_rates = growrates;
                                     me.getConversionRate(me.db, me.prefix, appid, ids, function (cs) {
                                         dashboard.conversion_rates = cs;
                                         me.getRetensionRates(me.db, me.prefix, appid, ids, function (rates) {
