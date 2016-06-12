@@ -96,6 +96,7 @@
 			}
 		});
 
+		var totalrevenues = {{ json_encode($dashboard->total_revenues)}};
 
 		var trChart = new Chart($("#trchart"), {
 			type: 'line',
@@ -127,7 +128,7 @@
 						pointBorderColor: "#2F5CB0",
 						pointBackgroundColor: "white",
 						pointBorderWidth: 1,
-						data: [65, 59, 80, 81, 32, 12, 40],
+						data: totalrevenues
 					}
 				]
 			},
@@ -227,7 +228,7 @@
 								<h6 style="margin: 0; color: gray">NEW SIGNUP</h6>
 							</div>
 							<div class="content text-center" style="padding-top: 0">
-								<span class="big"> 37</span>
+								<span class="big">{{$dashboard->n_new_signup}}</span>
 							</div>
 						</div>
 					</div>
@@ -258,7 +259,7 @@
 					<h6 style="margin: 0; color: white">RETENSION RATE</h6>
 				</div>
 				<div class=" pull-right mr">
-					<span class="big" style="position: absolute; bottom: 20px;right: 42px;"> 30%</span>
+					<span class="big" style="position: absolute; bottom: 20px;right: 42px;"> %</span>
 				</div>
 			</div>
 		</div>
@@ -268,7 +269,7 @@
 					<h6 style="margin: 0; color: white">AVERAGE CART SIZE</h6>
 				</div>
 				<div class="content text-center pull-right mr">
-					<span class="big" style="position: absolute; bottom: 20px;right: 42px;"> 194 $</span>
+					<span class="big" style="position: absolute; bottom: 20px;right: 42px;">${{$dashboard->n_avgcartsize}}</span>
 				</div>
 			</div>
 		</div>
@@ -278,7 +279,7 @@
 					<h6 style="margin: 0; color: white">PURCHASE CONVERSION RATE</h6>
 				</div>
 				<div class="content text-center pull-right mr">
-					<span class="big" style="position: absolute; bottom: 20px;right: 42px;"> 45%</span>
+					<span class="big" style="position: absolute; bottom: 20px;right: 42px;"> {{$dashboard->conversion_rates[ count ($dashboard->conversion_rates) -1]}}%</span>
 				</div>
 			</div>
 		</div>
@@ -288,12 +289,11 @@
 					<h6 style="margin: 0;  color: white">ABANDONMENT RATE</h6>
 				</div>
 				<div class="content text-center pull-right mr">
-					<span class="big" style="position: absolute; bottom: 20px;right: 42px;"> 28%</span>
+					<span class="big" style="position: absolute; bottom: 20px;right: 42px;"> 0%</span>
 				</div>
 			</div>
 		</div>
 	</div>
-
 
 	<div class="row">
 		<div class="col-sm-9 pl0">

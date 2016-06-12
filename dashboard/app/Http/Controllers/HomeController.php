@@ -11,26 +11,10 @@ class HomeController extends Controller
 {
 	private static $code;
 	private $parser;
-
-	private function loadCode($appid = null)
-	{
-		// cache mt.min.js in ::$code
-		if (HomeController::$code == null) {
-			$code = HomeController::$code = Storage::disk('resouce')->get('mt.min.js');
-		} else {
-			$code = HomeController::$code;
-		}
-
-		if ($appid != null) {
-			$code = str_replace('$APPID$', $appid, $code);
-		}
-		return $code;
-	}
-
+	
 	public function __construct()
 	{
 		$this->parser = Parser::create();
-		$this->loadCode();
 		$this->middleware('auth');
 	}
 
