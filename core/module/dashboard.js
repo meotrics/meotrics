@@ -105,7 +105,33 @@ class Dashboard {
             });
         }
     }
-    getTotalRevenue(db, prefix, appid, ids, time, callback) {
+    getTotalRevenue(db, prefix, appid, ids, starttime, endttime, callback) {
+        var now = new Date(starttime * 1000);
+        var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        now = new Date(endttime * 1000);
+        var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        let startsec = Math.round(startday.getTime() / 1000);
+        let endsec = Math.round(endday.getTime() / 1000) + 86400;
+        var revenue_pipeline = [{ $match: {} }, {
+                $group: {
+                    _id: "$" + ids._mtid, sum: { $sum: "$" + ids.amount }, purchase: { $sum: 1 }
+                }
+            }, {
+                $group: {
+                    _id: null, sum: { $sum: "$sum" }, count: { $sum: 1 }, npurchase: { $sum: "$purchase" }
+                }
+            }];
+        revenue_pipeline[0]['$match'][ids._isUser] = { $exists: false };
+        revenue_pipeline[0]['$match'][ids._typeid] = "purchase";
+        revenue_pipeline[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
+        db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
+            if (err)
+                throw err;
+            var revenue = res.length === 0 ? 0 : res[0].sum;
+            var nuser = res.length !== 0 ? 0 : res[0].count;
+            var npurchase = res.length !== 0 ? 0 : res[0].npurchase;
+            callback(revenue, npurchase, nuser);
+        });
     }
     getRevenue(db, prefix, appid, ids, time, callback) {
         var now = new Date(time * 1000);
@@ -114,7 +140,7 @@ class Dashboard {
         let seventhdaybefore = todaysec - 7 * 24 * 3600;
         var revenue_pipeline = [{ $match: {} }, {
                 $group: {
-                    _id: null, sum: { $sum: "$amount" }, count: { $sum: 1 }
+                    _id: null, sum: { $sum: "$" + ids.amount }, count: { $sum: 1 }
                 }
             }];
         revenue_pipeline[0]['$match'][ids._isUser] = { $exists: false };
@@ -489,26 +515,29 @@ class Dashboard {
                         dashboard.n_returning_visitor -= res;
                         me.getNewSignup(me.db, me.prefix, appid, ids, function (ret) {
                             dashboard.n_new_signup = ret;
-                            me.getTotalRevenue(me.db, me.prefix, appid, ids, function (revenues, n_purchase) {
-                                dashboard.total_revenues = revenues;
-                                var sumrevnue = revenues.reduce((pv, cv) => pv + cv, 0);
-                                dashboard.n_avgcartsize = n_purchase == 0 ? sumrevnue : sumrevnue / n_purchase;
-                                //gcallback(dashboard);
-                                me.getGrowthRates(me.db, me.prefix, appid, ids, startime, endtime, function (growrates) {
-                                    dashboard.usergrowth_rates = growrates;
-                                    me.getConversionRate(me.db, me.prefix, appid, ids, function (cs) {
-                                        dashboard.conversion_rates = cs;
-                                        me.getRetensionRate(me.db, me.prefix, appid, ids, function (rate) {
-                                            dashboard.retention_rate = rate;
-                                            me.getRevenuePerCustomer(me.db, me.prefix, appid, ids, function (v) {
-                                                dashboard.revenue_per_customer = v;
-                                                me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, function (campaign) {
-                                                    dashboard.highest_revenue_campaign = campaign;
-                                                    me.getMostPopulerCategory(me.db, me.prefix, appid, ids, function (cat) {
-                                                        dashboard.most_popular_category = cat;
-                                                        me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, function (ref) {
-                                                            dashboard.most_effective_ref = ref;
-                                                            gcallback(dashboard);
+                            me.getRevenues(me.db, me.prefix, appid, ids, startime, endtime, function (revenues, n_purchases) {
+                                dashboard.revenues = revenues;
+                                dashboard.n_purchases = n_purchases;
+                                me.getTotalRevenue(me.db, me.prefix, appid, ids, startime, endtime, function (revenue, npurchase, nuser) {
+                                    dashboard.total_revenue = revenue;
+                                    dashboard.n_avgcartsize = npurchase === 0 ? 0 : revenue / npurchase;
+                                    dashboard.revenue_per_customer = nuser === 0 ? 0 : revenue / nuser;
+                                    me.getGrowthRates(me.db, me.prefix, appid, ids, startime, endtime, function (growrates) {
+                                        dashboard.usergrowth_rates = growrates;
+                                        me.getConversionRate(me.db, me.prefix, appid, ids, function (cs) {
+                                            dashboard.conversion_rates = cs;
+                                            me.getRetensionRate(me.db, me.prefix, appid, ids, function (rate) {
+                                                dashboard.retention_rate = rate;
+                                                me.getRevenuePerCustomer(me.db, me.prefix, appid, ids, function (v) {
+                                                    dashboard.revenue_per_customer = v;
+                                                    me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, function (campaign) {
+                                                        dashboard.highest_revenue_campaign = campaign;
+                                                        me.getMostPopulerCategory(me.db, me.prefix, appid, ids, function (cat) {
+                                                            dashboard.most_popular_category = cat;
+                                                            me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, function (ref) {
+                                                                dashboard.most_effective_ref = ref;
+                                                                gcallback(dashboard);
+                                                            });
                                                         });
                                                     });
                                                 });

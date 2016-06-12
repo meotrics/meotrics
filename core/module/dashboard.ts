@@ -7,7 +7,9 @@ export class DashboardEntity {
 	public n_returning_visitor: number;
 	public n_new_signup: number;
 	public n_avgcartsize: number;
-	public total_revenues: number[];
+	public total_revenue: number;
+	public revenues: number[];
+	public n_purchases: number[];
 	public revenue_per_customer: number;
 	public retention_rate: number;
 	public usergrowth_rates: number[];
@@ -121,8 +123,36 @@ export class Dashboard {
 		}
 	}
 
-	private getTotalRevenue(db: mongo.Db, prefix: string, appid: string, ids, time: number, callback: (revenue: number, numberofpurchase: number) => void) {
+	private getTotalRevenue(db: mongo.Db, prefix: string, appid: string, ids, starttime: number, endttime: number, callback: (revenue: number, npurchase: number, nuser: number) => void) {
+		var now = new Date(starttime * 1000);
+		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		now = new Date(endttime * 1000);
+		var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
+		let startsec = Math.round(startday.getTime() / 1000);
+		let endsec = Math.round(endday.getTime() / 1000) + 86400;
+
+		var revenue_pipeline = [{ $match: {} }, {
+			$group: {
+				_id: "$" + ids._mtid, sum: { $sum: "$" + ids.amount }, purchase: { $sum: 1 }
+			}
+		}, {
+				$group: {
+					_id: null, sum: { $sum: "$sum" }, count: { $sum: 1 }, npurchase: {$sum: "$purchase"}
+				}
+			}];
+
+		revenue_pipeline[0]['$match'][ids._isUser] = { $exists: false };
+		revenue_pipeline[0]['$match'][ids._typeid] = "purchase";
+		revenue_pipeline[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
+
+		db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
+			if (err) throw err;
+			var revenue = res.length === 0 ? 0 : res[0].sum;
+			var nuser = res.length !== 0 ? 0 : res[0].count;
+			var npurchase = res.length !== 0 ? 0 : res[0].npurchase;
+			callback(revenue, npurchase, nuser);
+		});
 	}
 
 	private getRevenue(db: mongo.Db, prefix: string, appid: string, ids, time: number, callback: (revenue: number, numberofpurchase: number) => void) {
@@ -132,10 +162,9 @@ export class Dashboard {
 		let todaysec = Math.round(today.getTime() / 1000);
 		let seventhdaybefore = todaysec - 7 * 24 * 3600;
 
-
 		var revenue_pipeline = [{ $match: {} }, {
 			$group: {
-				_id: null, sum: { $sum: "$amount" }, count: { $sum: 1 }
+				_id: null, sum: { $sum: "$" + ids.amount }, count: { $sum: 1 }
 			}
 		}];
 
@@ -521,28 +550,32 @@ export class Dashboard {
 						me.getNewSignup(me.db, me.prefix, appid, ids, function (ret) {
 							dashboard.n_new_signup = ret;
 
-							me.getTotalRevenue(me.db, me.prefix, appid, ids, function (revenues, n_purchase) {
-								dashboard.total_revenues = revenues;
-								var sumrevnue = revenues.reduce((pv, cv) => pv + cv, 0);
-								dashboard.n_avgcartsize = n_purchase == 0 ? sumrevnue : sumrevnue / n_purchase;
-								//gcallback(dashboard);
+							me.getRevenues(me.db, me.prefix, appid, ids, startime, endtime, function (revenues, n_purchases) {
+								dashboard.revenues = revenues;
+								dashboard.n_purchases = n_purchases;
 
-								me.getGrowthRates(me.db, me.prefix, appid, ids, startime, endtime, function (growrates: number[]) {
-									dashboard.usergrowth_rates = growrates;
+								me.getTotalRevenue(me.db, me.prefix, appid, ids, startime, endtime, function (revenue, npurchase, nuser) {
+									dashboard.total_revenue = revenue;
+									dashboard.n_avgcartsize = npurchase === 0 ? 0 : revenue / npurchase;
+									dashboard.revenue_per_customer = nuser === 0 ? 0 : revenue / nuser;
 
-									me.getConversionRate(me.db, me.prefix, appid, ids, function (cs: number[]) {
-										dashboard.conversion_rates = cs;
-										me.getRetensionRate(me.db, me.prefix, appid, ids, function (rate: number) {
-											dashboard.retention_rate = rate;
-											me.getRevenuePerCustomer(me.db, me.prefix, appid, ids, function (v: number) {
-												dashboard.revenue_per_customer = v;
-												me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, function (campaign: string) {
-													dashboard.highest_revenue_campaign = campaign;
-													me.getMostPopulerCategory(me.db, me.prefix, appid, ids, function (cat: string) {
-														dashboard.most_popular_category = cat;
-														me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, function (ref: string) {
-															dashboard.most_effective_ref = ref;
-															gcallback(dashboard);
+									me.getGrowthRates(me.db, me.prefix, appid, ids, startime, endtime, function (growrates: number[]) {
+										dashboard.usergrowth_rates = growrates;
+
+										me.getConversionRate(me.db, me.prefix, appid, ids, function (cs: number[]) {
+											dashboard.conversion_rates = cs;
+											me.getRetensionRate(me.db, me.prefix, appid, ids, function (rate: number) {
+												dashboard.retention_rate = rate;
+												me.getRevenuePerCustomer(me.db, me.prefix, appid, ids, function (v: number) {
+													dashboard.revenue_per_customer = v;
+													me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, function (campaign: string) {
+														dashboard.highest_revenue_campaign = campaign;
+														me.getMostPopulerCategory(me.db, me.prefix, appid, ids, function (cat: string) {
+															dashboard.most_popular_category = cat;
+															me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, function (ref: string) {
+																dashboard.most_effective_ref = ref;
+																gcallback(dashboard);
+															});
 														});
 													});
 												});
