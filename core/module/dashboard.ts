@@ -9,8 +9,8 @@ export class DashboardEntity {
 	public n_avgcartsize: number;
 	public total_revenues: number[];
 	public revenue_per_customer: number;
-	public retention_rate: number[];
-	public usergrowth_rates: number;
+	public retention_rate: number;
+	public usergrowth_rates: number[];
 	public conversion_rate: number;
 	public highest_revenue_campaign: string;
 	public most_effective_ref: string;
@@ -78,8 +78,8 @@ export class Dashboard {
 		});
 	}
 
-	private getGrowRates(db: mongo.Db, prefix: string, appid: string, ids, callback: (a: number[]) => void) {
-		var nowsec = Math.round(new Date().getTime() / 1000);
+	private getGrowthRate(db: mongo.Db, prefix: string, appid: string, ids, time, callback: (a: number) => void) {
+		var nowsec =time;
 		var last24hsec = nowsec - 24 * 3600;
 		var last48hsec = nowsec - 48 * 3600;
 
@@ -108,98 +108,69 @@ export class Dashboard {
 		});
 	}
 
-	private getTotalRevenue(db: mongo.Db, prefix: string, appid: string, ids, callback: (revenue: number[], numberofpurchase: number) => void) {
-		var n_users: number[] = [];
-		var n_users_purchase: number[] = [];
-		var n_purchase = 0;
-		var now = new Date();
+	private getGrowthRates(db: mongo.Db, prefix: string, appid: string, ids, startime:number, endtime:number, callback: (a: number[]) => void) {
+		let me = this;
+		var rates = [];
+		var time = me.getTimeRange(startime, endtime);
+		var c = time.length;
+		for (let i = 0; i < time.length; i++)
+		{
+			me.getGrowthRate(db, prefix, appid, ids, i, function (rate) {
+				c--;
+				rates[i] = rate;
+				if (c == 0) {
+					callback(rates);
+				}
+			});
+		}
+	}
+	private getTotalRevenue(db: mongo.Db, prefix: string, appid: string, ids, time: number, callback: (revenue: number, numberofpurchase: number) => void) {
+	}
+
+	private getRevenue(db: mongo.Db, prefix: string, appid: string, ids, time: number, callback: (revenue: number, numberofpurchase: number) => void) {
+		var now = new Date(time*1000);
 		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
 		let todaysec = Math.round(today.getTime() / 1000);
 		let seventhdaybefore = todaysec - 7 * 24 * 3600;
-		let b0 = todaysec;
-		let b1 = b0 - 24 * 3600;
-		let b2 = b1 - 24 * 3600;
-		let b3 = b2 - 24 * 3600;
-		let b4 = b3 - 24 * 3600;
-		let b5 = b4 - 24 * 3600;
-		let b6 = b5 - 24 * 3600;
-		let b7 = b6 - 24 * 3600;
-		let b8 = b7 - 24 * 3600;
-		let b9 = b8 - 24 * 3600;
-		let b10 = b9 - 24 * 3600;
-		let b11 = b10 - 24 * 3600;
-		let b12 = b11 - 24 * 3600;
-		//let b13 = b12 - 24 * 3600;
-		//let b14 = b13 - 24 * 3600;
-
-
-		var revenues: number[] = [];
+	
+	
 		var revenue_pipeline = [{ $match: {} }, {
 			$group: {
 				_id: null, sum: { $sum: "$amount" }, count: { $sum: 1 }
 			}
 		}];
 
+		revenue_pipeline[0]['$match'][ids._isUser] = {$exists: false};
 		revenue_pipeline[0]['$match'][ids._typeid] = "purchase";
-		revenue_pipeline[0]['$match'][ids._ctime] = {};
-		revenue_pipeline[0]['$match'][ids._ctime].$gte = b6;
-		revenue_pipeline[0]['$match'][ids._ctime].$lt = b5;
+		revenue_pipeline[0]['$match'][ids._ctime] = { $gte: todaysec, $lt: todaysec + 86000 };
+
 		db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 			if (err) throw err;
-			revenues.push(res.length === 0 ? 0 : res[0].sum);
-			if (res.length !== 0) n_purchase += res[0].count;
-
-			revenue_pipeline[0]['$match'][ids._ctime].$gte = b5;
-			revenue_pipeline[0]['$match'][ids._ctime].$lt = b4;
-			db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
-				if (err) throw err;
-				revenues.push(res.length === 0 ? 0 : res[0].sum);
-				if (res.length !== 0) n_purchase += res[0].count;
-
-				revenue_pipeline[0]['$match'][ids._ctime].$gte = b4;
-				revenue_pipeline[0]['$match'][ids._ctime].$lt = b3;
-				db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
-					if (err) throw err;
-					revenues.push(res.length === 0 ? 0 : res[0].sum);
-					if (res.length !== 0) n_purchase += res[0].count;
-
-					revenue_pipeline[0]['$match'][ids._ctime].$gte = b3;
-					revenue_pipeline[0]['$match'][ids._ctime].$lt = b2;
-					db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
-						if (err) throw err;
-						revenues.push(res.length === 0 ? 0 : res[0].sum);
-						if (res.length !== 0) n_purchase += res[0].count;
-
-						revenue_pipeline[0]['$match'][ids._ctime].$gte = b2;
-						revenue_pipeline[0]['$match'][ids._ctime].$lt = b1;
-						db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
-							if (err) throw err;
-							revenues.push(res.length === 0 ? 0 : res[0].sum);
-							if (res.length !== 0) n_purchase += res[0].count;
-
-							revenue_pipeline[0]['$match'][ids._ctime].$gte = b1;
-							revenue_pipeline[0]['$match'][ids._ctime].$lt = b0;
-							db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
-								if (err) throw err;
-								revenues.push(res.length === 0 ? 0 : res[0].sum);
-								if (res.length !== 0) n_purchase += res[0].count;
-
-								revenue_pipeline[0]['$match'][ids._ctime] = { $gte: b0 };
-								db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
-									if (err) throw err;
-									revenues.push(res.length === 0 ? 0 : res[0].sum);
-									if (res.length !== 0) n_purchase += res[0].count;
-
-									callback(revenues, n_purchase);
-								});
-							});
-						});
-					});
-				});
-			});
+			var revenue = res.length === 0 ? 0 : res[0].sum;
+			var n_purchase = res.length !== 0 ? 0 : res[0].count;
+			callback(revenue, n_purchase);
 		});
 	}
+
+	private getRevenues(db: mongo.Db, prefix: string, appid: string, ids, starttime: number, endtime: number, callback: (revenues: number[], purchases: number[]) => void)
+	{
+		let me = this;
+		var revenues = [];
+		var purchases = [];
+		var time = me.getTimeRange(starttime, endtime);
+		var c = time.length;
+		for (let i = 0; i < time.length; i++) {
+			me.getRevenue(db, prefix, appid, ids, i, function (revenue, purchase) {
+				c--;
+				revenues[i] = revenue;
+				purchase[i] = purchase;
+				if (c == 0) {
+					callback(revenues, purchases);
+				}
+			});
+		}
+	 }
 
 	private getUniqueVisitor(db: mongo.Db, prefix: string, appid: string, ids, callback: (u: number[]) => void) {
 		var now = new Date();
@@ -271,7 +242,6 @@ export class Dashboard {
 		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 		let todaysec = Math.round(today.getTime() / 1000);
 		let b6 = todaysec - 24 * 6 * 3600;
-		
 		
 		me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "userid"], function (ids) {
 			var n_newuser, n6_user;
@@ -512,8 +482,14 @@ export class Dashboard {
 		callback("no");
 	}
 
-	public getDashboard(appid: string, callback: (d: DashboardEntity) => void) {
+	public getDashboard(appid: string, startime, endtime, callback: (d: DashboardEntity) => void) {
 		let me = this;
+		if (startime === undefined)
+		{
+			endtime  = Math.floor(new Date().getTime() / 1000);
+			startime = endtime - 30 * 86400;
+		}
+
 		function generateDashboard(gcallback: (d: DashboardEntity) => void) {
 			var dashboard: DashboardEntity = new DashboardEntity();
 			me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid"], function (ids) {
@@ -555,13 +531,13 @@ export class Dashboard {
 								dashboard.n_avgcartsize = n_purchase == 0 ? sumrevnue : sumrevnue / n_purchase;
 								//gcallback(dashboard);
 
-								me.getGrowRates(me.db, me.prefix, appid, ids, function (growrates: number[]) {
+								me.getGrowthRates(me.db, me.prefix, appid, ids, startime, endtime,function (growrates: number[]) {
 									dashboard.usergrowth_rates = growrates;
 
 									me.getConversionRate(me.db, me.prefix, appid, ids, function (cs: number[]) {
 										dashboard.conversion_rates = cs;
-										me.getRetensionRates(me.db, me.prefix, appid, ids, function (rates: number[]) {
-											dashboard.retention_rates = rates;
+										me.getRetensionRate(me.db, me.prefix, appid, ids, function (rate: number) {
+											dashboard.retention_rate = rate;
 											me.getRevenuePerCustomer(me.db, me.prefix, appid, ids, function (v: number) {
 												dashboard.revenue_per_customer = v;
 												me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, function (campaign: string) {

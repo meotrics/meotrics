@@ -111,7 +111,7 @@ export class CrudApi {
 		});
 
 		app.getEx('/dashboard/:appid/:starttime?/:endtime?', function (req, res) {
-			me.dashboard.getDashboard(req.params.appid, function (result) {
+			me.dashboard.getDashboard(req.params.appid, req.params.starttime, req.params.endtime, function (result) {
 				res.json(result);
 			});
 		});
