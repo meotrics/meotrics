@@ -372,6 +372,7 @@ class RefererType {
     }
     getTypeName(code) {
         var names = ["Unknown", "Organice Search", "Social Network", "Referral", "Email", "Direct"];
+        return names[code];
     }
     getRefType(url_string, referer) {
         url_string = url_string || "";

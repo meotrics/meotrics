@@ -6,11 +6,10 @@ var url = require('url');
 var fs = require('fs');
 var ua = require('ua-parser');
 var MD = require('mobile-detect');
-var referer = require('./referer.js').RefererType;
 var ActionMgr = require('./actionmgr');
-exports.HttpApi = function (db, converter, prefix, codepath, valuemgr) {
+exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	var code;
-	var actionmgr = new ActionMgr.ActionMgr(db, converter, prefix, "mapping", valuemgr, new referer());
+	var actionmgr = new ActionMgr.ActionMgr(db, converter, prefix, "mapping", valuemgr, ref);
 	var me = this;
 	this.onchange = function(){};
 

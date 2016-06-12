@@ -1,4 +1,5 @@
 ﻿import * as mongo from 'mongodb';
+import * as referer from './referer';
 
 export class DashboardEntity {
 	public ctime: number;
@@ -56,7 +57,7 @@ export class Dashboard {
 		return ret;
 	}
 
-	public constructor(private db: mongo.Db, private converter, private prefix: string, private delaysec: number) {
+	public constructor(private db: mongo.Db, private converter, private prefix: string, private ref: referer.RefererType, private delaysec: number) {
 	}
 
 	private getNewSignup(db: mongo.Db, prefix: string, appid: string, ids, callback: (a: number) => void) {
@@ -196,70 +197,6 @@ export class Dashboard {
 			});
 		}
 	 }
-
-	private getUniqueVisitor(db: mongo.Db, prefix: string, appid: string, ids, callback: (u: number[]) => void) {
-		var now = new Date();
-		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-		var uniquevisitors = [];
-		let todaysec = Math.round(today.getTime() / 1000);
-		let b0 = todaysec;
-		let b1 = b0 - 24 * 3600;
-		let b2 = b1 - 24 * 3600;
-		let b3 = b2 - 24 * 3600;
-		let b4 = b3 - 24 * 3600;
-		let b5 = b4 - 24 * 3600;
-		let b6 = b5 - 24 * 3600;
-
-		var pipeline = [{ $match: {} }, { $group: { _id: "$" + ids._mtid } }, {
-			$group: {
-				_id: null, count: { $sum: 1 }
-			}
-		}];
-
-		pipeline[0]['$match'][ids._typeid] = "pageview";
-		pipeline[0]['$match'][ids._ctime] = { $gte: b6, $lt: b5 };
-		db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
-			if (err) throw err;
-			uniquevisitors.push(res.length == 0 ? 0 : res.length);
-
-			pipeline[0]['$match'][ids._ctime] = { $gte: b5, $lt: b4 };
-			db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
-				if (err) throw err;
-				uniquevisitors.push(res.length == 0 ? 0 : res.length);
-
-				pipeline[0]['$match'][ids._ctime] = { $gte: b4, $lt: b3 };
-				db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
-					if (err) throw err;
-					uniquevisitors.push(res.length == 0 ? 0 : res.length);
-
-					pipeline[0]['$match'][ids._ctime] = { $gte: b3, $lt: b2 };
-					db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
-						if (err) throw err;
-						uniquevisitors.push(res.length == 0 ? 0 : res.length);
-
-						pipeline[0]['$match'][ids._ctime] = { $gte: b2, $lt: b1 };
-						db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
-							if (err) throw err;
-							uniquevisitors.push(res.length == 0 ? 0 : res.length);
-
-							pipeline[0]['$match'][ids._ctime] = { $gte: b1, $lt: b0 };
-							db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
-								if (err) throw err;
-								uniquevisitors.push(res.length == 0 ? 0 : res.length);
-
-								pipeline[0]['$match'][ids._ctime] = { $gte: b0 };
-								db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
-									if (err) throw err;
-									uniquevisitors.push(res.length == 0 ? 0 : res.length);
-									callback(uniquevisitors);
-								});
-							});
-						});
-					});
-				});
-			});
-		});
-	}
 
 	private getRetensionRate(db: mongo.Db, prefix: string, appid: string, ids, callback: (rate: number) => void) {
 		var me = this;
@@ -424,7 +361,7 @@ export class Dashboard {
 	}
 
 	public getMostEffectiveReferal(db: mongo.Db, prefix: string, appid: string, ids, starttime: number, endtime: number, callback: (ref: string) => void) {
-
+		var me = this;
 		var now = new Date(starttime * 1000);
 		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 		now = new Date(endtime * 1000);
@@ -449,9 +386,8 @@ export class Dashboard {
 		db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
 			if (err) throw err;
 			if (res.length == 0) return callback(undefined);
-			return callback(res[0]._id);
+			return callback(me.ref.getTypeName(res[0]._id));
 		});
-	
 	}
 
 	public getDashboard(appid: string, startime, endtime, callback: (d: DashboardEntity) => void) {
@@ -460,6 +396,13 @@ export class Dashboard {
 			endtime = Math.floor(new Date().getTime() / 1000);
 			startime = endtime - 30 * 86400;
 		}
+
+		var now = new Date(startime * 1000);
+		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		now = new Date(endtime * 1000);
+		var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		let startsec = Math.round(startday.getTime() / 1000);
+		let endsec = Math.round(endday.getTime() / 1000) + 86400;
 
 		function generateDashboard(gcallback: (d: DashboardEntity) => void) {
 			var dashboard: DashboardEntity = new DashboardEntity();
@@ -522,7 +465,6 @@ export class Dashboard {
 																dashboard.most_effective_ref = ref;
 																gcallback(dashboard);
 															});
-									
 													});
 												});
 											});
@@ -536,20 +478,20 @@ export class Dashboard {
 			});
 		}
 
-		me.db.collection(me.prefix + "dashboard").find({ appid: appid }).limit(1).toArray(function (err, res) {
+		me.db.collection(me.prefix + "dashboard").find({ appid: appid, endtime: endsec, starttime: startsec }).limit(1).toArray(function (err, res) {
 			if (err) throw err;
 			// cache not existed
 			if (res.length === 0) {
-				me.lock("c_" + appid, function (release) {
+				me.lock("c_" + appid + "-" + startsec + "-" + endsec, function (release) {
 					// recheck because cache could be create after the lock
-					me.db.collection(me.prefix + "dashboard").find({ appid: appid }).limit(1).toArray(function (err, res) {
+					me.db.collection(me.prefix + "dashboard").find({ appid: appid, endtime: endsec, starttime: startsec}).limit(1).toArray(function (err, res) {
 						if (err) throw err;
 						if (res.length === 0) {
 							generateDashboard(function (dash: DashboardEntity) {
 								callback(dash);
 								dash.appid = appid + "";
 								dash.ctime = Math.round(new Date().getTime() / 1000);
-								me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "" }, dash, { upsert: true }, function (err) {
+								me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + ""  , endtime: endsec, starttime: startsec}, dash, { upsert: true }, function (err) {
 									release()();
 									if (err) throw err;
 								});
@@ -561,7 +503,7 @@ export class Dashboard {
 								// the result dashboard alway up to date
 								// the problem with res[0] is that, is very likely up to date
 								// (deltatime < delay) but there is no warranty
-								me.getDashboard(appid, callback);
+								me.getDashboard(appid, startime, endtime, callback);
 							})();
 						}
 					});
@@ -573,8 +515,8 @@ export class Dashboard {
 			var deltaT = Math.round(new Date().getTime() / 1000) - dash.ctime;
 
 			if (deltaT > me.delaysec) {
-				me.lock("c_" + appid, function (release) {
-					me.db.collection(me.prefix + "dashboard").find({ appid: appid }).limit(1).toArray(function (err, res) {
+				me.lock("c_" + appid + "-" + startsec + "-" + endsec, function (release) {
+					me.db.collection(me.prefix + "dashboard").find({ appid: appid, endtime: endsec, starttime: startsec }).limit(1).toArray(function (err, res) {
 						if (err) throw err;
 						// this is a must found
 						var dash = res[0];
@@ -585,7 +527,7 @@ export class Dashboard {
 								callback(dash);
 								dash.appid = appid + "";
 								dash.ctime = Math.round(new Date().getTime() / 1000);
-								me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "" }, dash, { upsert: true }, function (err) {
+								me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "", endtime: endsec, starttime: startsec }, dash, { upsert: true }, function (err) {
 									release(function () {
 									})();
 									if (err) throw err;
@@ -596,7 +538,7 @@ export class Dashboard {
 								// callback(dash);
 								// again, why not use callback(dash) ? because i want 100% guarranty that the dash
 								// is up to date (deltatime < delay)
-								me.getDashboard(appid, callback);
+								me.getDashboard(appid, startime, endtime, callback);
 							})();
 					});
 				});

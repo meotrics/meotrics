@@ -4,6 +4,7 @@ const config = require('config');
 const express = require('express');
 const WS = require('./module/ws');
 const CrudApi = require('./module/crudapi');
+const referer = require('./module/referer');
 const bodyParser = require('body-parser');
 var converter = require('./utils/fakeidmanager.js');
 var appException = require('./module/appException.js');
@@ -22,13 +23,14 @@ option.server.poolSize = 40;
 mongodb.MongoClient.connect(buildconnstr(), option, function (err, db) {
     if (err)
         throw err;
+    var ref = new referer.RefererType();
     //set up new express application
     var app = express();
     appException(app);
     app.use(bodyParser.json()); // parse application/json
     converter = new converter.IdManager();
     var prefix = config.get("mongod.prefix") || "meotrics_";
-    var crudapi = new CrudApi.CrudApi(db, converter, prefix, config.get("dashboard.delay"));
+    var crudapi = new CrudApi.CrudApi(db, converter, prefix, ref, config.get("dashboard.delay"));
     crudapi.route(app); //bind route
     //run the backend bashboard
     var crudport = config.get("port") || 2108;
@@ -36,7 +38,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err, db) {
         console.log('Meotrics CORE API / OK /      ' + crudport);
     });
     var httpport = config.get('apiserver.port') || 1711;
-    var httpapi = new HttpApi(db, converter, prefix, config.get('apiserver.codepath'), crudapi.valuemgr);
+    var httpapi = new HttpApi(db, converter, prefix, config.get('apiserver.codepath'), crudapi.valuemgr, ref);
     var server = http.createServer(function (req, res) {
         httpapi.route(req, res);
     });

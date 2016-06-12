@@ -16,15 +16,15 @@ var TypeMgr = require('./typemgr.js').TypeMgr;
 var ValueMgr = require('./valuemgr.js').ValueMgr;
 import * as Dashboard from './dashboard';
 import http = require('http');
-
+import * as referer from './referer';
 import fs = require('fs');
 import qs = require('querystring');
 import url = require('url');
 export class CrudApi {
-	public  constructor(private db:mongodb.Db, private converter, private prefix, private dashboarddelay) {
+	public constructor(private db: mongodb.Db, private converter, private prefix, private ref: referer.RefererType, private dashboarddelay) {
 	}
 
-	public dashboard = new Dashboard.Dashboard(this.db, this.converter, this.prefix, this.dashboarddelay);
+	public dashboard = new Dashboard.Dashboard(this.db, this.converter, this.prefix, this.ref, this.dashboarddelay);
 	public trendMgr = new TrendMgr.TrendMgr(this.db, this.converter, this.prefix, "trend");
 	public propmgr = new PropMgr();
 	public typeCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "actiontype");

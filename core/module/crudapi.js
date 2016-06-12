@@ -12,12 +12,13 @@ var TypeMgr = require('./typemgr.js').TypeMgr;
 var ValueMgr = require('./valuemgr.js').ValueMgr;
 const Dashboard = require('./dashboard');
 class CrudApi {
-    constructor(db, converter, prefix, dashboarddelay) {
+    constructor(db, converter, prefix, ref, dashboarddelay) {
         this.db = db;
         this.converter = converter;
         this.prefix = prefix;
+        this.ref = ref;
         this.dashboarddelay = dashboarddelay;
-        this.dashboard = new Dashboard.Dashboard(this.db, this.converter, this.prefix, this.dashboarddelay);
+        this.dashboard = new Dashboard.Dashboard(this.db, this.converter, this.prefix, this.ref, this.dashboarddelay);
         this.trendMgr = new TrendMgr.TrendMgr(this.db, this.converter, this.prefix, "trend");
         this.propmgr = new PropMgr();
         this.typeCRUD = new CRUD(this.db, mongodb, async, this.converter, this.prefix, "actiontype");

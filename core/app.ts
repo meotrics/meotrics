@@ -3,7 +3,7 @@ import * as config from 'config';
 import * as express from 'express';
 import * as WS from './module/ws';
 import * as CrudApi from './module/crudapi';
-
+import * as referer from './module/referer';
 import bodyParser = require('body-parser');
 var converter = require('./utils/fakeidmanager.js');
 var appException = require('./module/appException.js');
@@ -11,7 +11,7 @@ import * as http  from 'http';
 
 var HttpApi = require('./module/httpapi.js').HttpApi;
 
-function buildconnstr():string {
+function buildconnstr(): string {
 	var host = config.get("mongod.host") || "127.0.0.1";
 	var port = config.get("mongod.port") || 27017;
 	var database = config.get("mongod.database") || "test";
@@ -19,20 +19,21 @@ function buildconnstr():string {
 }
 
 //Using connection pool. Initialize mongodb once
-var option:mongodb.MongoClientOptions = {};
+var option: mongodb.MongoClientOptions = {};
 option.server = {};
 option.server.poolSize = 40;
 
-mongodb.MongoClient.connect(buildconnstr(), option, function (err:mongodb.MongoError, db:mongodb.Db) {
+mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.MongoError, db: mongodb.Db) {
 	if (err) throw err;
 
+	var ref = new referer.RefererType();
 	//set up new express application
 	var app = express();
 	appException(app);
 	app.use(bodyParser.json()); // parse application/json
 	converter = new converter.IdManager();
-	var prefix:string = config.get<string>("mongod.prefix") || "meotrics_";
-	var crudapi = new CrudApi.CrudApi(db, converter, prefix, config.get("dashboard.delay"));
+	var prefix: string = config.get<string>("mongod.prefix") || "meotrics_";
+	var crudapi = new CrudApi.CrudApi(db, converter, prefix, ref, config.get("dashboard.delay"));
 	crudapi.route(app); //bind route
 
 	//run the backend bashboard
@@ -42,8 +43,8 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err:mongodb.MongoE
 	});
 
 	var httpport = config.get<number>('apiserver.port') || 1711;
-	var httpapi = new HttpApi(db, converter, prefix, config.get('apiserver.codepath'), crudapi.valuemgr);
-	var server = http.createServer(function (req:http.ServerRequest, res:http.ServerResponse) {
+	var httpapi = new HttpApi(db, converter, prefix, config.get('apiserver.codepath'), crudapi.valuemgr, ref);
+	var server = http.createServer(function (req: http.ServerRequest, res: http.ServerResponse) {
 		httpapi.route(req, res);
 	});
 

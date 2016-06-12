@@ -3,10 +3,11 @@ class DashboardEntity {
 }
 exports.DashboardEntity = DashboardEntity;
 class Dashboard {
-    constructor(db, converter, prefix, delaysec) {
+    constructor(db, converter, prefix, ref, delaysec) {
         this.db = db;
         this.converter = converter;
         this.prefix = prefix;
+        this.ref = ref;
         this.delaysec = delaysec;
         this.Lock = require('lock');
         this.lock = this.Lock();
@@ -171,68 +172,6 @@ class Dashboard {
             });
         }
     }
-    getUniqueVisitor(db, prefix, appid, ids, callback) {
-        var now = new Date();
-        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        var uniquevisitors = [];
-        let todaysec = Math.round(today.getTime() / 1000);
-        let b0 = todaysec;
-        let b1 = b0 - 24 * 3600;
-        let b2 = b1 - 24 * 3600;
-        let b3 = b2 - 24 * 3600;
-        let b4 = b3 - 24 * 3600;
-        let b5 = b4 - 24 * 3600;
-        let b6 = b5 - 24 * 3600;
-        var pipeline = [{ $match: {} }, { $group: { _id: "$" + ids._mtid } }, {
-                $group: {
-                    _id: null, count: { $sum: 1 }
-                }
-            }];
-        pipeline[0]['$match'][ids._typeid] = "pageview";
-        pipeline[0]['$match'][ids._ctime] = { $gte: b6, $lt: b5 };
-        db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
-            if (err)
-                throw err;
-            uniquevisitors.push(res.length == 0 ? 0 : res.length);
-            pipeline[0]['$match'][ids._ctime] = { $gte: b5, $lt: b4 };
-            db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
-                if (err)
-                    throw err;
-                uniquevisitors.push(res.length == 0 ? 0 : res.length);
-                pipeline[0]['$match'][ids._ctime] = { $gte: b4, $lt: b3 };
-                db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
-                    if (err)
-                        throw err;
-                    uniquevisitors.push(res.length == 0 ? 0 : res.length);
-                    pipeline[0]['$match'][ids._ctime] = { $gte: b3, $lt: b2 };
-                    db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
-                        if (err)
-                            throw err;
-                        uniquevisitors.push(res.length == 0 ? 0 : res.length);
-                        pipeline[0]['$match'][ids._ctime] = { $gte: b2, $lt: b1 };
-                        db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
-                            if (err)
-                                throw err;
-                            uniquevisitors.push(res.length == 0 ? 0 : res.length);
-                            pipeline[0]['$match'][ids._ctime] = { $gte: b1, $lt: b0 };
-                            db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
-                                if (err)
-                                    throw err;
-                                uniquevisitors.push(res.length == 0 ? 0 : res.length);
-                                pipeline[0]['$match'][ids._ctime] = { $gte: b0 };
-                                db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
-                                    if (err)
-                                        throw err;
-                                    uniquevisitors.push(res.length == 0 ? 0 : res.length);
-                                    callback(uniquevisitors);
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    }
     getRetensionRate(db, prefix, appid, ids, callback) {
         var me = this;
         var now = new Date();
@@ -382,6 +321,7 @@ class Dashboard {
         });
     }
     getMostEffectiveReferal(db, prefix, appid, ids, starttime, endtime, callback) {
+        var me = this;
         var now = new Date(starttime * 1000);
         var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         now = new Date(endtime * 1000);
@@ -406,7 +346,7 @@ class Dashboard {
                 throw err;
             if (res.length == 0)
                 return callback(undefined);
-            return callback(res[0]._id);
+            return callback(me.ref.getTypeName(res[0]._id));
         });
     }
     getDashboard(appid, startime, endtime, callback) {
@@ -415,6 +355,12 @@ class Dashboard {
             endtime = Math.floor(new Date().getTime() / 1000);
             startime = endtime - 30 * 86400;
         }
+        var now = new Date(startime * 1000);
+        var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        now = new Date(endtime * 1000);
+        var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        let startsec = Math.round(startday.getTime() / 1000);
+        let endsec = Math.round(endday.getTime() / 1000) + 86400;
         function generateDashboard(gcallback) {
             var dashboard = new DashboardEntity();
             me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid"], function (ids) {
@@ -480,14 +426,14 @@ class Dashboard {
                 });
             });
         }
-        me.db.collection(me.prefix + "dashboard").find({ appid: appid }).limit(1).toArray(function (err, res) {
+        me.db.collection(me.prefix + "dashboard").find({ appid: appid, endtime: endsec, starttime: startsec }).limit(1).toArray(function (err, res) {
             if (err)
                 throw err;
             // cache not existed
             if (res.length === 0) {
-                me.lock("c_" + appid, function (release) {
+                me.lock("c_" + appid + "-" + startsec + "-" + endsec, function (release) {
                     // recheck because cache could be create after the lock
-                    me.db.collection(me.prefix + "dashboard").find({ appid: appid }).limit(1).toArray(function (err, res) {
+                    me.db.collection(me.prefix + "dashboard").find({ appid: appid, endtime: endsec, starttime: startsec }).limit(1).toArray(function (err, res) {
                         if (err)
                             throw err;
                         if (res.length === 0) {
@@ -495,7 +441,7 @@ class Dashboard {
                                 callback(dash);
                                 dash.appid = appid + "";
                                 dash.ctime = Math.round(new Date().getTime() / 1000);
-                                me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "" }, dash, { upsert: true }, function (err) {
+                                me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "", endtime: endsec, starttime: startsec }, dash, { upsert: true }, function (err) {
                                     release()();
                                     if (err)
                                         throw err;
@@ -509,7 +455,7 @@ class Dashboard {
                                 // the result dashboard alway up to date
                                 // the problem with res[0] is that, is very likely up to date
                                 // (deltatime < delay) but there is no warranty
-                                me.getDashboard(appid, callback);
+                                me.getDashboard(appid, startime, endtime, callback);
                             })();
                         }
                     });
@@ -519,8 +465,8 @@ class Dashboard {
             var dash = res[0];
             var deltaT = Math.round(new Date().getTime() / 1000) - dash.ctime;
             if (deltaT > me.delaysec) {
-                me.lock("c_" + appid, function (release) {
-                    me.db.collection(me.prefix + "dashboard").find({ appid: appid }).limit(1).toArray(function (err, res) {
+                me.lock("c_" + appid + "-" + startsec + "-" + endsec, function (release) {
+                    me.db.collection(me.prefix + "dashboard").find({ appid: appid, endtime: endsec, starttime: startsec }).limit(1).toArray(function (err, res) {
                         if (err)
                             throw err;
                         // this is a must found
@@ -532,7 +478,7 @@ class Dashboard {
                                 callback(dash);
                                 dash.appid = appid + "";
                                 dash.ctime = Math.round(new Date().getTime() / 1000);
-                                me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "" }, dash, { upsert: true }, function (err) {
+                                me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "", endtime: endsec, starttime: startsec }, dash, { upsert: true }, function (err) {
                                     release(function () {
                                     })();
                                     if (err)
@@ -545,7 +491,7 @@ class Dashboard {
                                 // callback(dash);
                                 // again, why not use callback(dash) ? because i want 100% guarranty that the dash
                                 // is up to date (deltatime < delay)
-                                me.getDashboard(appid, callback);
+                                me.getDashboard(appid, startime, endtime, callback);
                             })();
                     });
                 });

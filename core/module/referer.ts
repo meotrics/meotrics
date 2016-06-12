@@ -381,9 +381,10 @@ export class RefererType {
 				return false;
 	}
 
-	public getTypeName(code: number)
+	public getTypeName(code: number) : string
 	{
 		var names = ["Unknown", "Organice Search", "Social Network", "Referral", "Email", "Direct"];
+		return names[code];
 	}
 
 	public getRefType(url_string: string, referer: string): number {
