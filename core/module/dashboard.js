@@ -239,42 +239,40 @@ class Dashboard {
         var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         let todaysec = Math.round(today.getTime() / 1000);
         let b6 = todaysec - 24 * 6 * 3600;
-        me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "userid"], function (ids) {
-            var n_newuser, n6_user;
-            let alltimecount = {};
-            alltimecount[ids._isUser] = true;
-            alltimecount[ids._ctime] = { $lt: b6 };
+        var n_newuser, n6_user;
+        let alltimecount = {};
+        alltimecount[ids._isUser] = true;
+        alltimecount[ids._ctime] = { $lt: b6 };
+        db.collection(prefix + appid).count(alltimecount, function (err, res) {
+            if (err)
+                throw err;
+            n6_user = res;
+            alltimecount[ids._ctime] = { $gte: b6 };
             db.collection(prefix + appid).count(alltimecount, function (err, res) {
                 if (err)
                     throw err;
-                n6_user = res;
-                alltimecount[ids._ctime] = { $gte: b6 };
-                db.collection(prefix + appid).count(alltimecount, function (err, res) {
+                n_newuser = res;
+                //get today user visit
+                var todayuservisitq = [];
+                todayuservisitq[0]['$match'] = { $or: [] };
+                todayuservisitq[0]['$match']['$or'][0][ids._isUser] = true;
+                todayuservisitq[0]['$match']['$or'][1][ids._isUser] = { $exists: false };
+                todayuservisitq[0]['$match']['$or'][1][ids._ctime] = { $gte: todaysec };
+                todayuservisitq[1]['$project'] = {};
+                todayuservisitq[1]['$project'][ids._mtid] = 1;
+                todayuservisitq[1]['$project'][ids.userid] = { $cond: { if: { $ifNull: ["$userid", false] }, then: 1, else: 0 } };
+                todayuservisitq[2]['$group'] = { _id: "$" + ids._mtid, userid: { $sum: "$" + ids.userid }, count: { $sum: 1 } };
+                todayuservisitq[3]['$match'] = { userid: { $gt: 0 }, count: { $gt: 1 } };
+                todayuservisitq[3]['$group'] = { _id: null, count: { $sum: 1 } };
+                console.log("todayuservisitq", todayuservisitq);
+                me.db.collection(me.prefix + "app" + appid).aggregate(todayuservisitq, function (err, res) {
                     if (err)
                         throw err;
-                    n_newuser = res;
-                    //get today user visit
-                    var todayuservisitq = [];
-                    todayuservisitq[0]['$match'] = { $or: [] };
-                    todayuservisitq[0]['$match']['$or'][0][ids._isUser] = true;
-                    todayuservisitq[0]['$match']['$or'][1][ids._isUser] = { $exists: false };
-                    todayuservisitq[0]['$match']['$or'][1][ids._ctime] = { $gte: todaysec };
-                    todayuservisitq[1]['$project'] = {};
-                    todayuservisitq[1]['$project'][ids._mtid] = 1;
-                    todayuservisitq[1]['$project'][ids.userid] = { $cond: { if: { $ifNull: ["$userid", false] }, then: 1, else: 0 } };
-                    todayuservisitq[2]['$group'] = { _id: "$" + ids._mtid, userid: { $sum: "$" + ids.userid }, count: { $sum: 1 } };
-                    todayuservisitq[3]['$match'] = { userid: { $gt: 0 }, count: { $gt: 1 } };
-                    todayuservisitq[3]['$group'] = { _id: null, count: { $sum: 1 } };
-                    console.log("todayuservisitq", todayuservisitq);
-                    me.db.collection(me.prefix + "app" + appid).aggregate(todayuservisitq, function (err, res) {
-                        if (err)
-                            throw err;
-                        var count = 0;
-                        if (res.length !== 0)
-                            count = res[0].count;
-                        var rate = (count - n_newuser) / n6_user;
-                        callback(rate);
-                    });
+                    var count = 0;
+                    if (res.length !== 0)
+                        count = res[0].count;
+                    var rate = (count - n_newuser) / n6_user;
+                    callback(rate);
                 });
             });
         });
@@ -383,8 +381,33 @@ class Dashboard {
             return callback(res.revenue / res.count);
         });
     }
-    getMostEffectiveReferal(db, prefix, appid, ids, callback) {
-        callback("no");
+    getMostEffectiveReferal(db, prefix, appid, ids, starttime, endtime, callback) {
+        var now = new Date(starttime * 1000);
+        var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        now = new Date(endtime * 1000);
+        var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        let startsec = Math.round(startday.getTime() / 1000);
+        let endsec = Math.round(endday.getTime() / 1000) + 86400;
+        let pipeline = [
+            { $match: {} }, {
+                $group: {
+                    _id: "$" + ids._reftype,
+                    count: { $sum: 1 }
+                }
+            }, {
+                $sort: { count: -1 }
+            }, {
+                $limit: 1
+            }];
+        pipeline[0]['$match'][ids._typeid] = 'pageview';
+        pipeline[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
+        db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
+            if (err)
+                throw err;
+            if (res.length == 0)
+                return callback(undefined);
+            return callback(res[0]._id);
+        });
     }
     getDashboard(appid, startime, endtime, callback) {
         let me = this;
@@ -394,7 +417,7 @@ class Dashboard {
         }
         function generateDashboard(gcallback) {
             var dashboard = new DashboardEntity();
-            me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid"], function (ids) {
+            me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid"], function (ids) {
                 var now = new Date();
                 var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                 let todaysec = Math.round(today.getTime() / 1000);

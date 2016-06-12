@@ -267,8 +267,7 @@ export class Dashboard {
 		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 		let todaysec = Math.round(today.getTime() / 1000);
 		let b6 = todaysec - 24 * 6 * 3600;
-
-		me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "userid"], function (ids) {
+		
 			var n_newuser, n6_user;
 
 			let alltimecount = {};
@@ -305,7 +304,7 @@ export class Dashboard {
 						callback(rate);
 					});
 				});
-			});
+		
 		});
 	}
 
@@ -376,7 +375,7 @@ export class Dashboard {
 		});
 	}
 
-	public getHighestRevenueCampaign(db: mongo.Db, prefix: string, appid: string, ids, starttime, endtime, callback: (cat: string) => void) {
+	public getHighestRevenueCampaign(db: mongo.Db, prefix: string, appid: string, ids, starttime: number, endtime: number, callback: (cat: string) => void) {
 		var now = new Date(starttime * 1000);
 		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 		now = new Date(endtime * 1000);
@@ -424,9 +423,35 @@ export class Dashboard {
 		});
 	}
 
-	public getMostEffectiveReferal(db: mongo.Db, prefix: string, appid: string, ids, callback: (ref: string) => void) {
+	public getMostEffectiveReferal(db: mongo.Db, prefix: string, appid: string, ids, starttime: number, endtime: number, callback: (ref: string) => void) {
 
-		callback("no");
+		var now = new Date(starttime * 1000);
+		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		now = new Date(endtime * 1000);
+		var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		let startsec = Math.round(startday.getTime() / 1000);
+		let endsec = Math.round(endday.getTime() / 1000) + 86400;
+
+		let pipeline = [
+			{ $match: {} }, {
+				$group: {
+					_id: "$" + ids._reftype,
+					count: { $sum: 1 }
+				}
+			}, {
+				$sort: { count: -1 }
+			}, {
+				$limit: 1
+			}];
+
+		pipeline[0]['$match'][ids._typeid] = 'pageview';
+		pipeline[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
+		db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
+			if (err) throw err;
+			if (res.length == 0) return callback(undefined);
+			return callback(res[0]._id);
+		});
+	
 	}
 
 	public getDashboard(appid: string, startime, endtime, callback: (d: DashboardEntity) => void) {
@@ -438,7 +463,7 @@ export class Dashboard {
 
 		function generateDashboard(gcallback: (d: DashboardEntity) => void) {
 			var dashboard: DashboardEntity = new DashboardEntity();
-			me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid"], function (ids) {
+			me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid" ], function (ids) {
 				var now = new Date();
 				var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
