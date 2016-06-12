@@ -308,14 +308,13 @@ class Dashboard {
             });
         });
     }
-    getMostPopulerCategory(db, prefix, appid, ids, callback) {
+    getMostPopulerCategory(db, prefix, appid, ids, starttime, endtime, callback) {
         var now = new Date(starttime * 1000);
         var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        now = new Date(endttime * 1000);
+        now = new Date(endtime * 1000);
         var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         let startsec = Math.round(startday.getTime() / 1000);
         let endsec = Math.round(endday.getTime() / 1000) + 86400;
-        let lastweeksec = Math.round(new Date().getTime() / 1000) - 7 * 24 * 3600;
         let pipeline = [
             { $match: {} }, {
                 $group: {
@@ -329,7 +328,7 @@ class Dashboard {
                 $limit: 1
             }];
         pipeline[0]['$match'][ids._typeid] = 'purchase';
-        pipeline[0]['$match'][ids._ctime] = { $gt: lastweeksec };
+        pipeline[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
         db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
             if (err)
                 throw err;
