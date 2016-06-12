@@ -345,6 +345,16 @@ export class Dashboard {
 	}
 
 	public getMostPopulerCategory(db: mongo.Db, prefix: string, appid: string, ids, callback: (cat: string) => void) {
+
+		var now = new Date(starttime * 1000);
+		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		now = new Date(endttime * 1000);
+		var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+		let startsec = Math.round(startday.getTime() / 1000);
+		let endsec = Math.round(endday.getTime() / 1000) + 86400;
+
+
 		let lastweeksec = Math.round(new Date().getTime() / 1000) - 7 * 24 * 3600;
 		let pipeline = [
 			{ $match: {} }, {
@@ -369,8 +379,15 @@ export class Dashboard {
 		});
 	}
 
-	public getHighestRevenueCampaign(db: mongo.Db, prefix: string, appid: string, ids, callback: (cat: string) => void) {
-		let lastweeksec = Math.round(new Date().getTime() / 1000) - 7 * 24 * 3600;
+	public getHighestRevenueCampaign(db: mongo.Db, prefix: string, appid: string, ids, starttime, endtime, callback: (cat: string) => void) {
+		var now = new Date(starttime * 1000);
+		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		now = new Date(endtime * 1000);
+		var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+		let startsec = Math.round(startday.getTime() / 1000);
+		let endsec = Math.round(endday.getTime() / 1000) + 86400;
+
 		let pipeline = [
 			{ $match: {} }, {
 				$group: {
@@ -384,7 +401,7 @@ export class Dashboard {
 			}];
 
 		pipeline[0]['$match'][ids._typeid] = 'purchase';
-		pipeline[0]['$match'][ids._ctime] = { $gt: lastweeksec };
+		pipeline[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
 		pipeline[0]['$match'][ids._utm_campaign] = { $exists: true, $ne: null };
 		db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
 			if (err) throw err;
@@ -471,19 +488,19 @@ export class Dashboard {
 
 										me.getConversionRate(me.db, me.prefix, appid, ids, startime, endtime, function (cs: number) {
 											dashboard.conversion_rate = cs;
+
 											me.getRetensionRate(me.db, me.prefix, appid, ids, function (rate: number) {
 												dashboard.retention_rate = rate;
-												me.getRevenuePerCustomer(me.db, me.prefix, appid, ids, function (v: number) {
-													dashboard.revenue_per_customer = v;
-													me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, function (campaign: string) {
+
+													me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, startime, endtime, function (campaign: string) {
 														dashboard.highest_revenue_campaign = campaign;
-														me.getMostPopulerCategory(me.db, me.prefix, appid, ids, function (cat: string) {
+														me.getMostPopulerCategory(me.db, me.prefix, appid, ids, startime, endtime, function (cat: string) {
 															dashboard.most_popular_category = cat;
-															me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, function (ref: string) {
+															me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, startime, endtime, function (ref: string) {
 																dashboard.most_effective_ref = ref;
 																gcallback(dashboard);
 															});
-														});
+									
 													});
 												});
 											});

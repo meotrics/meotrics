@@ -309,6 +309,12 @@ class Dashboard {
         });
     }
     getMostPopulerCategory(db, prefix, appid, ids, callback) {
+        var now = new Date(starttime * 1000);
+        var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        now = new Date(endttime * 1000);
+        var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        let startsec = Math.round(startday.getTime() / 1000);
+        let endsec = Math.round(endday.getTime() / 1000) + 86400;
         let lastweeksec = Math.round(new Date().getTime() / 1000) - 7 * 24 * 3600;
         let pipeline = [
             { $match: {} }, {
@@ -332,8 +338,13 @@ class Dashboard {
             return callback(res[0].cname);
         });
     }
-    getHighestRevenueCampaign(db, prefix, appid, ids, callback) {
-        let lastweeksec = Math.round(new Date().getTime() / 1000) - 7 * 24 * 3600;
+    getHighestRevenueCampaign(db, prefix, appid, ids, starttime, endtime, callback) {
+        var now = new Date(starttime * 1000);
+        var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        now = new Date(endtime * 1000);
+        var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        let startsec = Math.round(startday.getTime() / 1000);
+        let endsec = Math.round(endday.getTime() / 1000) + 86400;
         let pipeline = [
             { $match: {} }, {
                 $group: {
@@ -346,7 +357,7 @@ class Dashboard {
                 $limit: 1
             }];
         pipeline[0]['$match'][ids._typeid] = 'purchase';
-        pipeline[0]['$match'][ids._ctime] = { $gt: lastweeksec };
+        pipeline[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
         pipeline[0]['$match'][ids._utm_campaign] = { $exists: true, $ne: null };
         db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
             if (err)
@@ -427,16 +438,13 @@ class Dashboard {
                                             dashboard.conversion_rate = cs;
                                             me.getRetensionRate(me.db, me.prefix, appid, ids, function (rate) {
                                                 dashboard.retention_rate = rate;
-                                                me.getRevenuePerCustomer(me.db, me.prefix, appid, ids, function (v) {
-                                                    dashboard.revenue_per_customer = v;
-                                                    me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, function (campaign) {
-                                                        dashboard.highest_revenue_campaign = campaign;
-                                                        me.getMostPopulerCategory(me.db, me.prefix, appid, ids, function (cat) {
-                                                            dashboard.most_popular_category = cat;
-                                                            me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, function (ref) {
-                                                                dashboard.most_effective_ref = ref;
-                                                                gcallback(dashboard);
-                                                            });
+                                                me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, startime, endtime, function (campaign) {
+                                                    dashboard.highest_revenue_campaign = campaign;
+                                                    me.getMostPopulerCategory(me.db, me.prefix, appid, ids, startime, endtime, function (cat) {
+                                                        dashboard.most_popular_category = cat;
+                                                        me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, startime, endtime, function (ref) {
+                                                            dashboard.most_effective_ref = ref;
+                                                            gcallback(dashboard);
                                                         });
                                                     });
                                                 });
