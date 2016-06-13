@@ -86,7 +86,8 @@
 	var ifm = doc.createElement('iframe');
 	ifm.style.display="none";
 	ifm.src = "//meotrics.com/iframe.html?x=" + mt.appid + '-' + mt.actionid;
-	doc.body.appendChild(ifm);
+	if(doc.body === undefined) doc.head.appendChild(ifm);
+	else doc.body.appendChild(ifm);
 
 	mt.onready();
 })();

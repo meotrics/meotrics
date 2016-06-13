@@ -16,16 +16,21 @@ rq : []
 };
 (function(){
 	addEventListener("message", function(ev){
-		var origin = ev.origin || ev.originalEvent.origin
+		var origin = ev.origin || ev.originalEvent.origin;
 		if (origin.split('/')[2] !== "meotrics.com") return;
-		mt.event = ev
-		if(mt.excute) mt.excute(ev)
+		mt.event = ev;
+		if(mt.excute) mt.excute(ev);
 	}, false);
 
-	var s = getComputedStyle(document.getElementById('meotrics29101992'), null);
-	var cs = s['font-family'].substr(1, s['font-family'].length - 2).split('-');
-	mt.appid = cs[0];
-	mt.actionid = cs[1];
+	function getStyle (el, prop) {
+		return getComputedStyle === 'undefined' ? el.currentStyle[prop] : getComputedStyle(el, null).getPropertyValue(prop);
+	}
+
+	var s = getStyle(document.getElementById('meotrics29101992'), "font-family");
+	if(s.charAt(0) === '"') s=s.substr(1, s.length - 2);
+	s = s.split('-');
+	mt.appid=s[0];
+	mt.actionid=s[1];
 	var script = document.createElement('script');
 	script.setAttribute('src','//meotrics.com/mtfull.js');
 	script.setAttribute('defer', 'defer');
