@@ -34,16 +34,25 @@ export class Dashboard {
 		if (endtime < starttime) throw "wrong time input";
 		var me = this;
 		var ret = [];
+		
+		var now = new Date(starttime * 1000);
+		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		now = new Date(endtime * 1000);
+		var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+		starttime = Math.round(startday.getTime() / 1000);
+		endtime = Math.round(endday.getTime() / 1000);
 
 		var daydiff = Math.floor((endtime - starttime) / 86400);
 		if (daydiff == 0) return [endtime - 86400, endtime];
 		if (daydiff == 1) return [starttime, endtime];
 
 		// if not enough day for node, then return all day
-		if (daydiff < me.N) {
+		if (daydiff + 1 <= me.N) {
 			ret.push(starttime);
 			var st = starttime;
-			while (st < endtime) {
+		
+			while (st + 86400 < endtime) {
 				st += 86400;
 				ret.push(st);
 			}
@@ -53,10 +62,10 @@ export class Dashboard {
 
 		// return specific days in all day
 		// arary alway start with starttime and end with endtime
-		var d = Math.ceil((daydiff - 2) / (me.N - 2));
+		var d = daydiff  / (me.N - 1);
 		ret.push(starttime);
 		for (var i = 1; i < me.N - 1; i++)
-			ret.push( starttime + i * d * 86400);
+			ret.push( starttime + Math.round(i * d * 86400));
 		ret.push(endtime);
 		return ret;
 	}
@@ -407,7 +416,6 @@ export class Dashboard {
 				var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
 				let todaysec = Math.round(today.getTime() / 1000);
-				let seventhdaybefore = todaysec - 7 * 24 * 3600;
 				//1 number of new visitor today
 				var todayvismatch = {};
 				todayvismatch[ids._ctime] = { $gte: todaysec };

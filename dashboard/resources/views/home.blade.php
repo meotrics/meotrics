@@ -51,6 +51,9 @@
 		var usergrowthrates = [];
 		usergrowthrates = {!! json_encode($dashboard->usergrowth_rates) !!};
 		//
+		var npurchases = [];
+		npurchases = {!! json_encode($dashboard->n_purchases) !!};
+		//
 		var retenratechart = new Chart($("#revenuechart"), {
 			type: 'line',
 			data: {
@@ -63,10 +66,10 @@
 						borderDash: [],
 						borderDashOffset: 0.0,
 						borderJoinStyle: 'miter',
-						pointHoverRadius: 1,
+						pointHoverRadius: 3,
 						borderWidth: 2,
 						pointHoverBackgroundColor: "rgba(75,192,192,1)",
-						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderColor: "rgba(50,50,50,1)",
 						pointHoverBorderWidth: 2,
 						pointRadius: 2,
 						pointHitRadius: 10,
@@ -77,6 +80,28 @@
 						pointBackgroundColor: "white",
 						pointBorderWidth: 1,
 						data: totalrevenues
+					},
+					{
+						label: "Number of purchase",
+						lineTension: 0.5,
+						borderCapStyle: 'round',
+						borderDash: [],
+						borderDashOffset: 0.0,
+						borderJoinStyle: 'miter',
+						pointHoverRadius: 3,
+						borderWidth: 2,
+						pointHoverBackgroundColor: "rgba(75,192,192,1)",
+						pointHoverBorderColor: "rgba(50,50,50,1)",
+						pointHoverBorderWidth: 2,
+						pointRadius: 2,
+						pointHitRadius: 10,
+						fill: true,
+						borderColor: "#1dc7ea",
+						backgroundColor: "#9deeff",
+						pointBorderColor: "#1dc7ea",
+						pointBackgroundColor: "white",
+						pointBorderWidth: 1,
+						data: npurchases
 					}
 				]
 			},
@@ -103,10 +128,10 @@
 						borderDash: [],
 						borderDashOffset: 0.0,
 						borderJoinStyle: 'miter',
-						pointHoverRadius: 1,
+						pointHoverRadius: 3,
 						borderWidth: 2,
 						pointHoverBackgroundColor: "rgba(75,192,192,1)",
-						pointHoverBorderColor: "rgba(220,220,220,1)",
+						pointHoverBorderColor: "rgba(50,50,50,1)",
 						pointHoverBorderWidth: 2,
 						pointRadius: 2,
 						pointHitRadius: 10,
@@ -142,7 +167,6 @@
 			ctx.fillStyle = "black";
 			ctx.textAlign = "center";
 			ctx.fillText("visitors", canvas.width / 2, canvas.height / 2 + 20);
-
 		}
 
 		Chart.pluginService.register({
@@ -241,7 +265,7 @@
 					<h6 style="margin: 0; color: white">TODAY RETENSION RATE</h6>
 				</div>
 				<div class=" pull-right mr">
-					<span class="big" style="position: absolute; bottom: 20px;right: 42px;"> {{$dashboard->retention_rate}} %</span>
+					<span class="big" style="position: absolute; bottom: 20px;right: 42px;"> {{floor($dashboard->retention_rate)}} %</span>
 				</div>
 			</div>
 		</div>
@@ -251,7 +275,7 @@
 					<h6 style="margin: 0; color: white">AVERAGE CART SIZE</h6>
 				</div>
 				<div class="content text-center pull-right mr">
-					<span class="big" style="position: absolute; bottom: 20px;right: 42px;">${{$dashboard->n_avgcartsize}}</span>
+					<span class="big" style="position: absolute; bottom: 20px;right: 42px;">${{floor($dashboard->n_avgcartsize)}}</span>
 				</div>
 			</div>
 		</div>
@@ -261,7 +285,7 @@
 					<h6 style="margin: 0; color: white">PURCHASE CONVERSION RATE</h6>
 				</div>
 				<div class="content text-center pull-right mr">
-					<span class="big" style="position: absolute; bottom: 20px;right: 42px;"> {{$dashboard->conversion_rate}}
+					<span class="big" style="position: absolute; bottom: 20px;right: 42px;"> {{floor($dashboard->conversion_rate)}}
 						%</span>
 				</div>
 			</div>
@@ -286,7 +310,7 @@
 						<div class="header">
 							<h6 class="pull-right" style="margin:0; color: gray">
 								REVENUER PER CUSTOM
-								<span class="medium" style="color: #4e6cc9">$ {{$dashboard->revenue_per_customer}}</span>
+								<span class="medium" style="color: #4e6cc9">$ {{floor($dashboard->revenue_per_customer)}}</span>
 							</h6>
 
 							<h6 style="margin:0; color:gray">
