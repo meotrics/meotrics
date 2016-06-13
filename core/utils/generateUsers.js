@@ -10,7 +10,7 @@
 	function generateDB(appid, converter, url, n, collection, valuemgr,  callback) {
 		MongoClient.connect(url).then(function (db) {
 			var count = 0;
-			converter.toIDs(['_isUser', 'name', 'age', "_os", 'iq', "_device", "_browser", "_lang", "_city", 'gender', 'height', '_segments', '_campaign', '_lastcampaign', '_firstcampaign'], function (ids) {
+			converter.toIDs(['_isUser', '_ctime', 'name', 'age', "_os", 'iq', "_devicetype", "_browser", "_lang", "_city", 'gender', 'height', '_segments', '_campaign', '_lastcampaign', '_firstcampaign'], function (ids) {
 				for (var i = 0; i < n; i++) {
 					count++;
 					var user = generateUsers(ids);
@@ -74,7 +74,7 @@
 		users[ids._firstcampaign] = campaigns[generateNumber(0, 6)];
 		users[ids._campaign] = [campaigns[generateNumber(0, 6)], campaigns[generateNumber(0,6)]];
 		users[ids._lastcampaign] = campaigns[generateNumber(0, 6)];
-		user[ids._ctime] = Math.floor(new Date().getTime() / 1000 - generateNumber(0, 2592000));
+		users[ids._ctime] = Math.floor(new Date().getTime() / 1000 - generateNumber(0, 2592000));
 		return users;
 	}
 
