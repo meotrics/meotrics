@@ -295,7 +295,6 @@ class Dashboard {
         pipeline[0]['$match'][ids._typeid] = 'purchase';
         pipeline[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
         pipeline[0]['$match'][ids._utm_campaign] = { $exists: true, $ne: null };
-        console.log(JSON.stringify(pipeline));
         db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
             if (err)
                 throw err;
@@ -350,6 +349,15 @@ class Dashboard {
             return callback(me.ref.getTypeName(res[0]._id));
         });
     }
+    generateLabel(startime, endtime) {
+        var labels = [];
+        var ranges = this.getTimeRange(startime, endtime);
+        for (var i of ranges) {
+            var date = new Date(i * 1000);
+            labels.push(date.getMonth() + 1 + "-" + date.getDate());
+        }
+        return labels;
+    }
     getDashboard(appid, startime, endtime, callback) {
         let me = this;
         if (startime === undefined) {
@@ -364,6 +372,7 @@ class Dashboard {
         let endsec = Math.round(endday.getTime() / 1000) + 86400;
         function generateDashboard(gcallback) {
             var dashboard = new DashboardEntity();
+            dashboard.labels = me.generateLabel(startime, endtime);
             me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid"], function (ids) {
                 var now = new Date();
                 var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -407,16 +416,12 @@ class Dashboard {
                                             dashboard.conversion_rate = cs;
                                             me.getRetensionRate(me.db, me.prefix, appid, ids, function (rate) {
                                                 dashboard.retention_rate = rate;
-                                                console.log('herer');
                                                 me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, startime, endtime, function (campaign) {
                                                     dashboard.highest_revenue_campaign = campaign;
-                                                    console.log('pass');
                                                     me.getMostPopulerCategory(me.db, me.prefix, appid, ids, startime, endtime, function (cat) {
                                                         dashboard.most_popular_category = cat;
-                                                        console.log('here');
                                                         me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, startime, endtime, function (ref) {
                                                             dashboard.most_effective_ref = ref;
-                                                            console.log('too');
                                                             gcallback(dashboard);
                                                         });
                                                     });
