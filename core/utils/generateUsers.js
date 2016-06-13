@@ -66,7 +66,7 @@
 		users[ids._segments] = [];
 		users[ids.age] = generateNumber(20, 60);
 		users[ids._os] = os[generateNumber(0, 6)];
-		users[ids._device] = devices[generateNumber(0, 6)];
+		users[ids._devicetype] = devices[generateNumber(0, 6)];
 		users[ids.gender] = ['male' ,'female', ''][generateNumber(0, 2)];
 		users[ids._lang] = generateNumber(1, 2) === 1 ? 'en' : 'vn';
 		users[ids._city] = generateNumber(1, 2) === 1 ? 'Hồ Chí Minh' : 'Hà Nội';
@@ -74,6 +74,7 @@
 		users[ids._firstcampaign] = campaigns[generateNumber(0, 6)];
 		users[ids._campaign] = [campaigns[generateNumber(0, 6)], campaigns[generateNumber(0,6)]];
 		users[ids._lastcampaign] = campaigns[generateNumber(0, 6)];
+		user[ids._ctime] = Math.floor(new Date().getTime() / 1000 - generateNumber(0, 2592000));
 		return users;
 	}
 
