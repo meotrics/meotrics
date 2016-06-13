@@ -185,10 +185,13 @@ class Dashboard {
         let alltimecount = {};
         alltimecount[ids._isUser] = true;
         alltimecount[ids._ctime] = { $lt: b6 };
+        console.log("todayuservisitq", JSON.stringify(alltimecount), b6);
         db.collection(prefix + appid).count(alltimecount, function (err, res) {
             if (err)
                 throw err;
             n6_user = res;
+            if (n6_user == 0)
+                return callback(0);
             alltimecount[ids._ctime] = { $gte: b6 };
             db.collection(prefix + appid).count(alltimecount, function (err, res) {
                 if (err)

@@ -217,7 +217,7 @@ export class Dashboard {
 			db.collection(prefix + appid).count(alltimecount, function (err, res) {
 				if (err) throw err;
 				n6_user = res;
-
+				if (n6_user == 0) return callback(0);
 				alltimecount[ids._ctime] = { $gte: b6 };
 				db.collection(prefix + appid).count(alltimecount, function (err, res) {
 					if (err) throw err;
