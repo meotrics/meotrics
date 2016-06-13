@@ -11,10 +11,13 @@ class Dashboard {
         this.delaysec = delaysec;
         this.Lock = require('lock');
         this.lock = this.Lock();
-        this.N = 22; //max number of node
+        this.N = 12; //max number of node
     }
     //get time scale between two date
     getTimeRange(starttime, endtime) {
+        // make sure starttime and endtime are number
+        starttime = parseInt(starttime + "");
+        endtime = parseInt(endtime + "");
         if (endtime < starttime)
             throw "wrong time input";
         var me = this;
@@ -354,7 +357,7 @@ class Dashboard {
         var ranges = this.getTimeRange(startime, endtime);
         for (var i of ranges) {
             var date = new Date(i * 1000);
-            labels.push(date.getMonth() + 1 + "-" + date.getDate());
+            labels.push(date.toUTCString().split(' ')[2] + " " + date.getDate());
         }
         return labels;
     }

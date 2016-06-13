@@ -24,10 +24,13 @@ export class Dashboard {
 	private Lock = require('lock');
 	private lock = this.Lock();
 
-	private N: number = 22; //max number of node
+	private N: number = 12; //max number of node
 
 	//get time scale between two date
 	private getTimeRange(starttime: number, endtime: number): number[] {
+		// make sure starttime and endtime are number
+		starttime = parseInt(starttime + "");
+		endtime = parseInt(endtime +"");
 		if (endtime < starttime) throw "wrong time input";
 		var me = this;
 		var ret = [];
@@ -53,7 +56,7 @@ export class Dashboard {
 		var d = Math.ceil((daydiff - 2) / (me.N - 2));
 		ret.push(starttime);
 		for (var i = 1; i < me.N - 1; i++)
-			ret.push(starttime + i * d * 86400);
+			ret.push( starttime + i * d * 86400);
 		ret.push(endtime);
 		return ret;
 	}
@@ -398,7 +401,7 @@ export class Dashboard {
 		for (var i of ranges)
 		{
 			var date = new Date(i * 1000);
-			labels.push(date.getMonth() + 1 + "-" + date.getDate());
+			labels.push(date.toUTCString().split(' ')[2] + " " + date.getDate());
 		}
 		return labels;
 	 }
