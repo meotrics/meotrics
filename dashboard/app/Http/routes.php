@@ -1,25 +1,27 @@
 <?php
 
+Route::get('/', 'PermController@index');
+
 Route::get('/app/edit/{appcode}', 'PermController@getedit');
 Route::post('/app/edit/{appcode}', 'PermController@postedit');
-Route::get('/', 'PermController@index');
 Route::get('/app', 'PermController@app');
 Route::post('/app/create','PermController@create' );
+Route::get('/app/setup_status/{appcode}', 'PermController@setup_status');
+Route::get('/app/count_traffic/{appcode}', 'PermController@count_traffic');
+Route::get('/app/traffic14/{appcode}', 'PermController@traffic14');
+
 Route::get('/dashboard/{appcode}', 'HomeController@index');
+Route::post('/dashboard/{appcode}/currenttime', 'HomeController@postCurrenttime');
+
 Route::post('/perm/{appcode}/add', 'PermController@add');
 Route::post('/perm/{appcode}/set/{userid}', 'PermController@set');
 Route::post('/perm/{appcode}/delete/{userid}', 'PermController@delete');
 
-Route::get('/app/setup_status/{appcode}', 'PermController@setup_status');
-Route::get('/app/count_traffic/{appcode}', 'PermController@count_traffic');
-Route::get('/app/traffic14/{appcode}', 'PermController@traffic14');
-//Route::controller('trend', 'TrendController');
 
 Route::get('/trend/{appcode}/save', 'TrendController@getSave');
 Route::post('/trend/{appcode}/currenttime', 'TrendController@postCurrenttime');
 Route::post('/trend/{appcode}/currentsegment', 'TrendController@postCurrentsegment');
 Route::post('/trend/{appcode}/currenttrend/{$trendid}', 'TrendController@postCurrenttrend');
-
 Route::get('/trend/{appcode}/query', 'TrendController@getQuery');
 Route::get('/trend/{appcode}/create', 'TrendController@getCreate');
 Route::post('/trend/{appcode}/write', 'TrendController@postWrite');
@@ -34,11 +36,9 @@ Route::get('/actiontype/{appcode}/show/{id}', 'TypeController@show');
 Route::get('/actiontype/{appcode}/create', 'TypeController@create');
 Route::post('/actiontype/{appcode}/store', 'TypeController@store');
 Route::delete('/actiontype/{appcode}/{id}', 'TypeController@destroy');
-
 Route::post('/actiontype/{appid}/create', 'TypeController@create');
 
 Route::get('/segment/{appcode}/execute', 'SegmentController@getExecute');
-
 Route::get('/segment/{appcode}/create', 'SegmentController@getCreate');
 Route::get('/segment/{appcode}/update/{id}', 'SegmentController@getUpdate');
 Route::post('/segment/{appcode}/write', 'SegmentController@postWrite');
@@ -64,6 +64,5 @@ Route::controllers([
 Route::get('auth/reset', function(){
 	return View::make('auth.reset');
 });
-
 
 Route::controller('user', 'UserController');

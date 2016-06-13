@@ -5,34 +5,28 @@
 @section('script')
 	<script src="{{asset('/js/Chart.js')}}"></script>
 	<script>
-		$(document).ready(function () {
-			var progressbar = $('#progress_bar');
-			max = progressbar.attr('max');
-			time = (1000 / max) * 5;
-			value = progressbar.val();
+		onPageLoad(function () {
+			var $tp = $('#timepick');
+			var tp = $tp.dateRangePicker();
 
-			var loading = function () {
-				value += 1;
-				addValue = progressbar.val(value);
+			@if(isset($starttime))
+			$tp.data('dateRangePicker').setDateRange('{{$starttime}}', '{{$endtime}}');
+			@else
+			// 30 ngay truoc do
+			var today = new Date().toISOString().substr(0, 10);
+			var lastyear = new Date(new Date().getTime() - 31104000000).toISOString();
+			$tp.data('dateRangePicker').setDateRange(lastyear, today);
+			@endif
 
-				$('.progress-value').html(value + '%');
-				var $ppc = $('.progress-pie-chart'),
-								deg = 360 * value / 100;
-				if (value > 50) {
-					$ppc.addClass('gt-50');
-				}
-
-				$('.ppc-progress-fill').css('transform', 'rotate(' + deg + 'deg)');
-				$('.ppc-percents span').html(value + '%');
-
-				if (value == max) {
-					clearInterval(animate);
-				}
-			};
-
-			var animate = setInterval(function () {
-				loading();
-			}, time);
+			tp.bind('datepicker-change', function () {
+				var val = $(this).val();
+				$.post('/dashboard/{{$appcode}}/currenttime', {
+					'endTime': val.split(' ')[2],
+					'startTime': val.split(' ')[0]
+				}, function () {
+					location.reload();
+				});
+			});
 		});
 
 		var options = {
@@ -55,7 +49,7 @@
 				datasets: [
 					{
 						label: "My First dataset",
-						fill: false,
+					//	fill: false,
 						lineTension: 0.5,
 
 						borderCapStyle: 'round',
@@ -63,8 +57,6 @@
 						borderDash: [],
 						borderDashOffset: 0.0,
 						borderJoinStyle: 'miter',
-
-						pointBorderWidth: 2,
 						pointHoverRadius: 1,
 						borderWidth: 2,
 						pointHoverBackgroundColor: "rgba(75,192,192,1)",
@@ -79,7 +71,7 @@
 						pointBackgroundColor: "white",
 						pointBorderWidth: 1,
 
-						data: [65, 59, 80, 81, 32, 12, 40],
+						data: [65, 59, 80, 81, 32, 12, 40]
 					}
 				]
 			},
@@ -96,7 +88,8 @@
 			}
 		});
 
-		var totalrevenues = {{ json_encode($dashboard->total_revenues)}};
+		var totalrevenues =[];
+		{{"totalrevenues = " .json_encode($dashboard->total_revenues)}}
 
 		var trChart = new Chart($("#trchart"), {
 			type: 'line',
@@ -105,7 +98,6 @@
 				datasets: [
 					{
 						label: "My First dataset",
-						fill: false,
 						lineTension: 0.5,
 
 						borderCapStyle: 'round',
@@ -113,8 +105,6 @@
 						borderDash: [],
 						borderDashOffset: 0.0,
 						borderJoinStyle: 'miter',
-
-						pointBorderWidth: 2,
 						pointHoverRadius: 1,
 						borderWidth: 2,
 						pointHoverBackgroundColor: "rgba(75,192,192,1)",
@@ -159,22 +149,17 @@
 		}
 
 		Chart.pluginService.register({
-			afterDraw: function (chart, easing) {
-
+			afterDraw: function (chart) {
 				if (chart == visitChart) {
 					drawVisitNumber();
 				}
-
 			}
 		});
 
 		var visitChart = new Chart($("#visitchart"), {
 			type: 'doughnut',
 			data: {
-				labels: [
-					"New visitor",
-					"Returning visitor",
-				],
+				labels: ["New visitor","Returning visitor"],
 				datasets: [
 					{
 						data: [{{$dashboard->n_new_visitor}}, {{$dashboard->n_returning_visitor == 0 ? 1 : $dashboard->n_returning_visitor}}],
@@ -279,7 +264,8 @@
 					<h6 style="margin: 0; color: white">PURCHASE CONVERSION RATE</h6>
 				</div>
 				<div class="content text-center pull-right mr">
-					<span class="big" style="position: absolute; bottom: 20px;right: 42px;"> {{$dashboard->conversion_rates[ count ($dashboard->conversion_rates) -1]}}%</span>
+					<span class="big" style="position: absolute; bottom: 20px;right: 42px;"> {{$dashboard->conversion_rates[ count ($dashboard->conversion_rates) -1]}}
+						%</span>
 				</div>
 			</div>
 		</div>
@@ -301,9 +287,12 @@
 				<div class="col-md-12">
 					<div class="card " style="height: 240px;">
 						<div class="header">
-							<h6 class="pull-right" style="margin:0; color: gray">REVENUER PER CUSTOM <span class="medium" style="color: #4e6cc9">$59.00</span></h6>
+							<h6 class="pull-right" style="margin:0; color: gray">REVENUER PER CUSTOM <span class="medium"
+							                                                                               style="color: #4e6cc9">$59.00</span>
+							</h6>
 
-							<h6 style="margin:0; color:gray">TOTAL REVENUE <span class="medium" style="color: #4e6cc9">$46, 238.00</span></h6>
+							<h6 style="margin:0; color:gray">TOTAL REVENUE <span class="medium"
+							                                                     style="color: #4e6cc9">$46, 238.00</span></h6>
 
 						</div>
 						<div class="content">
@@ -324,7 +313,7 @@
 							<h5 style="margin: 0; text-align: right;color: #353535;font-size: 13px;">MOST POPULAR CATEGORY</h5>
 						</div>
 						<div class="content text-center pull-right mr">
-							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0px;">
+							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0;">
 								Woman Fashion & Accessories</h6>
 						</div>
 					</div>
@@ -338,7 +327,7 @@
 							<h5 style="margin: 0; text-align: right;color: #353535;font-size: 13px;">HIGHEST REVENUE CAMPAIGN</h5>
 						</div>
 						<div class="content text-center pull-right mr">
-							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0px;">
+							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0;">
 								Facebook</h6>
 						</div>
 					</div>
@@ -352,7 +341,7 @@
 							<h5 style=" margin: 0; text-align: right;color: #353535;font-size: 13px;">MOST EFFECTIVE REFERAL</h5>
 						</div>
 						<div class="content text-center pull-right mr">
-							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0px;">
+							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0;">
 								Organic search</h6>
 						</div>
 					</div>
@@ -366,3 +355,10 @@
 @section('additional')
 
 @endsection
+
+@section('action')
+	<li>
+		<input style="width: 220px;margin-top: 7px;" class="form-control mr" id="timepick">
+	</li>
+	@endsection
+

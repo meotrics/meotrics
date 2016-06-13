@@ -163,28 +163,9 @@
 							<span class="icon-bar"></span>
 						</button>
 					</div>
-					<div class="collapse navbar-collapse">
+					<div class="collapse navbar-collapse" style="padding-left: 0">
 						<ul class="nav navbar-nav navbar-left">
 							@yield('action')
-											<!-- <li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-								<i class="fa fa-globe"></i>
-								<b class="caret"></b>
-								<span class="notification">5</span>
-							</a>
-							<ul class="dropdown-menu">
-								<li><a href="#">Notification 1</a></li>
-								<li><a href="#">Notification 2</a></li>
-								<li><a href="#">Notification 3</a></li>
-								<li><a href="#">Notification 4</a></li>
-								<li><a href="#">Another notification</a></li>
-							</ul>
-						</li>
-						<li>
-							 <a href="">
-								<i class="fa fa-search"></i>
-							</a>
-						</li> -->
 						</ul>
 
 						<ul class="nav navbar-nav navbar-right">
@@ -193,7 +174,6 @@
 									<span class="vam">Action count:</span>
 									<span id="odometer" class="vam id_counter odometer"></span>
 								</a>
-
 							</li>
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -234,7 +214,6 @@
 
 @section('footer-script')
 	<script>
-
 		onPageLoad(function () {
 			$('.id_trackingcode').click(function () {
 				showCodeDialog('{{$appcode}}');
@@ -248,7 +227,6 @@
 				$(this).fadeOut(300, cb);
 			}
 		};
-
 	</script>
 
 	@yield('additional')

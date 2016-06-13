@@ -3,7 +3,6 @@
 use App\Util\MtHttp;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Storage;
 use Mobile_Detect;
 use UAParser\Parser;
 
@@ -11,7 +10,7 @@ class HomeController extends Controller
 {
 	private static $code;
 	private $parser;
-	
+
 	public function __construct()
 	{
 		$this->parser = Parser::create();
@@ -24,14 +23,36 @@ class HomeController extends Controller
 		return $response->withCookie(cookie('currentappid', $appid, 2147483647, '/' . $appid . '/'));
 	}
 
-	public function index(Request $request, $appid )
+	public function postCurrenttime(Request $request, $appid)
 	{
-		if ($request->user()) {
-      $dashboard = MtHttp::get('dashboard/'. $appid);
-			return view('home', ['dashboard' => $dashboard]);//->withCookie(cookie()->forget('mtid'));
-    } else
-			return redirect('auth/login');//->withCookie(cookie()->forget('mtid'));
+		$response = new Response();
+		$st = $request->input('startTime', null);
+		$et = $request->input('endTime', null);
+		$response->withCookie(cookie('currentdashboardstarttime', $st, 9147483, "/dashboard/$appid"));
+		$response->withCookie(cookie('currentdashboardendtime', $et, 9147483, "/dashboard/$appid"));
+		return $response;
+	}
 
+	public function index(Request $request, $appid)
+	{
+		// must login first
+		if (!$request->user()) return redirect('auth/login');//->withCookie(cookie()->forget('mtid'));
+
+		$st = $request->cookie('currentdashboardstarttime');
+		$et = $request->cookie('currentdashboardendtime');
+
+		$queryurl = 'dashboard/' . $appid;
+		if (isset($st)) {
+			$pieces = explode("-", $st);
+			$st = strtotime($pieces[1] . '/' . $pieces[2] . '/' . $pieces[0]);
+
+			$pieces = explode("-", $et);
+			$et = strtotime($pieces[1] . '/' . $pieces[2] . '/' . $pieces[0]);
+			$queryurl .= '/' . $st . '/' . $et;
+		}
+
+		$dashboard = MtHttp::get($queryurl);
+		return view('home', ['dashboard' => $dashboard]);//->withCookie(cookie()->forget('mtid'));
 	}
 
 	private function getRemoteIPAddress(Request $request)
