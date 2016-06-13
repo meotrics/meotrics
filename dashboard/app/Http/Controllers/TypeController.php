@@ -8,7 +8,6 @@ use App\Util\MtHttp;
 class TypeController extends Controller
 {
 	public function __construct(Request $request) {
-    $this->request = $request;
 		$this->middleware('auth');
   }
 
@@ -34,9 +33,9 @@ class TypeController extends Controller
 		}
 	}
 	
-	public function update($request, $appid, $id)
+	public function update(Request $request, $appid, $id)
 	{
-		$p = $this->request->all();
+		$p = $request->all();
 		$p['fields'] = array();
 		for($i = 0; $i < count($p['pcodes']); $i++){
 			$pn = $p['pnames'][$i];
@@ -51,16 +50,16 @@ class TypeController extends Controller
 		unset($p['pnames']);
 		unset($p['_method']);
 		MtHttp::put('actiontype/' . $appid . '/' . $id, $p);
-		return Redirect::action('TypeController@show', $id)->with('success', 'Action type saved !');;
+		return redirect("actiontype/$appid");
 	}
 
-	public function create($request, $appcode)
+	public function getcreate(Request $request, $appcode)
 	{	
 		return view('actiontype/create', ['appcode' => $appcode]);
 	}
 
-	public function store($request, $appcode){
-		$p = $this->request->all();
+	public function store(Request $request, $appcode){
+		$p = $request->all();
 		$p['fields'] = array();
 		for($i = 0; $i < count($p['pcodes']); $i++){
 			$pn = $p['pnames'][$i];
@@ -75,13 +74,12 @@ class TypeController extends Controller
 		unset($p['pnames']);
 		unset($p['_method']);
 		$result = MtHttp::post('actiontype/' . $appcode, $p);
-		return Redirect::action('TypeController@index');
+		return redirect("actiontype/$appcode");
 	}
 
-	public function destroy($request, $appcode, $id)
+	public function destroy(Request $request, $appcode, $id)
 	{
 		$result = MtHttp::delete('actiontype/' . $appcode . '/' . $id, array());
-		return Redirect::action('TypeController@index');
+		return redirect("actiontype/$appcode");
 	}
-
 }

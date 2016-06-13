@@ -81,7 +81,7 @@ exports.TypeMgr = function (db, mongodb, converter, async, prefix, typecrud, col
 	};
 
 	this.delete = function(req, res, callback){
-		typecrud(req, res, callback);
+		typecrud.delete(req, res, callback);
 	};
 
 	this.match = function(req, res, callback){
