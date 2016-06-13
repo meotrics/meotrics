@@ -95,14 +95,14 @@ export class Dashboard {
 		//count unique today visitor
 		pipeline[0]['$match'][ids._ctime] = { $gte: todaysec, $lt: todaysec + 86400 };
 		pipeline[0]['$match'][ids._isUser] = { $exists: false };
-		db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
+		db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
 			if (err) throw err;
 			if (res.length == 0) return callback(0);
 			else {
 				let todayvisitcount = res[0].count;
 				//count yesterday unique visitor
 				pipeline[0]['$match'][ids._ctime] = { $gte: todaysec - 86400, $lt: todaysec };
-				db.collection(prefix + appid).aggregate(pipeline, function (err, res) {
+				db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
 					if (err) throw err;
 					if (res.length == 0) return callback(todayvisitcount);
 					return callback(1.0 * todayvisitcount - res[0].count / res[0].count * 100);
@@ -117,7 +117,7 @@ export class Dashboard {
 		var time = me.getTimeRange(startime, endtime);
 		var c = time.length;
 		for (let i = 0; i < time.length; i++) {
-			me.getGrowthRate(db, prefix, appid, ids, i, function (rate) {
+			me.getGrowthRate(db, prefix, appid, ids, time[i], function (rate) {
 				c--;
 				rates[i] = rate;
 				if (c == 0) {
@@ -149,8 +149,7 @@ export class Dashboard {
 		revenue_pipeline[0]['$match'][ids._isUser] = { $exists: false };
 		revenue_pipeline[0]['$match'][ids._typeid] = "purchase";
 		revenue_pipeline[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
-
-		db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
+		db.collection(prefix + "app" + appid).aggregate(revenue_pipeline, function (err, res) {
 			if (err) throw err;
 			var revenue = res.length === 0 ? 0 : res[0].sum;
 			var nuser = res.length === 0 ? 0 : res[0].count;
@@ -162,10 +161,7 @@ export class Dashboard {
 	private getRevenue(db: mongo.Db, prefix: string, appid: string, ids, time: number, callback: (revenue: number, numberofpurchase: number) => void) {
 		var now = new Date(time * 1000);
 		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
 		let todaysec = Math.round(today.getTime() / 1000);
-		let seventhdaybefore = todaysec - 7 * 24 * 3600;
-
 		var revenue_pipeline = [{ $match: {} }, {
 			$group: {
 				_id: null, sum: { $sum: "$" + ids.amount }, count: { $sum: 1 }
@@ -174,9 +170,8 @@ export class Dashboard {
 
 		revenue_pipeline[0]['$match'][ids._isUser] = { $exists: false };
 		revenue_pipeline[0]['$match'][ids._typeid] = "purchase";
-		revenue_pipeline[0]['$match'][ids._ctime] = { $gte: todaysec, $lt: todaysec + 86000 };
-
-		db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
+		revenue_pipeline[0]['$match'][ids._ctime] = { $gte: todaysec, $lt: todaysec + 86400 };
+		db.collection(prefix + "app" +  appid).aggregate(revenue_pipeline, function (err, res) {
 			if (err) throw err;
 			var revenue = res.length === 0 ? 0 : res[0].sum;
 			var n_purchase = res.length === 0 ? 0 : res[0].count;
@@ -191,7 +186,7 @@ export class Dashboard {
 		var time = me.getTimeRange(starttime, endtime);
 		var c = time.length;
 		for (let i = 0; i < time.length; i++) {
-			me.getRevenue(db, prefix, appid, ids, i, function (revenue, purchase) {
+			me.getRevenue(db, prefix, appid, ids, time[i], function (revenue, purchase) {
 				c--;
 				revenues[i] = revenue;
 				purchases[i] = purchase;
@@ -214,12 +209,12 @@ export class Dashboard {
 			let alltimecount = {};
 			alltimecount[ids._isUser] = true;
 			alltimecount[ids._ctime] = { $lt: b6 };
-			db.collection(prefix + appid).count(alltimecount, function (err, res) {
+			db.collection(prefix + "app" +  appid).count(alltimecount, function (err, res) {
 				if (err) throw err;
 				n6_user = res;
 				if (n6_user == 0) return callback(0);
 				alltimecount[ids._ctime] = { $gte: b6 };
-				db.collection(prefix + appid).count(alltimecount, function (err, res) {
+				db.collection(prefix + "app" + appid).count(alltimecount, function (err, res) {
 					if (err) throw err;
 					n_newuser = res;
 					//get today user visit
@@ -241,7 +236,7 @@ export class Dashboard {
 						var count = 0;
 						if (res.length !== 0)
 							count = res[0].count;
-						var rate = (count - n_newuser) / n6_user;
+						var rate = (count - n_newuser) / n6_user * 100;
 						callback(rate);
 					});
 				});
@@ -265,7 +260,7 @@ export class Dashboard {
 		var piplelines = [{ $match: allvisitor }, { $group: { _id: "$" + ids._mtid } }, { $group: { _id: null, count: { $sum: 1 } } }];
 
 		//get unique visitor
-		db.collection(prefix + appid).aggregate(piplelines, function (err, res) {
+		db.collection(prefix + "app" +  appid).aggregate(piplelines, function (err, res) {
 			if (err) throw err;
 			var nuservisit = res.length === 0 ? 0 : res[0].count;
 
@@ -274,10 +269,10 @@ export class Dashboard {
 			piplelines[0]['$match'][ids._isUser] = { $exists: false };
 			piplelines[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
 									
-			db.collection(prefix + appid).aggregate(piplelines, function (err, res) {
+			db.collection(prefix + "app" +  appid).aggregate(piplelines, function (err, res) {
 				if (err) throw err;
 				var nuserpurchase = res.length === 0 ? 0 : res[0].count;
-				var conversionrate = nuservisit == 0 ? 0 : nuserpurchase / nuservisit;
+				var conversionrate = nuservisit == 0 ? 0 : nuserpurchase / nuservisit * 100;
 				callback(conversionrate);
 			});
 
@@ -326,7 +321,7 @@ export class Dashboard {
 		let endsec = Math.round(endday.getTime() / 1000) + 86400;
 
 		let pipeline = [
-			{ $match: {} }, {
+			{ $match: {} }, { $unwind: "$" + ids._utm_campaign }, {
 				$group: {
 					_id: "$" + ids._utm_campaign,
 					revenue: { $sum: "$" + ids.amount }
@@ -344,23 +339,6 @@ export class Dashboard {
 			if (err) throw err;
 			if (res.length == 0) return callback(undefined);
 			return callback(res[0]._id);
-		});
-	}
-
-	public getRevenuePerCustomer(db: mongo.Db, prefix: string, appid: string, ids, callback: (a: number) => void) {
-		let totaluserpipeline = [{ $match: {} }, { $group: { _id: "$_" + ids._mtid } }, {
-			$group: {
-				_id: null,
-				revenue: { $sum: "$" + ids.revenue }, count: { $sum: 1 }
-			}
-		}];
-		totaluserpipeline[0]['$match'][ids._isUser] = true;
-		totaluserpipeline[0]['$match'][ids.signup] = true;
-
-		db.collection(prefix + "app" + appid).aggregate(totaluserpipeline, function (err, res) {
-			if (err) throw err;
-			if (res.length == 0) return callback(0);
-			return callback(res.revenue / res.count);
 		});
 	}
 
