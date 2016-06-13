@@ -105,9 +105,7 @@ class ActionMgr {
                         if (err)
                             throw err;
                         // update location
-                        console.log(4);
                         me.location.parse(data._ip, function (res) {
-                            console.log(43);
                             var loc = { _city: res.city, _country: res.country };
                             me.valuemgr.cineObject(appid, data._typeid, loc);
                             me.valuemgr.cineObject(appid, "user", loc);
@@ -126,7 +124,6 @@ class ActionMgr {
                     });
                     //get user infomation
                     me.db.collection(collection).find({ _id: mtid }).limit(1).toArray(function (err, ret) {
-                        console.log(5);
                         if (err)
                             throw err;
                         var user = ret[0];
@@ -178,7 +175,6 @@ class ActionMgr {
                             delete arrayprop[ids._firstcampaign];
                             delete arrayprop[ids._lastcampaign];
                             delete arrayprop[ids._totalsec];
-                            console.log(8);
                             if (Object.keys(arrayprop).length !== 0)
                                 updateArrayBasedUserInfo(collection, mtid, user, arrayprop);
                         });
@@ -193,7 +189,6 @@ class ActionMgr {
         // + data: data to be append to user
         function updateArrayBasedUserInfo(collection, mtid, user, data) {
             me.converter.toObject(data, function (datax) {
-                console.log(10);
                 // append new element to the array or create one
                 var arr = [];
                 for (var p in datax)
@@ -377,7 +372,6 @@ class ActionMgr {
                         if (err)
                             throw err;
                     });
-                    console.log('534');
                     // merge and delete ano-mtid record IF EXISTED
                     me.db.collection(collection).find({ _id: themtid }).limit(1).toArray(function (err, r) {
                         if (err)

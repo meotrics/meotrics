@@ -149,8 +149,8 @@ export class Dashboard {
 		db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 			if (err) throw err;
 			var revenue = res.length === 0 ? 0 : res[0].sum;
-			var nuser = res.length !== 0 ? 0 : res[0].count;
-			var npurchase = res.length !== 0 ? 0 : res[0].npurchase;
+			var nuser = res.length === 0 ? 0 : res[0].count;
+			var npurchase = res.length === 0 ? 0 : res[0].npurchase;
 			callback(revenue, npurchase, nuser);
 		});
 	}
@@ -175,7 +175,7 @@ export class Dashboard {
 		db.collection(prefix + appid).aggregate(revenue_pipeline, function (err, res) {
 			if (err) throw err;
 			var revenue = res.length === 0 ? 0 : res[0].sum;
-			var n_purchase = res.length !== 0 ? 0 : res[0].count;
+			var n_purchase = res.length === 0 ? 0 : res[0].count;
 			callback(revenue, n_purchase);
 		});
 	}
@@ -190,7 +190,7 @@ export class Dashboard {
 			me.getRevenue(db, prefix, appid, ids, i, function (revenue, purchase) {
 				c--;
 				revenues[i] = revenue;
-				purchase[i] = purchase;
+				purchases[i] = purchase;
 				if (c == 0) {
 					callback(revenues, purchases);
 				}
@@ -219,8 +219,8 @@ export class Dashboard {
 					if (err) throw err;
 					n_newuser = res;
 					//get today user visit
-					var todayuservisitq = [];
-					todayuservisitq[0]['$match'] = { $or: [] };
+					var todayuservisitq = [{}, {}, {}, {}, {}];
+					todayuservisitq[0]['$match'] = { $or: [{}, {}] };
 					todayuservisitq[0]['$match']['$or'][0][ids._isUser] = true;
 					todayuservisitq[0]['$match']['$or'][1][ids._isUser] = { $exists: false };
 					todayuservisitq[0]['$match']['$or'][1][ids._ctime] = { $gte: todaysec };
@@ -229,9 +229,9 @@ export class Dashboard {
 					todayuservisitq[1]['$project'][ids.userid] = { $cond: { if: { $ifNull: ["$userid", false] }, then: 1, else: 0 } };
 					todayuservisitq[2]['$group'] = { _id: "$" + ids._mtid, userid: { $sum: "$" + ids.userid }, count: { $sum: 1 } };
 					todayuservisitq[3]['$match'] = { userid: { $gt: 0 }, count: { $gt: 1 } };
-					todayuservisitq[3]['$group'] = { _id: null, count: { $sum: 1 } };
+					todayuservisitq[4]['$group'] = { _id: null, count: { $sum: 1 } };
 
-					console.log("todayuservisitq", todayuservisitq);
+					//console.log("todayuservisitq", JSON.stringify(todayuservisitq));
 					me.db.collection(me.prefix + "app" + appid).aggregate(todayuservisitq, function (err, res) {
 						if (err) throw err;
 						var count = 0;
@@ -336,6 +336,7 @@ export class Dashboard {
 		pipeline[0]['$match'][ids._typeid] = 'purchase';
 		pipeline[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
 		pipeline[0]['$match'][ids._utm_campaign] = { $exists: true, $ne: null };
+		console.log(JSON.stringify(pipeline));
 		db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
 			if (err) throw err;
 			if (res.length == 0) return callback(undefined);
@@ -456,13 +457,16 @@ export class Dashboard {
 
 											me.getRetensionRate(me.db, me.prefix, appid, ids, function (rate: number) {
 												dashboard.retention_rate = rate;
-
+												console.log('herer');
 													me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, startime, endtime, function (campaign: string) {
 														dashboard.highest_revenue_campaign = campaign;
+														console.log('pass');
 														me.getMostPopulerCategory(me.db, me.prefix, appid, ids, startime, endtime, function (cat: string) {
 															dashboard.most_popular_category = cat;
+															console.log('here');
 															me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, startime, endtime, function (ref: string) {
 																dashboard.most_effective_ref = ref;
+																console.log('too');
 																gcallback(dashboard);
 															});
 													});

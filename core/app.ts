@@ -43,7 +43,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.Mongo
 	});
 
 	var httpport = config.get<number>('apiserver.port') || 1711;
-	var httpapi = new HttpApi(db, converter, prefix, config.get('apiserver.codepath'), crudapi.valuemgr, ref);
+	var httpapi = new HttpApi(db, converter, prefix, config.get('apiserver.codepath'), ref, crudapi.valuemgr);
 	var server = http.createServer(function (req: http.ServerRequest, res: http.ServerResponse) {
 		httpapi.route(req, res);
 	});

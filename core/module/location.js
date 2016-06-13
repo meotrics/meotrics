@@ -16,13 +16,10 @@ class LocationMgr {
                 return callback(res[0]);
             // 2 using the api
             request('http://ipinfo.io/' + ip, function (err, res, body) {
-                console.log(body);
                 if (!err && res.statusCode == 200) {
                     callback(body);
                     body = JSON.parse(body);
-                    console.log(body);
                     me.collection.insertOne(body, function (err, ret) {
-                        console.log(1003);
                         if (err)
                             throw err;
                     });
