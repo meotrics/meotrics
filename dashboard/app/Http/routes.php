@@ -6,6 +6,10 @@ Route::get('/app/edit/{appcode}', 'PermController@getedit');
 Route::post('/app/edit/{appcode}', 'PermController@postedit');
 Route::get('/app', 'PermController@app');
 Route::post('/app/create','PermController@create' );
+Route::post('/app/setup_status/{appcode}', 'PermController@setup_status');
+Route::post('/app/count_traffic/{appcode}', 'PermController@count_traffic');
+Route::post('/app/traffic14/{appcode}', 'PermController@traffic14');
+
 Route::get('/app/setup_status/{appcode}', 'PermController@setup_status');
 Route::get('/app/count_traffic/{appcode}', 'PermController@count_traffic');
 Route::get('/app/traffic14/{appcode}', 'PermController@traffic14');
@@ -31,12 +35,11 @@ Route::delete('/trend/{appcode}/remove/{id}', 'TrendController@deleteRemove');
 Route::get('/trend/{appcode}/{trendid?}', 'TrendController@getIndex');
 
 Route::get('/actiontype/{appcode}', 'TypeController@index');
-Route::post('/actiontype/{appcode}/update/{id}', 'TypeController@update');
+Route::put('/actiontype/{appcode}/update/{id}', 'TypeController@update');
 Route::get('/actiontype/{appcode}/show/{id}', 'TypeController@show');
-Route::get('/actiontype/{appcode}/create', 'TypeController@create');
+Route::get('/actiontype/{appcode}/create', 'TypeController@getcreate');
 Route::post('/actiontype/{appcode}/store', 'TypeController@store');
-Route::delete('/actiontype/{appcode}/{id}', 'TypeController@destroy');
-Route::post('/actiontype/{appid}/create', 'TypeController@create');
+Route::get('/actiontype/{appcode}/delete/{id}', 'TypeController@destroy');
 
 Route::get('/segment/{appcode}/execute', 'SegmentController@getExecute');
 Route::get('/segment/{appcode}/create', 'SegmentController@getCreate');
