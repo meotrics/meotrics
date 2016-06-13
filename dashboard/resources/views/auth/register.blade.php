@@ -82,13 +82,10 @@
 			}
 
 			onPageLoad(function () {
-				if($('#oldsite').attr('checked') == true)
-				{
-					changePurpose({value: '2'})}
-				else {
 
-					changePurpose({value: '1'})
-				}
+					$('#newsite').prop('checked', true);
+					$('#oldsite').removeAttr('checked');
+
 
 				loading();
 				gapi.load('auth2', function () {
