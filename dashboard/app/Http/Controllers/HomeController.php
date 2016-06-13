@@ -44,15 +44,15 @@ class HomeController extends Controller
 		$queryurl = 'dashboard/' . $appid;
 		if (isset($st)) {
 			$pieces = explode("-", $st);
-			$st = strtotime($pieces[1] . '/' . $pieces[2] . '/' . $pieces[0]);
+			$sts = strtotime($pieces[1] . '/' . $pieces[2] . '/' . $pieces[0]);
 
 			$pieces = explode("-", $et);
-			$et = strtotime($pieces[1] . '/' . $pieces[2] . '/' . $pieces[0]);
-			$queryurl .= '/' . $st . '/' . $et;
+			$ets = strtotime($pieces[1] . '/' . $pieces[2] . '/' . $pieces[0]);
+			$queryurl .= '/' . $sts . '/' . $ets;
 		}
 
 		$dashboard = MtHttp::get($queryurl);
-		return view('home', ['dashboard' => $dashboard]);//->withCookie(cookie()->forget('mtid'));
+		return view('home', ['dashboard' => $dashboard, 'starttime' => $st, 'endtime' =>$et]);//->withCookie(cookie()->forget('mtid'));
 	}
 
 	private function getRemoteIPAddress(Request $request)

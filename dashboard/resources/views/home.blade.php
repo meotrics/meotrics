@@ -5,7 +5,6 @@
 @section('script')
 	<script src="{{asset('/js/Chart.js')}}"></script>
 	<script>
-		console.log({!! json_encode($dashboard) !!});
 		onPageLoad(function () {
 			var $tp = $('#timepick');
 			var tp = $tp.dateRangePicker();
