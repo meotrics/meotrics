@@ -3,6 +3,8 @@ import * as referer from './referer';
 
 export class DashboardEntity {
 	public ctime: number;
+	public endtime: number;
+	public starttime: number;
 	public appid: string;
 	public n_new_visitor: number;
 	public n_returning_visitor: number;
@@ -494,6 +496,8 @@ export class Dashboard {
 								callback(dash);
 								dash.appid = appid + "";
 								dash.ctime = Math.round(new Date().getTime() / 1000);
+								dash.starttime = startsec;
+								dash.endtime = endsec;
 								me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + ""  , endtime: endsec, starttime: startsec}, dash, { upsert: true }, function (err) {
 									release()();
 									if (err) throw err;
@@ -530,6 +534,8 @@ export class Dashboard {
 								callback(dash);
 								dash.appid = appid + "";
 								dash.ctime = Math.round(new Date().getTime() / 1000);
+								dash.starttime = startsec;
+								dash.endtime = endsec;
 								me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "", endtime: endsec, starttime: startsec }, dash, { upsert: true }, function (err) {
 									release(function () {
 									})();

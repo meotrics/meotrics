@@ -443,6 +443,8 @@ class Dashboard {
                                 callback(dash);
                                 dash.appid = appid + "";
                                 dash.ctime = Math.round(new Date().getTime() / 1000);
+                                dash.starttime = startsec;
+                                dash.endtime = endsec;
                                 me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "", endtime: endsec, starttime: startsec }, dash, { upsert: true }, function (err) {
                                     release()();
                                     if (err)
@@ -480,6 +482,8 @@ class Dashboard {
                                 callback(dash);
                                 dash.appid = appid + "";
                                 dash.ctime = Math.round(new Date().getTime() / 1000);
+                                dash.starttime = startsec;
+                                dash.endtime = endsec;
                                 me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "", endtime: endsec, starttime: startsec }, dash, { upsert: true }, function (err) {
                                     release(function () {
                                     })();
