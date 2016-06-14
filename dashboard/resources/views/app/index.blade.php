@@ -11,11 +11,11 @@
 		onPageLoad(function () {
 
 			function update_status(app) {
-				$.get('/app/count_traffic/' + app, function(data){
+				$.post('/app/count_traffic/' + app, function(data){
 					$('.traffic_' + app).html(data);
 				});
 
-				$.get('/app/setup_status/' + app, function (data) {
+				$.post('/app/setup_status/' + app, function (data) {
 					var $st = $('.status_' + app);
 					$st.empty();
 
@@ -46,7 +46,7 @@
 			});
 		@foreach($apps as $ap)
 
-		$.get('/app/traffic14/{{$ap->code}}', function(data){
+		$.post('/app/traffic14/{{$ap->code}}', function(data){
 			$spl = $(".spl_{{$ap->code}}");
 			$spl.empty();
 			$spl.sparkline(data, {
