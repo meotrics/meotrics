@@ -2,7 +2,7 @@
 	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document;
 	
 	window.addEventListener("beforeunload", function (e) {
-		//ajax('x/' + mt.actionid);
+		ajax('x/' + mt.actionid);
 	});
 
 	function ajax(url, data, callback) {
@@ -11,7 +11,7 @@
 		script.src = '//api.meotrics.com/' + mt.appid + '/' + url + (data ? '?' + serialize(data) : '');
 		script.style.display = 'none';
 		script.onreadystatechange = script.onload = callback;//for IE
-		doc.body.appendChild(script);
+		doc.body === undefined ? doc.head.appendChild(script) : doc.body.appendChild(script);
 	}
 
 	function serialize(obj, prefix) {
@@ -25,17 +25,32 @@
 
 	mt.info = function (data, callback, callback2, callback3) {
 		if(typeof data == 'string') data = {userid: data};
-		return isready ? ajax('info', data, callback || callback3) : request_queue2.push(['info', data]);
+		if(isready)
+			ajax('info', data, callback || callback3)
+		else{
+			request_queue2.push(['info', data]);
+			(callback || callback3)();
+		}
 	};
 
 	mt.clear = function (callback, callback2, callback3, callback4) {
-		return isready ? ajax('clear', callback3 /*alway undefined, use callback3 for better minify*/, callback || callback4) : request_queue2.push(['clear']);
+		if(isready)
+			 ajax('clear', callback3 /*alway undefined, use callback3 for better minify*/, callback || callback4);
+		else{
+			request_queue2.push(['clear']);
+			(callback || callback4)();
+		}
 	};
 
 	mt.track = function (event, data, time, callback) {
 		data._deltat = (new Date() - time) / 1000;
 		data._typeid = event;
-		return isready ? ajax('track', addVisitorPlatform(data), callback) : request_queue2.push(['track', event, data, new Date()]);
+		if(isready) ajax('track', addVisitorPlatform(data), callback) 
+		else
+		{
+			request_queue2.push(['track', event, data, new Date()]);
+			callback();
+		}
 	};
 
 	function addVisitorPlatform(data) {
@@ -49,17 +64,21 @@
 	// clean request queue
 	function cleanRequest() {
 		// clean queue number 2 when out of element in queue number 1
-		if (i + 1 >= mt.rq.length) return cleanRequest2();
+		if (i >= mt.rq.length) { 
+			isready = 1;
+			return cleanRequest2();
+		}
 		var rq = mt.rq[i++];
 		mt[rq[0]](rq[1], rq[2], rq[3], cleanRequest);
 	}
 
 	// clean request queue step 2
 	function cleanRequest2() {
-		if (j + 1 >= request_queue2.length) // clean the state when done
-			return isready = 1;
-		var rq = request_queue2[j++];
-		mt[rq[0]](rq[1], rq[2], rq[3], cleanRequest2);
+		if (j < request_queue2.length) // clean the state when done
+		{
+			var rq = request_queue2[j++];
+			mt[rq[0]](rq[1], rq[2], rq[3], cleanRequest2);
+		}
 	}
 
 	mt.excute = function(event){
