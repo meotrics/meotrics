@@ -387,27 +387,27 @@ export class RefererType {
 		return names[code];
 	}
 
-	public getRefType(url_string: string, referer: string): number {
+	public getRefType(url_string: string, referer: string): string {
 		url_string = url_string || "";
 		referer = referer || "";
 		if (this.isPaidSearch(url_string, referer))
-			return 1;
+			return "1";
 
 		if (this.isOrganicSearch(referer))
-			return 2;
+			return "2";
 
 		if (this.isSocial(url_string, referer))
-			return 3;
+			return "3";
 
 		if (this.isReferal(url_string))
-			return 4;
+			return "4";
 
 		if (this.isEmail(url_string))
-			return 5;
+			return "5";
 
 		if (this.isDirect(url_string, referer))
-			return 6;
+			return "6";
 
-		return 0; //other advertising
+		return "0"; //other advertising
 	}
 }

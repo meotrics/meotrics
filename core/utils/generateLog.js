@@ -91,6 +91,7 @@ function generatePageView(ids, codename) {
 	page[ids._browser] = browsers[generateNumber(0, 6)];
 	page[ids._os] = os[generateNumber(0, 6)];
 	page[ids._devicetype] = devices[generateNumber(0, 6)];
+	page[ids._reftype] = generateNumber(0, 7) + "";
 
 	return page;
 }
@@ -123,7 +124,7 @@ function generatePurchase(ids, codename) {
 	purchase[ids._device] = devices[generateNumber(0, 6)];
 	purchase[ids._lang] = generateNumber(1, 2) === 1 ? 'en' : 'vn';
 	purchase[ids._city] = generateNumber(1, 2) === 1 ? 'Hồ Chí Minh' : 'Hà Nội';
-
+	purchase[ids._reftype] = generateNumber(0, 7) + "";
 	purchase[ids.paymentype] = generateNumber(1, 3);
 	return purchase;
 }
@@ -328,7 +329,7 @@ function generateName() {
 function generateDB(appid, actiontype, converter, url, n, collection, typeid, valuemgr, callback) {
 	var count = 0;
 	if (actiontype === 'purchase') {
-		converter.toIDs(['_os', '_browser', '_devicetype', '_lang', '_utm_campaign', '_utm_source', '_utm_medium', '_utm_content', '_utm_term','_typeid', '_ctime', 'amount', 'pname', 'cname', 'paymentype', '_mtid', 'cid', 'pid', 'pname', 'cname', 'quantity', 'price', '_segments', '_city'], function (ids) {
+		converter.toIDs(['_os', '_browser', '_devicetype', '_lang', '_utm_campaign', '_utm_source', '_utm_medium', '_utm_content', '_utm_term', '_typeid', '_ctime', 'amount', 'pname', 'cname', 'paymentype', '_mtid', 'cid', 'pid', 'pname', 'cname', 'quantity', 'price', '_segments', '_city', '_reftype'], function (ids) {
 			for (var i = 0; i < n; i++) {
 				count++;
 				var r = generatePurchase(ids, typeid);
@@ -348,7 +349,7 @@ function generateDB(appid, actiontype, converter, url, n, collection, typeid, va
 			}
 		});
 	} else {
-		converter.toIDs(['_os', '_browser', '_lang', '_devicetype','_utm_campaign', '_utm_source', '_utm_term','_utm_content','_utm_medium','_typeid', '_url', 'camid', '_ctime', '_mtid', '_segments'], function (ids) {
+		converter.toIDs(['_os', '_browser', '_lang', '_devicetype','_utm_campaign', '_utm_source', '_utm_term','_utm_content','_utm_medium','_typeid', '_url', 'camid', '_ctime', '_mtid', '_segments', '_reftype'], function (ids) {
 			for (var i = 0; i < n; i++) {
 				count++;
 				var r = generatePageView(ids, typeid);
