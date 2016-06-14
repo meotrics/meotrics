@@ -350,24 +350,33 @@
 				description: "All visitor in site",
 				condition: [{}]
 			};
-			/*
-			 converter.toIDs(['_mtid', '_isUser', '_typeid'], function (ids) {
-			 var keys = {};
-			 keys[ids._mtid] = 1;
-			 db.collection(prefix + appid, keys, {sparse: true});
+			
+			
+			converter.toIDs(['_mtid', '_isUser', '_typeid'], function (ids) {
+			var keys = {};
+				keys[ids._mtid] = 1;
+				db.collection(prefix + "app" + appid).createIndex(keys, function () {
+					keys = {};
+					keys[ids._isUser] = 1;
+					db.collection(prefix + "app" + appid).createIndex(keys, { sparse: true }, function () {
+						keys = {};
+						keys[ids._isUser] = 1;
+						keys[ids._typeid]  = 1;
+						keys[ids._ctime] = 1;
 
-			 keys = {};
-			 keys._id = 1;
-			 db.collection(prefix + appid, keys, {sparse: true});
+						db.collection(prefix + "app" + appid).createIndex(keys,  function () {
+							keys = {};
+							keys[ids._isUser] = 1;
+							keys[ids._ctime] = 1;
 
-			 keys = {};
-			 keys[ids.ctime] = 1;
-			 keys[ids._segments] = 1;
-			 keys[ids._typeid] = 1;
+							db.collection(prefix + "app" + appid).createIndex(keys, function () {
+								console.log('googd');
+							});
+						});
+					});
+				});
+			});
 
-			 db.collection(prefix + appid, keys, {sparse: true});
-			 });
-			 */
 			//db.collection(prefix + appid).createIndex()
 			typeCrud.createRaw(appid, purchase, function () {
 				typeCrud.createRaw(appid, pageview, function () {
