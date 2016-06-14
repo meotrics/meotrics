@@ -27,7 +27,7 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 			name: "Time zone", code: "_timezone",
 			operators: [{name: "Equal", code: "eq"}]
 		}, {
-			name: "Device Type", code: "devicetype",
+			name: "Device Type", code: "_devicetype",
 			operators: [{name: "Equal", code: "eq"}]
 		}, {
 			name: "Operating System", code: "_os",
@@ -50,20 +50,20 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 			name: "Screen Resolution", code: "_scr",
 			operators: [{name: "Equal", code: "eq"}]
 		}, {
-			name: "Referrer", code: "_ref",
+			name: "Channel", code: "_reftype",
 			operators: [{name: "Equal", code: "eq"},
 				{name: "Contain", code: "con"},
 				{name: "Start with", code: "sw"},
 				{name: "End with", code: "ew"},
 				{name: "Not contain", code: "ncon"}]
-		}, {
+		},/* {
 			name: "Campaign", code: "_campaign",
 			operators: [{name: "Equal", code: "eq"},
 				{name: "Contain", code: "con"},
 				{name: "Start with", code: "sw"},
 				{name: "End with", code: "ew"},
 				{name: "Not contain", code: "ncon"}]
-		},{
+		},*/{
 			name: "Last-touch Campaign", code: "_firstcampaign",
 			operators: [{name: "Equal", code: "eq"},
 				{name: "Contain", code: "con"},

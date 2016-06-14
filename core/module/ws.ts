@@ -36,7 +36,7 @@ export class WS {
 		var me = this;
 
 		this.httpserver.listen(me.port, function () {
-			console.log('Websocket server / OK /       ' + me.port);
+			console.log('Websocket server    | OK |    ' + me.port);
 		});
 
 		var wsServer = new websocket.server({
