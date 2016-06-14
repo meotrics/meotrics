@@ -34,7 +34,6 @@
 	};
 
 	mt.clear = function (callback, callback2, callback3, callback4) {
-		return isready ?: request_queue2.push(['clear']);
 		if(isready)
 			 ajax('clear', callback3 /*alway undefined, use callback3 for better minify*/, callback || callback4);
 		else{
