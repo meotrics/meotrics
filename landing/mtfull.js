@@ -25,17 +25,33 @@
 
 	mt.info = function (data, callback, callback2, callback3) {
 		if(typeof data == 'string') data = {userid: data};
-		return isready ? ajax('info', data, callback || callback3) : request_queue2.push(['info', data]);
+		if(isready)
+			ajax('info', data, callback || callback3)
+		else{
+			request_queue2.push(['info', data]);
+			(callback || callback3)();
+		}
 	};
 
 	mt.clear = function (callback, callback2, callback3, callback4) {
-		return isready ? ajax('clear', callback3 /*alway undefined, use callback3 for better minify*/, callback || callback4) : request_queue2.push(['clear']);
+		return isready ?: request_queue2.push(['clear']);
+		if(isready)
+			 ajax('clear', callback3 /*alway undefined, use callback3 for better minify*/, callback || callback4);
+		else{
+			request_queue2.push(['clear']);
+			(callback || callback4)();
+		}
 	};
 
 	mt.track = function (event, data, time, callback) {
 		data._deltat = (new Date() - time) / 1000;
 		data._typeid = event;
-		return isready ? ajax('track', addVisitorPlatform(data), callback) : request_queue2.push(['track', event, data, new Date()]);
+		if(isready) ajax('track', addVisitorPlatform(data), callback) 
+		else
+		{
+			request_queue2.push(['track', event, data, new Date()]);
+			callback();
+		}
 	};
 
 	function addVisitorPlatform(data) {
