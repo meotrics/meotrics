@@ -306,11 +306,11 @@ $props = isset($props) ? $props : [];
 										}
 									}],
 									xAxes: [{
-										stacked: true,
-									}],
+										stacked: true
+									}]
 								},
-								stacked: true,
-							}
+								stacked: true
+							};
 							data_chart.labels = data.labels;
 							data_chart.datasets = [];
 							var datasets_labels = data.datasets_labels ? data.datasets_labels : [];

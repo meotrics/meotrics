@@ -13,6 +13,7 @@ class SegmentController extends Controller
 	public function __construct()
 	{
 		$this->middleware('auth');
+		$this->reftypemap = ["Unknown","Paid Search", "Organice Search", "Social Network", "Referral", "Email", "Direct"];
 	}
 
 	public function getExecute(Request $request, $app_id)
@@ -320,7 +321,7 @@ class SegmentController extends Controller
 		if ($request->input('segment_id') && $request->input('field')) {
 			//echo 'segment/query1/' . $app_id . '/' . $request->input('segment_id') . '/' . $request->input('field');
 			$tmp_charts = MtHttp::get('segment/query1/' . $app_id . '/' . $request->input('segment_id') . '/' . $request->input('field'));
-			$convert_data = $this->convertData($tmp_charts);
+			$convert_data = $this->convertData($tmp_charts, $request->input('field'));
 			$result['labels'] = isset($convert_data['labels']) ? $convert_data['labels'] : [];
 			$result['datasets'] = isset($convert_data['datasets']) ? $convert_data['datasets'] : [];
 			$result['success'] = true;
@@ -328,6 +329,7 @@ class SegmentController extends Controller
 		return $result;
 	}
 
+	private $reftypemap;
 	public function getCharttwofields(Request $request, $app_id)
 	{
 		$result = ['success' => false];
@@ -341,9 +343,12 @@ class SegmentController extends Controller
 				if (isset($tmp_charts_first->key) && (is_string($tmp_charts_first->key) || $tmp_charts_first->key == null)) {
 					foreach ($tmp_charts as $tmp_chart) {
 						if (isset($tmp_chart->values)) {
-							$convert_data = $this->convertData($tmp_chart->values);
+							$convert_data = $this->convertData($tmp_chart->values, $request->input('field1'));
 							$labels = isset($convert_data['labels']) ? $convert_data['labels'] : [];
 							$datasets = array_merge($datasets, (isset($convert_data['datasets']) ? $convert_data['datasets'] : []));
+							if(  $request->input('field2') === '_reftype'  )
+								$datasets_labels[] = $this->reftypemap[ $tmp_chart->key];
+								else
 							$datasets_labels[] = $tmp_chart->key;
 						}
 					}
@@ -351,7 +356,7 @@ class SegmentController extends Controller
 					$tmp_datasets = [];
 					foreach ($tmp_charts as $tmp_chart) {
 						if (isset($tmp_chart->values)) {
-							$convert_data = $this->convertData($tmp_chart->values);
+							$convert_data = $this->convertData($tmp_chart->values, $request->input('field1'));
 							$labels = isset($convert_data['labels']) ? $convert_data['labels'] : [];
 							foreach ($tmp_chart->key as $tc_key => $tc_value) {
 								$tmp_datasets[$tc_value][] = $convert_data['datasets'][0];
@@ -359,7 +364,11 @@ class SegmentController extends Controller
 						}
 					}
 					foreach ($tmp_datasets as $td_label => $td_value) {
-						$datasets_labels[] = $td_label;
+						if(  $request->input('field2') === '_reftype'  )
+							$datasets_labels[] = $this->reftypemap[ $td_label];
+						else
+							$datasets_labels[] = $td_label;
+
 
 						$tmp_data = [];
 						foreach ($td_value as $tdv_value) {
@@ -372,12 +381,16 @@ class SegmentController extends Controller
 				} else {
 					foreach ($tmp_charts as $tmp_chart) {
 						if (isset($tmp_chart->values)) {
-							$convert_data = $this->convertData($tmp_chart->values);
+							$convert_data = $this->convertData($tmp_chart->values, $request->input('field1'));
 							$labels = isset($convert_data['labels']) ? $convert_data['labels'] : [];
 							$datasets = array_merge($datasets, (isset($convert_data['datasets']) ? $convert_data['datasets'] : []));
 							$tmp_label = isset($tmp_chart->key->from) ? ('from ' . $tmp_chart->key->from) : '';
 							$tmp_label .= isset($tmp_chart->key->to) ? (' to ' . $tmp_chart->key->to) : '';
-							$datasets_labels[] = $tmp_label;
+							if(  $request->input('field2') === '_reftype'  )
+								$datasets_labels[] = $this->reftypemap[ $tmp_label];
+							else
+								$datasets_labels[] = $tmp_label;
+
 						}
 					}
 				}
@@ -400,7 +413,7 @@ class SegmentController extends Controller
 		return $result;
 	}
 
-	public function convertData($charts)
+	public function convertData($charts, $f)
 	{
 		$result = ['datasets' => [], 'labels' => []];
 		$labels = [];
@@ -413,9 +426,15 @@ class SegmentController extends Controller
 			if (property_exists($tmp_charts_first, 'key') && is_string($tmp_charts_first->key)) {
 
 				foreach ($charts as $tmp_chart) {
-					$labels[] = $tmp_chart->key;
+
+					if( $f === '_reftype'  )
+						$labels[] = $this->reftypemap[ $tmp_chart->key];
+					else
+						$labels[] =$tmp_chart->key;
+
 					$tmp_data[] = $tmp_chart->count;
 				}
+
 				$datasets[] = (object)[
 					'data' => $tmp_data,
 				];
@@ -424,7 +443,8 @@ class SegmentController extends Controller
 				foreach ($charts as $tmp_chart) {
 					foreach ($tmp_chart->key as $tmp_label) {
 						if (!in_array($tmp_label, $labels)) {
-							$labels[] = $tmp_label;
+
+								$labels[] = $tmp_label;
 							$tmp_data[$tmp_label] = 0;
 						}
 						$tmp_data[$tmp_label] += (int)$tmp_chart->count;
@@ -437,6 +457,13 @@ class SegmentController extends Controller
 				$datasets[] = (object)[
 					'data' => $chart_data,
 				];
+
+				if ($f === '_reftype') {
+					$labels = [];foreach ($charts as $tmp_chart)
+					foreach ($tmp_chart->key as $tmp_label)
+						if (!in_array($tmp_label, $labels))
+							$labels[] = $this->reftypemap[$tmp_label];
+					}
 			} else {
 				foreach ($charts as $tmp_chart) {
 					if (!isset($tmp_chart->key))
@@ -444,12 +471,23 @@ class SegmentController extends Controller
 
 					$tmp_label = property_exists($tmp_chart, 'key') && property_exists($tmp_chart->key, 'from') ? ('from ' . $tmp_chart->key->from) : '';
 					$tmp_label .= property_exists($tmp_chart, 'key') && property_exists($tmp_chart->key, 'to') ? (' to ' . $tmp_chart->key->to) : '';
-					$labels[] = trim($tmp_label);
+
+						$labels[] = trim($tmp_label);
 					$tmp_data[] = $tmp_chart->count;
 				}
 				$datasets[] = (object)[
 					'data' => $tmp_data,
 				];
+
+				if ($f === '_reftype') {
+					$labels = [];
+					var_dump("he");
+					die;
+					foreach ($tmp_chart->key as $tmp_label)
+						if (!in_array($tmp_label, $labels))
+							$labels[] = $this->reftypemap[ trim($tmp_label)];
+				}
+
 			}
 		}
 		$result['datasets'] = $datasets;
