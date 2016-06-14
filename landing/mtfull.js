@@ -64,17 +64,21 @@
 	// clean request queue
 	function cleanRequest() {
 		// clean queue number 2 when out of element in queue number 1
-		if (i >= mt.rq.length) return cleanRequest2();
+		if (i >= mt.rq.length) { 
+			isready = 1;
+			return cleanRequest2();
+		}
 		var rq = mt.rq[i++];
 		mt[rq[0]](rq[1], rq[2], rq[3], cleanRequest);
 	}
 
 	// clean request queue step 2
 	function cleanRequest2() {
-		if (j >= request_queue2.length) // clean the state when done
-			return isready = 1;
-		var rq = request_queue2[j++];
-		mt[rq[0]](rq[1], rq[2], rq[3], cleanRequest2);
+		if (j < request_queue2.length) // clean the state when done
+		{
+			var rq = request_queue2[j++];
+			mt[rq[0]](rq[1], rq[2], rq[3], cleanRequest2);
+		}
 	}
 
 	mt.excute = function(event){
