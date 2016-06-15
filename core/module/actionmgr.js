@@ -131,7 +131,7 @@ class ActionMgr {
                             throw "mtid " + mtid + " did not match any user";
                         var typeid = data._typeid;
                         me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
-                            '_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed'], function (ids) {
+                            '_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_numberPurchase', '_listProduct'], function (ids) {
                             // increase revenue
                             var simpleprop = {};
                             if (typeid === 'purchase') {
@@ -170,7 +170,7 @@ class ActionMgr {
                                 simpleprop[ids.registed] = true;
                                 
                             }
-                            
+
                             // update user
                             if (Object.keys(simpleprop).length !== 0)
                                 me.db.collection(collection).updateOne({ _id: mtid }, { $set: simpleprop }, function (err, r) {
