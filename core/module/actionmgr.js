@@ -131,13 +131,30 @@ class ActionMgr {
                             throw "mtid " + mtid + " did not match any user";
                         var typeid = data._typeid;
                         me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
-                            '_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype'], function (ids) {
+                            '_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed'], function (ids) {
                             // increase revenue
                             var simpleprop = {};
                             if (typeid === 'purchase') {
                                 if (user[ids._revenue] === undefined)
                                     user[ids._revenue] = 0;
                                 simpleprop[ids._revenue] = user[ids._revenue] + data.amount;
+
+                                // ----------------------
+                                // Increase number of purchasing
+                                if(user[ids._numberPurchase] === undefined){
+                                    user[ids._numberPurchase] = 0;
+                                }
+                                simpleprop[ids._numberPurchase] = user[ids._numberPurchase] + 1;
+
+                                // Add purchase product up to 5 
+                                if(user[ids._listProduct] === undefined){
+                                    user[ids._listProduct] = [];
+                                }
+                                if(user[ids._listProduct].length == 5){
+                                    user[ids._listProduct].shift();
+                                }
+                                simpleprop[ids._listProduct] = user[ids._listProduct].unshift(data.pname);
+                                // -----------------------
                             }
                             if (typeid === 'pageview') {
                                 // record campaign
@@ -148,18 +165,12 @@ class ActionMgr {
                                     simpleprop[ids._lastcampaign] = utm_campaign;
                                     datax[ids._campaign] = utm_campaign;
                                 }
-                                // record reftype
-                                if (user[ids._reftype] === undefined) {
-                                    simpleprop[ids._reftype] = [data._reftype];
-                                }
-                                else {
-                                    if (simpleprop[ids.reftype].indexOf(data._reftype) == -1)
-                                        simpleprop[ids.reftype].push(data._reftype);
-                                }
                             }
                             if (typeid === 'signup' || typeid === 'login') {
                                 simpleprop[ids.registed] = true;
+                                
                             }
+                            
                             // update user
                             if (Object.keys(simpleprop).length !== 0)
                                 me.db.collection(collection).updateOne({ _id: mtid }, { $set: simpleprop }, function (err, r) {
