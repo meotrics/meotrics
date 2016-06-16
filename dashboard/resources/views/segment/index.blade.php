@@ -189,7 +189,8 @@ $props = isset($props) ? $props : [];
 			}
 
 			$('#action_update').attr('href', $('#action_update').attr('data-href') + '/' + that.val());
-
+			$.get('/segment/{{$appcode}}/execute/' + that.val());
+		
 			$('#desc').html(segments[that.val()].description);
 			$('#count').html(segments[that.val()].count);
 

@@ -16,19 +16,10 @@ class SegmentController extends Controller
 		$this->reftypemap = ["Unknown","Paid Search", "Organice Search", "Social Network", "Referral", "Email", "Direct"];
 	}
 
-	public function getExecute(Request $request, $app_id)
+	public function getExecute(Request $request, $appcode, $segid)
 	{
-		$query = $request->input('query');
-		$id = $request->input('id');
-
-		if ($id == null || $id == -1) {
-			$id = MtHttp::post('segment/' . $app_id, ['query' => $query, 'name' => 'Draf']);
-		}
-
-		//run querry on field
-		//MtHttp::get(':3000/segment/query')
-
-		return json_encode([]);
+		$model = MtHttp::get('segment/' . $appcode . '/' . $segid);
+		return json_encode($model);
 	}
 
 	public function getIndex(Request $request, $appcode, $segid = null)
