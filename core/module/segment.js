@@ -36,6 +36,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 		if (locksegment[segment._id.toString()] !== undefined) return callback(outcollection);
 		locksegment[segment._id.toString()] = true;
 		getQuery(segment.condition, function (out) {
+			console.log(out.map, out.reduce, out.option, out.finalize);
 			col.mapReduce(out.map, out.reduce, {
 				out: outcollection,
 				query: out.option,
@@ -48,7 +49,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 					// update segment count
 					db.collection(outcollection).count({value: 1}, function (err, ret) {
 						if (err) throw err;
-						db.collection(prefix + 'segment').updateOne({'_id': new mongodb.ObjectId(segment._id)}, {$set: {count: ret}}, function (err, ret) {
+						db.collection(prefix + 'segment').update({'_id': new mongodb.ObjectId(segment._id)}, {$set: {count: ret}}, function (err, ret) {
 							if (err) throw err;
 						});
 					});

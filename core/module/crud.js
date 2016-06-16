@@ -110,7 +110,7 @@ exports.CRUD = function (db, mongodb, async, converter, prefix, col) {
 		var atid = req.params.id;
 		var collection = prefix + col;
 		converter.toObject(data, function (r) {
-			db.collection(collection).updateOne({_id: new mongodb.ObjectID(atid)}, {$set: r}, function (err, results) {
+			db.collection(collection).update({_id: new mongodb.ObjectID(atid)}, {$set: r}, function (err, results) {
 				if (err) throw  err;
 				res.status(200).end();
 				if (callback !== undefined) callback();

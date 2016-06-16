@@ -110,11 +110,11 @@ class ActionMgr {
                             me.valuemgr.cineObject(appid, data._typeid, loc);
                             me.valuemgr.cineObject(appid, "user", loc);
                             me.converter.toObject(loc, function (datax) {
-                                me.db.collection(collection).updateOne({ _id: r.insertedId }, { "$set": loc }, function (err, r) {
+                                me.db.collection(collection).update({ _id: r.insertedId }, { "$set": loc }, function (err, r) {
                                     if (err)
                                         throw err;
                                 });
-                                me.db.collection(collection).updateOne({ _id: data._mtid }, { $set: loc }, function (err, r) {
+                                me.db.collection(collection).update({ _id: data._mtid }, { $set: loc }, function (err, r) {
                                     if (err)
                                         throw err;
                                 });
@@ -153,8 +153,8 @@ class ActionMgr {
                                     simpleprop[ids._reftype] = [data._reftype];
                                 }
                                 else {
-                                    if (simpleprop[ids.reftype].indexOf(data._reftype) == -1)
-                                        simpleprop[ids.reftype].push(data._reftype);
+                                    if (user[ids._reftype].indexOf(data._reftype) == -1)
+                                        simpleprop[ids._reftype].push(data._reftype);
                                 }
                             }
                             if (typeid === 'signup' || typeid === 'login') {
@@ -162,7 +162,7 @@ class ActionMgr {
                             }
                             // update user
                             if (Object.keys(simpleprop).length !== 0)
-                                me.db.collection(collection).updateOne({ _id: mtid }, { $set: simpleprop }, function (err, r) {
+                                me.db.collection(collection).update({ _id: mtid }, { $set: simpleprop }, function (err, r) {
                                     if (err)
                                         throw err;
                                 });
@@ -208,7 +208,7 @@ class ActionMgr {
                             arr = [arr];
                         arr = arr.concat(datax[p]).sort();
                     }
-                me.db.collection(collection).updateOne({ _id: mtid }, { "$set": user }, function (err, r) {
+                me.db.collection(collection).update({ _id: mtid }, { $set: user }, function (err, r) {
                     if (err)
                         throw err;
                 });
@@ -271,7 +271,7 @@ class ActionMgr {
             // set referal type
             data._reftype = me.referer.getRefType(data._url, data._ref);
             me.converter.toObject(data, function (datax) {
-                me.db.collection(collection).updateOne({ _id: actionid }, { $set: datax }, function (err, r) {
+                me.db.collection(collection).update({ _id: actionid }, { $set: datax }, function (err, r) {
                     if (err)
                         throw err;
                     callback();
@@ -294,7 +294,7 @@ class ActionMgr {
                     throw "not found pageview to close, actionid: " + actionid;
                 var newaction = {};
                 newaction[ids.totalsec] = Math.round(new Date().getTime() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0) - r[0][ids._ctime];
-                me.db.collection(collection).updateOne({ _id: actionid }, { $set: newaction }, function (err, r) {
+                me.db.collection(collection).update({ _id: actionid }, { $set: newaction }, function (err, r) {
                     if (err)
                         throw err;
                     res.writeHead(200);
@@ -494,7 +494,7 @@ class ActionMgr {
         function updateUserInfo(db, mtid, userx, callback) {
             callback(mtid);
             if (Object.keys(userx).length !== 0)
-                db.collection(collection).updateOne({ _id: mtid }, { $set: userx }, function (err, result) {
+                db.collection(collection).update({ _id: mtid }, { $set: userx }, function (err, result) {
                     if (err)
                         throw err;
                 });
@@ -536,11 +536,10 @@ class ActionMgr {
                     if (user.hasOwnProperty(p))
                         if (user[p] === 2910) {
                             user[p] = mtid;
-                            break;
                         }
                         else
                             delete user[p];
-                me.db.collection(collection).updateOne({ _id: mtid }, { $set: user }, function (err, r) {
+                me.db.collection(collection).update({ _id: mtid }, { $set: user }, function (err, r) {
                     if (err)
                         throw err;
                 });
