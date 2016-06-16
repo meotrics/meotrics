@@ -110,7 +110,7 @@ class ActionMgr {
                             me.valuemgr.cineObject(appid, data._typeid, loc);
                             me.valuemgr.cineObject(appid, "user", loc);
                             me.converter.toObject(loc, function (datax) {
-                                me.db.collection(collection).update({ _id: r.insertedId }, { "$set": loc }, function (err, r) {
+                                me.db.collection(collection).update({ _id: r.insertedId }, { $set: loc }, function (err, r) {
                                     if (err)
                                         throw err;
                                 });
@@ -131,13 +131,27 @@ class ActionMgr {
                             throw "mtid " + mtid + " did not match any user";
                         var typeid = data._typeid;
                         me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
-                            '_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype'], function (ids) {
+                            '_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype',
+                            '_numberPurchase', '_listProduct'], function (ids) {
                             // increase revenue
                             var simpleprop = {};
                             if (typeid === 'purchase') {
                                 if (user[ids._revenue] === undefined)
                                     user[ids._revenue] = 0;
                                 simpleprop[ids._revenue] = user[ids._revenue] + data.amount;
+                                // Increase number of purchasing                                                                               
+                                if (user[ids._numberPurchase] === undefined) {
+                                    user[ids._numberPurchase] = 0;
+                                }
+                                simpleprop[ids._numberPurchase] = user[ids._numberPurchase] + 1;
+                                // Add purchase product up to 5                                                                                
+                                if (user[ids._listProduct] === undefined) {
+                                    user[ids._listProduct] = [];
+                                }
+                                if (user[ids._listProduct].length == 5) {
+                                    user[ids._listProduct].shift();
+                                }
+                                simpleprop[ids._listProduct] = user[ids._listProduct].unshift(data.pname);
                             }
                             if (typeid === 'pageview') {
                                 // record campaign
