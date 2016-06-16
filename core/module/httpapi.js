@@ -132,10 +132,9 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		var appid = req.appid;
 		getMtid(req, appid, res, function (mtid) {
 			var data = {};
-			for (var i in req.params) if (req.params.hasOwnProperty(i)) {
-				if (i.startsWith('_') === false) data[i] = req.params[i];
-			}
-
+			for (var i in req.params) if (req.params.hasOwnProperty(i))
+				if (i.startsWith('_') === false) data[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
+			
 			actionmgr.identifyRaw(appid, {mtid: mtid, user: data}, function (mtid) {
 				//set new mtid if need
 				setCookie(res, "mtid", mtid,  appid);

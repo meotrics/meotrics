@@ -370,7 +370,7 @@
 							keys[ids._ctime] = 1;
 
 							db.collection(prefix + "app" + appid).createIndex(keys, function () {
-								console.log('googd');
+								//console.log('googd');
 							});
 						});
 					});

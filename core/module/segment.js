@@ -36,7 +36,6 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 		if (locksegment[segment._id.toString()] !== undefined) return callback(outcollection);
 		locksegment[segment._id.toString()] = true;
 		getQuery(segment.condition, function (out) {
-			console.log(out.map, out.reduce, out.option, out.finalize);
 			col.mapReduce(out.map, out.reduce, {
 				out: outcollection,
 				query: out.option,
