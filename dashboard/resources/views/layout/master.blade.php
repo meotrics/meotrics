@@ -169,7 +169,7 @@
 						</ul>
 
 						<ul class="nav navbar-nav navbar-right">
-							<li>
+							<li class="hidden">
 								<a href="#">
 									<span class="vam">Action count:</span>
 									<span id="odometer" class="vam id_counter odometer"></span>
