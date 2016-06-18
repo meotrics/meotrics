@@ -76,140 +76,166 @@
 @endsection
 @section('body')
 
-	<div class="wrapper">
-		<div class="sidebar main_sidebar" data-color="blue" data-image="/img/sidebar-4.jpg">
-			<!--   you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple" -->
-			<div class="sidebar-wrapper">
-				<div class="logo">
-					<a class="simple-text" href="{{ URL::to('/') }}">
-						<img src="{{ asset('img/logo.png') }}" width="30px"/>
-						<span class="logo-text">Meotrics</span>
-					</a>
-				</div>
-				<ul class="nav">
-					<li class="{{ Route::getCurrentRoute()->getPath() == 'home' ? 'active' : '' }}">
-						<a href="/dashboard/{{ $appcode }}">
-							<i class="pe-7s-graph"></i>
-							<p>Dashboard</p>
-						</a>
-					</li>
-					<li class="{{ Route::getCurrentRoute()->getPath() == 'trend' ? 'active' : '' }}">
-						<a href="/trend/{{$appcode}}">
-							<i class="pe-7s-graph1"></i>
-							<p>Trend</p>
-						</a>
-					</li>
-					<li class="{{ Route::getCurrentRoute()->getPath() == 'segment' ? 'active' : '' }}">
-						<a href="/segment/{{$appcode}}">
-							<i class="pe-7s-users"></i>
-							<p>Segmentation</p>
-						</a>
-					</li>
-					<li class="{{ Route::getCurrentRoute()->getPath() == 'funnel' ? 'active' : '' }}">
-						<a href="/funnel/{{$appcode}}">
-							<i class="pe-7s-filter"></i>
-							<p>Funnel</p>
-						</a>
-					</li>
-					<li class="{{ Route::getCurrentRoute()->getPath() == 'revenue' ? 'active' : '' }}">
-						<a href="/revenue/{{$appcode}}">
-							<i class="pe-7s-cash"></i>
-							<p>Revenue</p>
-						</a>
-					</li>
-					<li class="{{ Route::getCurrentRoute()->getPath() == 'campaign' ? 'active' : '' }}">
-						<a href="/campaign/{{$appcode}}">
-							<i class="pe-7s-graph3"></i>
-							<p>Marketing Campaign</p>
-						</a>
-					</li>
-					<li class="{{ Route::getCurrentRoute()->getPath() == 'insight' ? 'active' : '' }}">
-						<a href="/insight/{{$appcode}}">
-							<i class="pe-7s-user"></i>
-							<p>User Profile</p>
-						</a>
-					</li>
+<div class="wrapper">
+    <div class="sidebar main_sidebar" data-color="blue" data-image="/img/sidebar-4.jpg">
+        <!--   you can change the color of the sidebar using: data-color="blue | azure | green | orange | red | purple" -->
+        <div class="sidebar-wrapper">
+            <div class="logo">
+                <a class="simple-text" href="{{ URL::to('/') }}">
+                    <img src="{{ asset('img/logo.png') }}" width="30px"/>
+                    <span class="logo-text">Meotrics</span>
+                </a>
+            </div>
+            <ul class="nav">
+                <li class="{{ Route::getCurrentRoute()->getPath() == 'home' ? 'active' : '' }}">
+                    <a href="/dashboard/{{ $appcode }}">
+                        <i class="pe-7s-graph"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+                <li class="{{ Route::getCurrentRoute()->getPath() == 'trend' ? 'active' : '' }}">
+                    <a href="/trend/{{$appcode}}">
+                        <i class="pe-7s-graph1"></i>
+                        <p>Trend</p>
+                    </a>
+                </li>
+                <li class="{{ Route::getCurrentRoute()->getPath() == 'segment' ? 'active' : '' }}">
+                    <a href="/segment/{{$appcode}}">
+                        <i class="pe-7s-users"></i>
+                        <p>Segmentation</p>
+                    </a>
+                </li>
+                <li class="{{ Route::getCurrentRoute()->getPath() == 'funnel' ? 'active' : '' }}">
+                    <a href="/funnel/{{$appcode}}">
+                        <i class="pe-7s-filter"></i>
+                        <p>Funnel</p>
+                    </a>
+                </li>
+                <li class="{{ Route::getCurrentRoute()->getPath() == 'revenue' ? 'active' : '' }}">
+                    <a href="/revenue/{{$appcode}}">
+                        <i class="pe-7s-cash"></i>
+                        <p>Revenue</p>
+                    </a>
+                </li>
+                <li class="{{ Route::getCurrentRoute()->getPath() == 'campaign' ? 'active' : '' }}">
+                    <a href="/campaign/{{$appcode}}">
+                        <i class="pe-7s-graph3"></i>
+                        <p>Marketing Campaign</p>
+                    </a>
+                </li>
+                <li class="{{ Route::getCurrentRoute()->getPath() == 'insight' ? 'active' : '' }}">
+                    <a href="/insight/{{$appcode}}">
+                        <i class="pe-7s-user"></i>
+                        <p>User Profile</p>
+                    </a>
+                </li>
 
-					<!-- <li class="user-area">
-						<ul class="media-list" style="margin-left: 10px; margin-top: 10px;">
-							<li class="media">
-								<div class="media-left">
-									<a href="#">
-										<img class="media-object" width="40px" src="/img/user.png" alt="">
-									</a>
-								</div>
-								<div class="media-body">
-									<h5 style="color:white;" class="media-heading">thanhpk</h5>
-									<a class="small" href="/auth/default/view?id=4">profile</a>
-									&nbsp; &nbsp;
-									<a class="small" href="/auth/logout" data-method="get">logout</a>
-									<a class="small" href="/actiontype" data-method="get">action type</a>
-								</div>
-							</li>
-						</ul>
-					</li> -->
-				</ul>
-			</div>
-		</div>
+                <!-- <li class="user-area">
+                        <ul class="media-list" style="margin-left: 10px; margin-top: 10px;">
+                                <li class="media">
+                                        <div class="media-left">
+                                                <a href="#">
+                                                        <img class="media-object" width="40px" src="/img/user.png" alt="">
+                                                </a>
+                                        </div>
+                                        <div class="media-body">
+                                                <h5 style="color:white;" class="media-heading">thanhpk</h5>
+                                                <a class="small" href="/auth/default/view?id=4">profile</a>
+                                                &nbsp; &nbsp;
+                                                <a class="small" href="/auth/logout" data-method="get">logout</a>
+                                                <a class="small" href="/actiontype" data-method="get">action type</a>
+                                        </div>
+                                </li>
+                        </ul>
+                </li> -->
+            </ul>
+        </div>
+    </div>
 
-		<div class="main-panel">
-			<nav class="navbar navbar-default navbar-fixed">
-				<div class="container-fluid">
-					<div class="navbar-header">
-						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
-							<span class="sr-only">Toggle navigation</span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-						</button>
-					</div>
-					<div class="collapse navbar-collapse" style="padding-left: 0">
-						<ul class="nav navbar-nav navbar-left">
-							@yield('action')
-						</ul>
+    <div class="main-panel">
+        <nav class="navbar navbar-default navbar-fixed">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation-example-2">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="collapse navbar-collapse" style="padding-left: 0">
+                    <ul class="nav navbar-nav navbar-left">
+                        @yield('action')
+                    </ul>
 
-						<ul class="nav navbar-nav navbar-right">
-							<li class="hidden">
-								<a href="#">
-									<span class="vam">Action count:</span>
-									<span id="odometer" class="vam id_counter odometer"></span>
-								</a>
-							</li>
-							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-									<span class="vam">	{{ $appname }}</span>
-									<b class="caret"></b>
-								</a>
-								<ul class="dropdown-menu">
-									<li><a href="#" class="id_trackingcode">Get tracking code</a></li>
-									<li><a href="/actiontype/{{$appcode}}">Manage action types</a></li>
-									@if(count($apps) !=0)
-										<li class="divider"></li>
-										@foreach($apps as $ap)
-											@if($ap->code != $appcode)
-												<li><a href="/dashboard/{{$ap->code }}">Switch to {{$ap->name}}</a></li>
-											@endif
-										@endforeach
-										<li><a href="/app">Manage apps</a></li>
-									@endif
-									<li class="divider"></li>
-									<li><a href="/user/profile">Your profile</a></li>
-									<li><a href="/auth/signout">Logout</a></li>
-								</ul>
-							</li>
-						</ul>
-					</div>
-				</div>
-			</nav>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="hidden">
+                            <a href="#">
+                                <span class="vam">Action count:</span>
+                                <span id="odometer" class="vam id_counter odometer"></span>
+                            </a>
+                        </li>
+                        
+                        <li class="dropdown">
+                            <a href="#" class="button action blue button-radius"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                <span class="label">{{ $appname }}</span>
+                                <b class="caret"></b>
+                            </a>
+                            <ul class="dropdown-menu" style="min-width: 137px;">
+                                @if(count($apps) !=0)
+                                @foreach($apps as $ap)
+                                @if($ap->code != $appcode)
+                                <li><a href="/dashboard/{{$ap->code }}"> {{$ap->name}}</a></li>
+                                @endif
+                                @endforeach
+                                @endif
+                            </ul>
+                        </li>
+                        
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <img src="/img/user.png" class="user-image" alt="User Image">
+                                <span class="hidden-xs">{{ Auth::user()->email }}</span>
+                            </a>
+                            <ul class="dropdown-menu" style="min-width: 262px">
+<!--                                <li><a href="#" class="id_trackingcode">Get tracking code</a></li>
+                                <li><a href="/actiontype/{{$appcode}}">Manage action types</a></li>
+                                @if(count($apps) !=0)
+                                <li class="divider"></li>
+                                @foreach($apps as $ap)
+                                @if($ap->code != $appcode)
+                                <li><a href="/dashboard/{{$ap->code }}">Switch to {{$ap->name}}</a></li>
+                                @endif
+                                @endforeach-->
+                                <li><a href="/app">App management</a></li>
+                                <!--@endif-->
+                                <li class="divider"></li>
+                                <li><a href="/user/profile">Profile & Billing</a></li>
+                                <li><a href="/auth/signout">Sign out</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
 
 
-			<div class="content">
-				<div class="container-fluid">
-					@yield('content')
-				</div>
-			</div>
-		</div>
-	</div>
+        <div class="content">
+            <div class="container-fluid">
+                @yield('content')
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-link pull-right">
+                <a href="{{App\Enum\CommonEnum::LINK_DOCUMENTATION}}">Documentation</a>
+                <a href="{{App\Enum\CommonEnum::LINK_API_DOC}}">API doc</a>
+                <a href="javascript:void(0)">Support: {{App\Enum\CommonEnum::SUPPORT_PHONE}}</a>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('footer-script')
