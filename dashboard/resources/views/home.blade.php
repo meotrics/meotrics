@@ -6,6 +6,18 @@
 	<script src="{{asset('/js/Chart.js')}}"></script>
 	<script>
 		onPageLoad(function () {
+			
+			function update_pageview(){
+				
+			}
+			
+			function update_signup() {
+				
+			}
+			
+			websock.appChange('{{$appcode}}', 'type.pageview', update_pageview);
+			websock.appChange('{{$appcode}}', 'type.pageview', update_signup);
+			
 			var $tp = $('#timepick');
 			var tp = $tp.dateRangePicker();
 

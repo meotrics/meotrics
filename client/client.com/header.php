@@ -20,9 +20,7 @@
 		
 
 
-    <!--BEGIN MEOTRICS TRACKING CODE -->
-<link href="//api.meotrics.com/speedyapply" rel="stylesheet" type="text/css"/>
-<script>var mt={appid:'speedyapply'}</script>
-<script id="mtspeedyapply" src="//meotrics.com/mttrack.js"></script>
-<script src="//meotrics.com/mtend.js" defer async="true"></script>
+<!--BEGIN MEOTRICS TRACKING CODE -->
+<link rel="stylesheet" href="//127.0.0.1:1711/thanh"/>
+<script id="meotrics29101992" src="/mttrack.js"></script>
 <!--END MEOTRICS TRACKING CODE -->

@@ -383,7 +383,7 @@ export class RefererType {
 
 	public getTypeName(code: number) : string
 	{
-		var names = ["Unknown", "Organice Search", "Social Network", "Referral", "Email", "Direct"];
+		var names = ["Unknown", "Paid Search", "Organice Search", "Social Network", "Referral", "Email", "Direct"];
 		return names[code];
 	}
 

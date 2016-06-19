@@ -170,7 +170,6 @@
 						<span class="label">Cancel</span></button>
 					<button type="button" data-dismiss="modal" class="button action blue id_add">
 						<span class="label">Next step</span></button>
-
 				</div>
 			</div>
 		</div>
