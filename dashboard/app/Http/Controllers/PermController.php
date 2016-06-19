@@ -54,6 +54,18 @@ class PermController extends Controller
 		return $res . '';
 	}
 
+	public function getPageview(Request $request, $appcode)
+	{
+		$res = MtHttp::getRaw('app/getpageview/' . $appcode);
+		return $res . '';
+	}
+
+	public function getSignup(Request $request, $appcode)
+	{
+		$res = MtHttp::getRaw('app/getsignup/' . $appcode);
+		return $res . '';
+	}
+	
 	public function count_traffic(Request $request, $appcode)
 	{
 		$res = MtHttp::get('app/count_traffic/' . $appcode);

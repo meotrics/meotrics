@@ -1,7 +1,6 @@
 @extends('layout.main')
 @section('header-script')
 	<script>
-
 		function onPageLoad(fn) {
 			if (window.addEventListener)
 				window.addEventListener('load', fn, false);
@@ -56,7 +55,6 @@
 	</script>
 @endsection
 @section('body')
-
 	<div class="wrapper">
 		<div class="">
 			<nav class="navbar navbar-default navbar-fixed">
@@ -64,7 +62,6 @@
 					<div class="navbar-header">
 						<div class="row"><a class="" href="#"><img style="margin-top: 12px" height="25px" src="/img/meotrics-alt.png"/></a>
 							</div>
-
 					</div>
 
 					<div class="collapse navbar-collapse">
@@ -73,7 +70,6 @@
 						</ul>
 
 						<ul class="nav navbar-nav navbar-right">
-
 							<li class="dropdown">
 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 									<span class="vam">	{{ \Auth::user()->name}}</span>
