@@ -274,15 +274,11 @@
 
 			var register =
 			{
-				codename: "signup",
-				name: "Sign up",
+				codename: "register",
+				name: "Register",
 				desc: "User register",
 				fields: [
-					{pname: "Email", pcode: "email"},	
-					{pname: "Name", pcode: "name"},
-					{pname: "Age", pcode: "age"},
-					{pname: "Gender", pcode: "gender"},
-					{pname: "Gender", pcode: "gender"}
+					{pname: "User ID", pcode: "userid"},	
 				],
 				deftrendfields: [
 					{pname: "Campaign", pcode: "_utm_campaign"},
