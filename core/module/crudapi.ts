@@ -116,6 +116,18 @@ export class CrudApi {
 			});
 		});
 
+		app.getEx('/app/:appid/getpageview', function (req, res) {
+			me.dashboard.getPageview(req.params.appid, function (result) {
+				res.json(result);
+			});
+		});
+
+		app.getEx('/app/:appid/getsignup', function (req, res) {
+			me.dashboard.getSignup(function (result) {
+				res.json(result);
+			});
+		});
+
 		app.getEx('/app/traffic14/:appid', function (req, res) {
 			me.appmgr.traffic14(req.params.appid, function (ret) {
 				res.json(ret);
