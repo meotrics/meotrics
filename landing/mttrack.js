@@ -17,7 +17,7 @@ rq : []
 (function(){
 	addEventListener("message", function(ev){
 		var origin = ev.origin || ev.originalEvent.origin;
-		if (origin.split('/')[2] !== "meotrics.com") return;
+		if (origin.split('/')[2] !== "meotrics.com" && origin.split('/')[2] !== "meotrics.dev" ) return;
 		mt.event = ev;
 		if(mt.excute) mt.excute(ev);
 	}, false);
@@ -32,7 +32,9 @@ rq : []
 	mt.appid=s[0];
 	mt.actionid=s[1];
 	var script = document.createElement('script');
-	script.setAttribute('src','//meotrics.com/mtfull.js');
+	var host = "meotrics.com";
+	if(location.hostname == "client.meotrics.dev") host = "meotrics.dev";
+	script.setAttribute('src','//'+host+'/mtfull.js');
 	script.setAttribute('defer', 'defer');
 	script.setAttribute('async', true);
 	document.head.appendChild(script);
