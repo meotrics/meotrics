@@ -84,7 +84,7 @@ export class Dashboard {
 		let me = this;
 		let match = {};
 		match[ids._ctime] = { $gte: todaysec };
-		match[ids._typeid] = 'signup';
+		match[ids._typeid] = 'register';
 		match[ids._isUser] = { $exists: false };
 		db.collection(prefix + "app" + appid).count(match, function (err, res) {
 			if (err) throw err;
@@ -400,6 +400,17 @@ export class Dashboard {
 			me.getTodayVisitor(me.db, me.prefix, appid, ids, function (n_new_visitor, n_returning_visitor) {
 				ret['newVisitors'] = n_new_visitor;
 				ret['returningVisitors'] = n_returning_visitor;
+				callback(ret);
+			});
+		});
+	}
+
+	public getSignup(appid: string, callback: (ret) => void) {
+		let me = this;
+		var ret = {}
+		me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "userid"], function (ids) {
+			me.getNewSignup(me.db, me.prefix, appid, ids, function (su) {
+				ret['signup'] = su;
 				callback(ret);
 			});
 		});

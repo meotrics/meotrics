@@ -123,7 +123,7 @@ export class CrudApi {
 		});
 
 		app.getEx('/app/:appid/getsignup', function (req, res) {
-			me.dashboard.getSignup(function (result) {
+			me.dashboard.getSignup(req.params.appid, function (result) {
 				res.json(result);
 			});
 		});
