@@ -32,11 +32,11 @@ export class Dashboard {
 	private getTimeRange(starttime: number, endtime: number): number[] {
 		// make sure starttime and endtime are number
 		starttime = parseInt(starttime + "");
-		endtime = parseInt(endtime +"");
+		endtime = parseInt(endtime + "");
 		if (endtime < starttime) throw "wrong time input";
 		var me = this;
 		var ret = [];
-		
+
 		var now = new Date(starttime * 1000);
 		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 		now = new Date(endtime * 1000);
@@ -53,7 +53,7 @@ export class Dashboard {
 		if (daydiff + 1 <= me.N) {
 			ret.push(starttime);
 			var st = starttime;
-		
+
 			while (st + 86400 < endtime) {
 				st += 86400;
 				ret.push(st);
@@ -64,10 +64,10 @@ export class Dashboard {
 
 		// return specific days in all day
 		// arary alway start with starttime and end with endtime
-		var d = daydiff  / (me.N - 1);
+		var d = daydiff / (me.N - 1);
 		ret.push(starttime);
 		for (var i = 1; i < me.N - 1; i++)
-			ret.push( starttime + Math.round(i * d * 86400));
+			ret.push(starttime + Math.round(i * d * 86400));
 		ret.push(endtime);
 		return ret;
 	}
@@ -153,7 +153,7 @@ export class Dashboard {
 			}
 		}, {
 				$group: {
-					_id: null, sum: { $sum: "$sum" }, count: { $sum: 1 }, npurchase: {$sum: "$purchase"}
+					_id: null, sum: { $sum: "$sum" }, count: { $sum: 1 }, npurchase: { $sum: "$purchase" }
 				}
 			}];
 
@@ -182,7 +182,7 @@ export class Dashboard {
 		revenue_pipeline[0]['$match'][ids._isUser] = { $exists: false };
 		revenue_pipeline[0]['$match'][ids._typeid] = "purchase";
 		revenue_pipeline[0]['$match'][ids._ctime] = { $gte: todaysec, $lt: todaysec + 86400 };
-		db.collection(prefix + "app" +  appid).aggregate(revenue_pipeline, function (err, res) {
+		db.collection(prefix + "app" + appid).aggregate(revenue_pipeline, function (err, res) {
 			if (err) throw err;
 			var revenue = res.length === 0 ? 0 : res[0].sum;
 			var n_purchase = res.length === 0 ? 0 : res[0].count;
@@ -214,44 +214,44 @@ export class Dashboard {
 		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 		let todaysec = Math.round(today.getTime() / 1000);
 		let b6 = todaysec - 24 * 6 * 3600;
-		
-			var n_newuser, n6_user;
 
-			let alltimecount = {};
-			alltimecount[ids._isUser] = true;
-			alltimecount[ids._ctime] = { $lt: b6 };
-			db.collection(prefix + "app" +  appid).count(alltimecount, function (err, res) {
+		var n_newuser, n6_user;
+
+		let alltimecount = {};
+		alltimecount[ids._isUser] = true;
+		alltimecount[ids._ctime] = { $lt: b6 };
+		db.collection(prefix + "app" + appid).count(alltimecount, function (err, res) {
+			if (err) throw err;
+			n6_user = res;
+			if (n6_user == 0) return callback(0);
+			alltimecount[ids._ctime] = { $gte: b6 };
+			db.collection(prefix + "app" + appid).count(alltimecount, function (err, res) {
 				if (err) throw err;
-				n6_user = res;
-				if (n6_user == 0) return callback(0);
-				alltimecount[ids._ctime] = { $gte: b6 };
-				db.collection(prefix + "app" + appid).count(alltimecount, function (err, res) {
-					if (err) throw err;
-					n_newuser = res;
-					//get today user visit
-					var todayuservisitq = [{}, {}, {}, {}, {}];
-					todayuservisitq[0]['$match'] = { $or: [{}, {}] };
-					todayuservisitq[0]['$match']['$or'][0][ids._isUser] = true;
-					todayuservisitq[0]['$match']['$or'][1][ids._isUser] = { $exists: false };
-					todayuservisitq[0]['$match']['$or'][1][ids._ctime] = { $gte: todaysec };
-					todayuservisitq[1]['$project'] = {};
-					todayuservisitq[1]['$project'][ids._mtid] = 1;
-					todayuservisitq[1]['$project'][ids.userid] = { $cond: { if: { $ifNull: ["$userid", false] }, then: 1, else: 0 } };
-					todayuservisitq[2]['$group'] = { _id: "$" + ids._mtid, userid: { $sum: "$" + ids.userid }, count: { $sum: 1 } };
-					todayuservisitq[3]['$match'] = { userid: { $gt: 0 }, count: { $gt: 1 } };
-					todayuservisitq[4]['$group'] = { _id: null, count: { $sum: 1 } };
+				n_newuser = res;
+				//get today user visit
+				var todayuservisitq = [{}, {}, {}, {}, {}];
+				todayuservisitq[0]['$match'] = { $or: [{}, {}] };
+				todayuservisitq[0]['$match']['$or'][0][ids._isUser] = true;
+				todayuservisitq[0]['$match']['$or'][1][ids._isUser] = { $exists: false };
+				todayuservisitq[0]['$match']['$or'][1][ids._ctime] = { $gte: todaysec };
+				todayuservisitq[1]['$project'] = {};
+				todayuservisitq[1]['$project'][ids._mtid] = 1;
+				todayuservisitq[1]['$project'][ids.userid] = { $cond: { if: { $ifNull: ["$userid", false] }, then: 1, else: 0 } };
+				todayuservisitq[2]['$group'] = { _id: "$" + ids._mtid, userid: { $sum: "$" + ids.userid }, count: { $sum: 1 } };
+				todayuservisitq[3]['$match'] = { userid: { $gt: 0 }, count: { $gt: 1 } };
+				todayuservisitq[4]['$group'] = { _id: null, count: { $sum: 1 } };
 
-					//console.log("todayuservisitq", JSON.stringify(todayuservisitq));
-					me.db.collection(me.prefix + "app" + appid).aggregate(todayuservisitq, function (err, res) {
-						if (err) throw err;
-						var count = 0;
-						if (res.length !== 0)
-							count = res[0].count;
-						var rate = (count - n_newuser) / n6_user * 100;
-						callback(rate);
-					});
+				//console.log("todayuservisitq", JSON.stringify(todayuservisitq));
+				me.db.collection(me.prefix + "app" + appid).aggregate(todayuservisitq, function (err, res) {
+					if (err) throw err;
+					var count = 0;
+					if (res.length !== 0)
+						count = res[0].count;
+					var rate = (count - n_newuser) / n6_user * 100;
+					callback(rate);
 				});
-		
+			});
+
 		});
 	}
 
@@ -260,7 +260,7 @@ export class Dashboard {
 		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 		now = new Date(endtime * 1000);
 		var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-	
+
 		let startsec = Math.round(startday.getTime() / 1000);
 		let endsec = Math.round(endday.getTime() / 1000) + 86400;
 
@@ -271,7 +271,7 @@ export class Dashboard {
 		var piplelines = [{ $match: allvisitor }, { $group: { _id: "$" + ids._mtid } }, { $group: { _id: null, count: { $sum: 1 } } }];
 
 		//get unique visitor
-		db.collection(prefix + "app" +  appid).aggregate(piplelines, function (err, res) {
+		db.collection(prefix + "app" + appid).aggregate(piplelines, function (err, res) {
 			if (err) throw err;
 			var nuservisit = res.length === 0 ? 0 : res[0].count;
 
@@ -279,8 +279,8 @@ export class Dashboard {
 			piplelines[0]['$match'][ids._typeid] = "purchase";
 			piplelines[0]['$match'][ids._isUser] = { $exists: false };
 			piplelines[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
-									
-			db.collection(prefix + "app" +  appid).aggregate(piplelines, function (err, res) {
+
+			db.collection(prefix + "app" + appid).aggregate(piplelines, function (err, res) {
 				if (err) throw err;
 				var nuserpurchase = res.length === 0 ? 0 : res[0].count;
 				var conversionrate = nuservisit == 0 ? 0 : nuserpurchase / nuservisit * 100;
@@ -290,7 +290,7 @@ export class Dashboard {
 		});
 	}
 
-	public getMostPopulerCategory(db: mongo.Db, prefix: string, appid: string, ids, starttime:number, endtime: number, callback: (cat: string) => void) {
+	public getMostPopulerCategory(db: mongo.Db, prefix: string, appid: string, ids, starttime: number, endtime: number, callback: (cat: string) => void) {
 		var now = new Date(starttime * 1000);
 		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 		now = new Date(endtime * 1000);
@@ -298,7 +298,7 @@ export class Dashboard {
 
 		let startsec = Math.round(startday.getTime() / 1000);
 		let endsec = Math.round(endday.getTime() / 1000) + 86400;
-		
+
 		let pipeline = [
 			{ $match: {} }, {
 				$group: {
@@ -383,17 +383,61 @@ export class Dashboard {
 		});
 	}
 
-	public generateLabel(startime: number, endtime: number)
-	{
+	public generateLabel(startime: number, endtime: number) {
 		var labels = [];
 		var ranges = this.getTimeRange(startime, endtime);
-		for (var i of ranges)
-		{
+		for (var i of ranges) {
 			var date = new Date(i * 1000);
 			labels.push(date.toUTCString().split(' ')[2] + " " + date.getDate());
 		}
 		return labels;
 	 }
+
+	public getPageview(appid: string, callback:(ret)=>void) {
+		let me = this;
+		var ret = {}
+		me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "userid"], function (ids) {
+			me.getTodayVisitor(me.db, me.prefix, appid, ids, function (n_new_visitor, n_returning_visitor) {
+				ret['newVisitors'] = n_new_visitor;
+				ret['returningVisitors'] = n_returning_visitor;
+				callback(ret);
+			});
+		});
+	}
+
+	public getTodayVisitor(db: mongo.Db, prefix: string, appid: string, ids, callback: (n_new_visitor, n_returning_visitor) => void) {
+		var now = new Date();
+		var n_returning_visitor, n_new_visitor;
+				var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+				let todaysec = Math.round(today.getTime() / 1000);
+				//1 number of new visitor today
+				var todayvismatch = {};
+				todayvismatch[ids._ctime] = { $gte: todaysec };
+
+				var pipelines = [{ $match: todayvismatch }, { $group: { _id: "$" + ids._mtid } }, {
+			$group: {
+				_id: null, count: { $sum: 1 }
+			}
+				}];
+				db.collection(prefix + "app" + appid).aggregate(pipelines, function (err, res) {
+			if (err) throw err;
+			if (res.length === 0)
+				n_returning_visitor = 0;
+			else n_returning_visitor = res[0].count;
+
+			// 2 number of returning visitor
+			todayvismatch[ids._isUser] = true;
+			todayvismatch[ids._ctime] = { $gte: todaysec };
+
+			db.collection(prefix + "app" + appid).count(todayvismatch, function (err, res) {
+				if (err) throw err;
+				n_new_visitor = res;
+				n_returning_visitor -= res;
+				callback(n_new_visitor, n_returning_visitor);
+			});
+				});
+	}
 
 	public getDashboard(appid: string, startime: number, endtime: number, callback: (d: DashboardEntity) => void) {
 		let me = this;
@@ -401,7 +445,7 @@ export class Dashboard {
 			endtime = Math.floor(new Date().getTime() / 1000);
 			startime = endtime - 30 * 86400;
 		}
-		
+
 		var now = new Date(startime * 1000);
 		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 		now = new Date(endtime * 1000);
@@ -413,63 +457,37 @@ export class Dashboard {
 			var dashboard: DashboardEntity = new DashboardEntity();
 
 			dashboard.labels = me.generateLabel(startime, endtime);
-			me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid" ], function (ids) {
-				var now = new Date();
-				var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+			me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid"], function (ids) {
+				me.getTodayVisitor(me.db, me.prefix, appid, ids, function (n_new_visitor, n_returning_visitor) {
+					dashboard.n_new_visitor = n_new_visitor;
+					dashboard.n_returning_visitor = n_returning_visitor;
+					me.getNewSignup(me.db, me.prefix, appid, ids, function (ret) {
+						dashboard.n_new_signup = ret;
 
-				let todaysec = Math.round(today.getTime() / 1000);
-				//1 number of new visitor today
-				var todayvismatch = {};
-				todayvismatch[ids._ctime] = { $gte: todaysec };
+						me.getRevenues(me.db, me.prefix, appid, ids, startime, endtime, function (revenues, n_purchases) {
+							dashboard.revenues = revenues;
+							dashboard.n_purchases = n_purchases;
 
-				var pipelines = [{ $match: todayvismatch }, { $group: { _id: "$" + ids._mtid } }, {
-					$group: {
-						_id: null, count: { $sum: 1 }
-					}
-				}];
-				me.db.collection(me.prefix + "app" + appid).aggregate(pipelines, function (err, res) {
-					if (err) throw err;
-					if (res.length === 0)
-						dashboard.n_returning_visitor = 0;
-					else dashboard.n_returning_visitor = res[0].count;
+							me.getTotalRevenue(me.db, me.prefix, appid, ids, startime, endtime, function (revenue, npurchase, nuser) {
+								dashboard.total_revenue = revenue;
+								dashboard.n_avgcartsize = npurchase === 0 ? 0 : revenue / npurchase;
+								dashboard.revenue_per_customer = nuser === 0 ? 0 : revenue / nuser;
 
-					// 2 number of returning visitor
-					todayvismatch[ids._isUser] = true;
-					todayvismatch[ids._ctime] = { $gte: todaysec };
+								me.getGrowthRates(me.db, me.prefix, appid, ids, startime, endtime, function (growrates: number[]) {
+									dashboard.usergrowth_rates = growrates;
 
-					me.db.collection(me.prefix + "app" + appid).count(todayvismatch, function (err, res) {
-						if (err) throw err;
-						dashboard.n_new_visitor = res;
-						dashboard.n_returning_visitor -= res;
+									me.getConversionRate(me.db, me.prefix, appid, ids, startime, endtime, function (cs: number) {
+										dashboard.conversion_rate = cs;
 
-						me.getNewSignup(me.db, me.prefix, appid, ids, function (ret) {
-							dashboard.n_new_signup = ret;
-
-							me.getRevenues(me.db, me.prefix, appid, ids, startime, endtime, function (revenues, n_purchases) {
-								dashboard.revenues = revenues;
-								dashboard.n_purchases = n_purchases;
-
-								me.getTotalRevenue(me.db, me.prefix, appid, ids, startime, endtime, function (revenue, npurchase, nuser) {
-									dashboard.total_revenue = revenue;
-									dashboard.n_avgcartsize = npurchase === 0 ? 0 : revenue / npurchase;
-									dashboard.revenue_per_customer = nuser === 0 ? 0 : revenue / nuser;
-
-									me.getGrowthRates(me.db, me.prefix, appid, ids, startime, endtime, function (growrates: number[]) {
-										dashboard.usergrowth_rates = growrates;
-
-										me.getConversionRate(me.db, me.prefix, appid, ids, startime, endtime, function (cs: number) {
-											dashboard.conversion_rate = cs;
-
-											me.getRetensionRate(me.db, me.prefix, appid, ids, function (rate: number) {
-												dashboard.retention_rate = rate;
-													me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, startime, endtime, function (campaign: string) {
-														dashboard.highest_revenue_campaign = campaign;
-														me.getMostPopulerCategory(me.db, me.prefix, appid, ids, startime, endtime, function (cat: string) {
-															dashboard.most_popular_category = cat;
-															me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, startime, endtime, function (ref: string) {
-																dashboard.most_effective_ref = ref;
-																gcallback(dashboard);
-															});
+										me.getRetensionRate(me.db, me.prefix, appid, ids, function (rate: number) {
+											dashboard.retention_rate = rate;
+											me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, startime, endtime, function (campaign: string) {
+												dashboard.highest_revenue_campaign = campaign;
+												me.getMostPopulerCategory(me.db, me.prefix, appid, ids, startime, endtime, function (cat: string) {
+													dashboard.most_popular_category = cat;
+													me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, startime, endtime, function (ref: string) {
+														dashboard.most_effective_ref = ref;
+														gcallback(dashboard);
 													});
 												});
 											});
@@ -489,7 +507,7 @@ export class Dashboard {
 			if (res.length === 0) {
 				me.lock("c_" + appid + "-" + startsec + "-" + endsec, function (release) {
 					// recheck because cache could be create after the lock
-					me.db.collection(me.prefix + "dashboard").find({ appid: appid, endtime: endsec, starttime: startsec}).limit(1).toArray(function (err, res) {
+					me.db.collection(me.prefix + "dashboard").find({ appid: appid, endtime: endsec, starttime: startsec }).limit(1).toArray(function (err, res) {
 						if (err) throw err;
 						if (res.length === 0) {
 							generateDashboard(function (dash: DashboardEntity) {
@@ -498,7 +516,7 @@ export class Dashboard {
 								dash.ctime = Math.round(new Date().getTime() / 1000);
 								dash.starttime = startsec;
 								dash.endtime = endsec;
-								me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + ""  , endtime: endsec, starttime: startsec}, dash, { upsert: true }, function (err) {
+								me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "", endtime: endsec, starttime: startsec }, dash, { upsert: true }, function (err) {
 									release()();
 									if (err) throw err;
 								});
