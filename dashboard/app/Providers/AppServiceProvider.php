@@ -23,8 +23,10 @@ class AppServiceProvider extends ServiceProvider
 			if (\Auth::user() == null) return;
 			$userid = \Auth::user()->id;
 			$veri  =  \Auth::user()->verified;
-			//abort(400, Request::route()->currentRouteName() );
-
+	if(Route::current() == null) {
+		\Log::error("path not found: " . Request::url());
+		abort(400, "path not found: " . Request::url() );
+	}
 			$param = Route::current()->parameters();
 
 			if ($param == null)

@@ -29,7 +29,7 @@ var userid = userid || 0;
 		conn = new WebSocket('wss://' + window.location.host + '/ws', 'mtdashboard');
 
 		conn.onopen = function(event){
-
+			console.log('ok');
 			for(var i in branch) if(branch.hasOwnProperty(i))
 				for(var j in branch[i]) if(branch[i].hasOwnProperty(j))
 					conn.send(JSON.stringify({appid: i, code: j}));
@@ -38,7 +38,8 @@ var userid = userid || 0;
 			// clean the queue
 			//while(stack.length != 0)
 			//	conn.send(JSON.stringify(stack.pop()));
-		}
+		};
+		
 		conn.onmessage = function (e) {
 			var mes = JSON.parse(e.data);
 

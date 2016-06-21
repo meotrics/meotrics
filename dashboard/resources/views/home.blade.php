@@ -8,15 +8,27 @@
 		onPageLoad(function () {
 			
 			function update_pageview(){
-				
+				throttle(function(){
+					$.post('/app/getpageview/{{$appcode}}', function(data){
+						data = JSON.parse(data);
+						$('.id_newv').html(data.newVisitors);
+						$('.id_retu').html(data.returningVisitors);
+						drawVisitChart(data.newVisitors, data.returningVisitors);
+					});
+				}, 1000)();
 			}
 			
-			function update_signup() {
-				
+			function update_register() {
+				throttle(function(){
+					$.post('/app/getsignup/{{$appcode}}', function(data){
+						data = JSON.parse(data);
+						$('.id_newsignup').html(data.signup);
+					})
+				}, 1000)();
 			}
 			
 			websock.appChange('{{$appcode}}', 'type.pageview', update_pageview);
-			websock.appChange('{{$appcode}}', 'type.pageview', update_signup);
+			websock.appChange('{{$appcode}}', 'type.register', update_register);
 			
 			var $tp = $('#timepick');
 			var tp = $tp.dateRangePicker();
@@ -168,44 +180,50 @@
 			}
 		});
 
-		function drawVisitNumber() {
+		function drawVisitNumber( newv, retv) {
 			var canvas = document.getElementById("visitchart");
 			var ctx = canvas.getContext("2d");
 			ctx.font = "22px Roboto";
 			ctx.fillStyle = "black";
 			ctx.textAlign = "center";
-			ctx.fillText("{{$dashboard->n_new_visitor + $dashboard->n_returning_visitor}}", canvas.width / 2, canvas.height / 2);
+			ctx.fillText(  parseInt(newv) + parseInt(retv) + "" , canvas.width / 2, canvas.height / 2);
 			ctx.font = "14px Roboto";
 			ctx.fillStyle = "black";
 			ctx.textAlign = "center";
 			ctx.fillText("visitors", canvas.width / 2, canvas.height / 2 + 20);
 		}
 
-		Chart.pluginService.register({
-			afterDraw: function (chart) {
-				if (chart == visitChart) {
-					drawVisitNumber();
-				}
-			}
-		});
-
-		var visitChart = new Chart($("#visitchart"), {
-			type: 'doughnut',
-			data: {
-				labels: ["New visitor", "Returning visitor"],
-				datasets: [
-					{
-						data: [{{$dashboard->n_new_visitor}}, {{$dashboard->n_returning_visitor == 0 ? 1 : $dashboard->n_returning_visitor}}],
-						backgroundColor: ["#4E6CC9", "#8C8C8C"],
-						hoverBackgroundColor: ["#4E6CC9", "#8C8C8C"]
+		function drawVisitChart(newv, retv)
+		{
+			newv = parseInt(newv);
+			newv = newv == 0 ? 1 : newv;
+			retv = parseInt(retv);
+			var visitChart = new Chart($("#visitchart"), {
+				type: 'doughnut',
+				data: {
+					labels: ["New visitor", "Returning visitor"],
+					datasets: [
+						{
+							data: [newv, retv],
+							backgroundColor: ["#4E6CC9", "#8C8C8C"],
+							hoverBackgroundColor: ["#4E6CC9", "#8C8C8C"]
+						}
+					]
+				},
+				options: options
+			});
+			Chart.pluginService.register({
+				afterDraw: function (chart) {
+					if (chart == visitChart) {
+						drawVisitNumber( newv,retv);
 					}
-				]
-			},
-			options: options
-		});
-		drawVisitNumber();
+				}
+			});
 
+			drawVisitNumber( newv,retv);
+		}
 
+		drawVisitChart({{$dashboard->n_new_visitor}},{{ $dashboard->n_returning_visitor}});
 	</script>
 @endsection
 @section('content')
@@ -220,10 +238,10 @@
 								<div class="col-sm-6" style="font-size: 12px">
 									<h6 style="margin-bottom:0; margin-top:20px;  color: gray">TODAY VISITOR</h6>
 									<div class=""><i class="fa fa-circle" style="color: #4E6CC9"></i> New visitor</div>
-									<div class="medium text-center" style="color: #4E6CC9">{{$dashboard->n_new_visitor}}</div>
-									<div style="margin-top: 10px"><i class="fa fa-circle" style="color: #8C8C8C"></i> Returning visitor
+									<div class="medium text-center id_newv" style="color: #4E6CC9">{{$dashboard->n_new_visitor}}</div>
+									<div style="margin-top: 10px"><i class="fa fa-circle " style="color: #8C8C8C"></i> Returning visitor
 									</div>
-									<div class="medium text-center" style="color: #8C8C8C;">{{$dashboard->n_returning_visitor}}</div>
+									<div class="medium text-center id_retu" style="color: #8C8C8C;">{{$dashboard->n_returning_visitor}}</div>
 
 								</div>
 								<div class="col-sm-6">
@@ -246,7 +264,7 @@
 								<h6 style="margin: 0; color: gray">TODAY NEW SIGNUP</h6>
 							</div>
 							<div class="content text-center" style="padding-top: 0">
-								<span class="big">{{$dashboard->n_new_signup}}</span>
+								<span class="big id_newsignup">{{$dashboard->n_new_signup}}</span>
 							</div>
 						</div>
 					</div>
