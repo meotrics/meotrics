@@ -310,7 +310,10 @@ $props = isset($props) ? $props : [];
 										stacked: true
 									}]
 								},
-								stacked: true
+								stacked: true,
+                                                                gridLines: {
+                                                                    display: false
+                                                                }
 							};
 							data_chart.labels = data.labels;
 							data_chart.datasets = [];

@@ -199,7 +199,7 @@
                                 <span class="hidden-xs">{{ Auth::user()->email }}</span>
                             </a>
                             <ul class="dropdown-menu" style="min-width: 262px">
-                                <li><a href="#" class="id_trackingcode">Get tracking code</a></li>
+<!--                                <li><a href="#" class="id_trackingcode">Get tracking code</a></li>
                                 <li><a href="/actiontype/{{$appcode}}">Manage action types</a></li>
                                 @if(count($apps) !=0)
                                 <li class="divider"></li>
@@ -207,9 +207,9 @@
                                 @if($ap->code != $appcode)
                                 <li><a href="/dashboard/{{$ap->code }}">Switch to {{$ap->name}}</a></li>
                                 @endif
-                                @endforeach
-                                <li><a href="/app">App management</a></li>
-                                @endif
+                                @endforeach-->
+                                <li><a href="/app/manage/{{$appcode}}">App management</a></li>
+                                <!--@endif-->
                                 <li class="divider"></li>
                                 <li><a href="/user/profile">Profile & Billing</a></li>
                                 <li><a href="/auth/signout">Sign out</a></li>
