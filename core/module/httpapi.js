@@ -11,7 +11,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	var code;
 	var actionmgr = new ActionMgr.ActionMgr(db, converter, prefix, "mapping", valuemgr, ref);
 	var me = this;
-	this.onchange = function(){};
+	this.onchange = function () { };
 
 	function loadCode(appid, actionid, callback) {
 		// cache mtcode in code for minimize disk usage, lazy load
@@ -65,7 +65,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		};
 		for (var i in request.params) if (request.params.hasOwnProperty(i))
 			if (i.startsWith('_') === false)
-				res[i] = request.params[i];
+				res[i] = isNaN(request.params[i]) ? request.params[i] : parseFloat(request.params[i]);
 
 		// extract campaign
 		var query = url.parse(uri, true).query;
@@ -81,22 +81,22 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	function getMtid(req, appid, res, callback) {
 		var mtid = getCookie(req, "mtid");
 		if (mtid === undefined) {
-		    mtid = req.params._mtid;
-		    if (mtid === undefined) {
-		        return actionmgr.setupRaw(appid, function (mtid) {
-		            setCookie(res, "mtid", mtid, appid);
-		            callback(mtid);
-		        });
-		    }
+			mtid = req.params._mtid;
+			if (mtid === undefined) {
+				return actionmgr.setupRaw(appid, function (mtid) {
+					setCookie(res, "mtid", mtid, appid);
+					callback(mtid);
+				});
+			}
 		}
 
 		// check if mtid is valid
 		actionmgr.ismtidValid(appid, mtid, function (ret) {
 			if (ret) callback(mtid);
 			else {
-				eraseCookie(res, "mtid",  appid);
+				eraseCookie(res, "mtid", appid);
 				actionmgr.setupRaw(appid, function (mtid) {
-					setCookie(res, "mtid", mtid,  appid);
+					setCookie(res, "mtid", mtid, appid);
 					callback(mtid);
 				});
 			}
@@ -109,13 +109,14 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
 	function clear(req, res) {
 		// delete the cookie
-		eraseCookie(res, 'mtid',  req.appid);
+		eraseCookie(res, 'mtid', req.appid);
 		res.end();
 	}
 
 	function track(req, res) {
 		var appid = req.appid;
 		var data = trackBasic(req);
+
 		getMtid(req, appid, res, function (mtid) {
 			data._mtid = mtid;
 			actionmgr.saveRaw(appid, data, function (actionid) {
@@ -126,21 +127,21 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		});
 	}
 
-    // identify an user
-    // if mtid not exists in the parameter ->create one
+	// identify an user
+	// if mtid not exists in the parameter ->create one
 	function info(req, res) {
 		var appid = req.appid;
 		getMtid(req, appid, res, function (mtid) {
 			var data = {};
 			for (var i in req.params) if (req.params.hasOwnProperty(i))
 				if (i.startsWith('_') === false) data[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
-			
-			actionmgr.identifyRaw(appid, {mtid: mtid, user: data}, function (mtid) {
+
+			actionmgr.identifyRaw(appid, { mtid: mtid, user: data }, function (mtid) {
 				//set new mtid if need
-				setCookie(res, "mtid", mtid,  appid);
+				setCookie(res, "mtid", mtid, appid);
 				res.setHeader('Content-Type', 'text/plain');
 
-				res.end("\""+mtid + "\"");
+				res.end("\"" + mtid + "\"");
 			});
 		});
 	}
@@ -191,7 +192,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	}
 
 	function pageview(req, res) {
-	    var appid = req.appid;
+		var appid = req.appid;
 		// record an new pageview
 		var data = trackBasic(req);
 		getMtid(req, appid, res, function (mtid) {

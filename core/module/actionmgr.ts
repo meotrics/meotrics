@@ -167,7 +167,7 @@ simpleprop[ids._listProduct] = user[ids._listProduct].unshift(data.pname);
 											simpleprop[ids._reftype].push(data._reftype);
 									}
 								}
-								if (typeid === 'signup' || typeid === 'login') {
+								if (typeid === 'register' || typeid === 'login') {
 									simpleprop[ids.registed] = true;
 								}
 
