@@ -4,7 +4,7 @@ Route::get('/', 'PermController@index');
 
 Route::get('/app/edit/{appcode}', 'PermController@getedit');
 Route::post('/app/edit/{appcode}', 'PermController@postedit');
-Route::get('/app/{appcode}', 'PermController@manage');
+Route::get('/app', 'PermController@app');
 Route::post('/app/create','PermController@create' );
 Route::post('/app/setup_status/{appcode}', 'PermController@setup_status');
 Route::post('/app/count_traffic/{appcode}', 'PermController@count_traffic');

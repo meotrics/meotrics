@@ -355,11 +355,7 @@ class AuthController extends Controller
 			}
 
 			\Auth::loginUsingId($userid);
-                        $apps = DB::table('apps')->join('user_app', 'apps.id', '=', 'user_app.appid')
-			->where('user_app.userid', $userid)->get();
-                        $appcode = isset($apps[0]) ? $apps[0]->code : '';
-                        
-			return "/app/".$appcode;
+			return "/app";
 		} else {
 			return view("errors.500", ['error'=>'wrong tokenid']);
 		}
