@@ -11,3 +11,14 @@ obj/
 web.Debug.config
 web.Release.config
 web.config
+
+app.js
+module/actionmgr.js
+module/crudapi.js
+module/dashboard.js
+module/location.js
+module/location.ts
+module/referer.js
+module/trendmgr.js
+module/ws.js
+utils/redisscanner.js
