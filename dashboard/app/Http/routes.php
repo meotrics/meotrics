@@ -4,13 +4,15 @@ Route::get('/', 'PermController@index');
 
 Route::get('/app/edit/{appcode}', 'PermController@getedit');
 Route::post('/app/edit/{appcode}', 'PermController@postedit');
-Route::get('/app', 'PermController@app');
+Route::get('/app/{appcode}', 'PermController@manage');
 Route::post('/app/create','PermController@create' );
 Route::post('/app/setup_status/{appcode}', 'PermController@setup_status');
 Route::post('/app/count_traffic/{appcode}', 'PermController@count_traffic');
 Route::post('/app/traffic14/{appcode}', 'PermController@traffic14');
 Route::post('/app/getpageview/{appcode}', 'PermController@getPageview');
 Route::post('/app/getsignup/{appcode}', 'PermController@getSignup');
+Route::get('/app/manage/{appcode}', 'PermController@manage');
+Route::post('/app/postadd/{appcode}', 'PermController@postadd');
 
 Route::get('/app/setup_status/{appcode}', 'PermController@setup_status');
 Route::get('/app/count_traffic/{appcode}', 'PermController@count_traffic');

@@ -174,4 +174,56 @@ class PermController extends Controller
 			return new Response();
 		else abort(403, 'Unauthorized action');
 	}
+        
+    public function manage(Request $request, $appcode){
+        $ap = DB::table('apps')->where('code', $appcode)->first();
+        if ($ap == null) abort(500, 'cannot find app: ' . $appcode);
+
+        $ap->owner = \App\User::find($ap->ownerid);
+        $ap->agencies = DB::table('user_app')->join('users', 'users.id', '=', 'user_app.userid')->where('user_app.appid', $ap->id)->get();
+        $your_role = '';
+        if($ap->agencies){
+            foreach($ap->agencies as $ag){
+                if($ag->appid != $ap->id || $ag->userid != $ap->ownerid){
+                    continue;
+                }
+                if($ag->can_perm){
+                    $your_role = 'Full control';
+                    continue;
+                }
+                if($ag->can_struct){
+                    $your_role = 'Edit app structure';
+                    continue;
+                }
+                if($ag->can_report){
+                    $your_role = 'Create or edit reports';
+                    continue;
+                }
+            }
+        }
+        $status = $this->setup_status($request, $appcode);
+        $traffic = $this->count_traffic($request, $appcode);
+        return view('app/manage', [
+            'ap' => $ap, 
+            'appcode' => $appcode,
+            'status' => $status,
+            'traffic' => $traffic,
+            'your_role' => $your_role,
+        ]);
+    }
+    
+    public function postadd(Request $request, $appcode)
+    {
+        $name = $request->input('name');
+        $url = $request->input('url');
+
+        if ($name == null || $name == '')
+            abort(500, 'name must not be empty');
+
+        $ap = DB::table('apps')->where('apps.code', $appcode)->first();
+        if ($ap == null) abort(500, 'cannot find app: ' . $appcode);
+
+        DB::table('apps')->where('id', $ap->id)->update(['name' => $name, 'url'=>$url]);
+        return json_encode(['success' => true]);
+    }
 }

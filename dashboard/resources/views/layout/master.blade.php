@@ -208,7 +208,7 @@
                                 <li><a href="/dashboard/{{$ap->code }}">Switch to {{$ap->name}}</a></li>
                                 @endif
                                 @endforeach
-                                <li><a href="/app">App management</a></li>
+                                <li><a href="/app/{{$appcode}}">App management</a></li>
                                 @endif
                                 <li class="divider"></li>
                                 <li><a href="/user/profile">Profile & Billing</a></li>
