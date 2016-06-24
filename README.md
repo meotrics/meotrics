@@ -3,7 +3,6 @@ Hệ thống thu thập và phân tích hành vi người dùng
 [![](http://blog.meotrics.com/wp-content/uploads/2016/03/Logo_Blue_word-1.png)](http://meotrics.com) [![License](https://img.shields.io/crates/l/rustc-serialize.svg)](https://opensource.org/licenses/Apache-2.0) ![](http://d1va5oqn59yrvt.cloudfront.net/uploads/2014/10/hiring-header.png)
 Please contact meotrics@gmail.com
 
-
 * * *
 
 Cài đặt môi trường DEV
@@ -16,9 +15,10 @@ Trỏ danh sách tên miền sau để tiện phát triển hệ thống:
 
 | Tên miền              | Địa chỉ           |
 |-----------------------|-------------------|
-|`meotrics.dev`           | `127.0.0.1`         |
-|`app.meotrics.dev`		| `127.0.0.1`		|
-|`client.meotrics.dev`		| `127.0.0.1`		|
+|`meotrics.dev`         | `127.0.0.1`       |
+|`app.meotrics.dev`		  | `127.0.0.1`		    |
+|`client.meotrics.dev 	| `127.0.0.1`		    |
+|`api.meotrics.dev`     | `127.0.0.1`       |
 
 Trong hệ thống Window, sửa file, `Windows\\System32\\drivers\\etc\\host`, trong Linux hoặc Mac, sửa file `/etc/hosts` (`/private/etc/hosts`)
 
@@ -34,63 +34,29 @@ Trong hệ thống Window, sửa file, `Windows\\System32\\drivers\\etc\\host`, 
   Vào thư mục `meotrics/core/config`, copy file `production.json` thành `default.json`
 
 #### Yêu cầu cài đặt các module sau
-
+* [Git LFS](https://git-lfs.github.com/)
+* [Typescript](https://www.typescriptlang.org/)
 * Nodejs
-* Mysql
-* Mongodb
+* MySQL
+* MongoDb
 * Redis
-* Composer
+* Composer (xem cách cài đặt composer ở [đây](docs/composerinstall))
 * Npm
 * Nginx hoặc Apache
 
 ### Cài đặt Front End
-1. Cài đặt Composer
-  * Với môi trường Windows
+Chuyển vào thư mục dashboard (`meotrics/dashboard`), gõ
 
-    Download tại [đây](https://getcomposer.org/Composer-Setup.exe)
+```bash
+# composer install
+# composer update
+# chmod -R 777 storage
+```
 
-    **Chú ý** enable module `openssl` (tìm file `php.ini`, bỏ comment tất cả các dòng chứa *extension=php_openssl.dll*), enable thêm module `mbstring`
-  * Với môi trường Linux
-
-    Gõ lệnh sau trong terminal
-
-    ```bash
-    curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
-    ```
-  * Với môi trường Mac
-    Cài đặt mcrypt trước, sau đó gõ
-
-    ```bash
-    brew update
-    brew upgrade
-    brew tap homebrew/dupes
-    brew tap josegonzalez/homebrew-php
-    brew install php54-mcrypt
-    php --version // To Test your php
-    sudo composer update
-    ```
-
-2. Khởi tạo Laravel framework
-  Chuyển vào thư mục dashboard (`meotrics/dashboard`), tạo thư mục database, gõ
-
-  ```bash
-  sudo composer install
-  sudo composer update
-  sudo chmod -R 777 storage
-  ```
-3. [optional] Xóa cache
-  ```bash
-  php artisan route:clear
-  php artisan clear-compiled
-  php artisan cache:clear
-  ```
 ### Cài đặt Backend
-1. Cài đặt nodejs
-  Chuyển vào thư mục core (`meotrics/core`), gõ
 
-  ```bash
-  npm install
-  ```
+Chuyển vào thư mục core (`meotrics/core`), gõ `npm install` để download các package cần thiết. 
+Sau khi cài đặt xong, gõ `tsc` để biên dịch lại mã nguồn typescript.
 
 ### Cài đặt web server
 Có thể chạy hệ thống bằng apache hoặc nginx, với mỗi server, copy và sửa các đoạn config như dưới
@@ -129,20 +95,19 @@ Restart nginx bằng lệnh
 
   Import database từ file  `\resources\meotrics_dashboard.sql`
 
-Chạy chương trình
+Khởi động hệ thống
 ---
 
 * Chạy apache (hoặc nginx) ở cổng `80`
 * Chay Mysql ở cổng `3306` _(cổng mặc định của mysql)_
 * Chạy mongodb ở cổng `27017` _(cổng mặc định của mongodb)_
 
-* Chạy backend bằng lệnh
+* Chuyển vào thư mục `meotrics/core`, khởi động các backend services bằng lệnh
   ```bash
-  cd core
   node app.js
   ```
-  Backend sẽ lắng nghe ở 2 cổng `2108` và `1711`.
+  Các backend services sẽ lắng nghe ở 3 cổng `2108`, `1711` và `2910`.
 
-* Truy cập vào địa chỉ [meotrics.dev](client.meotrics.dev) để vào website.
+* Truy cập vào địa chỉ [client.meotrics.dev](client.meotrics.dev) để vào website.
 * Truy cập vào địa chỉ [app.meotrics.dev/auth/login](http://app.meotrics.dev/auth/login) để đăng nhập.
 * Truy cập vào địa chỉ [client.meotrics.dev](client.meotrics.dev) để chạy web site client.
