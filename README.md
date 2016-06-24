@@ -22,6 +22,18 @@ Trỏ danh sách tên miền sau để tiện phát triển hệ thống:
 
 Trong hệ thống Window, sửa file, `Windows\\System32\\drivers\\etc\\host`, trong Linux hoặc Mac, sửa file `/etc/hosts` (`/private/etc/hosts`)
 
+#### Yêu cầu cài đặt các module sau
+* [Git LFS](https://git-lfs.github.com/)
+* [Typescript](https://www.typescriptlang.org/)
+* Nodejs
+* MySQL
+* MongoDb
+* Redis
+* Composer (xem cách cài đặt composer ở [đây](docs/composerinstall))
+* Npm
+* Nginx hoặc Apache
+
+
 #### config file
 * Front-end
 
@@ -33,16 +45,11 @@ Trong hệ thống Window, sửa file, `Windows\\System32\\drivers\\etc\\host`, 
 
   Vào thư mục `meotrics/core/config`, copy file `production.json` thành `default.json`
 
-#### Yêu cầu cài đặt các module sau
-* [Git LFS](https://git-lfs.github.com/)
-* [Typescript](https://www.typescriptlang.org/)
-* Nodejs
-* MySQL
-* MongoDb
-* Redis
-* Composer (xem cách cài đặt composer ở [đây](docs/composerinstall))
-* Npm
-* Nginx hoặc Apache
+  Ở Git Bash, gõ
+  ```bash
+  git lfs install
+  git lfs pull
+  ```
 
 ### Cài đặt Front End
 Chuyển vào thư mục dashboard (`meotrics/dashboard`), gõ
