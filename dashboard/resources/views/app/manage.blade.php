@@ -28,7 +28,7 @@
                                             <h6>Manage App or</h6>
                                         </div>
                                         <div class="track-new-app">
-                                            <button type="button" class="action button blue button-radius" data-toggle="modal" data-target="#addModal">
+                                            <button type="button" class="action button blue button-radius-mini" data-toggle="modal" data-target="#addModal">
                                                 <span class="label">Track new app</span>
                                             </button>
                                         </div>

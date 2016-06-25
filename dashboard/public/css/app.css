@@ -288,7 +288,7 @@ select {
 
 .form-control {
 	height: 34px;
-	font-size: 15px;
+	font-size: 14px;
 	padding-bottom: 6px;
 	/*
 	 * update 07/05/2016
@@ -696,11 +696,12 @@ div.back .fa-chevron-left {
 
 .medium
 {
-	font-size: 18px;
+	font-size: 21px;
 }
 
 .big {
-	font-size: 25px;
+	font-size: 50px;
+
 }
 
 .bigup {
@@ -726,6 +727,7 @@ div.back .fa-chevron-left {
 
 .card .header {
 	padding: 15px 15px 0;
+	height: 45px;
 }
 
 .onoffswitch {
@@ -846,8 +848,8 @@ div.back .fa-chevron-left {
  */
 .user-image{
     float: left;
-    width: 25px;
-    height: 25px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     margin-right: 10px;
     margin-top: -2px;
