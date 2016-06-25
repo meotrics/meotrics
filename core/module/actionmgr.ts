@@ -141,10 +141,10 @@ simpleprop[ids._numberPurchase] = user[ids._numberPurchase] + 1;
 if(user[ids._listProduct] === undefined){                                                                      
 													user[ids._listProduct] = [];                                                                               
 }                                                                                                              
-if(user[ids._listProduct].length == 5){                                                                        
+if(user[ids._listProduct].length > 4){                                                                        
 																 user[ids._listProduct].shift();                                                                            
 }                                                                                                              
-simpleprop[ids._listProduct] = user[ids._listProduct].unshift(data.pname);                                     
+simpleprop[ids._listProduct] = user[ids._listProduct].push(data.pname);                                     
                           
 								}
 								if (typeid === 'pageview') {
