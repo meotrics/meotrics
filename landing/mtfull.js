@@ -1,11 +1,89 @@
 (function () {
+	var T = 2000;
+	var SESSIONGAP = 1200;
+	var STARTANDLEAVE;
+	var ISBLUR, lastcycle;
+	var lefttime;
 	var host = "meotrics.com";
 	if(location.hostname == "client.meotrics.dev") host = "meotrics.dev";
 	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document;
 	
-	window.addEventListener("beforeunload", function (e) {
-		ajax('x/' + mt.actionid);
+	function attach(event, fn)
+	{
+		if (window.addEventListener)
+				window.addEventListener(event, fn, false);
+		else if (window.attachEvent)
+			window.attachEvent('on' + event, fn);
+	}
+
+	function interact(){
+		totalidle = 0;
+	}
+
+	attach("beforeunload", function (e) {
+		var delta = Math.round(new Date().getTime() / 1000) - lastcycle;
+		stopsession(totaltime+delta);
 	});
+
+	attach('keydown', interact);
+	attach('mousemove', interact);
+	attach('mousedown', interact);
+	attach('scroll', interact);
+	attach('resize', interact);
+	attach('pagehide', interact);
+	attach('pageshow', interact);
+
+	attach('blur', function(){
+		ISBLUR = true;
+		lefttime = Math.round(new Date().getTime() / 1000);
+	})
+
+	
+	attach('focus', function(){
+		if(ISBLUR === undefined){
+			startsession()
+		}
+		if(ISBLUR === false) return;
+		if(ISBLUR === true)
+		{
+			var delta = Math.round(new Date().getTime() / 1000) - lefttime;
+			//the user has left for too long
+			if(delta > SESSIONGAP)
+			{
+				stopsession(totaltime);
+				startsession();
+				return;
+			}
+			else
+			{}
+		}
+		ISBLUR = false;
+	});
+
+
+	function stopsession(sessiontime)
+	{
+		ISBLUR = undefined;
+		ajax('x/' + mt.actionid, {sessiontime: sessiontime});
+	}
+
+	function startsession()
+	{
+		//start a new pageview,
+	}
+
+	function backgroundtimer()
+	{
+		if(ISBLUR === false)
+		{
+			totalidle+=T;
+			totaltime+=T;
+			if(totalidle > SESSIONGAP)
+				stopsession(Math.max(totaltime, SESSIONGAP));
+		}
+		lastcycle = Math.round(new Date().getTime() / 1000);
+		return setTimeout(backgroundtimer, T)
+	}
 
 	function ajax(url, data, callback) {
 		var script = doc.createElement('script');
