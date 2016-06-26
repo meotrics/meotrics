@@ -165,7 +165,7 @@
 											</div>
 										</div>
 
-										<div class="siteinfo" style="margin-bottom: 30px">
+										<div class="siteinfo">
 											<div class="form-group">
 												<input type="text" placeholder="Site name" class="minput username"
 												       name="sitename" value="{{ old('name') }}" required>
@@ -176,46 +176,49 @@
 											</div>
 										</div>
 
-										<div class='form-group text-left' >
-											<input type='checkbox' id='input4' required>
-											<label for="input4"><strong class="text-left">
-													I agree with Meotrics&rsquo;s
-													<a href="" data-toggle="modal" data-target="#privacy_dialog">Policy</a>
-													and
-													<a href="" data-toggle="modal" data-target="#terms_dialog">Terms</a>
-												</strong></label>
-										</div>
-
-
 										<div class="form-group  text-left">
+											<div class="form-group">
+												<input type="email" class="minput email" placeholder="Email"
+													   name="email" value="{{ old('email') }}" required>
+											</div>
 
-											<p>Sign up with <button class="button action red" type="button" id="gsin" style=" vertical-align: middle;height: 32px;">
-											<span class="label"> <i class="fa fa-google-plus"
-											                        style="vertical-align: baseline; text-shadow: none;"></i>
-												<span id="ggmes" class="ml">Google</span>
-											</span>
-												</button> Or use your email address</p>
+											<div class='form-group text-left' >
+												<input type='checkbox' id='input4' required>
+												<label for="input4"><strong class="text-left">
+														I agree with Meotrics&rsquo;s
+														<a href="" data-toggle="modal" data-target="#privacy_dialog">Policy</a>
+														and
+														<a href="" data-toggle="modal" data-target="#terms_dialog">Terms</a>
+													</strong></label>
+											</div>
 
-												<input type="hidden" name="_token" value="{{ csrf_token() }}">
-												@if (isset($error))
-													<div class="text-danger">
+											<div style="text-align: center">
 
-																<p>{{ $error }}</p>
-
-													</div>
-												@endif
-
-												<div class="form-group">
-													<input type="email" class="minput email" placeholder="Email"
-													       name="email" value="{{ old('email') }}" required>
-												</div>
-
-
-												<div class="form-group text-left" style="margin-top: 20px; margin-bottom: 0px">
-													<button class="signinbtn button action blue" style="vertical-align: top;">
+												<div class="form-group " style="margin-top: 20px; margin-bottom: 0px">
+													<button class="signinbtn button action blue" style="vertical-align: top;border-radius: 16px;padding-left: 14px;padding-right: 14px;margin-bottom: 10px;">
 														<span class="label">Sign up</span>
 													</button>
 												</div>
+
+												<p>------------------------- Or sign up with -------------------------</p>
+
+												<button class="button action red" type="button" id="gsin" style="vertical-align: top;border-radius: 16px;padding-left: 14px;padding-right: 14px;margin-bottom: 10px;">
+												<span class="label">
+													{{--<i class="fa fa-google-plus"--}}
+																		{{--style="vertical-align: baseline; text-shadow: none;"></i>--}}
+													<span id="ggmes" >Google</span>
+												</span>
+													</button>
+
+													<input type="hidden" name="_token" value="{{ csrf_token() }}">
+													@if (isset($error))
+														<div class="text-danger">
+
+																	<p>{{ $error }}</p>
+
+														</div>
+												</div>
+											@endif
 										</div>
 									</form>
 								</div>

@@ -96,15 +96,15 @@
 
 									<form role="form" class="form-inputs col-sm-8 col-sm-offset-2" method="POST" action="/auth/login">
 										<h1 class="login-msg">Hey Buddy, welcome back!</h1>
-										<button class=" button " type="button" id="gsin" style="vertical-align: top; background: white">
-										<span class="label"> <i class="fa fa-google-plus" style="vertical-align: baseline; color: #E00000; text-shadow: none;"></i>
-											<span id="ggmes" class="ml">Sign up/Sign in with Google Account</span>
+										<button class=" button action red" type="button" id="gsin" style="vertical-align: top;width: 100%;border-radius: 16px;">
+										<span class="label">
+											<span id="ggmes" class="ml">Sign in with Google</span>
 											</span>
 										</button>
 
-										<h1 class="login-msg" style="margin-bottom: 0; margin-bottom: 10px; margin-top:30px">Or, use your
-											password</h1>
-
+										{{--<h1 class="login-msg" style="margin-bottom: 0; margin-bottom: 10px; margin-top:30px">Or, use your--}}
+											{{--password</h1>--}}
+										<p style="margin-top: 20px">------------------------- Or use your password -------------------------</p>
 
 										@if(count($errors) > 0)
 											<div class="text-danger">
@@ -125,18 +125,23 @@
 										</div>
 
 										<div class="form-group text-left" style="margin-top: 20px;">
-											<button class="signinbtn button action blue" style="vertical-align: top;">
-												<span class="label">Sign in</span>
-											</button>
-											<div class="ml" style="display: inline-block; margin-left: 20px">
+
+											<div class="ml">
 
 													<input id="rem" type="checkbox" data-toggle="checkbox" name="remember" style="margin-top: 0">
 													<label for="rem" style="margin-bottom: 0px">	Remember me</label>
 
-												<p style="margin-bottom: 0;">
+											</div>
+											<button class="signinbtn button action blue" style="vertical-align: top;border-radius: 16px;padding-left: 14px;padding-right: 14px;margin-bottom: 20px;width: 100%;margin-top: 10px">
+													<span class="label">Sign in</span>
+											</button>
+
+											<div>
+												<p style="margin-bottom: 10;float:right;">
 													<a class="" href="/auth/reset">Forgotten Your Password?</a>
 												</p>
 											</div>
+
 										</div>
 									</form>
 								</div>
