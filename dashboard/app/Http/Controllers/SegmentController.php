@@ -65,7 +65,6 @@ class SegmentController extends Controller
 			'fields' => [],
 			'conditions' => [],
 		];
-
 		$html_sub_condition = View::make('segment/partials/condition-sub-item');
 		$html_sub_condition = preg_replace("/\r|\n/", "", $html_sub_condition->render());
 		$html_condition_item = View::make('segment/partials/condition_item');

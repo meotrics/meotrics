@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="row">
-    <div class="card col-md-12">
+    <div class="card col-md-12 vl-tab">
         <div class="row">
             <!--<div class="header col-md-12">-->
             <div class="app-manage">
@@ -10,12 +10,12 @@
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs" role="">
                     <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
-                    <li role=""><a href="{{URL::to('app/edit/'.$appcode)}}" >Team member</a></li>
+                    <li role="presentation"><a href="{{URL::to('app/edit/'.$appcode)}}" >Team member</a></li>
                     <li role="presentation"><a href="{{URL::to('actiontype/'.$appcode)}}" >Event management</a></li>
                 </ul>
 
                 <!-- Tab panes -->
-                <div class="tab-content">
+                <div class="tab-content vl-tab-content">
                     <div role="tabpanel" class="tab-pane active" id="home">
                         <div class="manage-area col-md-9">
                             <div class="title ">
@@ -25,7 +25,7 @@
                                 <form class="form-horizontal pb10" method="post" action="{{URL::to('app/postadd/'.$appcode)}}">
                                     <div class="row">
                                         <div class="description">
-                                            <h6>Manage App or</h6>
+                                            <h6 style="text-transform: none;color:black">Manage app or</h6>
                                         </div>
                                         <div class="track-new-app">
                                             <button type="button" class="action button blue button-radius-mini" data-toggle="modal" data-target="#addModal">
@@ -106,7 +106,7 @@
                                             <h6><span>Paste this snippet just before the&nbsp;<b>&lt;/head&gt;</b>&nbsp;tag of your page:</span></h6>
                                         </div>
                                     </div>
-                                    <div class="row" style="padding-left: 25px">
+                                    <div class="row" style="padding-left: 25px;margin-top: 15px;">
                                         <pre class="pre_client_setup ng-binding" style="border-left: 4px solid #4B8DF8;">&lt;script type="text/javascript"&gt; 
                                         var mtxJsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
                                         document.write(unescape("%3Cscript src='" + mtxJsHost + "www.metrixa.com/ConvTrackNew/Scripts/metrixa_search_tracker.js' type='text/javascript'%3E%3C/script%3E"));

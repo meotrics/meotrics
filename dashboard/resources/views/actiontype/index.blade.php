@@ -10,7 +10,7 @@
 
 @section('content')
 <div class="row">
-<div class="card col-md-12">
+<div class="card col-md-12 vl-tab">
     <div class="row">
         <div class="app-manage">
             <!-- Nav tabs -->
@@ -21,7 +21,7 @@
                 </ul>
 
                 <!-- Tab panes -->
-                <div class="tab-content">
+                <div class="tab-content vl-tab-content">
                     <div role="tabpanel" class="tab-pane active" id="home">
                         <div class="manage-area col-md-12">
                             <div class="title ">

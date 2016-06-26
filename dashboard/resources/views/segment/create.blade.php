@@ -14,7 +14,6 @@
 					wildcard: '%QUERY'
 				}
 			});
-
 			$dom.typeahead({minLength: 0, highlight: true}, {
 				name: 'best-pictures',
 				display: 'value',
@@ -161,8 +160,10 @@
 				<div class="col-md-12">
 					<input type="hidden" class="row hidden" value="{{$segment->_id}}" name="id">
 					<div class=" row">
-						<div class="col-md-2">
+						<div class="col-md-1">
 							<h6>Name</h6>
+							</div>
+						<div class="col-md-4">
 							<input type="text" class="form-control " name="name" value="{{Input::old('name', $segment->name)}}"
 							       placeholder="Enter name"/>
 							@if($errors->any())
@@ -170,16 +171,31 @@
 								<p class="errror">{{$errors->first('conditions')}}</p>
 							@endif
 						</div>
+					</div>
+					<div class="row">
+							<div class="col-md-1" style="padding-top: 0">
+								<h6>Description</h6>
+							</div>
+							<div class="col-md-6">
+								<!--<label class="col-md-12" style="margin-top: 10px">Segment description</label>-->
 
+								<input type="text" class="form-control" name="description" placeholder="Enter description"
+									   value="{{isset($segment->description) ? $segment->description : ''}}"/>
+
+							</div>
+					</div>
+					<div>
 						<div class="col-md-10" id="div-filter-date" style="display: none">
-							<h6>Filter date</h6>
-
-
-							<div class="input-group" style="width: 300px;">
-                            <span class="input-group-addon">
-                                <i class="pe-7s-date" style="font-size:26px; padding-left:6px;"></i>
-                            </span>
-								<input type="text" class="form-control" id="segment-date-range" name="timerange">
+							<div>
+								<h6>Filter date</h6>
+							</div>
+							<div>
+								<div class="input-group" style="width: 300px;">
+                            		<span class="input-group-addon">
+                                		<i class="pe-7s-date" style="font-size:26px; padding-left:6px;"></i>
+                            		</span>
+									<input type="text" class="form-control" id="segment-date-range" name="timerange">
+								</div>
 							</div>
 						</div>
 					</div>
@@ -215,18 +231,6 @@
 							</div>
 						</div>
 					</div>
-
-					<div class="row">
-						<div class="col-md-12" style="padding-top: 0">
-							<h6>Description</h6>
-							<!--<label class="col-md-12" style="margin-top: 10px">Segment description</label>-->
-
-							<input type="text" class="form-control" name="description" placeholder="Enter description"
-							       value="{{isset($segment->description) ? $segment->description : ''}}"/>
-
-						</div>
-					</div>
-
 					<div class="row">
 						<div class="col-md-12">
 							<!--                        <button type="button" class="action button blue button-radius" onclick="backFn()">

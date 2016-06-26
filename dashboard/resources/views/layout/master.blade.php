@@ -117,8 +117,8 @@
                         <p>Revenue</p>
                     </a>
                 </li>
-                <li class="{{ Route::getCurrentRoute()->getPath() == 'campaign' ? 'active' : '' }}">
-                    <a href="/campaign/{{$appcode}}">
+                <li class="{{ Route::getCurrentRoute()->getPath() == 'marketing' ? 'active' : '' }}">
+                    <a href="/marketing/{{$appcode}}">
                         <i class="pe-7s-graph3"></i>
                         <p>Marketing Campaign</p>
                     </a>
@@ -179,7 +179,7 @@
                         <li class="dropdown" style="margin-top:6px;margin-bottom: 6px">
                             <a href="#" class="button action blue button-radius-mini"
                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                <span class="label limit-char font-mini" style="padding: 0px!important;">{{ $appname }}</span>
+                                <span class="label limit-char font-mini" style="padding: 0px!important;margin-top:5px">{{ $appname }}</span>
                                 <b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu" style="min-width: 137px;">

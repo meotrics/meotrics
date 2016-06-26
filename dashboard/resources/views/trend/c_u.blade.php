@@ -33,7 +33,7 @@
 
 						<div class="row">
 							<div class="col-md-2">
-								<h6 class="pull-right" style="margin-top: 11px">LIST</h6>
+								<h6 class="pull-right" style="margin-top: 11px">List</h6>
 							</div>
 							<div class="col-md-2">
 								<select class="form-control" id="order" name="Trend[order]">
@@ -66,7 +66,7 @@
 
 						<div class="row">
 							<div class="col-md-2">
-								<h6 class="pull-right" style="margin-top: 11px">by</h6>
+								<h6 class="pull-right" style="margin-top: 11px">By</h6>
 							</div>
 							<div class="col-md-6">
 								<select class="form-control" id="meotrics" name="Trend[meotrics]">

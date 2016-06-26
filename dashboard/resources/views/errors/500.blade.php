@@ -33,7 +33,7 @@
 </head>
 <body>
 <div class="container">
-	<div class="content">
+	<div class="content bg-error">
 		<div class="title">Sorry, something went wrong !</div>
 		@if(isset($error))
 			<p>{{$error}}</p>

@@ -1,71 +1,86 @@
-@extends('../layout/landing')
-@section('title', '404 Not Found')
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <link rel="icon" type="image/png" href="{{asset('favicon.ico')}}">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+  <title>@yield('title')</title>
 
-@section('style')
-<style>
-  
-  body {
-    background-image: url({{ URL::asset("/img/slide-bg.png") }});
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
-    min-width: 100vw;
-    min-height: 100vh;
-  }
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' name='viewport'/>
+  <meta name="viewport" content="width=device-width"/>
 
-  .error-page {
-    margin-top: 100px;
-    color: #fff;
-    font-weight: lighter;
-  }
-
-  .error > img {
-    margin-bottom: auto;
-    margin-top: auto;
-    display: inline;
-  }
-
-  .error > h1 {
-    font-weight: 300;
-    font-size: 50px;
-  }
-
-  .error .des {
-    font-size: 20px;
-  }
-
-  @media (max-width: 768px) {
-    .error-page {
-      margin-top: 0;
+  <!-- Bootstrap core CSS     -->
+  <link href="{{asset('css/bootstrap.min.css')}}" rel="stylesheet"/>
+  <!-- Light bootstrap dashboard theme -->
+  <link href="{{asset('css/animate.min.css')}}" rel="stylesheet"/>
+  <link href="{{asset('css/light-bootstrap-dashboard.css')}}" rel="stylesheet"/>
+  <link href="{{asset('css/pe-icon-7-stroke.css')}}" rel="stylesheet"/>
+  <link href="{{asset('css/gf-roboto.css')}}" rel='stylesheet' type='text/css'>
+  <!-- Fonts and icons -->
+  <link href="{{asset('css/font-awesome.min.css')}}" rel="stylesheet">
+  <link href="{{ asset('/css/style.css') }}" rel="stylesheet">
+  <link href="{{asset('css/fg.menu.css')}}" rel="stylesheet"/>
+  <link href="{{asset('css/daterangepicker.css')}}" rel="stylesheet"/>
+  <link href="{{asset('css/sweetalert.css')}}"/>
+  <link rel="stylesheet" href="{{asset('css/odometer-theme-minimal.css')}}"/>
+  <link rel="stylesheet" href="{{asset('css/select2.min.css')}}"/>
+  @yield('style')
+  <link href="{{asset('css/app.css')}}" rel="stylesheet"/>
+  @yield('header-script')
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      color: #B0BEC5;
+      display: table;
+      font-weight: 100;
+      font-family: 'Lato';
+      background: url(/img/error.png);
+      background-repeat: no-repeat;
     }
-    .error-page > h1 {
-      font-size: 26px;
+
+    .container {
+      text-align: center;
+      display: table-cell;
+      vertical-align: middle;
     }
-    .error-page .des {
-      font-size: 14px;
+
+    .content {
+      text-align: center;
+      display: inline-block;
     }
-  }
-</style>
-@endsection
 
-@section('content')
-<section class="error-page">
-  <div class="row">
-    <div class="col-sm-6 col-sm-offset-3">
-      <div class="text-center error">
-        <img src="{{ URL::asset('img/404.png') }}" alt="404" class="img-responsive">
-        <h1>Sorry, page not found</h1>
-        <p class="des">Perhaps you clicked an outdated link, or we had removed the file</p>
-        <p class="text-uppercase" style="font-size: 20px; margin:20px;">back to</p>
-
-        <ul class="nav mnavbar mnavbar-center">
-          <li class="bordered"><a href="{{ URL::to('/') }}">Homepage</a></li>
-          <li class="bordered"><a href="{{ URL::to('features.html') }}">Features</a></li>
-          <li class="bordered"><a href="{{ URL::to('contact.html')  }}">Contact us</a></li>
-        </ul>
-
+    .title {
+      font-size: 72px;
+      margin-bottom: 40px;
+    }
+    .height-button{
+      padding: 12px !important;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="content " style="margin-top: 130px">
+    <div class="col-md-12">
+      <div class="col-md-4">
+        <a href="/trend/dfsdf/create" class="button action blue button-radius height-button">
+          <span class="label"><b>View demo</b></span>
+        </a>
+      </div>
+      <div class="col-md-4">
+        <a href="/trend/dfsdf/create" class="button action blue button-radius height-button" >
+          <span class="label"><b>Yes I need it!</b></span>
+        </a>
+      </div>
+      <div class="col-md-4">
+        <a href="/trend/dfsdf/create" class="button action blue button-radius height-button">
+          <span class="label"><b>Pre - Register</b></span>
+        </a>
       </div>
     </div>
   </div>
-</section>
-@endsection
+</div>
+</body>
+</html>

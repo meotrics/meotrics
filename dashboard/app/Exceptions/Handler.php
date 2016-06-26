@@ -36,7 +36,12 @@ class Handler extends ExceptionHandler {
 	 */
 	public function render($request, Exception $e)
 	{
+//		if ($e instanceof CustomException) {
+//			var_dump("fucke");die;
+//		}
+//
 		return parent::render($request, $e);
+//		abort(404);
 	}
 
 }

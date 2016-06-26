@@ -33,7 +33,8 @@
     vertical-align: baseline;
     font-weight: bold !important;
     /*max-height: 32px;*/
-    width: 65px;
+    width: 77px;
+    margin-left: 4px;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     padding: 0px!important;
@@ -95,4 +96,49 @@
 .sidebar .nav p{
     text-transform: none ;
     font-size: 14px;
+}
+.ddm span.label, button span.label, .button span.label{
+    font-size: 14px !important;
+}
+button, .button{
+    padding: 3px 4px 5px 4px !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered
+{
+    font-size: 14px !important;
+}
+.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td{
+    padding: 9px 8px !important;
+}
+.vl-tab{
+    box-shadow: none;
+    background: rgba(251, 251, 251, 0.15);
+}
+.vl-tab .nav-tabs{
+    border-bottom: none;
+}
+.vl-tab li:hover{
+    opacity: 0.9;
+}
+.vl-tab .nav-tabs>li>a,.vl-tab .nav-tabs>li.active>a:hover{
+    border:none;
+}
+.vl-tab-content{
+    float:left;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(63, 63, 68, 0.1);
+    background-color: #FFFFFF;
+    width: 100%;
+}
+.track-new-app button{
+    width: 130px;
+}
+.table > thead > tr > th{
+    text-transform: none!important;
+}
+.title-table th{
+    color:#4B8DF8 !important;
+}
+.bg-dev{
+    width: 100%;
+    position: absolute;
 }
