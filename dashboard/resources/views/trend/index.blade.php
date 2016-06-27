@@ -4,9 +4,11 @@
 
 @section('action')
 	<li>
-		<a href="/trend/{{$appcode}}/create" class="button action blue button-radius" style="margin-left: -14px;">
-			<span class="label">New trend</span>
-		</a>
+		<div class="col-md-5" style="margin-top: 11px">
+			<a href="/trend/{{$appcode}}/create" class="button action blue button-radius" style="margin-left: -14px;">
+				<span class="label"><b>New trend</b></span>
+			</a>
+		</div>
 	</li>
 @endsection
 
@@ -17,7 +19,7 @@
 				<div class="header col-md-12">
 					<div class="col-md-5">
 						<form class="">
-							<label style="vertical-align: bottom; margin-right: 6px; color: #4B8DF8;text-transform: none;font-size: 16px;">Trend</label>
+							<label style="vertical-align: bottom; margin-right: 6px; color: #4B8DF8;text-transform: none;font-size: 14px;">Trend</label>
 							<select id="trend" class="form-control input-sm " style="width: 200px; display:inline-block">
 								<?php if (isset($trends[0])) $trend_first = $trends[0]; ?>
 								@foreach($trends as $trend)
@@ -57,7 +59,7 @@
 								<input style="width: 220px;display: inline-block;" class="form-control mr" id="timepick">
 							</div>
 							<div class="col-md-7">
-								<label style="vertical-align: bottom; margin-right: 5px; color: #4B8DF8;text-transform: none;font-size: 16px;">Segment</label>
+								<label style="vertical-align: bottom; margin-right: 5px; color: #4B8DF8;text-transform: none;font-size: 14px;">Segment</label>
 								<select id="segpick" class="form-control input-sm" style="width: 200px; display:inline-block;">
 									@foreach($segments as $segment)
 										@if( $segmentid == $segment->_id)

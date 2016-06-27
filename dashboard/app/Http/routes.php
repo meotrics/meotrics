@@ -54,6 +54,11 @@ Route::get('/segment/{appcode}/chartonefield', 'SegmentController@getChartonefie
 Route::get('/segment/{appcode}/charttwofields', 'SegmentController@getCharttwofields');
 Route::get('/segment/{appcode}/{segid?}', 'SegmentController@getIndex');
 
+Route::get('/funnel/{appcode}','FunnelController@index');
+Route::get('/revenue/{appcode}','RevenueController@index');
+Route::get('/marketing/{appcode}','MarketingController@index');
+
+
 Route::post('/auth/googlesignin', 'Auth\AuthController@googlesignin');
 Route::get('auth/signout', 'UserController@signout');
 Route::post('auth/resent', 'Auth\AuthController@resent');
@@ -73,3 +78,6 @@ Route::get('auth/reset', function(){
 });
 
 Route::controller('user', 'UserController');
+Route::get('/error',function(){
+	abort(404);
+});

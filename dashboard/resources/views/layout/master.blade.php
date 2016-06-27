@@ -82,8 +82,8 @@
         <div class="sidebar-wrapper">
             <div class="logo">
                 <a class="simple-text" href="{{ URL::to('/') }}">
-                    <img src="{{ asset('img/logo.png') }}" width="30px"/>
-                    <span class="logo-text">Meotrics</span>
+                    <img src="{{ asset('img/meotrics_logo.png') }}"    style="width: 150px; margin-left: 14px;"/>
+                    {{--<span class="logo-text"></span>--}}
                 </a>
             </div>
             <ul class="nav">
@@ -117,8 +117,8 @@
                         <p>Revenue</p>
                     </a>
                 </li>
-                <li class="{{ Route::getCurrentRoute()->getPath() == 'campaign' ? 'active' : '' }}">
-                    <a href="/campaign/{{$appcode}}">
+                <li class="{{ Route::getCurrentRoute()->getPath() == 'marketing' ? 'active' : '' }}">
+                    <a href="/marketing/{{$appcode}}">
                         <i class="pe-7s-graph3"></i>
                         <p>Marketing Campaign</p>
                     </a>
@@ -176,10 +176,10 @@
                             </a>
                         </li>
                         
-                        <li class="dropdown">
-                            <a href="#" class="button action blue button-radius"
+                        <li class="dropdown" style="margin-top:6px;margin-bottom: 6px">
+                            <a href="#" class="button action blue button-radius-mini"
                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                <span class="label">{{ $appname }}</span>
+                                <span class="label limit-char font-mini current-appname" style="padding: 0px!important;margin-top:5px">{{ $appname }}</span>
                                 <b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu" style="min-width: 137px;">
@@ -190,13 +190,20 @@
                                 @endif
                                 @endforeach
                                 @endif
+                                <li  >
+                                    {{--<a href="#" class="blue" data-toggle="modal" data-target="#addModal">Track new app</a>--}}
+                                    <button type="button" class="action button blue" data-toggle="modal" data-target="#addModal" style="width: 100%">
+                                        <span class="label" data-toggle="modal" data-target="#addModal">Track new app</span>
+                                    </button>
+                                </li>
                             </ul>
                         </li>
                         
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                <img src="/img/user.png" class="user-image" alt="User Image">
-                                <span class="hidden-xs">{{ Auth::user()->email }}</span>
+                                <img src="/img/meotrics_user.png" class="user-image" alt="User Image">
+                                <span class="hidden-xs font-mini">{{ Auth::user()->email }}</span>
+                                <b class="caret"></b>
                             </a>
                             <ul class="dropdown-menu" style="min-width: 262px">
 <!--                                <li><a href="#" class="id_trackingcode">Get tracking code</a></li>

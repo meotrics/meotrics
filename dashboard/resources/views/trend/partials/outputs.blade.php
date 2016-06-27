@@ -35,7 +35,7 @@ return c;
 			var row = data[i];
 			var rowstr = "<td class='text-muted'>" + stt + "</td>";
 		
-			rowstr += '<td>' + he.encode(row.temp[objcode]) + '</td>';
+			rowstr += '<td style="text-align: left">' + he.encode(row.temp[objcode]) + '</td>';
 		
 			if(countProp(row.temp) >= maxn){
 					   maxn = countProp(row.temp);

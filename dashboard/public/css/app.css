@@ -277,7 +277,7 @@ select {
 }
 
 .navbar .navbar-nav > li > a {
-	padding: 7px 13px;
+	padding: 5px 13px;
 }
 
 .navbar .navbar-nav > li > a {
@@ -287,8 +287,8 @@ select {
 }
 
 .form-control {
-	height: 34px;
-	font-size: 15px;
+	height: 32px;
+	font-size: 14px;
 	padding-bottom: 6px;
 	/*
 	 * update 07/05/2016
@@ -328,6 +328,7 @@ a:hover, a:focus {
 .card h6 {
 	font-weight: normal;
 	font-size: 14px;
+	text-transform: none;
 	/*
 	 * update 07/05/2016
 	 */
@@ -344,7 +345,7 @@ a:hover, a:focus {
 }
 
 .select2-container--default .select2-selection--single {
-	height: 34px;
+	height: 32px;
 	outline: none;
 }
 
@@ -696,11 +697,12 @@ div.back .fa-chevron-left {
 
 .medium
 {
-	font-size: 18px;
+	font-size: 21px;
 }
 
 .big {
-	font-size: 25px;
+	font-size: 50px;
+
 }
 
 .bigup {
@@ -726,6 +728,7 @@ div.back .fa-chevron-left {
 
 .card .header {
 	padding: 15px 15px 0;
+	/*height: 45px;*/
 }
 
 .onoffswitch {
@@ -769,11 +772,12 @@ div.back .fa-chevron-left {
 }
 
 .onoffswitch-checkbox:checked + .onoffswitch-label {
-	background-color: #3AC710;
+	/*background-color: #3AC710;*/
+	background-color: #4B8DF8;
 }
 
 .onoffswitch-checkbox:checked + .onoffswitch-label, .onoffswitch-checkbox:checked + .onoffswitch-label:before {
-	border-color: #3AC710;
+	border-color: #6C7D9A;
 }
 
 .onoffswitch-checkbox:checked + .onoffswitch-label:before {
@@ -846,8 +850,8 @@ div.back .fa-chevron-left {
  */
 .user-image{
     float: left;
-    width: 25px;
-    height: 25px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     margin-right: 10px;
     margin-top: -2px;

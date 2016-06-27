@@ -54,7 +54,7 @@ $operators_default = [
                         </option>
                         <?php
                     endforeach;
-                    ?>
+                        ?>
                 </select>
             </div>
             <div class="col-md-2" <?= $condition->select_type == 'user' ? 'style="display: none"' : '' ?>>

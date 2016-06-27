@@ -231,18 +231,19 @@
 		<div class="col-sm-4 ">
 			<div class="row">
 				<div class="col-md-12 pl0">
-					<div class="card" style="height: 140px;">
+					<div class="card border-top-1" style="height: 140px;">
 						<div style="padding-left: 12px">
-							<div class="row">
+							<div class="row ">
 
 								<div class="col-sm-6" style="font-size: 12px">
-									<h6 style="margin-bottom:0; margin-top:20px;  color: gray">TODAY VISITOR</h6>
-									<div class=""><i class="fa fa-circle" style="color: #4E6CC9"></i> New visitor</div>
-									<div class="medium text-center id_newv" style="color: #4E6CC9">{{$dashboard->n_new_visitor}}</div>
-									<div style="margin-top: 10px"><i class="fa fa-circle " style="color: #8C8C8C"></i> Returning visitor
+									<h6 style="margin-bottom:0; margin-top:12px;  color:#8492af;font-size: 18px">TODAY VISITOR</h6>
+									<div style="margin-left: 10px;margin-top:10px;">
+										<div class="" style="font-size: 9px"><i class="fa fa-circle" style="color: #4E6CC9"></i> New visitor</div>
+										<div class="medium text-center id_newv" style="color: #4E6CC9">{{$dashboard->n_new_visitor}}</div>
+										<div style="margin-top: 6px;font-size: 9px"><i class="fa fa-circle " style="color: #8C8C8C"></i> Returning visitor
+										</div>
+										<div class="medium text-center id_retu" style="color: #25396e;">{{$dashboard->n_returning_visitor}}</div>
 									</div>
-									<div class="medium text-center id_retu" style="color: #8C8C8C;">{{$dashboard->n_returning_visitor}}</div>
-
 								</div>
 								<div class="col-sm-6">
 									<div style="height: 110px; width: 105px; margin-top: 20px">
@@ -257,14 +258,26 @@
 
 			</div>
 			<div class="row">
-				<div class="col-sm-12 pl0 ">
-					<div class="card" style="height: 70px">
+				<div class="vl-md-6" style="margin-right: 9px">
+					<div class="card border-top-1" style="height: 130px">
 						<div class="" style="">
 							<div class="header text-center">
-								<h6 style="margin: 0; color: gray">TODAY NEW SIGNUP</h6>
+								<h6 style="margin: 0; color: #0e1a35">NEW SIGNUP</h6>
 							</div>
 							<div class="content text-center" style="padding-top: 0">
-								<span class="big id_newsignup">{{$dashboard->n_new_signup}}</span>
+								<span class="big id_newsignup" style="color: #4164c2;">{{$dashboard->n_new_signup}}</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="vl-md-6">
+					<div class="card border-top-1" style="height: 130px">
+						<div class="" style="">
+							<div class="header text-center">
+								<h6 style="margin: 0; color: #0e1a35">USER GROWTH RATE</h6>
+							</div>
+							<div class="content text-center" style="padding-top: 0">
+								<span class="big id_newsignup" style="color: #4164c2;">{{$dashboard->n_new_signup}}</span>
 							</div>
 						</div>
 					</div>
@@ -274,9 +287,9 @@
 		<div class="col-sm-8 pl0">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="card " style="height: 225px;">
+					<div class="card border-top-1" style="height: 285px;">
 						<div class="header">
-							<h6 style="margin:0; color: gray"> USER GROWTH RATE</h6>
+							{{--<h6 style="margin:0; color: gray"> USER GROWTH RATE</h6>--}}
 						</div>
 						<div class="content">
 							<div style="height: 175px">
@@ -290,7 +303,7 @@
 	</div>
 	<div class="row">
 		<div class="col-sm-3 pl0">
-			<div class="card" style="background: #4E6CC9; color: white; height: 80px">
+			<div class="card vl-table-4 bg-table-1">
 				<div class="header text-center">
 					<h6 style="margin: 0; color: white">TODAY RETENSION RATE</h6>
 				</div>
@@ -300,7 +313,7 @@
 			</div>
 		</div>
 		<div class="col-sm-3 pl0">
-			<div class="card" style="background: #4E6CC9; color: white; height: 80px">
+			<div class="card vl-table-4 bg-table-2">
 				<div class="header text-center">
 					<h6 style="margin: 0; color: white">AVERAGE CART SIZE</h6>
 				</div>
@@ -310,7 +323,7 @@
 			</div>
 		</div>
 		<div class="col-sm-3 pl0">
-			<div class="card" style="background: #4E6CC9; color: white; height: 80px">
+			<div class="card vl-table-4 bg-table-3">
 				<div class="header text-center">
 					<h6 style="margin: 0; color: white">PURCHASE CONVERSION RATE</h6>
 				</div>
@@ -321,7 +334,7 @@
 			</div>
 		</div>
 		<div class="col-sm-3 pl0">
-			<div class="card" style="background: #4E6CC9; color: white; height: 80px">
+			<div class="card vl-table-4 bg-table-4">
 				<div class="header text-center">
 					<h6 style="margin: 0;  color: white">ABANDONMENT RATE</h6>
 				</div>
@@ -336,17 +349,31 @@
 		<div class="col-sm-9 pl0">
 			<div class="row">
 				<div class="col-md-12">
-					<div class="card " style="height: 240px;">
+					<div class="card border-top-2" style="height: 360px;">
 						<div class="header">
-							<h6 class="pull-right" style="margin:0; color: gray">
-								REVENUER PER CUSTOM
-								<span class="medium" style="color: #4e6cc9">$ {{floor($dashboard->revenue_per_customer)}}</span>
-							</h6>
-
-							<h6 style="margin:0; color:gray">
-								TOTAL REVENUE
-								<span class="medium" style="color: #4e6cc9">$ {{$dashboard->total_revenue}}</span>
-							</h6>
+							<div class="row">
+								<div class="col-md-3" style="margin-top:13px">
+									<h6 style="margin:0; color:#0e1a35;font-size: 18px;">
+										TOTAL REVENUE
+									</h6>
+								</div>
+								<div class="row col-md-2">
+									<h6 style="margin:0; color:#0e1a35">
+										REVENUE
+										</h6>
+									<h6 style="margin-left:0px; ">
+										<span class="medium" style="color: #4164c2">$ {{$dashboard->total_revenue}}</span>
+									</h6>
+								</div>
+								<div class="row col-md-3">
+									<h6 style="margin:0; color: #0e1a35">
+										REVENUE PER CUSTOM
+										</h6>
+									<h6 style="margin-left:0px;">
+										<span class="medium" style="color: #4164c2">$ {{floor($dashboard->revenue_per_customer)}}</span>
+									</h6>
+								</div>
+							</div>
 						</div>
 						<div class="content">
 							<div style="height: 190px">
@@ -361,12 +388,12 @@
 		<div class="col-sm-3 pl0">
 			<div class="row">
 				<div class="col-sm-12 ">
-					<div class="card" style=" height: 70px">
+					<div class="card border-right-1" style=" height: 109px">
 						<div class="header text-center">
-							<h5 style="margin: 0; text-align: right;color: #353535;font-size: 13px;">MOST POPULAR CATEGORY</h5>
+							<h5 style="margin: 0; text-align: right;color: #0e1a35;font-size: 14px;">MOST POPULAR CATEGORY</h5>
 						</div>
 						<div class="content text-center pull-right mr">
-							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0;">
+							<h6 style="position: absolute; right: 30px; text-align: right;width: 80%;margin-top: 0;color:#5584ff;">
 							{{$dashboard->most_popular_category or "N/A"}}
 							</h6>
 						</div>
@@ -376,12 +403,12 @@
 
 			<div class="row">
 				<div class="col-sm-12 ">
-					<div class="card" style=" height: 70px">
+					<div class="card border-right-2" style=" height: 109px">
 						<div class="header text-center">
-							<h5 style="margin: 0; text-align: right;color: #353535;font-size: 13px;">HIGHEST REVENUE CAMPAIGN</h5>
+							<h5 style="margin: 0; text-align: right;color: #0e1a35;font-size: 14px;">HIGHEST REVENUE CAMPAIGN</h5>
 						</div>
 						<div class="content text-center pull-right mr">
-							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0;">
+							<h6 style="position: absolute;right: 30px; text-align: right;width: 80%;margin-top: 0;color:#4164c2">
 								{{$dashboard->highest_revenue_campaign or "N/A" }}
 							</h6>
 						</div>
@@ -391,12 +418,12 @@
 
 			<div class="row">
 				<div class="col-sm-12 ">
-					<div class="card" style=" height: 70px">
+					<div class="card border-right-3" style=" height: 109px">
 						<div class="header text-center">
-							<h5 style=" margin: 0; text-align: right;color: #353535;font-size: 13px;">MOST EFFECTIVE REFERAL</h5>
+							<h5 style=" margin: 0; text-align: right;color: #0e1a35;font-size: 14px;">MOST EFFECTIVE REFERAL</h5>
 						</div>
 						<div class="content text-center pull-right mr">
-							<h6 style="position: absolute; bottom: 20px;right: 30px; text-align: right;width: 80%;margin-top: 0;">
+							<h6 style="position: absolute;right: 30px; text-align: right;width: 80%;margin-top: 0;color:#25396e">
 								{{$dashboard->most_effective_ref or "N/A"}}
 							</h6>
 						</div>
@@ -412,7 +439,7 @@
 
 @section('action')
 	<li>
-		<input style="width: 220px;margin-top: 7px;" class="form-control mr" id="timepick">
+		<input style="width: 192px;margin-top: 11px;" class="form-control mr" id="timepick">
 	</li>
 @endsection
 

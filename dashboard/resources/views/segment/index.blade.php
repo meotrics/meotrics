@@ -32,9 +32,8 @@ $props = isset($props) ? $props : [];
 
 @section('action')
 	<li>
-		<a href="{{ URL::to('segment/'. $appcode . '/create') }}" class="button action blue button-radius"
-		   style="margin-left: -14px;">
-			<span class="label">New Segmentation</span>
+		<a href="{{ URL::to('segment/'. $appcode . '/create') }}" class="button action blue button-radius">
+			<span class="label"><b>New Segmentation</b></span>
 		</a>
 	</li>
 @endsection
@@ -78,14 +77,18 @@ $props = isset($props) ? $props : [];
 							<h6>Description</h6>
 						</div>
 						<div class="col-md-7">
-							<p class="segment-desc"
-							   id="desc"><?= property_exists($segment_first, 'description') ? $segment_first->description : '' ?></p>
-							<p> @if(isset($segment_first->startTime ))
-									<label>Time range:</label></br> <span id="startTime">{{$segment_first->startTime}}</span>
-									to {{$segment_first->endTime}},
-								@endif
-								<span id="count">@if(isset($segment_first->count)){{$segment_first->count}}@endif</span>
-							</p>
+							<div class="col-md-3">
+								<p class="segment-desc"
+								   id="desc"><?= property_exists($segment_first, 'description') ? $segment_first->description : '' ?></p>
+							</div>
+							<div class="col-md-4">
+								<p class="segment-desc">  @if(isset($segment_first->startTime ))
+										<label>Time range:</label></br> <span id="startTime">{{$segment_first->startTime}}</span>
+										to {{$segment_first->endTime}},
+									@endif
+									<span id="count">@if(isset($segment_first->count)){{$segment_first->count}}@endif</span>
+								</p>
+							</div>
 						</div>
 					</div>
 					@endif
@@ -107,7 +110,7 @@ $props = isset($props) ? $props : [];
 							-->
 			<div class=" content row">
 				<div class="col-md-6">
-					<div class="col-md-3 fix-padding" style="text-align: right">
+					<div class="col-md-3 fix-padding">
 						<h6>Filter By</h6>
 					</div>
 					<div class="col-md-4 fix-padding" id="div-filter-one ">

@@ -16,7 +16,7 @@
 
 @section('content')
 <div class="row">
-<div class="card col-md-12">
+<div class="card col-md-12 vl-tab">
     <div class="row">
         <div class="app-manage">
             <!-- Nav tabs -->
@@ -27,7 +27,7 @@
                 </ul>
 
                 <!-- Tab panes -->
-                <div class="tab-content">
+                <div class="tab-content vl-tab-content">
                     <div role="tabpanel" class="tab-pane active" id="home">
                         <div class="manage-area col-md-12">
                             <div class="title ">
@@ -36,7 +36,7 @@
                             <div class="header col-md-12">
                                 <table class="table table-hover" style="margin-bottom: 0">
                                     <thead>
-                                        <tr>
+                                        <tr class="title-table">
                                             <th style="padding-left: 0px">Email</th>
                                             <th>Full control</th>
                                             <th>Edit app structure</th>
@@ -115,6 +115,11 @@
                                     @endforeach
                                     </tbody>
                                 </table>
+                                <div class="row">
+                                    <div class="col-sm-12" style="padding-top: 0">
+                                        <a class="id_grant" href="#">Grant access for other user</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
