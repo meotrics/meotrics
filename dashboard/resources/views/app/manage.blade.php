@@ -37,7 +37,7 @@
                                         <div class="col-md-3">
                                             <h6>Name</h6>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-4 row-appname">
                                             <h6 style="color: black">{{$ap->name}}</h6>
                                             <input type="text" class="form-control " name="name" required="" value="{{$ap->name}}" style="display: none">
                                         </div>
@@ -54,7 +54,7 @@
                                         <div class="col-md-3">
                                             <h6>URL</h6>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-4 row-appurl">
                                             <h6 style="color: black">{{$ap->url}}</h6>
                                             <input type="text" class="form-control " name="url" required="" value="{{$ap->url}}" style="display: none">
                                         </div>
@@ -181,19 +181,26 @@ $('.a-edit-obj').click(function(){
 
 $('.a-save-obj').click(function(){
     var that = $(this);
-    var form = that.closest('form');
-    $.ajax({
-        url: form.attr('action'),
-        data: form.serialize(),
-        dataType: 'JSON',
-        type: 'POST',
-        success: function(data){
-            if(data.success){
-                that.parent().prev().find('h6').show();
-                that.parent().prev().find('input').hide();
+    if(that.parent().prev().find('input').is(':visible')){
+        var form = that.closest('form');
+        $.ajax({
+            url: form.attr('action'),
+            data: form.serialize(),
+            dataType: 'JSON',
+            type: 'POST',
+            success: function(data){
+                if(data.success){
+                    that.parent().prev().find('h6').show();
+                    that.parent().prev().find('input').hide();
+                    $('.row-appname').find('h6').text(data.name);
+                    $('.row-appname').find('input').val(data.name);
+                    $('.current-appname').text(data.name);
+                    $('.row-appurl').find('h6').text(data.url);
+                    $('.row-appurl').find('input').val(data.url);
+                }
             }
-        }
-    });
+        });
+    }
 });
 
 $('.id_add').click(function () {

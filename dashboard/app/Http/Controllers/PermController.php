@@ -201,7 +201,7 @@ class PermController extends Controller
                 }
             }
         }
-        $status = $this->setup_status($request, $appcode);
+        $status = $this->setup_status($request, $appcode) ? 'Connected' : 'Not connected';
         $traffic = $this->count_traffic($request, $appcode);
         return view('app/manage', [
             'ap' => $ap, 
@@ -224,6 +224,10 @@ class PermController extends Controller
         if ($ap == null) abort(500, 'cannot find app: ' . $appcode);
 
         DB::table('apps')->where('id', $ap->id)->update(['name' => $name, 'url'=>$url]);
-        return json_encode(['success' => true]);
+        return json_encode([
+            'success' => true, 
+            'name' => $name,
+            'url' => $url
+        ]);
     }
 }

@@ -115,6 +115,11 @@
                                     @endforeach
                                     </tbody>
                                 </table>
+                                <div class="row">
+                                    <div class="col-sm-12" style="padding-top: 0">
+                                        <a class="id_grant" href="#">Grant access for other user</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
