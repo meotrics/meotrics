@@ -10,6 +10,9 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 			name: "Gender", code: "gender",
 			operators: [{name: "Equal", code: "eq"}]
 		}, {
+			name: "Phone", code: "phone",
+			operators: [{ name: "Equal", code: "eq" }]
+		}, {
 			name: "Country", code: "_country",
 			operators: [{name: "Equal", code: "eq"},
 				{name: "Contain", code: "con"},
