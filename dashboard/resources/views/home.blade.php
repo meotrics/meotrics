@@ -76,8 +76,8 @@
 		var totalrevenues = [];
 		totalrevenues = {!! json_encode($dashboard->revenues) !!};
 		//
-		var usergrowthrates = [];
-		usergrowthrates = {!! json_encode($dashboard->usergrowth_rates) !!};
+		//var usergrowthrates = [];
+		//usergrowthrates = {-- !! json_encode($dashboard->usergrowth_rates) !! --};
 		//
 		var npurchases = [];
 		npurchases = {!! json_encode($dashboard->n_purchases) !!};
@@ -206,7 +206,7 @@
 		function drawVisitChart(newv, retv)
 		{
 			newv = parseInt(newv);
-			newv = newv == 0 ? 1 : newv;
+			//newv = newv == 0 ? 1 : newv;
 			retv = parseInt(retv);
 			var visitChart = new Chart($("#visitchart"), {
 				type: 'doughnut',
@@ -214,7 +214,7 @@
 					labels: ["New visitor", "Returning visitor"],
 					datasets: [
 						{
-							data: [newv, retv],
+							data: [newv == 0 ? 1 : newv, retv],
 							backgroundColor: ["#4E6CC9", "#8C8C8C"],
 							hoverBackgroundColor: ["#4E6CC9", "#8C8C8C"]
 						}
