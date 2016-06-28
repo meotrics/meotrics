@@ -43,55 +43,68 @@ $props = isset($props) ? $props : [];
 		<div class="card col-md-12">
 			<div class="header row col-segment">
 				<!--<form class="col-md-12">-->
-				<div class="col-md-6">
-					<div class="col-md-3 fix-padding">
-						<h6>Segmentation</h6>
-					</div>
-					<div class="col-md-5 fix-padding">
-						<select id="segment" class="form-control input-sm" style="display:inline-block">
-							@foreach($segments as $segment)
-								<option value="{{$segment->_id}}" {{ $segment->_id == $segment_first->_id ? 'selected' : '' }}>
-									{{$segment->name ? $segment->name : TrendEnum::EMPTY_NAME}}
-								</option>
-							@endforeach
-						</select>
-					</div>
-					<div class=" col-md-2 div-edit-obj fix-padding">
-						<a id="action_update" data-href="{{URL::to('segment/'. $appcode .'/update')}}" href="{{URL::to('segment/'. $appcode .'/update', [
+				<div class="row">
+					<div class="col-md-6">
+						<div class="col-md-3 fix-padding">
+							<h6>Segmentation</h6>
+						</div>
+						<div class="col-md-5 fix-padding">
+							<select id="segment" class="form-control input-sm" style="display:inline-block">
+								@foreach($segments as $segment)
+									<option value="{{$segment->_id}}" {{ $segment->_id == $segment_first->_id ? 'selected' : '' }}>
+										{{$segment->name ? $segment->name : TrendEnum::EMPTY_NAME}}
+									</option>
+								@endforeach
+							</select>
+						</div>
+						<div class=" col-md-2 div-edit-obj fix-padding">
+							<a id="action_update" data-href="{{URL::to('segment/'. $appcode .'/update')}}" href="{{URL::to('segment/'. $appcode .'/update', [
                                         'id' => isset($segment_first) ? $segment_first->_id : ''
                                     ])}}" class="a-edit-obj" role="button">
-							<!--<span class="glyphicon glyphicon-pencil"></span>-->
-							<i class="fa fa-pencil" aria-hidden="true"></i>
-						</a>
-					</div>
-					<div class="col-md-2 div-trash-obj fix-padding">
-						<a id="action_delete" href="javascript:void(0)" class="a-trash-obj" role="button">
-							<!--<span class="glyphicon glyphicon-trash"></span>-->
-							<i class="fa fa-trash" aria-hidden="true"></i>
-						</a>
+								<!--<span class="glyphicon glyphicon-pencil"></span>-->
+								<i class="fa fa-pencil" aria-hidden="true"></i>
+							</a>
+						</div>
+						<div class="col-md-2 div-trash-obj fix-padding">
+							<a id="action_delete" href="javascript:void(0)" class="a-trash-obj" role="button">
+								<!--<span class="glyphicon glyphicon-trash"></span>-->
+								<i class="fa fa-trash" aria-hidden="true"></i>
+							</a>
+						</div>
 					</div>
 				</div>
 				@if(isset($segment_first))
-					<div class="col-md-5 pull-right">
-						<div class="col-md-5">
-							<h6>Description</h6>
-						</div>
-						<div class="col-md-7">
-							<div class="col-md-3">
-								<p class="segment-desc"
+					<div class="row">
+						<div class="content col-md-6">
+							<div class="col-md-3 fix-padding">
+								<h6>Description</h6>
+							</div>
+							<div class="col-md-5 limit-char-des fix-padding">
+								<p class="segment-desc" style="font-size: 14px"
 								   id="desc"><?= property_exists($segment_first, 'description') ? $segment_first->description : '' ?></p>
 							</div>
+						</div>
+						<div class="col-md-6 content">
+							@if(isset($segment_first->startTime ))
+								<div class="col-md-3">
+									Time range:
+								</div>
+								<div class="col-md-5">
+									<span id="startTime">{{$segment_first->startTime}}</span>
+									to {{$segment_first->endTime}}
+								</div>
+							@endif
 							<div class="col-md-4">
-								<p class="segment-desc">  @if(isset($segment_first->startTime ))
-										<label>Time range:</label></br> <span id="startTime">{{$segment_first->startTime}}</span>
-										to {{$segment_first->endTime}},
-									@endif
+								<div class="col-md-6">
+									Count:
+								</div>
+								<div class="col-md-6">
 									<span id="count">@if(isset($segment_first->count)){{$segment_first->count}}@endif</span>
-								</p>
+								</div>
 							</div>
 						</div>
 					</div>
-					@endif
+				@endif
 									<!--</form>-->
 			</div>
 
@@ -109,7 +122,7 @@ $props = isset($props) ? $props : [];
 							@endif
 							-->
 			<div class=" content row">
-				<div class="col-md-6">
+				<div class="row col-md-6">
 					<div class="col-md-3 fix-padding">
 						<h6>Filter By</h6>
 					</div>

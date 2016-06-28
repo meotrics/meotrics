@@ -142,3 +142,37 @@ button, .button{
     width: 100%;
     position: absolute;
 }
+.limit-char-des{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-height: 15px;
+    vertical-align: baseline;
+    font-weight: bold !important;
+    max-height: 30px;
+    width: 200px;
+    margin-left: 21px;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    padding: 0px!important;
+}
+.action_hide{
+    display: none;
+}
+.action_show{
+    display: inline;
+}
+.vl-tab-content .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td{
+    vertical-align: initial;
+}
+.button-cr{
+    background: none;
+    border-radius: 17px;
+    height: 34px;
+    width: 34px;
+    margin-left: 10px;
+    color:#4B8DF8;
+}
+.vl-tab-content button:hover{
+    color: #4B8DF8;
+}

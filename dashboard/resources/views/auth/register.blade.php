@@ -161,7 +161,8 @@
 												<label for="newsite">I would like to track a new site</label>
 												<br/>
 												<input type='radio' id='oldsite' name='radio' onclick="changePurpose(this)" value="2">
-												<label for="oldsite">I&rsquo;m joining partner&rsquo;s site</label>
+												{{--<label for="oldsite">I&rsquo;m joining partner&rsquo;s site</label>--}}
+												<label for="oldsite">I'm waiting for authorization assignment</label>
 											</div>
 										</div>
 
@@ -202,7 +203,7 @@
 
 												<p>------------------------- Or sign up with -------------------------</p>
 
-												<button class="button action red" type="button" id="gsin" style="vertical-align: top;border-radius: 16px;padding-left: 14px;padding-right: 14px;margin-bottom: 10px;">
+													<button class="button action red" type="button" id="gsin" style="vertical-align: top;border-radius: 16px;padding-left: 14px;padding-right: 14px;margin-bottom: 10px;">
 												<span class="label">
 													{{--<i class="fa fa-google-plus"--}}
 																		{{--style="vertical-align: baseline; text-shadow: none;"></i>--}}

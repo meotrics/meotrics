@@ -193,7 +193,7 @@
                                 <li  >
                                     {{--<a href="#" class="blue" data-toggle="modal" data-target="#addModal">Track new app</a>--}}
                                     <button type="button" class="action button blue" data-toggle="modal" data-target="#addModal" style="width: 100%">
-                                        <span class="label" data-toggle="modal" data-target="#addModal">Track new app</span>
+                                        <span class="label">Track new app</span>
                                     </button>
                                 </li>
                             </ul>

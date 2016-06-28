@@ -41,7 +41,7 @@
 						<h6 class="pull-right " >Code</h6>
 					</div>
 					<div class="col-sm-5">
-						<input type="text" class="form-control fmonospaced" name="codename" placeholder="Name" required>
+						<input type="text" class="form-control fmonospaced" name="codename" placeholder="Code" required>
 					</div>
 				</div>
 				<div class="row">
@@ -50,7 +50,7 @@
 					</div>
 					<div class="col-sm-5">
 						<input type="text" name="name" class="form-control" id="exampleInputEmail1"
-                   placeholder=" Display Name" required>
+                   placeholder="Display Name" required>
           </div>
 				</div>
 				<div class="row">

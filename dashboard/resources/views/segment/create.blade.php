@@ -185,11 +185,11 @@
 							</div>
 					</div>
 					<div>
-						<div class="col-md-10" id="div-filter-date" style="display: none">
-							<div>
+						<div class="row" id="div-filter-date" style="display: none">
+							<div class="col-md-1" style="padding-top: 0">
 								<h6>Filter date</h6>
 							</div>
-							<div>
+							<div class="col-md-6">
 								<div class="input-group" style="width: 300px;">
                             		<span class="input-group-addon">
                                 		<i class="pe-7s-date" style="font-size:26px; padding-left:6px;"></i>

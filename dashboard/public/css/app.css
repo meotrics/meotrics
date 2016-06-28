@@ -38,7 +38,7 @@ select {
 
 .fmonospaced {
 	color: #2C629A;
-	text-transform: uppercase;
+	/*text-transform: uppercase;*/
 	background-color: rgba(0, 0, 0, 0.05);
 	font-family: 'consolas', 'Monaco', monospace;
 }
@@ -333,7 +333,7 @@ a:hover, a:focus {
 	 * update 07/05/2016
 	 */
 	color: #4B8DF8;
-	margin: 10px 0 5px 13px;
+	margin: 10px 0 5px 8px;
 }
 
 .mt {
@@ -512,7 +512,6 @@ div.back .fa-chevron-left {
 
 .segment-desc {
 	margin-top: 6px;
-	margin-left: -11px;
 }
 
 .div-seg-first-col {
@@ -912,9 +911,9 @@ div.back .fa-chevron-left {
     padding-left: 10px;
  }
  
- .manage-area h6{
-     text-transform: capitalize;
- }
+ /*.manage-area h6{*/
+     /*text-transform: capitalize;*/
+ /*}*/
  
  .manage-area .btn-group{
      top: 5px;
