@@ -776,7 +776,7 @@ div.back .fa-chevron-left {
 }
 
 .onoffswitch-checkbox:checked + .onoffswitch-label, .onoffswitch-checkbox:checked + .onoffswitch-label:before {
-	border-color: #6C7D9A;
+	border-color: #4B8DF8;
 }
 
 .onoffswitch-checkbox:checked + .onoffswitch-label:before {
