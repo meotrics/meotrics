@@ -15,7 +15,7 @@ export class DashboardEntity {
 	public n_purchases: number[];
 	public revenue_per_customer: number;
 	public retention_rate: number;
-	public usergrowth_rates: number[];
+	public usergrowth_rate: number;
 	public conversion_rate: number;
 	public highest_revenue_campaign: string;
 	public most_effective_ref: string;
@@ -96,7 +96,7 @@ export class Dashboard {
 			'13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
 
 		// xac dinh gio
-		var curhour = now.getHours();
+		var curhour = now.getHours() ;
 		var queryCont = [];
 		var labelarr = [];
 		// get Rangue query
@@ -114,15 +114,14 @@ export class Dashboard {
 		}
 
 		var queryMatch = {};
-		queryMatch[ids._ctime] = { $gt: nowsec - 24 * 3600 };
-		queryMatch[ids._ctime] = { $lte: nowsec};
+		queryMatch[ids._ctime] = { $gt: nowsec - 24 * 3600 , $lte: nowsec};
 		var query = [{ $match: queryMatch }, {
-			$project: { "_id": 0, "hour": { $concat: queryCont } }
+			$project: { "_id": 0, _mtid: 1, hour: { $concat: queryCont } }
 		}, {
-				$group: { _id: "$hour", count: { $sum: 1 } }
+				$group: { _id: { hour: "$hour", _mtid: "$" + ids._mtid } }
 			}, {
-				$sort: { _id: 1 }
-		}];
+				$group: { _id: "$_id.hour", count: { $sum: 1 } }
+			}];
 		
 		db.collection(prefix + "app" + appid).aggregate(query, function (err, res) {
 			if (err) throw err;
@@ -140,12 +139,16 @@ export class Dashboard {
 				}
 				data.push(value);
 			}
+			
 			callback(data.reverse(), labelarr.reverse());
 		});
 	}
 
-	private getGrowthRate(db: mongo.Db, prefix: string, appid: string, ids, time, callback: (a: number) => void) {
-		var now = new Date(time * 1000);
+	private getGrowthRate(db: mongo.Db, prefix: string, appid: string, ids, starttime:number, endtime:number, callback: (a: number) => void) {
+
+		//count all today
+
+		var now = new Date(starttime * 1000);
 		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 		let todaysec = Math.round(today.getTime() / 1000);
 
@@ -172,22 +175,6 @@ export class Dashboard {
 				});
 			}
 		});
-	}
-
-	private getGrowthRates(db: mongo.Db, prefix: string, appid: string, ids, startime: number, endtime: number, callback: (a: number[]) => void) {
-		let me = this;
-		var rates = [];
-		var time = me.getTimeRange(startime, endtime);
-		var c = time.length;
-		for (let i = 0; i < time.length; i++) {
-			me.getGrowthRate(db, prefix, appid, ids, time[i], function (rate) {
-				c--;
-				rates[i] = rate;
-				if (c == 0) {
-					callback(rates);
-				}
-			});
-		}
 	}
 
 	private getTotalRevenue(db: mongo.Db, prefix: string, appid: string, ids, starttime: number, endttime: number, callback: (revenue: number, npurchase: number, nuser: number) => void) {
@@ -547,8 +534,8 @@ export class Dashboard {
 								dashboard.n_avgcartsize = npurchase === 0 ? 0 : revenue / npurchase;
 								dashboard.revenue_per_customer = nuser === 0 ? 0 : revenue / nuser;
 
-								me.getGrowthRates(me.db, me.prefix, appid, ids, startime, endtime, function (growrates: number[]) {
-									dashboard.usergrowth_rates = growrates;
+								me.getGrowthRate(me.db, me.prefix, appid, ids, startime, endtime, function (growrate: number) {
+									dashboard.usergrowth_rate = growrate;
 
 									me.getConversionRate(me.db, me.prefix, appid, ids, startime, endtime, function (cs: number) {
 										dashboard.conversion_rate = cs;
