@@ -78,6 +78,11 @@
 		var npurchases = [];
 		npurchases = {!! json_encode($dashboard->n_purchases) !!};
 		//
+		var traffic24 = [];
+		traffic24 = {!! json_encode($dashboard->traffic24) !!};
+		var traffic24labels =[];
+		traffic24labels = {!! json_encode($dashboard->traffic24labels) !!};
+		//console.log(traffic24, traffic24lable, labels, totalrevenues);
 		var retenratechart = new Chart($("#revenuechart"), {
 			type: 'line',
 			data: {
@@ -140,32 +145,33 @@
 			}
 		});
 
+
 		var trChart = new Chart($("#ugchart"), {
-			type: 'line',
+			type: 'bar',
 			data: {
-				labels: labels,
+				labels: traffic24labels, //labels,
 				datasets: [
 					{
-						label: "User Growth Rate ",
+						label: "Traffic",
 						lineTension: 0.5,
 						borderCapStyle: 'round',
 						borderDash: [],
 						borderDashOffset: 0.0,
 						borderJoinStyle: 'miter',
 						pointHoverRadius: 3,
-						borderWidth: 2,
-						pointHoverBackgroundColor: "rgba(75,192,192,1)",
-						pointHoverBorderColor: "rgba(50,50,50,1)",
-						pointHoverBorderWidth: 2,
-						pointRadius: 2,
+						borderWidth: 1,
+						//pointHoverBackgroundColor: "rgba(75,192,192,1)",
+						//pointHoverBorderColor: "rgba(50,50,50,1)",
+						//pointHoverBorderWidth: 2,
+						//pointRadius: 2,
 						pointHitRadius: 10,
 						fill: true,
 						borderColor: "#2F5CB0",
 						backgroundColor: "rgba(78,108,201,0.3)",
-						pointBorderColor: "#2F5CB0",
-						pointBackgroundColor: "white",
-						pointBorderWidth: 1,
-						data: usergrowthrates
+						//pointBorderColor: "#2F5CB0",
+						//pointBackgroundColor: "white",
+						//pointBorderWidth: 1,
+						data: traffic24// usergrowthrates
 					}
 				]
 			},
@@ -175,7 +181,7 @@
 				legend: {display: false},
 				animation: false,
 				scales: {
-					yAxes: [{display: false}], xAxes: [{display: true}]
+					yAxes: [{display: true}], xAxes: [{display: true}]
 				}
 			}
 		});
@@ -289,7 +295,7 @@
 				<div class="col-md-12">
 					<div class="card border-top-1" style="height: 285px;">
 						<div class="header">
-							{{--<h6 style="margin:0; color: gray"> USER GROWTH RATE</h6>--}}
+							<h6 style="margin:0; color: gray">TRAFFIC</h6>
 						</div>
 						<div class="content">
 							<div style="height: 175px">
