@@ -133,22 +133,6 @@ export class Dashboard {
 		});
 	}
 
-	private getNewSignup(db: mongo.Db, prefix: string, appid: string, ids, callback: (a: number) => void) {
-		var now = new Date();
-		var nowsec = Math.round(new Date().getTime() / 1000);
-		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-		let todaysec = Math.round(today.getTime() / 1000);
-
-		let me = this;
-		let match = {};
-		match[ids._ctime] = { $gte: todaysec };
-		match[ids._typeid] = 'register';
-		match[ids._isUser] = { $exists: false };
-		db.collection(prefix + "app" + appid).count(match, function (err, res) {
-			if (err) throw err;
-			callback(res);
-		});
-	}
 
 	private getGrowthRate(db: mongo.Db, prefix: string, appid: string, ids, time, callback: (a: number) => void) {
 		var now = new Date(time * 1000);
@@ -463,16 +447,6 @@ export class Dashboard {
 		});
 	}
 
-	public getSignup(appid: string, callback: (ret) => void) {
-		let me = this;
-		var ret = {}
-		me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "userid"], function (ids) {
-			me.getNewSignup(me.db, me.prefix, appid, ids, function (su) {
-				ret['signup'] = su;
-				callback(ret);
-			});
-		});
-	}
 
 	public getTodayVisitor(db: mongo.Db, prefix: string, appid: string, ids, callback: (n_new_visitor, n_returning_visitor) => void) {
 		var now = new Date();
@@ -508,6 +482,27 @@ export class Dashboard {
 				});
 	}
 
+	private getNewSignup(db: mongo.Db, prefix: string, appid: string, ids, starttime: number, endtime: number, callback: (a: number) => void) {
+
+		var now = new Date(starttime * 1000);
+		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		now = new Date(endtime * 1000);
+		var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+		let startsec = Math.round(startday.getTime() / 1000);
+		let endsec = Math.round(endday.getTime() / 1000) + 86400;
+
+		let me = this;
+		let match = {};
+		match[ids._ctime] = { $gte: startsec, $lt: endsec };
+		match[ids._typeid] = 'register';
+		match[ids._isUser] = { $exists: false };
+		db.collection(prefix + "app" + appid).count(match, function (err, res) {
+			if (err) throw err;
+			callback(res);
+		});
+	}
+
 	public getDashboard(appid: string, startime: number, endtime: number, callback: (d: DashboardEntity) => void) {
 		let me = this;
 		if (startime === undefined) {
@@ -530,7 +525,7 @@ export class Dashboard {
 				me.getTodayVisitor(me.db, me.prefix, appid, ids, function (n_new_visitor, n_returning_visitor) {
 					dashboard.n_new_visitor = n_new_visitor;
 					dashboard.n_returning_visitor = n_returning_visitor;
-					me.getNewSignup(me.db, me.prefix, appid, ids, function (ret) {
+					me.getNewSignup(me.db, me.prefix, appid, ids, startime, endtime, function (ret) {
 						dashboard.n_new_signup = ret;
 
 						me.getRevenues(me.db, me.prefix, appid, ids, startime, endtime, function (revenues, n_purchases) {
