@@ -26,8 +26,8 @@ var userid = userid || 0;
 	var branch = {};
 	var conn ;
 	function start() {
-		//conn = new WebSocket('wss://' + window.location.host + '/ws', 'mtdashboard');
-		conn = new WebSocket('wss://' + 'app.meotrics.com' + '/ws', 'mtdashboard');
+		conn = new WebSocket('wss://' + window.location.host + '/ws', 'mtdashboard');
+		//conn = new WebSocket('wss://' + 'app.meotrics.com' + '/ws', 'mtdashboard');
 
 		conn.onopen = function(event){
 			console.log('ok');

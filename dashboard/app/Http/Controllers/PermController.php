@@ -60,9 +60,19 @@ class PermController extends Controller
 		return $res . '';
 	}
 
-	public function getSignup(Request $request, $appcode)
+	public function getSignup(Request $request, $appcode,$startime, $endtime)
 	{
-		$res = MtHttp::getRaw('app/getsignup/' . $appcode);
+
+
+		$queryurl = 'app/getsignup/' . $appcode;
+			$pieces = explode("-", $startime);
+			$sts = strtotime($pieces[1] . '/' . $pieces[2] . '/' . $pieces[0]);
+
+			$pieces = explode("-", $endtime);
+			$ets = strtotime($pieces[1] . '/' . $pieces[2] . '/' . $pieces[0]);
+			$queryurl .= '/' . $sts . '/' . $ets;
+
+		$res = MtHttp::getRaw($queryurl);
 		return $res . '';
 	}
 	

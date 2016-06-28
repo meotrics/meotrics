@@ -77,6 +77,17 @@ export class Dashboard {
 	public constructor(private db: mongo.Db, private converter, private prefix: string, private ref: referer.RefererType, private delaysec: number) {
 	}
 
+	public getSignup(appid: string, starttime:number, endtime:number, callback: (ret) => void) {
+	let me = this;
+	var ret = {}
+		 me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "userid"], function (ids) {
+							me.getNewSignup(me.db, me.prefix, appid, ids, starttime, endtime, function (su) {
+									ret['signup'] = su;
+									callback(ret);
+								});
+						});
+		}
+
 	private getTraffic24(db: mongo.Db, prefix: string, appid: string, ids, callback: (data: number[], labels: string[]) => void) {
 		var now = new Date();
 
@@ -132,7 +143,6 @@ export class Dashboard {
 			callback(data.reverse(), labelarr.reverse());
 		});
 	}
-
 
 	private getGrowthRate(db: mongo.Db, prefix: string, appid: string, ids, time, callback: (a: number) => void) {
 		var now = new Date(time * 1000);

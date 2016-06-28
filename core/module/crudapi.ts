@@ -122,8 +122,8 @@ export class CrudApi {
 			});
 		});
 
-		app.getEx('/app/getsignup/:appid', function (req, res) {
-			me.dashboard.getSignup(req.params.appid, function (result) {
+		app.getEx('/app/getsignup/:appid/:starttime/:endtime', function (req, res) {
+			me.dashboard.getSignup(req.params.appid, req.params.starttime, req.params.endtime,function (result) {
 				res.json(result);
 			});
 		});

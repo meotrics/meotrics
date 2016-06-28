@@ -10,7 +10,7 @@ Route::post('/app/setup_status/{appcode}', 'PermController@setup_status');
 Route::post('/app/count_traffic/{appcode}', 'PermController@count_traffic');
 Route::post('/app/traffic14/{appcode}', 'PermController@traffic14');
 Route::post('/app/getpageview/{appcode}', 'PermController@getPageview');
-Route::post('/app/getsignup/{appcode}', 'PermController@getSignup');
+Route::post('/app/getsignup/{appcode}/{starttime}/{endtime}', 'PermController@getSignup');
 Route::get('/app/manage/{appcode}', 'PermController@manage');
 Route::post('/app/postadd/{appcode}', 'PermController@postadd');
 

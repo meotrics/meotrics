@@ -19,8 +19,12 @@
 			}
 			
 			function update_register() {
+				console.log('fc');
 				throttle(function(){
-					$.post('/app/getsignup/{{$appcode}}', function(data){
+					console.log('d');
+					var endtime= $tp.val().split(' ')[2];
+					var starttime = $tp.val().split(' ')[0];
+					$.post('/app/getsignup/{{$appcode}}/' + starttime + "/" + endtime, function(data){
 						data = JSON.parse(data);
 						$('.id_newsignup').html(data.signup);
 					})
