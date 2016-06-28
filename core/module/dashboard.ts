@@ -21,6 +21,8 @@ export class DashboardEntity {
 	public most_effective_ref: string;
 	public most_popular_category: string;
 	public labels: string[];
+	public traffic24: number[];
+	public traffic24labels: string[];
 }
 export class Dashboard {
 	private Lock = require('lock');
@@ -73,6 +75,62 @@ export class Dashboard {
 	}
 
 	public constructor(private db: mongo.Db, private converter, private prefix: string, private ref: referer.RefererType, private delaysec: number) {
+	}
+
+	private getTraffic24(db: mongo.Db, prefix: string, appid: string, ids, callback: (data: number[], labels: string[]) => void) {
+		var now = new Date();
+
+		var nowsec = Math.round(now.getTime() / 1000);
+		var label = ['24', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
+			'13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
+
+		// xac dinh gio
+		var curhour = now.getHours();
+		var queryCont = [];
+		var labelarr = [];
+		// get Rangue query
+		for (var i = 0; i < 24; i++) {
+			var curlabel = label[(curhour - i + 24) % 24];
+			labelarr.push(curlabel);
+			queryCont.push({
+        $cond: [{
+					$and: [
+						{ $lte: ["$" + ids._ctime, nowsec - i * 3600] },
+						{ $gt: ["$" + ids._ctime, nowsec - (i + 1) * 3600] }
+					]
+				}, curlabel, ""]
+      });
+		}
+
+		var queryMatch = {};
+		queryMatch[ids._ctime] = { $gt: nowsec - 24 * 3600 };
+		queryMatch[ids._ctime] = { $lte: nowsec};
+		var query = [{ $match: queryMatch }, {
+			$project: { "_id": 0, "hour": { $concat: queryCont } }
+		}, {
+				$group: { _id: "$hour", count: { $sum: 1 } }
+			}, {
+				$sort: { _id: 1 }
+		}];
+		
+		db.collection(prefix + "app" + appid).aggregate(query, function (err, res) {
+			if (err) throw err;
+			var data = [];
+			for (var i = 0; i < 24; i++)
+			{
+				var value = 0;
+				for (var j = 0; j < res.length; j++)
+				{
+					if (res[j]._id === label[(curhour - i + 24) % 24])
+					{
+						value = res[j].count;
+						break;
+					}
+				}
+				data.push(value);
+			}
+			callback(data.reverse(), labelarr.reverse());
+		});
 	}
 
 	private getNewSignup(db: mongo.Db, prefix: string, appid: string, ids, callback: (a: number) => void) {
@@ -498,7 +556,13 @@ export class Dashboard {
 													dashboard.most_popular_category = cat;
 													me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, startime, endtime, function (ref: string) {
 														dashboard.most_effective_ref = ref;
-														gcallback(dashboard);
+														me.getTraffic24(me.db, me.prefix, appid, ids, function (data, labels) {
+
+															dashboard.traffic24 = data;
+															dashboard.traffic24labels = labels;
+
+															gcallback(dashboard);
+														});
 													});
 												});
 											});

@@ -22,3 +22,4 @@ module/referer.js
 module/trendmgr.js
 module/ws.js
 utils/redisscanner.js
+module/sessionmgr.js
