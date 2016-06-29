@@ -130,12 +130,17 @@ export class ActionMgr {
 
 								if (typeid === 'purchase') {
 									if (user[ids._revenue] === undefined) user[ids._revenue] = 0;
-									simpleprop[ids._revenue] = user[ids._revenue] + data.amount;
+									//get purchase amount
+									if (data.quantity === undefined) data.quantity = 1;
+									if (data.price === undefined) data.price = 0;
+									if (data.amount === undefined) data.amount = data.price * data.quantity;
+									datax[ids._revenue] = user[ids._revenue] + data.amount;
+
 									// Increase number of purchasing                                                                               
 									if (user[ids._numberPurchase] === undefined) {
 										user[ids._numberPurchase] = 0;
 									}
-									simpleprop[ids._numberPurchase] = user[ids._numberPurchase] + 1;
+									datax[ids._numberPurchase] = user[ids._numberPurchase] + 1;
 
 									// Add purchase product up to 5                                                                                
 									if (user[ids._listProduct] === undefined) {
@@ -144,7 +149,7 @@ export class ActionMgr {
 									if (user[ids._listProduct].length > 4) {
 																			 user[ids._listProduct].shift();
 									}
-									simpleprop[ids._listProduct] = user[ids._listProduct].push(data.pname);
+									datax[ids._listProduct] = user[ids._listProduct].push(data.pname);
 
 								}
 								if (typeid === 'pageview') {
@@ -193,7 +198,6 @@ export class ActionMgr {
 		delete datax[ids._typeid];
 		delete datax[ids._referer];
 		delete datax[ids._totalsec];
-		delete datax[ids._revenue];
 		delete datax[ids._firstcampaign];
 		delete datax[ids._lastcampaign];
 		delete datax[ids._totalsec];
@@ -224,6 +228,12 @@ export class ActionMgr {
 
 		//sync data from datax to user
 		for (var p in datax) if (datax.hasOwnProperty(p)) {
+
+			if (p === ids._revenue || p === ids._numberPurchase || p === ids._listProduct)
+			{
+				user[p] = datax[p];
+				continue;
+			}
 			if (user[p] !== undefined) arr = user[p];
 			else arr = [];
 
@@ -300,7 +310,7 @@ export class ActionMgr {
 					if (err) throw err;
 					collection.find({ _id: data._mtid }).limit(1).toArray(function (err, r) { 
 						if (err) throw err;
-						if (r.length == 0) throw "user not found: " + data._mtid;
+						if (r.length == 0) throw "user not found 309: " + data._mtid;
 							me.updateArrayBasedUserInfo(collection, data._mtid, ids, r[0], datax, function () {
 								callback();
 							});
@@ -322,7 +332,6 @@ export class ActionMgr {
 				if (err) throw err;
 				if (r.length === 0) throw "not found pageview to close, actionid: " + actionid;
 				var newaction = {};
-				console.log('session time' + data.sessiontime);
 				newaction[ids.totalsec] = data.sessiontime;// Math.round(new Date().getTime() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0) - r[0][ids._ctime];
 				me.db.collection(collection).update({ _id: actionid }, { $set: newaction }, function (err, r) {
 					if (err) throw err;
