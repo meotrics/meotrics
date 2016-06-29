@@ -22,7 +22,7 @@ export class ActionMgr {
 
 		me.converter.toID('_isUser', function (isUser) {
 
-			me.db.collection(collectionmapping).find({ anomtid: mtid }).limit(1).toArray(function (err, r) {
+						me.db.collection(collectionmapping).find({ anomtid: mtid }).limit(1).toArray(function (err, r) {
 				if (r.length !== 0) mtid = r[0].idemtid;
 				// check if user existed
 				var query = { _id: mtid };
@@ -31,7 +31,7 @@ export class ActionMgr {
 					if (ret.length === 0) callback(false);
 					else callback(true);
 				});
-			});
+						});
 		});
 	};
 
@@ -56,11 +56,11 @@ export class ActionMgr {
 	// + data3
 	public saveRaw(appid, data, callback) {
 		let me = this;
-		var collection = this.prefix + "app" + appid;
+		var collection = me.db.collection(this.prefix + "app" + appid);
 		var collectionmapping = this.prefix + this.mapping;
 		var mtid = new mongodb.ObjectID(data._mtid);
 		data._mtid = mtid;
-		var utm_campaign = data._utm_campaign;
+		
 		data._segments = [];
 
 		// correct timming
@@ -68,7 +68,7 @@ export class ActionMgr {
 		delete data._deltat;
 
 		if (data._link !== undefined) {
-			me.db.collection(collection).find({ _id: new mongodb.ObjectID(data._link) }).limit(1).toArray(function (err, ret) {
+			collection.find({ _id: new mongodb.ObjectID(data._link) }).limit(1).toArray(function (err, ret) {
 				if (err) throw err;
 				if (ret.length == 0) throw "link not found: " + data._link + ", in app: " + appid;
 				let link = ret[0];
@@ -96,7 +96,7 @@ export class ActionMgr {
 				data._reftype = me.referer.getRefType(data._url, data._ref);
 
 				me.converter.toObject(data, function (datax) {
-					me.db.collection(collection).insertOne(datax, function (err, r) {
+					collection.insertOne(datax, function (err, r) {
 						if (err) throw err;
 						// update location
 						me.location.parse(data._ip, function (res) {
@@ -104,12 +104,12 @@ export class ActionMgr {
 							me.valuemgr.cineObject(appid, data._typeid, loc);
 							me.valuemgr.cineObject(appid, "user", loc);
 							me.converter.toObject(loc, function (datax) {
-								me.db.collection(collection).update({ _id: r.insertedId }, { $set: loc } , function (err, r) {
+								collection.update({ _id: r.insertedId }, { $set: loc }, function (err, r) {
 									if (err) throw err;
 								});
-								me.db.collection(collection).update({ _id: data._mtid }, { $set: loc }, function (err, r) {
+								collection.update({ _id: data._mtid }, { $set: loc }, function (err, r) {
 									if (err) throw err;
-								});				
+								});
 							});
 						});
 
@@ -117,13 +117,13 @@ export class ActionMgr {
 					});
 
 					//get user infomation
-					me.db.collection(collection).find({ _id: mtid }).limit(1).toArray(function (err, ret) {
+					collection.find({ _id: mtid }).limit(1).toArray(function (err, ret) {
 						if (err) throw err;
 						var user = ret[0];
 						if (user === undefined) throw "mtid " + mtid + " did not match any user";
 						var typeid = data._typeid;
 						me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
-							'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype', 
+							'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype',
 							'_numberPurchase', '_listProduct'], function (ids) {
 								// increase revenue
 								var simpleprop = {};
@@ -132,98 +132,105 @@ export class ActionMgr {
 									if (user[ids._revenue] === undefined) user[ids._revenue] = 0;
 									simpleprop[ids._revenue] = user[ids._revenue] + data.amount;
 									// Increase number of purchasing                                                                               
-									if(user[ids._numberPurchase] === undefined){                                                                   
-									  user[ids._numberPurchase] = 0;                                                                             
-}                                                                                                            
-simpleprop[ids._numberPurchase] = user[ids._numberPurchase] + 1;                                               
+									if (user[ids._numberPurchase] === undefined) {
+										user[ids._numberPurchase] = 0;
+									}
+									simpleprop[ids._numberPurchase] = user[ids._numberPurchase] + 1;
 
-// Add purchase product up to 5                                                                                
-if(user[ids._listProduct] === undefined){                                                                      
-													user[ids._listProduct] = [];                                                                               
-}                                                                                                              
-if(user[ids._listProduct].length > 4){                                                                        
-																 user[ids._listProduct].shift();                                                                            
-}                                                                                                              
-simpleprop[ids._listProduct] = user[ids._listProduct].push(data.pname);                                     
-                          
+									// Add purchase product up to 5                                                                                
+									if (user[ids._listProduct] === undefined) {
+										user[ids._listProduct] = [];
+									}
+									if (user[ids._listProduct].length > 4) {
+																			 user[ids._listProduct].shift();
+									}
+									simpleprop[ids._listProduct] = user[ids._listProduct].push(data.pname);
+
 								}
 								if (typeid === 'pageview') {
-									// record campaign
-									if (utm_campaign) {
-										if (user[ids._firstcampaign] === undefined) {
-											simpleprop[ids._firstcampaign] = utm_campaign;
-										}
-										simpleprop[ids._lastcampaign] = utm_campaign;
-										datax[ids._campaign] = utm_campaign;
-									}
-
-									// record reftype
-									if (user[ids._reftype] === undefined) {
-										simpleprop[ids._reftype] = [data._reftype];
-									}
-									else
-									{
-										if (user[ids._reftype].indexOf(data._reftype) == -1)
-											simpleprop[ids._reftype].push(data._reftype);
-									}
+									datax[ids._campaign] = datax[ids._utm_campaign];
 								}
+
 								if (typeid === 'register' || typeid === 'login') {
 									simpleprop[ids.registed] = true;
 								}
 
-								// update user
-								if (Object.keys(simpleprop).length !== 0)
-									me.db.collection(collection).update({ _id: mtid }, { $set: simpleprop }, function (err, r) {
-										if (err) throw err;
-									});
-
+								// update system-based prop
 								// filter out unneeded array prop
 								var arrayprop = {};
 								for (var p in datax) if (datax.hasOwnProperty(p))
 									if (p.startsWith('_'))
 										arrayprop[p] = datax[p];
-								delete arrayprop[ids._mtid];
-								delete arrayprop[ids._ctime];
-								delete arrayprop[ids._segments];
-								delete arrayprop[ids._url];
-								delete arrayprop[ids._typeid];
-								delete arrayprop[ids._referer];
-								delete arrayprop[ids._totalsec];
-								delete arrayprop[ids._revenue];
-								delete arrayprop[ids._firstcampaign];
-								delete arrayprop[ids._lastcampaign];
-								delete arrayprop[ids._totalsec];
+
+								// update non-system prop for user
+								for (p in simpleprop) if (simpleprop.hasOwnProperty(p))
+									if (p.startsWith('_') == false)
+										arrayprop[p] = simpleprop[p];
+								
 								if (Object.keys(arrayprop).length !== 0)
-									updateArrayBasedUserInfo(collection, mtid, user, arrayprop);
+									me.updateArrayBasedUserInfo(collection, ids, mtid, user, arrayprop);
 							});
 					});
 				});
 			});
 		}
+	}
 
-		// purpose: add new data to arrays in user
-		// param:
-		// + collection: collection to query user information
-		// + mtid: mongodb.ObjectID mtid of user
-		// + data: data to be append to user
-		function updateArrayBasedUserInfo(collection, mtid, user, data) {
-			me.converter.toObject(data, function (datax) {
-				// append new element to the array or create one
-				var arr = [];
-				for (var p in datax) if (datax.hasOwnProperty(p)) {
-					if (user[p] !== undefined) {
-						arr = user[p];
-					}
-					if (arr instanceof Array === false)
-						arr = [arr];
 
-					arr = arr.concat(datax[p]).sort();
-				}
-				me.db.collection(collection).update({ _id: mtid }, { $set: user }, function (err, r) {
-					if (err) throw err;
-				});
-			});
+	// purpose: add new data to arrays in user
+	// param:
+	// + collection: collection to query user information
+	// + mtid: mongodb.ObjectID mtid of user
+	// + data: data to be append to user
+	private updateArrayBasedUserInfo(collection: mongodb.Collection, mtid: mongodb.ObjectID, ids, user, datax, callback?:()=>void) {
+		// append new element to the array or create one
+		var arr = [];
+
+		delete datax[ids._mtid];
+		delete datax[ids._ctime];
+		delete datax[ids._segments];
+		delete datax[ids._url];
+		delete datax[ids._typeid];
+		delete datax[ids._referer];
+		delete datax[ids._totalsec];
+		delete datax[ids._revenue];
+		delete datax[ids._firstcampaign];
+		delete datax[ids._lastcampaign];
+		delete datax[ids._totalsec];
+
+		if (datax[ids._utm_campaign]) {
+			if (user[ids._firstcampaign] === undefined) {
+				user[ids._firstcampaign] = datax[ids._utm_campaign];
+			}
+			user[ids._lastcampaign] = datax[ids._utm_campaign];
 		}
+
+		// remove unneed prop in user
+		for (var p in user) if (user.hasOwnProperty(p)) {
+			var found = false;
+			for (var r in datax) if (datax.hasOwnProperty(r)) 
+				if (r == p) {
+					found = true;
+					break;
+				}
+			if (found == false) delete user[p];
+		}
+
+		//sync data from datax to user
+		for (var p in datax) if (datax.hasOwnProperty(p)) {
+			if (user[p] !== undefined) arr = user[p];
+			else arr = [];
+
+			if (arr instanceof Array === false) arr = [arr];
+
+			if (arr.indexOf(datax[p]) === -1) user[p] = arr.concat(datax[p]).sort();
+			else delete user[p];
+		}
+
+		collection.update({ _id: mtid }, { $set: user }, function (err, r) {
+			if (err) throw err;
+			if (callback !== undefined) callback();
+		});
 	}
 
 	// purpose: record an action
@@ -247,16 +254,17 @@ simpleprop[ids._listProduct] = user[ids._listProduct].push(data.pname);
 	// + data: action data
 	public fixRaw(appid: string, actionids: string, lastactionidstr: string, data, callback: () => void) {
 		let me = this;
+		console.log("fix " + actionids);
 		let actionid = new mongodb.ObjectID(actionids);
 
 		if (data._mtid) data._mtid = new mongodb.ObjectID(data._mtid);
-		var collection = me.prefix + "app" + appid;
+		var collection = me.db.collection(me.prefix + "app" + appid);
 		//make sure dont change typeid
 		delete data._typeid;
 		if (lastactionidstr !== null && lastactionidstr !== undefined && lastactionidstr !== '') {
 			let lastactionid = new mongodb.ObjectID(lastactionidstr);
 
-			me.db.collection(collection).find({ _id: lastactionid }).limit(1).toArray(function (err, r) {
+			collection.find({ _id: lastactionid }).limit(1).toArray(function (err, r) {
 				if (err) throw err;
 				if (r.length == 0) throw "wrong last action id: " + lastactionidstr;
 				let lastaction = r[0];
@@ -274,16 +282,20 @@ simpleprop[ids._listProduct] = user[ids._listProduct].push(data.pname);
 		return store();
 
 		function store() {
-			
-
 			me.updateChainCampaign(appid, actionids, data);
 			me.valuemgr.cineObject(appid, "pageview", data);
 			// set referal type
 			data._reftype = me.referer.getRefType(data._url, data._ref);
 			me.converter.toObject(data, function (datax) {
-				me.db.collection(collection).update({ _id: actionid }, { $set: datax }, function (err, r) {
+				collection.update({ _id: actionid }, { $set: datax }, function (err, r) {
 					if (err) throw err;
-					callback();
+					collection.find({ _id: data._mtid }).limit(1).toArray(function (err, r) { 
+						if (err) throw err;
+						if (r.length == 0) throw "user not found: " + data._mtid;
+							me.updateArrayBasedUserInfo(collection, data._mtid, r[0], datax, function () {
+								callback();
+						});
+					});
 				});
 			});
 		}
@@ -393,8 +405,7 @@ simpleprop[ids._listProduct] = user[ids._listProduct].push(data.pname);
 						if (err) throw err;
 						if (r.length === 0) return;
 						var olduser = r[0];
-						if (olduser[ids._os] !== undefined && olduser[ids._os] !== null)
-						{
+						if (olduser[ids._os] !== undefined && olduser[ids._os] !== null) {
 							if (olduser[ids._os] instanceof Array) {
 								if (userx[ids._os] !== undefined || userx[ids._os] !== null)
 									userx[ids._os] = olduser[ids._os].concat(userx[ids._os]);
@@ -402,7 +413,7 @@ simpleprop[ids._listProduct] = user[ids._listProduct].push(data.pname);
 							else {
 								if (userx[ids._os] !== undefined || userx[ids._os] !== null)
 									userx[ids._os] = [olduser[ids._os]].concat(userx[ids._os]);
-							}					
+							}
 						}
 
 						if (olduser[ids._segment] !== undefined && olduser[ids._segment] !== null) {
@@ -496,7 +507,7 @@ simpleprop[ids._listProduct] = user[ids._listProduct].push(data.pname);
 
 						if (userx[ids._firstcampaign] === undefined) userx[ids._firstcampaign] = olduser[ids._firstcampaign];
 						if (userx[ids._lastcampaign] === undefined) userx[ids._lastcampaign] = olduser[ids._lastcampaign];
-						
+
 						me.db.collection(collection).deleteOne({ _id: themtid }, function (err) {
 							if (err) throw err;
 						});
@@ -546,7 +557,7 @@ simpleprop[ids._listProduct] = user[ids._listProduct].push(data.pname);
 			me.db.collection(collection).insertOne(user, function (err, results) {
 				if (err) throw err;
 				var mtid = results.insertedId;
-				
+
 				callback(mtid);
 				// update mtid equal id
 				for (var p in user) if (user.hasOwnProperty(p))
