@@ -4,12 +4,12 @@
 	if(location.hostname == "client.meotrics.dev") host = "meotrics.dev";
 	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document;
 	
-	var T = 2000;
+	var T = 2;
 	var SESSIONGAP = 1200;
 	var STARTANDLEAVE;
 	var ISBLUR, lastcycle,totaltime,totalidle;
 	var lefttime;
-
+	var canstartnewsession = false;
 	function init()
 	{	
 		totaltime = 0;
@@ -26,7 +26,10 @@
 	}
 
 	function interact(){
+		ISBLUR = false;
 		totalidle = 0;
+		if(canstartnewsession) startsession();
+		canstartnewsession = false;
 	}
 
 	attach("beforeunload", function (e) {
@@ -86,7 +89,6 @@
 
 	var startsession = mt.startsession = function ()
 	{
-		console.log('start session');
 		//start a new pageview
 		mt.track('pageview', {_link: null, _callback : true},0, function(){
 			init();
@@ -96,16 +98,17 @@
 
 	function backgroundtimer()
 	{
-		console.log('cycle');
 		if(ISBLUR === false)
 		{
 			totalidle+=T;
 			totaltime+=T;
-			if(totalidle > SESSIONGAP)
+			if(totalidle > SESSIONGAP){
 				stopsession(Math.max(totaltime, SESSIONGAP));
+				canstartnewsession = true;
+			}
 		}
 		lastcycle = Math.round(new Date().getTime() / 1000);
-		return setTimeout(backgroundtimer, T)
+		return setTimeout(backgroundtimer, T*1000)
 	}
 
 	function ajax(url, data, callback) {
