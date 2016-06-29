@@ -124,7 +124,7 @@ export class ActionMgr {
 						var typeid = data._typeid;
 						me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
 							'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype', 'lastactionid', '_ref', 
-							'_callback', '_numberPurchase', '_listProduct'], function (ids) {
+							'_callback', '_numberPurchase', '_listProduct', '_deltat', 'actionid'], function (ids) {
 								// increase revenue
 								var simpleprop = {};
 
@@ -202,6 +202,7 @@ export class ActionMgr {
 		delete datax[ids._callback];
 		delete datax[ids._link];
 		delete datax[ids.lastactionid];
+		delete datax[ids.actionid];
 
 		if (datax[ids._utm_campaign]) {
 			if (user[ids._firstcampaign] === undefined) {
@@ -261,7 +262,6 @@ export class ActionMgr {
 		let me = this;
 		console.log("fix " + actionids);
 		let actionid = new mongodb.ObjectID(actionids);
-		console.log('co fix ko');
 		if (data._mtid) data._mtid = new mongodb.ObjectID(data._mtid);
 		var collection = me.db.collection(me.prefix + "app" + appid);
 		//make sure dont change typeid
@@ -269,7 +269,7 @@ export class ActionMgr {
 
 		me.converter.toIDs(['_utm_source', '_utm_campaign', '_utm_term', '_utm_content',
 			'_utm_medium', '_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
-			'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype',
+			'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype', '_deltat', 'actionid',
 			'lastactionid', '_ref', '_callback', '_numberPurchase', '_listProduct'], function (ids) {
 		if (lastactionidstr !== null && lastactionidstr !== undefined && lastactionidstr !== '') {
 			let lastactionid = new mongodb.ObjectID(lastactionidstr);
