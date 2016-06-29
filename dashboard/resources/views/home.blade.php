@@ -214,7 +214,7 @@
 					labels: ["New visitor", "Returning visitor"],
 					datasets: [
 						{
-							data: [newv == 0 ? 1 : newv, retv],
+							data: [(newv == 0 && retv == 0) ? 1 : newv, retv],
 							backgroundColor: ["#4E6CC9", "#8C8C8C"],
 							hoverBackgroundColor: ["#4E6CC9", "#8C8C8C"]
 						}
