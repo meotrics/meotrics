@@ -529,10 +529,27 @@ export class ActionMgr {
 		// purpose: update info which mtid is mtid
 		function updateUserInfo(db: mongodb.Db, mtid, userx, callback) {
 			callback(mtid);
-			if (Object.keys(userx).length !== 0)
+			if (Object.keys(userx).length !== 0) {
+				me.converter.toIDs(['email', 'phone', '_stime'], function (ids) { 
+				if (userx[ids.email] !== undefined || userx[ids.phone] !== undefined)
+				{
+					db.collection(collection).find({ _id: mtid }).limit(1).toArray(function (err, r) {
+						if (err) throw err;
+						var userx = {};
+						if (r[0][ids._stime] === undefined || r[0][ids._stime] === null) {
+							userx[ids._stime] = Math.round(new Date().getTime() / 1000);
+							db.collection(collection).update({ _id: mtid }, { $set: userx }, function (err, result) {
+								if (err) throw err;
+							});
+						}
+					});
+					}
+				});
+
 				db.collection(collection).update({ _id: mtid }, { $set: userx }, function (err, result) {
 					if (err) throw err;
 				});
+			}
 		}
 	}
 
