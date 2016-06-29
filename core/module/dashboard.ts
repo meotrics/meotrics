@@ -515,7 +515,7 @@ export class Dashboard {
 			var dashboard: DashboardEntity = new DashboardEntity();
 
 			dashboard.labels = me.generateLabel(startime, endtime);
-			me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid"], function (ids) {
+			me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid", "_stime"], function (ids) {
 				me.getTodayVisitor(me.db, me.prefix, appid, ids, function (n_new_visitor, n_returning_visitor) {
 					dashboard.n_new_visitor = n_new_visitor;
 					dashboard.n_returning_visitor = n_returning_visitor;

@@ -287,7 +287,7 @@
 								<h6 style="margin: 0; color: #0e1a35">USER GROWTH RATE</h6>
 							</div>
 							<div class="content text-center" style="padding-top: 0">
-								<span class="big id_newsignup" style="color: #4164c2;">{{$dashboard->n_new_signup}}</span>
+								<span class="big id_newsignup" style="color: #4164c2;">{{$dashboard->usergrowth_rate}}</span>
 							</div>
 						</div>
 					</div>
