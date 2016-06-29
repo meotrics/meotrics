@@ -145,35 +145,33 @@ export class Dashboard {
 	}
 
 	private getGrowthRate(db: mongo.Db, prefix: string, appid: string, ids, starttime:number, endtime:number, callback: (a: number) => void) {
-
-		//count all today
-
 		var now = new Date(starttime * 1000);
-		var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-		let todaysec = Math.round(today.getTime() / 1000);
+		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		now = new Date(endtime * 1000);
+		var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-		var pipeline = [{ $match: {} }, { $group: { _id: "$" + ids._mtid } }, {
-			$group: {
-				_id: null, count: { $sum: 1 }
-			}
-		}];
-
-		//count unique today visitor
-		pipeline[0]['$match'][ids._ctime] = { $gte: todaysec, $lt: todaysec + 86400 };
-		pipeline[0]['$match'][ids._isUser] = { $exists: false };
-		db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
+		let startsec = Math.round(startday.getTime() / 1000);
+		let endsec = Math.round(endday.getTime() / 1000) + 86400;
+		var query = {};
+		query[ids._stime] = {
+			$lte: startsec
+		}
+		query[ids._isUser] = true;
+		//count number of user at starttime
+		db.collection(prefix + "app" + appid).count(query, function (err, c) {
 			if (err) throw err;
-			if (res.length == 0) return callback(0);
-			else {
-				let todayvisitcount = res[0].count;
-				//count yesterday unique visitor
-				pipeline[0]['$match'][ids._ctime] = { $gte: todaysec - 86400, $lt: todaysec };
-				db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
-					if (err) throw err;
-					if (res.length == 0) return callback(todayvisitcount);
-					return callback(1.0 * todayvisitcount - res[0].count / res[0].count * 100);
-				});
+			var startc = c;
+
+			query[ids._stime] = {
+				$gt: startsec, $lte: endsec
 			}
+			db.collection(prefix + "app" + appid).count(query, function (err, c) {
+				if (err) throw err;
+				var deltac = c;
+
+				if (deltac + startc == 0) return callback(0);
+				else return callback(deltac / (deltac + startc));
+			});
 		});
 	}
 
@@ -279,8 +277,7 @@ export class Dashboard {
 				todayuservisitq[2]['$group'] = { _id: "$" + ids._mtid, userid: { $sum: "$" + ids.userid }, count: { $sum: 1 } };
 				todayuservisitq[3]['$match'] = { userid: { $gt: 0 }, count: { $gt: 1 } };
 				todayuservisitq[4]['$group'] = { _id: null, count: { $sum: 1 } };
-
-				//console.log("todayuservisitq", JSON.stringify(todayuservisitq));
+				
 				me.db.collection(me.prefix + "app" + appid).aggregate(todayuservisitq, function (err, res) {
 					if (err) throw err;
 					var count = 0;

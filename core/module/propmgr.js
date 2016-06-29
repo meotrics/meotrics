@@ -18,7 +18,7 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 			{name: "Contain", code: "con"},
 				{name: "Start with", code: "sw"},
 				{name: "End with", code: "ew"},
-				{name: "Not contain", code: "ncon"}]]
+				{name: "Not contain", code: "ncon"}]
 		}, {
 			name: "Country", code: "_country",
 			operators: [{name: "Equal", code: "eq"},
