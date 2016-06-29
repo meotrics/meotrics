@@ -123,8 +123,8 @@ export class ActionMgr {
 						if (user === undefined) throw "mtid " + mtid + " did not match any user";
 						var typeid = data._typeid;
 						me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
-							'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype',
-							'_numberPurchase', '_listProduct'], function (ids) {
+							'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype', 'lastactionid', '_ref', 
+							'_callback', '_numberPurchase', '_listProduct'], function (ids) {
 								// increase revenue
 								var simpleprop = {};
 
@@ -197,6 +197,11 @@ export class ActionMgr {
 		delete datax[ids._firstcampaign];
 		delete datax[ids._lastcampaign];
 		delete datax[ids._totalsec];
+		delete datax[ids._deltat];
+		delete datax[ids._ref];
+		delete datax[ids._callback];
+		delete datax[ids._link];
+		delete datax[ids.lastactionid];
 
 		if (datax[ids._utm_campaign]) {
 			if (user[ids._firstcampaign] === undefined) {
@@ -256,11 +261,16 @@ export class ActionMgr {
 		let me = this;
 		console.log("fix " + actionids);
 		let actionid = new mongodb.ObjectID(actionids);
-
+		console.log('co fix ko');
 		if (data._mtid) data._mtid = new mongodb.ObjectID(data._mtid);
 		var collection = me.db.collection(me.prefix + "app" + appid);
 		//make sure dont change typeid
 		delete data._typeid;
+
+		me.converter.toIDs(['_utm_source', '_utm_campaign', '_utm_term', '_utm_content',
+			'_utm_medium', '_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
+			'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype',
+			'lastactionid', '_ref', '_callback', '_numberPurchase', '_listProduct'], function (ids) {
 		if (lastactionidstr !== null && lastactionidstr !== undefined && lastactionidstr !== '') {
 			let lastactionid = new mongodb.ObjectID(lastactionidstr);
 
@@ -269,19 +279,18 @@ export class ActionMgr {
 				if (r.length == 0) throw "wrong last action id: " + lastactionidstr;
 				let lastaction = r[0];
 				data._link = lastactionid;
-				me.converter.toIDs(['_utm_source', '_utm_campaign', '_utm_term', '_utm_content', '_utm_medium'], function (ids) {
+			
 					if (data._utm_source == undefined) data._utm_source = lastaction[ids._utm_source];
 					if (data._utm_campaign == undefined) data._utm_campaign = lastaction[ids._utm_campaign];
 					if (data._utm_term == undefined) data._utm_term = lastaction[ids._utm_term];
 					if (data._utm_content == undefined) data._utm_content = lastaction[ids._utm_content];
 					if (data._utm_medium == undefined) data._utm_medium = lastaction[ids._utm_meidum];
-					return store();
+					return store(ids);
 				});
-			});
-		}
-		return store();
-
-		function store() {
+			}
+			return store(ids);
+		});
+		function store(ids) {
 			me.updateChainCampaign(appid, actionids, data);
 			me.valuemgr.cineObject(appid, "pageview", data);
 			// set referal type
@@ -292,9 +301,9 @@ export class ActionMgr {
 					collection.find({ _id: data._mtid }).limit(1).toArray(function (err, r) { 
 						if (err) throw err;
 						if (r.length == 0) throw "user not found: " + data._mtid;
-							me.updateArrayBasedUserInfo(collection, data._mtid, r[0], datax, function () {
+							me.updateArrayBasedUserInfo(collection, data._mtid, ids, r[0], datax, function () {
 								callback();
-						});
+							});
 					});
 				});
 			});
