@@ -128,13 +128,13 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 				if (callback === true)
 				{
 					res.setHeader('Content-Type', 'application/javascript');
-					res.end("mt.actionid = \"" + mtid + "\"; console.log('fuck')");
+					res.end("mt.actionid = \"" + mtid + "\";");
 				}
 				else {
 					res.setHeader('Content-Type', 'text/plain');
 					res.end("\"" + mtid + "\"");
 				}
-				
+	
 			});
 		});
 	}

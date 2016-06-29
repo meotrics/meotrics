@@ -322,7 +322,8 @@ export class ActionMgr {
 				if (err) throw err;
 				if (r.length === 0) throw "not found pageview to close, actionid: " + actionid;
 				var newaction = {};
-				newaction[ids.totalsec] = Math.round(new Date().getTime() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0) - r[0][ids._ctime];
+				console.log('session time' + data.sessiontime);
+				newaction[ids.totalsec] = data.sessiontime;// Math.round(new Date().getTime() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0) - r[0][ids._ctime];
 				me.db.collection(collection).update({ _id: actionid }, { $set: newaction }, function (err, r) {
 					if (err) throw err;
 					res.writeHead(200);
