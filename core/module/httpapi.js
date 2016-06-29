@@ -50,6 +50,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		if (uri === "" || uri.startsWith(request.headers.referer) === false) uri = request.headers.referer || '';
 		var res = {
 			_url: uri,
+			_callback : request.params._callback,
 			_ref: request.params._ref,
 			_typeid: request.params._typeid,
 			_ip: getRemoteAddress(request),
@@ -116,13 +117,24 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	function track(req, res) {
 		var appid = req.appid;
 		var data = trackBasic(req);
+		var callback = (data._callback == 'true' || data._callback == true);
+		delete data._callback;
 
 		getMtid(req, appid, res, function (mtid) {
 			data._mtid = mtid;
 			actionmgr.saveRaw(appid, data, function (actionid) {
 				me.onchange(appid, "type." + data._typeid);
-				res.setHeader('Content-Type', 'text/plain');
-				res.end("\"" + mtid + "\"");
+				
+				if (callback === true)
+				{
+					res.setHeader('Content-Type', 'application/javascript');
+					res.end("mt.actionid = \"" + mtid + "\"; console.log('fuck')");
+				}
+				else {
+					res.setHeader('Content-Type', 'text/plain');
+					res.end("\"" + mtid + "\"");
+				}
+				
 			});
 		});
 	}

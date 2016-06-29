@@ -15,7 +15,10 @@ onready : function(){
 rq : []
 };
 (function(){
+	var called = false;
 	addEventListener("message", function(ev){
+		if(called === true) return;
+		called = true;
 		var origin = ev.origin || ev.originalEvent.origin;
 		if (origin.split('/')[2] !== "meotrics.com" && origin.split('/')[2] !== "meotrics.dev" ) return;
 		mt.event = ev;

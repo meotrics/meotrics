@@ -1,17 +1,26 @@
 (function () {
-	var T = 2000;
-	var SESSIONGAP = 1200;
-	var STARTANDLEAVE;
-	var ISBLUR, lastcycle;
-	var lefttime;
+	
 	var host = "meotrics.com";
 	if(location.hostname == "client.meotrics.dev") host = "meotrics.dev";
 	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document;
 	
+	var T = 2000;
+	var SESSIONGAP = 1200;
+	var STARTANDLEAVE;
+	var ISBLUR, lastcycle,totaltime,totalidle;
+	var lefttime;
+
+	function init()
+	{	
+		totaltime = 0;
+		totalidle = 0;
+		STARTANDLEAVE = ISBLUR = lastcycle = lefttime = undefined;
+	}
+
 	function attach(event, fn)
 	{
 		if (window.addEventListener)
-				window.addEventListener(event, fn, false);
+			window.addEventListener(event, fn, false);
 		else if (window.attachEvent)
 			window.attachEvent('on' + event, fn);
 	}
@@ -67,13 +76,27 @@
 		ajax('x/' + mt.actionid, {sessiontime: sessiontime});
 	}
 
-	function startsession()
+	function addIframeLink(){
+		var ifm = doc.createElement('iframe');
+		ifm.style.display="none";
+		ifm.src = "//" + host + "/iframe.html?x=" + mt.appid + '-' + mt.actionid;
+		if(doc.body === undefined) doc.head.appendChild(ifm);
+		else doc.body.appendChild(ifm);
+	}
+
+	var startsession = mt.startsession = function ()
 	{
-		//start a new pageview,
+		console.log('start session');
+		//start a new pageview
+		mt.track('pageview', {_link: null, _callback : true},0, function(){
+			init();
+			addIframeLink();
+		});
 	}
 
 	function backgroundtimer()
 	{
+		console.log('cycle');
 		if(ISBLUR === false)
 		{
 			totalidle+=T;
@@ -137,7 +160,7 @@
 		data._ref = doc.referrer;
 		data._scr = screen.width + "x" + screen.height;
 		data._url = location.href;
-		data._link = mt.actionid;
+		if(data._link === undefined) data._link = mt.actionid;
 		return data;
 	}
 
@@ -181,12 +204,8 @@
 		}
 		cleanRequest();// excute delayed request in queue
 	}
-
-	var ifm = doc.createElement('iframe');
-	ifm.style.display="none";
-	ifm.src = "//" + host + "/iframe.html?x=" + mt.appid + '-' + mt.actionid;
-	if(doc.body === undefined) doc.head.appendChild(ifm);
-	else doc.body.appendChild(ifm);
-
+	init();
+	backgroundtimer();
+	addIframeLink();
 	mt.onready();
 })();
