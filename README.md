@@ -113,6 +113,23 @@ Restart nginx bằng lệnh
 
   Import database từ file  `\resources\meotrics_dashboard.sql`
 
+
+Cập nhật mã nguồn
+---
+Sau một thời gian, các package của hệ thống sẽ bị outdated, tại thư mục `meotrics` dùng chuỗi lệnh sau để cập nhật lại mã nguồn
+
+```bash
+git pull
+git lfs pull
+cd ../meotrics/dashboard
+composer update
+cd ../../DefinitelyTyped
+git pull
+cd ../meotrics/core
+npm install
+tsc
+```
+
 Khởi động hệ thống
 ---
 
