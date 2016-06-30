@@ -7,7 +7,6 @@ export class TrendMgr {
 
 	public queryRaw(appid: string, trid: string, segid: string, starttime: number, endtime: number, callback: (a: any[]) => void) {
 		let me = this;
-
 		var collection = me.prefix + me.col;
 
 		me.db.collection(collection).find({ _id: new mongodb.ObjectID(trid) }, { _id: 0 }).limit(1).next(function (err, trenddoc) {
@@ -51,7 +50,7 @@ export class TrendMgr {
 	private getQueryTrending(object, callback: (string) => void) {
 		var me = this;
 		var query = [];
-		me.converter.toIDs([object.object, "_typeid", "_ctime", "_segment", object.param], function (ids) {
+		me.converter.toIDs([object.object, "_typeid", "_ctime", "_segments", "_mtid", object.param], function (ids) {
 			object.object = ids[object.object];
 			object.param = ids[object.param];
 
@@ -59,15 +58,30 @@ export class TrendMgr {
 			match.$match[ids._typeid] = object.typeid;
 			// -- START MATCH CLAUSE
 			query.push(match);
+			
 			if (object._segment !== undefined) {
-				match.$match[ids._segments] = { $in: [new mongodb.ObjectID(object._segment)] };
+				var lookup = {
+					$lookup:
+					{
+						from: me.prefix + "app" + object._appid,
+						localField: ids._mtid,
+						foreignField: "_id",
+						as: "_user"
+					}
+				};
+				query.push(lookup);
+				var matchSegment = {
+					$match: {}
+				};
+				matchSegment.$match[`_user.0.${ids._segments}`] = { $in: [new mongodb.ObjectID(object._segment)] };
+				query.push(matchSegment);
 			}
-
-			if (object.startTime !== undefined) {
+			
+			if (object.startTime !== undefined || object.startTime !== null) {
 				match.$match[ids._ctime] = { $gte: object.startTime };
 			}
 
-			if (object.endTime !== undefined) {
+			if (object.endTime !== undefined || object.endTime !== null) {
 				if (match.$match[ids._ctime] !== undefined) match.$match[ids._ctime].$lte = object.endTime;
 				else match.$match[ids._ctime] = { $lte: object.endTime };
 			}
