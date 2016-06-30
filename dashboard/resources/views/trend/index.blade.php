@@ -64,7 +64,7 @@
 									@foreach($segments as $segment)
 										@if( $segmentid == $segment->_id)
 											<?php $trend_segment = $segment ?>
-											<option value="{{$segment->_id}}">{{  $segment->name or "unnamed"}} selected</option>
+											<option value="{{$segment->_id}}" selected>{{  $segment->name or "unnamed"}} </option>
 										@else
 											<option value="{{$segment->_id}}">{{  $segment->name or "unnamed"}}</option>
 										@endif
@@ -114,7 +114,7 @@
 			// bind event
 			$('#segpick').on('change', function () {
 				var val = $(this).val();
-				$.post('/trend/{{$appcode}}/currentsegment/', {'segmentid': val}, function () {
+				$.post('/trend/{{$appcode}}/currentsegment', {'segmentid': val}, function () {
 					location.reload();
 				});
 			});
