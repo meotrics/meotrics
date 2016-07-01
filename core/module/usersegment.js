@@ -47,12 +47,15 @@ exports.UserSegment = function (db, mongodb, async, converter, prefix) {
 
 					for(let j=0; j<fields.length; j++) {
 						let field = fields[j];
+
 						for(let i=0;i<length; i++){
 							let temp = users[i][ids[field]];
 							if(isDemoGraphic(field)){
 								// check if temp is array or not
 								if(Array.isArray(temp)){
-									usersReturn[i][ids[field]] = temp.pop();
+									console.log(field);
+									console.log(temp);
+									usersReturn[i][ids[field]] = temp.pop() || '';
 									continue;
 								}
 
@@ -69,7 +72,7 @@ exports.UserSegment = function (db, mongodb, async, converter, prefix) {
 	}
 
 	function isDemoGraphic(fieldName) {
-		const demoGraphics = ['_os', '_devicetype', '_browser', '_campaign'];
+		const demoGraphics = ['_os', '_devicetype', '_browser', '_campaign', '_listProduct'];
 
 		if(demoGraphics.indexOf(fieldName) !== -1){
 			return true;

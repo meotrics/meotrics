@@ -12,14 +12,14 @@ MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get(
 	if (err) throw err;
 	var userSegment = new UserSegment(db, mongodb, async, converter, config.get('mongod.prefix'));
 
-	userSegment.getUsers('appiship', [], ['_os', 'gender', '_city'], 0, function(users){
+	userSegment.getUsers('apphmt5', [], ['_os', 'gender', '_city', '_listProduct', '_numberPurchase'], 0, function(users){
 		console.log(users);
 	});
 
 	// this.getUsers = function(appName, segmentId, fields, start, callback)
 	// neu khong chon segment nao thi de la []
 	// start la vi tri bat dau lay
-	// fields la cac field can lay gia tri, co 2 field mac dinh hien tai la name, _mtid
+	// fields la cac field can lay gia tri, co 3 field mac dinh hien tai la name, _mtid, email
 	// a nho nhap dung ten cua field tuong ung trong db
 	// e mo` mai~ chua test duoc may cai field vua them vao user nhu _numberProduct, _productPurchasing ...
 });
