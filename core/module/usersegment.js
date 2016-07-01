@@ -20,7 +20,7 @@ exports.UserSegment = function (db, mongodb, async, converter, prefix) {
 		}
 
 		// Get users from mongodb
-		let fieldToTranslate = fields.slice().concat(['_segments', '_ctime', '_isUser', '_mtid', 'name']);
+		let fieldToTranslate = fields.slice().concat(['_segments', '_lastSeen', '_isUser', '_mtid', 'name', 'email']);
 		converter.toIDs(fieldToTranslate, (ids) => {
 			let query = {
 				[ids['_segments']]: segmentId,
@@ -28,7 +28,7 @@ exports.UserSegment = function (db, mongodb, async, converter, prefix) {
 			};
 
 			let sort = {
-				[ids['_ctime']]: -1
+				[ids['_lastSeen']]: -1
 			}
 
 			db.collection(prefix + appName).find(query).sort(sort).skip(skip).limit(limit).toArray((err, users) => {
@@ -40,9 +40,11 @@ exports.UserSegment = function (db, mongodb, async, converter, prefix) {
 					for(let i=0; i<length; i++){
 						usersReturn[i] = {};
 						// Add default field here
-						usersReturn[i][ids['name']] = users[i][ids['name']];
-						usersReturn[i][ids['_mtid']] = users[i][ids['_mtid']];
+						usersReturn[i][ids['name']] = users[i][ids['name']] || '';
+						usersReturn[i][ids['_mtid']] = users[i][ids['_mtid']] || '';
+						usersReturn[i][ids['email']] = users[i][ids['email']] || '';
 					}
+
 					for(let j=0; j<fields.length; j++) {
 						let field = fields[j];
 						for(let i=0;i<length; i++){
