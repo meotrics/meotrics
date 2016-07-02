@@ -1,8 +1,6 @@
 Hệ thống thu thập và phân tích hành vi người dùng
 
-[![](http://blog.meotrics.com/wp-content/uploads/2016/03/Logo_Blue_word-1.png)](http://meotrics.com) [![License](https://img.shields.io/crates/l/rustc-serialize.svg)](https://opensource.org/licenses/Apache-2.0) ![](http://d1va5oqn59yrvt.cloudfront.net/uploads/2014/10/hiring-header.png)
-Please contact meotrics@gmail.com
-
+[![](http://blog.meotrics.com/wp-content/uploads/2016/03/Logo_Blue_word-1.png)](http://meotrics.com) [![License](https://img.shields.io/crates/l/rustc-serialize.svg)](https://opensource.org/licenses/Apache-2.0)
 * * *
 
 Cài đặt môi trường DEV
@@ -17,7 +15,7 @@ Trỏ danh sách tên miền sau để tiện phát triển hệ thống:
 |-----------------------|-------------------|
 |`meotrics.dev`         | `127.0.0.1`       |
 |`app.meotrics.dev`		  | `127.0.0.1`		    |
-|`client.meotrics.dev 	| `127.0.0.1`		    |
+|`client.meotrics.dev` 	| `127.0.0.1`		    |
 |`api.meotrics.dev`     | `127.0.0.1`       |
 
 Trong hệ thống Window, sửa file, `Windows\\System32\\drivers\\etc\\host`, trong Linux hoặc Mac, sửa file `/etc/hosts` (`/private/etc/hosts`)
@@ -29,7 +27,7 @@ Trong hệ thống Window, sửa file, `Windows\\System32\\drivers\\etc\\host`, 
 * MySQL
 * MongoDb
 * Redis
-* Composer (xem cách cài đặt composer ở [đây](docs/composerinstall))
+* Composer (xem cách cài đặt composer ở [đây](docs/composerinstall.md))
 * Npm
 * Nginx hoặc Apache
 
@@ -37,7 +35,7 @@ Trong hệ thống Window, sửa file, `Windows\\System32\\drivers\\etc\\host`, 
 #### config file
 * Front-end
 
-  *Trong thư mục `/dashboard` tạo một file .env có nội dung giống với `.env.example`, sửa config csdl ở đây*
+  *Trong thư mục `/dashboard` tạo một file .env có nội dung giống với `.env.example`, sau đó sửa lại cấu hình cơ sở dữ liệu trong file .env*
 
   Đặt `DB_USERNAME/DB_PASSWORD` là `meotrics/meotrics123`
 
@@ -55,15 +53,28 @@ Trong hệ thống Window, sửa file, `Windows\\System32\\drivers\\etc\\host`, 
 Chuyển vào thư mục dashboard (`meotrics/dashboard`), gõ
 
 ```bash
-# composer install
-# composer update
-# chmod -R 777 storage
+composer install
+composer update
+chmod -R 777 storage
 ```
 
 ### Cài đặt Backend
 
-Chuyển vào thư mục core (`meotrics/core`), gõ `npm install` để download các package cần thiết. 
-Sau khi cài đặt xong, gõ `tsc` để biên dịch lại mã nguồn typescript.
+Chuyển vào thư mục core (`meotrics/core`), gõ `npm install` để download các package cần thiết.
+
+Backend được viết chủ yếu bằng ngôn ngữ Typescript, muốn chạy được bằng NodeJS, phải biên dịch mã
+nguồn này ra file typescript bằng lệnh `tsc`. Mã nguồn typescript lại tham chiếu tới một số file ở
+project [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped). Do vậy, muốn biên dịch
+thành công, cần phải tải prject DefinitelyTyped về máy. Vẫn ở thư mục `meotrics/core`, gõ
+
+```bash
+cd ../..
+# download project DefinitelyTyped
+git clone https://github.com/DefinitelyTyped/DefinitelyTyped.git
+cd meotrics/core
+# compile to javascript code
+tsc
+```
 
 ### Cài đặt web server
 Có thể chạy hệ thống bằng apache hoặc nginx, với mỗi server, copy và sửa các đoạn config như dưới
@@ -80,7 +91,7 @@ LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so
 ```
 Thêm toàn bộ nội dung ở [cấu hình](docs/apacheconf.md) vào file `http-vhosts.conf`
 
-Sau khi cấu hình xong, truy cập vào địa chỉ [https://meotrics.com](https://meotrics.com) và [https://app.meotrics.com](https://app.meotrics.com), 
+Sau khi cấu hình xong, truy cập vào địa chỉ [https://meotrics.com](https://meotrics.com) và [https://app.meotrics.com](https://app.meotrics.com),
 [https://api.meotrics.com](https://api.meotrics.com), để accept certification cho trình duyệt, với mỗi một trình duyệt mới, đều phải accept lại
 certification.
 
@@ -101,6 +112,23 @@ Restart nginx bằng lệnh
   Tạo tài khoản mysql có tên `meotrics/meotrics123`
 
   Import database từ file  `\resources\meotrics_dashboard.sql`
+
+
+Cập nhật mã nguồn
+---
+Sau một thời gian, các package của hệ thống sẽ bị outdated, tại thư mục `meotrics` dùng chuỗi lệnh sau để cập nhật lại mã nguồn
+
+```bash
+git pull
+git lfs pull
+cd ../meotrics/dashboard
+composer update
+cd ../../DefinitelyTyped
+git pull
+cd ../meotrics/core
+npm install
+tsc
+```
 
 Khởi động hệ thống
 ---

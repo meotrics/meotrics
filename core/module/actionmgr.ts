@@ -124,7 +124,7 @@ export class ActionMgr {
 						var typeid = data._typeid;
 						me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
 							'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype', 'lastactionid', '_ref', 
-							'_callback', '_numberPurchase', '_listProduct', '_deltat', 'actionid'], function (ids) {
+							'_callback', '_numberPurchase', '_listProduct', '_deltat', 'actionid', '_lastSeen'], function (ids) {
 								// increase revenue
 								var simpleprop = {};
 
@@ -159,6 +159,9 @@ export class ActionMgr {
 								if (typeid === 'register' || typeid === 'login') {
 									simpleprop[ids.registed] = true;
 								}
+
+								// Add last active
+								datax[ids._lastSeen] = Date.now();
 
 								// update system-based prop
 								// filter out unneeded array prop
@@ -229,7 +232,7 @@ export class ActionMgr {
 		//sync data from datax to user
 		for (var p in datax) if (datax.hasOwnProperty(p)) {
 
-			if (p === ids._revenue || p === ids._numberPurchase || p === ids._listProduct)
+			if (p === ids._revenue || p === ids._numberPurchase || p === ids._listProduct || p === ids._lastSeen)
 			{
 				user[p] = datax[p];
 				continue;
