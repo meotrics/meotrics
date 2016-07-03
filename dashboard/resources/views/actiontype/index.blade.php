@@ -59,7 +59,7 @@
                                                         <th style="width: 100px;">Code</th>
                                                         <th style="width: 120px;">Name</th>
                                                         <th style="width: 300px;">Description</th>
-                                                        <th style="width: 400px;">Properties</th>
+                                                        <th style="width: 350px;">Properties</th>
                                                         <th></th>
                                                     </tr>
                                                 </thead>

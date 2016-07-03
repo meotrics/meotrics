@@ -3,7 +3,6 @@
 	<script>
 		var userid = '{{$userid}}';
 		var appcode = '{{$appcode}}';
-
 		function onPageLoad(fn) {
 			if (window.addEventListener)
 				window.addEventListener('load', fn, false);
@@ -124,7 +123,7 @@
                     </a>
                 </li>
                 <li class="{{ Route::getCurrentRoute()->getPath() == 'insight' ? 'active' : '' }}">
-                    <a href="/insight/{{$appcode}}">
+                    <a href="/userprofile/{{$appcode}}">
                         <i class="pe-7s-user"></i>
                         <p>User Profile</p>
                     </a>
@@ -218,7 +217,7 @@
                                 <li><a href="/app/manage/{{$appcode}}">App management</a></li>
                                 <!--@endif-->
                                 <li class="divider"></li>
-                                <li><a href="/user/profile">Profile & Billing</a></li>
+                                <li><a href="/user/profile/{{$appcode}}">Profile & Billing</a></li>
                                 <li><a href="/auth/signout">Sign out</a></li>
                             </ul>
                         </li>
@@ -243,6 +242,45 @@
         </div>
     </div>
 </div>
+
+    {{--add new app--}}
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Track new app</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row pt pb10">
+                    <div class="col-sm-4 ">
+                        <h6 class="pull-right">name of the app</h6>
+                    </div>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control id_name" placeholder="App Name" required>
+                    </div>
+                </div>
+
+                <div class="row pt pb10">
+                    <div class="col-sm-4 ">
+                        <h6 class="pull-right">url of the app</h6>
+                    </div>
+                    <div class="col-sm-7">
+                        <input type="text" class="form-control id_url" placeholder="App URL" >
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="button action ">
+                    <span class="label">Cancel</span></button>
+                <button type="button" data-dismiss="modal" class="button action blue id_add">
+                    <span class="label">Next step</span></button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('footer-script')
@@ -260,6 +298,28 @@
 				$(this).fadeOut(300, cb);
 			}
 		};
+
+
+        $('.id_add').click(function () {
+            $.post('/app/create', {name: $('.id_name').val(), url:$('.id_url').val()}, function (appcode) {
+                showCodeDialog(appcode, function () {
+                    //redirect to new app code
+                    var url_new = location.href.replace("/<?= $appcode ?>", "/"+appcode);
+                    location.href = url_new;
+                });
+            }).fail(function () {
+                alert('cannot create app');
+            });
+            $('.id_name').val("");
+            $('.id_url').val("");
+        });
+        function getIntegrationCode(appcode) {
+            $.get('/track.html', function (response) {
+                var html = $('<div/>').text(response).html();
+                $('.pre_client_setup').html(html.replace(/\$APPID\$/g, appcode));
+            });
+        }
+        getIntegrationCode('<?= $appcode ?>');
 	</script>
 
 	@yield('additional')
