@@ -355,6 +355,19 @@ class AuthController extends Controller
 			}
 
 			\Auth::loginUsingId($userid);
+
+			if($request->input('newsite')==true)
+			{
+				if ($isAdmin) {
+				$appname = $request->input('sitename');
+				$appurl = $request->input('siteurl');
+
+				// create new app
+				$code = PermController::createApp($userid, $appname, $appurl);
+				// jump right to dashboard
+
+				return redirect('dashboard/' . $code);
+			}
 			return "/app";
 		} else {
 			return view("errors.500", ['error'=>'wrong tokenid']);

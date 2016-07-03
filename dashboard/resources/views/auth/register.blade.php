@@ -102,7 +102,7 @@
 					}
 					else ready();
 
-					auth2.attachClickHandler(document.getElementById('gsin'), {}, onSignIn, error);
+					auth2.attachClickHandler(document.getElementById('gsin'), {}, onRegisterGG, error);
 					});
 				})
 			});
@@ -121,6 +121,20 @@
 				}
 			}
 
+			function onRegisterGG(googleUser){
+				var profile = googleUser.getBasicProfile();
+
+				document.getElementById('ggmes').innerText = 'Loading, please wait, ' + googleUser.getBasicProfile().getName();
+				$.post('/auth/googlesignin', {
+					id: profile.getId(),
+					id_token: googleUser.getAuthResponse().id_token,
+					sitename: $('input[name="sitename"]'),
+					siteurl: $('input[name="siteurl"]'),
+					newsite: $('#newsite').prop('checked')
+				}, function (url) {
+					window.location.href = url;
+				});
+			}
 			function onSignIn(googleUser) {
 				var profile = googleUser.getBasicProfile();
 
@@ -210,8 +224,6 @@
 													<span id="ggmes" >Google</span>
 												</span>
 													</button>
-
-													<input type="hidden" name="_token" value="{{ csrf_token() }}">
 													@if (isset($error))
 														<div class="text-danger">
 
