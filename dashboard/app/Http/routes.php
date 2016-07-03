@@ -2,6 +2,7 @@
 
 Route::get('/', 'PermController@index');
 
+
 Route::get('/app/edit/{appcode}', 'PermController@getedit');
 Route::post('/app/edit/{appcode}', 'PermController@postedit');
 Route::get('/app', 'PermController@app');
@@ -57,6 +58,8 @@ Route::get('/segment/{appcode}/{segid?}', 'SegmentController@getIndex');
 Route::get('/funnel/{appcode}','FunnelController@index');
 Route::get('/revenue/{appcode}','RevenueController@index');
 Route::get('/marketing/{appcode}','MarketingController@index');
+Route::get('/user/profile/{appcode}', 'UserController@profile');
+Route::get('/userprofile/{appcode}', 'listuserController@index');
 
 
 Route::post('/auth/googlesignin', 'Auth\AuthController@googlesignin');
@@ -78,6 +81,8 @@ Route::get('auth/reset', function(){
 });
 
 Route::controller('user', 'UserController');
+
+
 Route::get('/error',function(){
 	abort(404);
 });

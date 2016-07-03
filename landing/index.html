@@ -18,14 +18,15 @@
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="stylesheet" href="css/meotrics.css">
     <link rel="stylesheet" href="css/index.css">
-
     <link rel="alternate" hreflang="en-us" href="http://meotrics.com/" />
 
+
+    <!--<link rel="stylesheet" type="text/css" href="slider/css/demo.css" />-->
+    <link rel="stylesheet" type="text/css" href="slider/css/style.css" />
+    <script type="text/javascript" src="slider/js/modernizr.custom.28468.js"></script>
+    <script type="text/javascript" src="https://app.getresponse.com/view_webform_v2.js?u=BqME4&webforms_id=6250703"></script>
     <!--BEGIN MEOTRICS TRACKING CODE -->
 <link href="//api.meotrics.com/meotrics" rel="stylesheet" type="text/css"/>
-<script>var mt={appid:'meotrics'}</script>
-<script id="mtmeotrics" src="//meotrics.com/mttrack.js"></script>
-<script src="//meotrics.com/mtend.js" defer async="true"></script>
 <!--END MEOTRICS TRACKING CODE -->
 
     
@@ -61,6 +62,8 @@ s0.parentNode.insertBefore(s1,s0);
 </script>
 <!--End of Tawk.to Script-->
 
+
+
 </head>
 
 <body>
@@ -85,8 +88,8 @@ s0.parentNode.insertBefore(s1,s0);
                             <li ><a href="/page/career.html">Career</a></li>
                             <li><a href="http://blog.meotrics.com/">Blog</a></li>
                             <li><a href="/page/contact.html">Contact</a></li>
-                            <li><a href="https://app.meotrics.com/auth/login">Login</a></li>
-                            <li class="bordered"><a href="/page/register.html">Register</a></li>
+                            <li><a href="/page/try.html">Login</a></li>
+                            <li class="bordered"><a href="/page/try.html">Register</a></li>
                         </ul>
                     </div>
                     <!--/.nav-collapse -->
@@ -97,13 +100,40 @@ s0.parentNode.insertBefore(s1,s0);
             <div class="header-content text-center">
                 <h1>Are you wasting your money acting on wrong data?</h1>
                 <p>Only Meotrics can tell!</p>
-                <a class="mbtn mbtn-primary" href="page/register.html">Get started</a>
+                <a class="mbtn mbtn-primary" href="/page/try.html" >Get 30 days free trial!</a>
             </div>
         </div>
     </header>
 
     <section id="dashboard">
-        <img src="img/dashboard.png" class="img-responsive" alt="dashboard">
+        <div id="da-slider" class="da-slider img-responsive">
+            <div class="da-slide">
+                <div class="da-img">
+                    <iframe width="853" height="480" src="https://www.youtube.com/embed/GSQsdKR6FGw" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="da-slide">
+                <div class="da-img">
+                    <iframe width="853" height="480" src="https://www.youtube.com/embed/GSQsdKR6FGw" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+            <div class="da-slide">
+                <div class="da-img">
+                    <iframe width="853" height="480" src="https://www.youtube.com/embed/GSQsdKR6FGw" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+            <!--<div class="da-slide">-->
+                <!--<h2>Quality Control</h2>-->
+                <!--<p>Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.</p>-->
+                <!--<a href="#" class="da-link">Read more</a>-->
+                <!--<div class="da-img"><img src="slider/images/4.png" alt="image01" /></div>-->
+            <!--</div>-->
+            <nav class="da-arrows">
+                <span class="da-arrows-prev"></span>
+                <span class="da-arrows-next"></span>
+            </nav>
+        </div>
+        </div>
     </section>
 
     <section id="features">
@@ -312,6 +342,15 @@ s0.parentNode.insertBefore(s1,s0);
         var domain = "//app." + location.hostname;
         $('.loginlink').prop('href', domain + '/auth/login');
         $('.registerlink').prop('href', domain + '/auth/register');
+    </script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="slider/js/jquery.cslider.js"></script>
+    <script type="text/javascript">
+        $(function() {
+
+            $('#da-slider').cslider();
+
+        });
     </script>
 </body>
 <!-- write by conghd -->

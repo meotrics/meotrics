@@ -30,12 +30,15 @@ return c;
 		//data = JSON.parse(data);
 		var stt = 0;
 		var maxn = 0;
+
+
+
 		for (var i in data) {
 			stt++;
 			var row = data[i];
 			var rowstr = "<td class='text-muted'>" + stt + "</td>";
 		
-			rowstr += '<td style="text-align: left">' + he.encode(row.temp[objcode]) + '</td>';
+			rowstr += '<td style="text-align: center">' + he.encode(row.temp[objcode] === undefined ? "unknown" : row.temp[objcode]) + '</td>';
 		
 			if(countProp(row.temp) >= maxn){
 					   maxn = countProp(row.temp);
@@ -47,10 +50,9 @@ return c;
 			for (var j in row.temp) if (row.temp.hasOwnProperty(j) && j.toString().startsWith('_') == false && j.toString() !== objcode && 'null'!== he.encode(matchFieldName(j, typeid))){
 			    if(countProp(row.temp) >= maxn){
 				head += '<th style="text-align: center;"> ' + he.encode(matchFieldName(j, typeid)) + ' </th>';
-				
-				
+			
 }
-				rowstr += '<td>' + he.encode(row.temp[j]) + '</td>';
+				rowstr += '<td>' + he.encode(row.temp[j] === undefined ? "unknown" : row.temp[j] ) + '</td>';
 			}
 console.log(he.encode(matchFieldName(j, typeid)));
 			rowstr = '<tr>' + rowstr + '</tr>';

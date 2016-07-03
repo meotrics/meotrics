@@ -23,7 +23,7 @@
                 <ul class="nav nav-tabs" role="">
                     <li role="presentation" class=""><a href="{{URL::to('app/manage/'.$appcode)}}">Home</a></li>
                     <li role="" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab" >Team member</a></li>
-                    <li role="presentation"><a href="{{URL::to('actiontype/'.$appcode)}}">Event management</a></li>
+                    <li role="presentation"><a href="{{URL::to('actiontype/'.$appcode)}}">Action type</a></li>
                 </ul>
 
                 <!-- Tab panes -->

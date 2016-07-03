@@ -323,7 +323,7 @@ $props = isset($props) ? $props : [];
 										}
 									}],
 									xAxes: [{
-										stacked: true
+										stacked: true,
 									}]
 								},
 								stacked: true,

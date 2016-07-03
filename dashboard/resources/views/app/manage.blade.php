@@ -11,7 +11,7 @@
                 <ul class="nav nav-tabs" role="">
                     <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
                     <li role="presentation"><a href="{{URL::to('app/edit/'.$appcode)}}" >Team member</a></li>
-                    <li role="presentation"><a href="{{URL::to('actiontype/'.$appcode)}}" >Event management</a></li>
+                    <li role="presentation"><a href="{{URL::to('actiontype/'.$appcode)}}" >Action type</a></li>
                 </ul>
 
                 <!-- Tab panes -->
@@ -202,26 +202,5 @@ $('.a-save-obj').click(function(){
         });
     }
 });
-
-$('.id_add').click(function () {
-    $.post('/app/create', {name: $('.id_name').val(), url:$('.id_url').val()}, function (appcode) {
-        showCodeDialog(appcode, function () {
-            //redirect to new app code
-            var url_new = location.href.replace("/<?= $appcode ?>", "/"+appcode);
-            location.href = url_new;
-        });
-    }).fail(function () {
-        alert('cannot create app');
-    });
-    $('.id_name').val("");
-    $('.id_url').val("");
-});
-function getIntegrationCode(appcode) {
-    $.get('/track.html', function (response) {
-        var html = $('<div/>').text(response).html();
-        $('.pre_client_setup').html(html.replace(/\$APPID\$/g, appcode));
-    });
-}
-getIntegrationCode('<?= $appcode ?>');
 </script>
 @endsection

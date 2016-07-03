@@ -600,7 +600,7 @@ export class Dashboard {
 				return;
 			}
 
-			var dash = res[0];
+			var dash: DashboardEntity = res[0];
 			var deltaT = Math.round(new Date().getTime() / 1000) - dash.ctime;
 
 			if (deltaT > me.delaysec) {
@@ -634,7 +634,16 @@ export class Dashboard {
 					});
 				});
 			} else {
-				callback(dash);
+				me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid", "_stime", "_utm_campaign"], function (ids) {
+					me.getNewSignup(me.db, me.prefix, appid, ids, startime, endtime, function (newsignup) {
+						me.getTodayVisitor(me.db, me.prefix, appid, ids, function (newvistor, returning) {
+							dash.n_new_signup = newsignup;
+							dash.n_returning_visitor = returning;
+							dash.n_new_visitor = newvistor;
+							callback(dash);
+						});
+					});
+				});
 			}
 		});
 	}
