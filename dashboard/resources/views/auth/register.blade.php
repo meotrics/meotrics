@@ -54,15 +54,15 @@
 @section('content')
 	<section>
 		<script>
-			function onSignIn(googleUser) {
-				var profile = googleUser.getBasicProfile();
-				$.post('/auth/googlesignin', {
-					id: profile.getId(),
-					id_token: googleUser.getAuthResponse().id_token
-				}, function (url) {
-					window.location.href = url;
-				});
-			}
+//			function onSignIn(googleUser) {
+//				var profile = googleUser.getBasicProfile();
+//				$.post('/auth/googlesignin', {
+//					id: profile.getId(),
+//					id_token: googleUser.getAuthResponse().id_token
+//				}, function (url) {
+//					window.location.href = url;
+//				});
+//			}
 			function loading() {
 				$('.signinbtn').removeClass('blue');
 				$('.signinbtn').prop('type', 'button');
@@ -101,7 +101,7 @@
 						return;
 					}
 					else ready();
-
+					
 					auth2.attachClickHandler(document.getElementById('gsin'), {}, onRegisterGG, error);
 					});
 				})
@@ -128,8 +128,8 @@
 				$.post('/auth/googlesignin', {
 					id: profile.getId(),
 					id_token: googleUser.getAuthResponse().id_token,
-					sitename: $('input[name="sitename"]'),
-					siteurl: $('input[name="siteurl"]'),
+					sitename: $('input[name="sitename"]').val(),
+					siteurl: $('input[name="siteurl"]').val(),
 					newsite: $('#newsite').prop('checked')
 				}, function (url) {
 					window.location.href = url;
