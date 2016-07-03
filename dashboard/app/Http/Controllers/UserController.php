@@ -1,24 +1,27 @@
 <?php namespace App\Http\Controllers;
 
+use App\App;
 use App\Util\MtHttp;
 use Illuminate\Support\Facades\Request;
 
-class UserController extends Controller {
 
+class UserController extends Controller {
   public function __construct()
   {
     $this->middleware('auth');
   }
 
-	public function signout(Request $request)
+  public function signout(Request $request)
 	{
 		return view('auth/signout');
 	}
 
-  public function getProfile()
+  public function Profile()
   {
+
     return view('user/profile');
   }
+
   public function postProfile()
   {
     $updates = array();
