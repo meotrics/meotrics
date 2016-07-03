@@ -9,17 +9,19 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 		}, {
 			name: "Gender", code: "gender",
 			operators: [{name: "Equal", code: "eq"}]
-		}, {
-			name: "Phone", code: "phone",
-			operators: [{ name: "Equal", code: "eq" }]
-		}, {
-			name: "Email", code: "email",
-			operators: [{ name: "Equal", code: "eq" },
-			{name: "Contain", code: "con"},
-				{name: "Start with", code: "sw"},
-				{name: "End with", code: "ew"},
-				{name: "Not contain", code: "ncon"}]
-		}, {
+		}, 
+		//{
+		//	name: "Phone", code: "phone",
+		//	operators: [{ name: "Equal", code: "eq" }]
+		//}, {
+		//	name: "Email", code: "email",
+		//	operators: [{ name: "Equal", code: "eq" },
+		//	{name: "Contain", code: "con"},
+		//		{name: "Start with", code: "sw"},
+		//		{name: "End with", code: "ew"},
+		//		{name: "Not contain", code: "ncon"}]
+		//},
+		 {
 			name: "Country", code: "_country",
 			operators: [{name: "Equal", code: "eq"},
 				{name: "Contain", code: "con"},
@@ -40,6 +42,13 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 			name: "Device Type", code: "_devicetype",
 			operators: [{name: "Equal", code: "eq"}]
 		}, {
+			name: "Device", code: "_deviceid", 
+			operators:  [{name: "Equal", code: "eq"},
+                                {name: "Contain", code: "con"},
+                                {name: "Start with", code: "sw"},
+                                {name: "End with", code: "ew"},
+                                {name: "Not contain", code: "ncon"}]
+		 }, {
 			name: "Operating System", code: "_os",
 			operators: [{name: "Equal", code: "eq"},
 				{name: "Contain", code: "con"},
