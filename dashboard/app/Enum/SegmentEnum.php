@@ -5,10 +5,15 @@ class SegmentEnum {
     const CHART_COLOR_DEFAULT = 'red';
     public static function conditionSubOperators(){
         return [
-            'lt' => 'Less than',
-            'eq' => 'Equal',
-            'gt' => 'Greater than',
-            'in' => 'From..to..',
+//            'lt' => 'Less than',
+//            'eq' => 'Equal',
+//            'gt' => 'Greater than',
+//            'in' => 'From..to..',
+            '>' => 'greater than',
+            '>=' => 'less or equal',
+            '=' => 'equal',
+            '<' => 'less than',
+            '<=' => 'greater or equal',
         ];
     }
     

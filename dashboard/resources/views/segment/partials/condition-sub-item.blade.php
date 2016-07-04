@@ -16,7 +16,7 @@ $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators();
     <div class="col-md-2 col-md-offset-2" >
 		<select class="form-control "
 		        name="Segment[{{ $i_condition }}][conditions][{{ $i_condition_sub }}][cs_field]"
-		        value="{{ $condition->field }}">
+                        value="{{ $condition->field }}" onchange="changeSubField(this)">
 
 			@if ($condition->fields)
 				@foreach ($condition->fields as $c_field)
@@ -26,7 +26,7 @@ $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators();
 			@endif
 		</select>
 	</div>
-	<div class="col-md-2">
+	<div class="col-md-2" data-name="condition-sub-operator">
 		<select class="form-control" 
                         name="Segment[{{ $i_condition}}][conditions][{{$i_condition_sub}}][cs_operator]"
                         onchange="operatorSubChange(this)">

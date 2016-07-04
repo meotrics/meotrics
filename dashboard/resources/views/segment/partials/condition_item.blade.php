@@ -40,7 +40,7 @@ $operators_default = [
     <div class="col-md-12" style="padding-top: 0; padding-bottom: 0">
         <div class="row">
             <!--<label class="col-md-2" style="margin-top: 10px">List top</label>-->
-            <div class="col-md-2">
+            <div class="col-md-2" data-name="condition-item-type">
                 <input class="row hidden" type="hidden" name="Segment[{{$i_condition}}][select_type]" value="{{$condition->select_type}}">
                 <select class="form-control" name="Segment[{{$i_condition}}][type]" onchange="typeChange(this)">
                     <?php
@@ -84,7 +84,7 @@ $operators_default = [
                     ?>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2" data-name="condition-item-operator">
                 <select class="form-control" id="" name="Segment[<?= $i_condition ?>][operator]" onchange="operatorChange(this)">
                     <?php
                     if (property_exists($condition, 'operators')) {

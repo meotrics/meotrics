@@ -335,7 +335,46 @@
 		}
 
 		function changeField(e) {
+                    var that = $(e);
+                    var containter = that.parent().parent();
+                    var condition_item = that.closest('div[data-name="condition-item"]');
+                    getOperator(condition_item, 'condition-item-operator', that.val());
 		}
+                
+                function changeSubField(e){
+                    var that = $(e);
+                    var containter = that.parent().parent();
+                    var condition_item = that.closest('div[data-name="condition-item"]');
+                    getOperator(condition_item, 'condition-sub-operator', that.val());
+                }
+                
+                function getOperator(item, operator_name, field_val){
+                    var div_operator = item.find('div[data-name="'+operator_name+'"]');
+                    var select_operator = div_operator.find('select');
+                    var operator_behavior = [
+                        {code: '>', name: 'greater than'},
+                        {code: '>=', name: 'less or equal'},
+                        {code: '=', name: 'equal'},
+                        {code: '<', name: 'less than'},
+                        {code: '<=', name: 'greater or equal'}
+                    ];
+                    var operator_default = [
+                        {code: 'equal', name: 'Equal'},
+                        {code: 'contain', name: 'Contain'},
+                        {code: 'start_with', name: 'Start with'},
+                        {code: 'end_with', name: 'End with'},
+                    ];
+                    var operator = operator_default;
+                    if(field_val == 'pid' || field_val == 'cid' || field_val == 'price' || 
+                        field_val == 'quantity' || field_val == '_ctime' || field_val == 'oid' || 
+                        field_val == 'level' || field_val == 'userid'){
+                        operator = operator_behavior;
+                    }
+                    select_operator.html('');
+                    $.each(operator, function (oi, ov) {
+                        select_operator.append('<option value="' + ov.code + '">' + ov.name + '</option>');
+                    });
+                }
 
 		function addFilter(e) {
 			var that = $(e);

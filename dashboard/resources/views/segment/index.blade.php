@@ -344,6 +344,31 @@ $props = isset($props) ? $props : [];
 								});
 //                            data_chart.datasets[di]['data'] = dv['data'];
 							});
+                                                        var tmp_labels = [];
+                                                        if(data_chart.labels.length < 7){
+                                                            var add = 0;
+                                                            add = Math.floor((7 - data_chart.labels.length)/2);
+                                                            console.log(add);
+                                                            $.each(data_chart.datasets, function(ddi, ddv){
+                                                                tmp_labels = [];
+                                                                var tmp_data = [];
+                                                                for(var i = 0; i<add; i++){
+                                                                    tmp_data.push(0);
+                                                                    tmp_labels.push('');
+                                                                }
+                                                                $.each(ddv.data, function(ddv_data_i, ddv_data_v){
+                                                                    tmp_data.push(ddv_data_v);
+                                                                    tmp_labels.push(data_chart.labels[ddv_data_i]);
+                                                                });
+                                                                for(var i = 0; i<add; i++){
+                                                                    tmp_data.push(0);
+                                                                    tmp_labels.push('');
+                                                                }
+                                                                data_chart.datasets[ddi].data = tmp_data;
+                                                            })
+                                                            data_chart.labels = tmp_labels;
+                                                            
+                                                        }
 							$('#myChart').show();
 							$('#myChart').html('');
 							var myBarChart = new Chart(ctx, {
