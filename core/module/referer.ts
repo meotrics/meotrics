@@ -314,13 +314,12 @@ export class RefererType {
 				var url_parts = url.parse(url_string, true);
 
 				var medium = url_parts.query.utm_medium;
-				if (medium == "cpc" || medium == "ppc" || medium == "paid-search" || medium == "Paid search" || medium == "paidsearch")
-			return true;
-
+			
 		url_parts = url.parse(referer, true);
 				for (var l of this.paidSearchs)
 					if (url_parts.hostname != null && url_parts.hostname.endsWith(l))
-				return true;
+						if (medium == "cpc" || medium == "ppc" || medium == "paid-search" || medium == "Paid search" || medium == "paidsearch")
+							return true;
 
 				return false;
 	}
