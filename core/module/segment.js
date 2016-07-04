@@ -6,6 +6,12 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 			SegRet = require('./segmentresult.js').SegmentResult,
 			segRet = new SegRet(db, mongodb, converter, async, prefix);
 
+	this.listUser = function (appid, segmentid, field1, field2, page, callback) {
+		segRet.getUsers(appid, segmentid, (field2 === undefined ? [field1]: [field1, field2]), parseInt(page), function (users) {
+			callback(users);
+		})
+	};
+
 	this.querySegment = function (appid, segmentid, field1, field2, callback) {
 		var type1 = 'string', type2 = 'string',
 				numberfieldarr = ['age', 'height'];

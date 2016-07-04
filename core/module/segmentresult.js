@@ -1,3 +1,4 @@
+"use strict";
 exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 	var me = this;
 

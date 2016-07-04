@@ -54,7 +54,7 @@ export class CrudApi {
 		app.deleteEx('/trend/:appid/:id', this.trendCRUD.delete);
 		// Query trend
 
-		app.get('/trend/query/:appid/:id/:segid?/:starttime?/:endtime?', function (req, res) { me.trendMgr.query(req, res) });
+		app.getEx('/trend/query/:appid/:id/:segid?/:starttime?/:endtime?', function (req, res) { me.trendMgr.query(req, res) });
 
 		// CRUD segment
 		app.postEx('/segment/:appid', function (req, res) {
@@ -67,6 +67,12 @@ export class CrudApi {
 		app.getEx('/segment/:appid/:id', function (req, res) {
 			me.segCRUD.match(req, res, function () {
 				me.segMgr.excuteSegment(req.params.id);
+			});
+		});
+
+		app.getEx('/segment/:appid/:id/listUser/:page/:field1/:field2?', function (req, res) {
+			me.segMgr.listUser(req.params.appid, req.params.id, req.params.field1, req.params.field2, req.params.page, function (results) {
+				res.json(results);
 			});
 		});
 
