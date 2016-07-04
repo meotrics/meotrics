@@ -166,7 +166,7 @@
 					{ pname: "Country", pcode: "_country" },
 					{ pname: "Language", pcode: "_lang" },
 					{pname: "Device Type", pcode: "_devicetype"}, 
-					{name: "Device", code: "_deviceid"}
+					{name: "Device", pcode: "_deviceid"}
 				],
 				deftrendobjects: [
 					{desc: "Number of time purchased", operation: "count", param: "_id"},
@@ -209,7 +209,7 @@
 				{ pname: "Country", pcode: "_country" },
 			{ pname: "Language", pcode: "_lang" },
 		{pname: "Device Type", pcode: "_devicetype"}, 
-					{name: "Device", code: "_deviceid"}
+					{name: "Device", pcode: "_deviceid"}
 				],
 				deftrendobjects: [
 					{desc: "Number of pageview", operation: "count", param: "_id"},
@@ -309,7 +309,7 @@
 					{ pname: "Country", pcode: "_country" },
 					{ pname: "Language", pcode: "_lang" },
 					{ pname: "Device Type", pcode: "_devicetype" },
-					{ name: "Device", code: "_deviceid" }
+					{ name: "Device", pcode: "_deviceid" }
 				]
 			};
 
@@ -347,7 +347,7 @@
 					{ pname: "Country", pcode: "_country" },
 					{ pname: "Language", pcode: "_lang" },
 					{ pname: "Device Type", pcode: "_devicetype" },
-					{ name: "Device", code: "_deviceid" }
+					{ name: "Device", pcode: "_deviceid" }
 				]
 			};
 
