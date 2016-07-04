@@ -159,9 +159,14 @@
 					{pname: "City", pcode: "_city"},
 					{pname: "Referer", pcode: "_ref"},
 					{pname: "Screen Resolution", pcode: "_scr"},
-					{pname: "Browser Version", pcode: "_browser"},
-					{pname: "OS Version", pcode: "_osver"},
-					{pname: "Location", pcode: "_location"}
+					{pname: "Browser", pcode: "_browser"},
+					{ pname: "OS Version", pcode: "_osver" },
+					{ pname: "Browser Version", pcode: "_browserver" },
+					{ pname: "Location", pcode: "_location" },
+					{ pname: "Country", pcode: "_country" },
+					{ pname: "Language", pcode: "_lang" },
+					{pname: "Device Type", pcode: "_devicetype"}, 
+					{name: "Device", code: "_deviceid"}
 				],
 				deftrendobjects: [
 					{desc: "Number of time purchased", operation: "count", param: "_id"},
@@ -197,9 +202,14 @@
 					{pname: "City", pcode: "_city"},
 					{pname: "Referer", pcode: "_ref"},
 					{pname: "Screen Resolution", pcode: "_scrres"},
-					{pname: "Browser Version", pcode: "_browser"},
+					{ pname: "Browser", pcode: "_browser" },
+					{ pname: "Browser Version", pcode: "_browserver" },
 					{pname: "OS Version", pcode: "_osver"},
-					{pname: "Location", pcode: "_location"}
+					{ pname: "Location", pcode: "_location" },
+				{ pname: "Country", pcode: "_country" },
+			{ pname: "Language", pcode: "_lang" },
+		{pname: "Device Type", pcode: "_devicetype"}, 
+					{name: "Device", code: "_deviceid"}
 				],
 				deftrendobjects: [
 					{desc: "Number of pageview", operation: "count", param: "_id"},
@@ -292,9 +302,14 @@
 					{pname: "City", pcode: "_city"},
 					{pname: "Referer", pcode: "_ref"},
 					{pname: "Screen Resolution", pcode: "_scrres"},
-					{pname: "Browser Version", pcode: "_browser"},
+					{ pname: "Browser", pcode: "_browser" },
+					{ pname: "Browser Version", pcode: "_browserver" },
 					{pname: "OS Version", pcode: "_osver"},
-					{pname: "Location", pcode: "_location"}
+					{ pname: "Location", pcode: "_location" },
+					{ pname: "Country", pcode: "_country" },
+					{ pname: "Language", pcode: "_lang" },
+					{ pname: "Device Type", pcode: "_devicetype" },
+					{ name: "Device", code: "_deviceid" }
 				]
 			};
 
@@ -325,9 +340,14 @@
 					{pname: "City", pcode: "_city"},
 					{pname: "Referer", pcode: "_ref"},
 					{pname: "Screen Resolution", pcode: "_scrres"},
-					{pname: "Browser Version", pcode: "_browser"},
+					{ pname: "Browser", pcode: "_browser" },
+					{ pname: "Browser Version", pcode: "_browserver" },
 					{pname: "OS Version", pcode: "_osver"},
-					{pname: "Location", pcode: "_location"}
+					{ pname: "Location", pcode: "_location" },
+					{ pname: "Country", pcode: "_country" },
+					{ pname: "Language", pcode: "_lang" },
+					{ pname: "Device Type", pcode: "_devicetype" },
+					{ name: "Device", code: "_deviceid" }
 				]
 			};
 
