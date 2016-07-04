@@ -434,7 +434,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 	const numberUsersPerPage = 15;
 
 	this.getUsers = function (appName, segmentId, fields, start, callback) {
-		console.log(appName, segmentId, fields, start);
+		if (typeof (segmentId) == "string") segmentId = new mongodb.ObjectId(segmentId);
 
 		if (start >= maxNumberUsers) {
 			return callback([]);
@@ -458,8 +458,8 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 			let sort = {
 				[ids['_lastSeen']]: -1
 			}
-
-			db.collection(prefix + appName).find(query).sort(sort).skip(skip).limit(limit).toArray((err, users) => {
+			
+			db.collection(prefix + "app" + appName).find(query).sort(sort).skip(skip).limit(limit).toArray((err, users) => {
 				if (err) throw err;
 				const length = users.length;
 				let usersReturn = [];
