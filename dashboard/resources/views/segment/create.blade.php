@@ -125,22 +125,26 @@
 						endforeach;
 						endif;
 						$f_behaviors = [
-										(object)['code' => 'sum', 'name' => 'Sum'],
-										(object)['code' => 'avg', 'name' => 'Average'],
-										(object)['code' => 'count', 'name' => 'Count']
+                                                    (object)['code' => 'sum', 'name' => 'Sum'],
+                                                    (object)['code' => 'avg', 'name' => 'Average'],
+                                                    (object)['code' => 'count', 'name' => 'Count']
+						];
+                                                $f_behaviors_purchase = [
+                                                    (object)['code' => 'count', 'name' => 'Count'],
 						];
 						?>
 		var f_behavior = [
-							{code: 'sum', name: 'Sum'},
-							{code: 'avg', name: 'Average'},
-							{code: 'count', name: 'Count'}
-						];
+                    {code: 'sum', name: 'Sum'},
+                    {code: 'avg', name: 'Average'},
+                    {code: 'count', name: 'Count'}
+                ];
+                var f_behavior_purchase = [{code: 'count', name: 'Count'}];
 		var operator_behavior = [
-			{code: '>', name: 'greater than'},
-			{code: '>=', name: 'less or equal'},
-			{code: '=', name: 'equal'},
-			{code: '<', name: 'less than'},
-			{code: '<=', name: 'greater or equal'}
+                    {code: '>', name: 'greater than'},
+                    {code: '>=', name: 'less or equal'},
+                    {code: '=', name: 'equal'},
+                    {code: '<', name: 'less than'},
+                    {code: '<=', name: 'greater or equal'}
 		];
 		<?php $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators(); ?>
 
@@ -309,9 +313,11 @@
 							destroySuggession(containter.find('input[name="Segment[' + i_condition + '][value]"]'));
 						}
 						containter.find('select[name="Segment[' + i_condition + '][f]"]').html('');
-						$.each(f_behavior, function (fi, fv) {
-							containter.find('select[name="Segment[' + i_condition + '][f]"]').append('<option value="' + fv.code + '">' + fv.name + '</option>');
-						});
+                                                var tmp_behavior = that.val() == 'purchase' ? f_behavior : f_behavior_purchase;
+                                                $.each(tmp_behavior, function (fi, fv) {
+                                                    containter.find('select[name="Segment[' + i_condition + '][f]"]').append('<option value="' + fv.code + '">' + fv.name + '</option>');
+                                                });
+                                                
 						$('select[name="Segment[' + i_condition + '][field]"]').html('');
 						if (v.fields.length) {
 							$.each(v.fields, function (fieldi, fieldv) {
