@@ -1,4 +1,4 @@
-var UserSegment = require('../module/usersegment.js').UserSegment;
+var UserSegment = require('../module/segmentresult.js').SegmentResult;
 var MongoClient = require('mongodb').MongoClient;
 var config = require('config');
 var async = require('async');
@@ -10,9 +10,9 @@ converter = new converter.IdManager();
 
 MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get('mongod.port') + '/' + config.get('mongod.database'), function (err, db) {
 	if (err) throw err;
-	var userSegment = new UserSegment(db, mongodb, async, converter, config.get('mongod.prefix'));
+	var userSegment = new UserSegment(db, mongodb,  converter,async, config.get('mongod.prefix'));
 
-	userSegment.getUsers('apphmt5', [], ['_os', 'gender', '_city', '_listProduct', '_numberPurchase'], 0, function(users){
+	userSegment.getUsers('abc', '5772c2a2a1df59ac329cbc25', ['_os', 'gender'], 0, function(users){
 		console.log(users);
 	});
 
