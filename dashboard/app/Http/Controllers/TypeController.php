@@ -40,7 +40,7 @@ class TypeController extends Controller
 		for($i = 0; $i < count($p['pcodes']); $i++){
 			$pn = $p['pnames'][$i];
 			$pc = $p['pcodes'][$i];
-			if($pn && $pc && $pn != '' && $pc != ''){
+			if($pn && $pc && $pn != '' && $pc != '' && substr($pc, 0, 1) != "_"){
 				array_push($p['fields'], array('pname' => $pn, 'pcode' => $pc));
 			} else {
 				continue;
@@ -64,7 +64,8 @@ class TypeController extends Controller
 		for($i = 0; $i < count($p['pcodes']); $i++){
 			$pn = $p['pnames'][$i];
 			$pc = $p['pcodes'][$i];
-			if($pn && $pc && $pn != '' && $pc != ''){
+
+			if($pn && $pc && $pn != '' && $pc != '' && substr($pc, 0, 1) != "_"){
 				array_push($p['fields'], array('pname' => $pn, 'pcode' => $pc));
 			} else {
 				continue;
