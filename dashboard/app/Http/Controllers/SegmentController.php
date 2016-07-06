@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
-
+use App\Util\Access;
+use Auth;
 class SegmentController extends Controller
 {
 	public function __construct()
@@ -18,12 +19,14 @@ class SegmentController extends Controller
 
 	public function getExecute(Request $request, $appcode, $segid)
 	{
+        if(Access::can_view($request->user()->id, $appcode) == false) abort(500, "Permission Denied");
 		$model = MtHttp::get('segment/' . $appcode . '/' . $segid);
 		return json_encode($model);
 	}
 
 	public function getIndex(Request $request, $appcode, $segid = null)
 	{
+        if(Access::can_view($request->user()->id, $appcode) == false) abort(500, "Permission Denied");
 		$props = MtHttp::get('prop/' . $appcode);
 		$segments = MtHttp::get('segment/' . $appcode);
 
@@ -42,6 +45,7 @@ class SegmentController extends Controller
 
 	public function getCreate(Request $request, $app_id)
 	{
+        if(Access::can_editReport($request->user()->id, $app_id) == false) abort(500, "Permission Denied");
 		$actions = MtHttp::get('actiontype/' . $app_id);
 		$props = MtHttp::get('prop/' . $app_id);
 		$prop_first = isset($props[0]) ? $props[0] : (object)[
@@ -82,6 +86,7 @@ class SegmentController extends Controller
 
 	public function getUpdate(Request $request, $app_id, $id)
 	{
+        if(Access::can_editReport($request->user()->id, $app_id) == false) abort(500, "Permission Denied");
 		$t = time();
 		$segment = $this->loadModel($app_id, $id);
 		$props = MtHttp::get('prop/' . $app_id);
@@ -184,6 +189,7 @@ class SegmentController extends Controller
 
 	public function loadModel($app_id, $id)
 	{
+        if(Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permission Denied");
 		$model = MtHttp::get('segment/' . $app_id . '/' . $id);
 		if ($model) {
 			return $model;
@@ -200,6 +206,7 @@ class SegmentController extends Controller
 
 	public function postWrite(Request $request, $appcode)
 	{
+        if(Access::can_editReport($request->user()->id, $appcode) == false) abort(500, "Permission Denied");
 		if (isset($_POST['Segment']) && is_array($_POST['Segment']) && isset($_POST['name'])) {
 			$query = [];
 			$data_post = $_POST['Segment'];
@@ -297,6 +304,7 @@ class SegmentController extends Controller
 
 	public function deleteRemove(Request $request, $app_id, $id)
 	{
+        if(Access::can_editReport($request->user()->id, $app_id) == false) abort(500, "Permission Denied");
 		$result = ['success' => false];
 		$segment = $this->loadModel($app_id, $id);
 		$result = MtHttp::delete('segment/' . $app_id . '/' . $id, null);
@@ -307,6 +315,7 @@ class SegmentController extends Controller
 
 	public function getChartonefield(Request $request, $app_id)
 	{
+if(Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permission Denied");
 		$result = ['success' => false];
 		if ($request->input('segment_id') && $request->input('field')) {
 			//echo 'segment/query1/' . $app_id . '/' . $request->input('segment_id') . '/' . $request->input('field');
@@ -322,6 +331,7 @@ class SegmentController extends Controller
 	private $reftypemap;
 	public function getCharttwofields(Request $request, $app_id)
 	{
+if(Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permission Denied");
 		$result = ['success' => false];
 		if ($request->input('segment_id') && $request->input('field1') && $request->input('field2')) {
 			$tmp_charts = MtHttp::get('segment/query2/' . $app_id . '/' . $request->input('segment_id') . '/' . $request->input('field2') . '/' . $request->input('field1'));
