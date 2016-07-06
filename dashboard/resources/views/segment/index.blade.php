@@ -384,49 +384,45 @@ $props = isset($props) ? $props : [];
                                                     /*
                                                      * set list user here
                                                      */
-													gender_table(data.user);
+													var field1 = $('select[name="Prop[one]"]').val();
+													var field2 = $('select[name="Prop[two]"]').val();
+													var column2 = "";
+													if(field2){
+														column2 = "<td>"+field2+"</td>";
+													}
+													var column = "<tr><td>#</td>" +
+															"<td>id</td>" +
+															"<td>name</td>" +
+															"<td>email</td>" +
+															"<td>"+field1+"</td>" +
+															column2+
+															"</tr>";
+													for(var i = 0; i < data.users.length; i++){
+														var item = data.users[i];
+														var columnfield = "";
+														if(field2){
+															columnfield = "<td>"+item[field2]+"</td>";
+														}
+														var cl = "<tr>" +
+																"<td>"+(i+1)+"</td>" +
+																"<td>"+item._mtid+"</td>"+
+																"<td>"+item.name+"</td>"+
+																"<td>"+item.email+"</td>"+
+																"<td>"+item[field1]+"</td>"+
+																columnfield+
+																"</tr>";
+														column += cl;
+													}
+													var table = "<table class ='table table-hover'>"+column+"</table>";
+													$("#user_table").empty();
+													$("#user_table").append(table);
+													console.log(data.users);
                                                 }
 					},
 				});
 			}
 		}
 
-		function gender_table(data){
-			var field1 = $('select[name="Prop[one]"]').val();
-			var field2 = $('select[name="Prop[two]"]').val();
-			var column2 = "";
-			if(field2){
-				column2 = "<td>"+field2+"</td>";
-			}
-			var column = "<tr><td>#</td>" +
-					"<td style='display: none;'>id</td>" +
-					"<td>name</td>" +
-					"<td>email</td>" +
-					"<td>"+field1+"</td>" +
-					column2+
-					"</tr>";
-			for(var i = 0; i < data.length; i++){
-				var item = data[i];
-				var columnfield = "";
-				if(field2){
-					columnfield = "<td>"+item[field2]+"</td>";
-				}
-				var cl = "<tr>" +
-						"<td>"+(i+1)+"</td>" +
-						"<td style='display: none;'>"+item._mtid+"</td>"+
-						"<td>"+item.name+"</td>"+
-						"<td>"+item.email+"</td>"+
-						"<td>"+item[field1]+"</td>"+
-						columnfield+
-						"</tr>";
-				column += cl;
-			}
-			var table = "<table class ='table table-hover'>"+column+"</table>";
-			$("#user_table").empty();
-			$("#user_table").append(table);
-			window.data = data;
-			console.log(data);
-		}
 
 		// Get context with jQuery - using jQuery's .get() method.
 		//    var ctx = $("#myChart").get(0).getContext("2d");
