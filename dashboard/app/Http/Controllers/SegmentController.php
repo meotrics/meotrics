@@ -323,6 +323,10 @@ if(Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permiss
 			$convert_data = $this->convertData($tmp_charts, $request->input('field'));
 			$result['labels'] = isset($convert_data['labels']) ? $convert_data['labels'] : [];
 			$result['datasets'] = isset($convert_data['datasets']) ? $convert_data['datasets'] : [];
+                        /*
+                         * get list user
+                         */
+                        $result['users'] = MtHttp::get("segment/$app_id/".$request->input('segment_id')."/listUser/1/".$request->input('field'));
 			$result['success'] = true;
 		}
 		return $result;
@@ -331,7 +335,7 @@ if(Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permiss
 	private $reftypemap;
 	public function getCharttwofields(Request $request, $app_id)
 	{
-if(Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permission Denied");
+            if(Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permission Denied");
 		$result = ['success' => false];
 		if ($request->input('segment_id') && $request->input('field1') && $request->input('field2')) {
 			$tmp_charts = MtHttp::get('segment/query2/' . $app_id . '/' . $request->input('segment_id') . '/' . $request->input('field2') . '/' . $request->input('field1'));
@@ -408,6 +412,10 @@ if(Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permiss
 			$result['labels'] = $labels;
 			$result['datasets'] = $datasets;
 			$result['datasets_labels'] = $datasets_labels;
+                        /*
+                         * get list user
+                         */
+                        $result['users'] = MtHttp::get("segment/$app_id/".$request->input('segment_id')."/listUser/1/".$request->input('field1')."/".$request->input('field2'));
 			$result['success'] = true;
 		}
 		return $result;

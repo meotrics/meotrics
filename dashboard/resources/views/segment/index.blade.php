@@ -377,6 +377,12 @@ $props = isset($props) ? $props : [];
 								options: options
 							});
 						}
+                                                if(data.users){
+                                                    /*
+                                                     * set list user here
+                                                     */
+                                                    console.log(data.users);
+                                                }
 					},
 				});
 			}
