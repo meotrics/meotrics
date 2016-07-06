@@ -9,11 +9,10 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\View;
 use stdClass;
+use App\Util\Access;
 
 class TrendController extends Controller
 {
-	private $request;
-
 	public function __construct(Request $request)
 	{
 		$this->middleware('auth');
@@ -32,18 +31,9 @@ class TrendController extends Controller
 		return MtHttp::post('trend/1', $data);
 	}
 
-	public function getList()
-	{
-		return json_encode(MtHttp::get('trend/' . '1'));
-	}
-
-	public function getDelete()
-	{
-
-	}
-
 	public function postCurrenttime(Request $request, $appid)
 	{
+        if(Access::can_view($request->user()->id, $appid) == false) abort(500,'Permission Denied');
 		$response = new Response();
 		$st = $request->input('startTime', null);
 		$et = $request->input('endTime', null);
@@ -54,6 +44,7 @@ class TrendController extends Controller
 
 	public function postCurrentsegment(Request $request, $appid)
 	{
+        if(Access::can_view($request->user()->id, $appid) == false) abort(500,'Permission Denied');
 		$response = new Response();
 		$segmentid = $request->input('segmentid', '');
 		return $response->withCookie(cookie('currentsegmentid', $segmentid, 9147483, '/trend/' . $appid ));
@@ -61,12 +52,14 @@ class TrendController extends Controller
 
 	public function postCurrenttrend(Request $request, $appid, $trendid)
 	{
+        if(Access::can_view($request->user()->id, $appid) == false) abort(500,'Permission Denied');
 		$response = new Response();
 		return $response->withCookie(cookie('currenttrendid', $trendid, 9147483, '/trend/' . $appid ));
 	}
 
 	public function getIndex(Request $request, $app_id, $trendid = null)
 	{
+        if(Access::can_view($request->user()->id, $app_id) == false) abort(500,'Permission Denied');
 		$actiontypes = MtHttp::get('actiontype/' . $app_id);
 
 		$segid = $request->cookie('currentsegmentid');
@@ -143,32 +136,9 @@ class TrendController extends Controller
 		]);
 	}
 
-	public function getQuery(Request $request, $app_id)
-	{
-		$result = ['success' => false];
-		if ($request->input('_id') != null) {
-			$trendid = $request->input('_id');
-			$outputs = MtHttp::get('trend/query/' . $app_id . '/' . $trendid);
-			$result['success'] = true;
-			$result['outputs'] = $outputs;
-		} else {
-//			$data = array(
-//				'typeid' => $request->input('typeid'),
-//				'object' => $request->input('object'),
-//				'operation' => $request->input('operation'),
-//				'param' => $request->input('param'),
-//				'order' => intval($request->input('order')),
-//				'name' => 'Draft',
-//				'_isDraft' => true
-//			);
-//			$trendid = MtHttp::post('trend/1', $data);
-			$result['success'] = false;
-		}
-		return $result;
-	}
-
 	public function getCreate(Request $request, $app_id)
 	{
+        if(Access::can_editReport($request->user()->id, $app_id) == false) abort(500,'Permission Denied');
 		$actiontypes = MtHttp::get('actiontype/' . $app_id);
 		$actiontype_first = $actiontypes && $actiontypes[0] ? $actiontypes[0] : (object)[
 			'name' => '',
@@ -193,6 +163,7 @@ class TrendController extends Controller
 
 	public function postWrite(Request $request, $app_id)
 	{
+        if(Access::can_editReport($request->user()->id, $app_id) == false) abort(500,'Permission Denied');
 		if (isset($_POST['Trend'])) {
 
 			// validate create data
@@ -237,26 +208,9 @@ class TrendController extends Controller
 		return false;
 	}
 
-	public function getMeotrics($app_id, $action_id)
-	{
-		$result = ['success' => false];
-		/*** get meotrics by appid and actionid ***/
-
-		$meotrics = [];
-		for ($i = 0; $i < 5; $i++) {
-			$meotric = new stdClass();
-			$meotric->name = "Number of pageview " . $i;
-			$meotric->operation = TrendEnum::DEFAULT_OPERATION;
-			$meotric->param = TrendEnum::DEFAULT_PARAM;
-			$meotrics[] = $meotric;
-		}
-		$result['success'] = true;
-		$result['meotrics'] = $meotrics;
-		return response()->json($result);
-	}
-
 	public function getHtmloutputs(Request $request, $app_id)
 	{
+        if(Access::can_view($request->user()->id, $app_id) == false) abort(500,'Permission Denied');
 		$result = ['success' => false];
 		if ($request->input('_id') != null) {
 			$trendid = $request->input('_id');
@@ -275,6 +229,7 @@ class TrendController extends Controller
 
 	public function getUpdate(Request $requrest, $app_id, $id)
 	{
+        if(Access::can_editReport($request->user()->id, $app_id) == false) abort(500,'Permission Denied');
 		$trend = $this->loadTrend($app_id, $id);
 		$actiontypes = MtHttp::get('actiontype/' . $app_id);
 		$actiontype_first = $actiontypes && $actiontypes[0] ? $actiontypes[0] : (object)[
@@ -301,6 +256,7 @@ class TrendController extends Controller
 
 	public function deleteRemove(Request $requrest, $app_id, $id)
 	{
+        if(Access::can_editReport($request->user()->id, $app_id) == false) abort(500,'Permission Denied');
 		$result = ['success' => false];
 		$trend = $this->loadTrend($app_id, $id);
 		$result = MtHttp::delete('trend/' . $app_id . '/' . $id, null);

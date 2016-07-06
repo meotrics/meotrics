@@ -6,15 +6,15 @@ use App\Util\MtHttp;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Auth;
 
 class PermController extends Controller
 {
-	public function __construct(Request $request)
+    public function __construct(Request $request)
 	{
 		$this->request = $request;
 		$this->middleware('auth');
 	}
-
 
 	public function index(Request $request)
 	{
@@ -27,7 +27,7 @@ class PermController extends Controller
 
 	public function app(Request $request)
 	{
-		$userid = \Auth::user()->id;
+		$userid = Auth::user()->id;
 		$apps = DB::table('apps')->join('user_app', 'apps.id', '=', 'user_app.appid')
 			->where('user_app.userid', $userid)->get();
 
@@ -44,26 +44,28 @@ class PermController extends Controller
 
 	public function traffic14(Request $request, $appcode)
 	{
+        if(Access::can_view(Auth::user()->id, $appcode)==false) abort(500, "Access denied");
 		$traffic = MtHttp::get('app/traffic14/' . $appcode);
 		return $traffic;
 	}
 
 	public function setup_status(Request $request, $appcode)
 	{
+        if(Access::can_view(Auth::user()->id, $appcode)==false) abort(500, "Access denied");
 		$res = MtHttp::getRaw('app/status/' . $appcode);
 		return $res . '';
 	}
 
 	public function getPageview(Request $request, $appcode)
 	{
+        if(Access::can_view(Auth::user()->id, $appcode)==false) abort(500, "Access denied");
 		$res = MtHttp::getRaw('app/getpageview/' . $appcode);
 		return $res . '';
 	}
 
 	public function getSignup(Request $request, $appcode,$startime, $endtime)
 	{
-
-
+        if(Access::can_view(Auth::user()->id, $appcode)==false) abort(500, "Access denied");
 		$queryurl = 'app/getsignup/' . $appcode;
 			$pieces = explode("-", $startime);
 			$sts = strtotime($pieces[1] . '/' . $pieces[2] . '/' . $pieces[0]);
@@ -82,12 +84,6 @@ class PermController extends Controller
 		return $res . '';
 	}
 
-	public function counter(Request $request, $appcode)
-	{
-		$res = MtHttp::get('api/counter/' . $appcode);
-		return $res . '';
-	}
-
 	public function getedit(Request $request, $appcode)
 	{
 		$ap = DB::table('apps')->where('code', $appcode)->first();
@@ -101,6 +97,7 @@ class PermController extends Controller
 
 	public function postedit(Request $request, $appcode)
 	{
+        if(Access::can_editStruct(Auth::user()->id, $appcode)==false) abort(500, "Access denied");
 		$name = $request->input('name');
 		$url = $request->input('url');
 		
@@ -117,7 +114,8 @@ class PermController extends Controller
 
 	public function set(Request $request, $appcode, $userid)
 	{
-		$uid = \Auth::user()->id;
+		$uid = Auth::user()->id;
+        if(Access::can_editPerm($uid, $appcode)==false) abort(500, "Access denied");
 		$status = Access::setPerm($uid, $userid, $appcode, $request->input('can_perm'), $request->input('can_struct'), $request->input('can_report'));
 		if ($status == 0)
 			return new Response();
@@ -162,7 +160,8 @@ class PermController extends Controller
 	public function delete(Request $request, $appcode, $userid)
 	{
 		$uid = \Auth::user()->id;
-		$status = Access::deletePerm($uid, $userid, $appcode);
+		if(Access::can_editPerm($uid, $appcode) == false) abort(500, "Permission denied");
+        $status = Access::deletePerm($uid, $userid, $appcode);
 		if ($status == 0)
 			return new Response();
 		else abort(403, 'Unauthorized action');
@@ -172,6 +171,7 @@ class PermController extends Controller
 	{
 		$email = $request->input('email');
 		$uid = \Auth::user()->id;
+		if(Access::can_editPerm($uid, $appcode) == false) abort(500, "Permission denied");
 		//get userid from email
 		$user = DB::table('users')->where('email', $email)->first();
 		if ($user == null) abort(500, 'user not found: ' . $email);
