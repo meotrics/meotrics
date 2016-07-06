@@ -59,7 +59,7 @@ Route::get('/funnel/{appcode}','FunnelController@index');
 Route::get('/revenue/{appcode}','RevenueController@index');
 Route::get('/marketing/{appcode}','MarketingController@index');
 Route::get('/user/profile/{appcode}', 'UserController@profile');
-Route::get('/userprofile/{appcode}', 'listuserController@index');
+Route::get('/userprofile/{appcode}', 'ListuserController@index');
 
 
 Route::post('/auth/googlesignin', 'Auth\AuthController@googlesignin');
