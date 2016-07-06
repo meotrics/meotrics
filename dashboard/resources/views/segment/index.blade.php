@@ -185,6 +185,9 @@ $props = isset($props) ? $props : [];
 			<div class="row">
 				<div class="col-md-12" data-name="canvas-chart"></div>
 			</div>
+			<div class="row">
+				<div class="col-md-12" id = "user_table"></div>
+			</div>
 		</div>
 	</div>
 @endsection
@@ -381,6 +384,37 @@ $props = isset($props) ? $props : [];
                                                     /*
                                                      * set list user here
                                                      */
+													var field1 = $('select[name="Prop[one]"]').val();
+													var field2 = $('select[name="Prop[two]"]').val();
+													var column2 = "";
+													if(field2){
+														column2 = "<td>"+field2+"</td>";
+													}
+													var column = "<tr><td>#</td>" +
+															"<td>id</td>" +
+															"<td>email</td>" +
+															"<td>name</td>" +
+															"<td>"+field1+"</td>" +
+															column2+
+															"</tr>";
+													for(var i = 0; i < data.users.length; i++){
+														var item = data.users[i];
+														var columnfield = "";
+														if(field2){
+															columnfield = "<td>"+item.field2+"</td>";
+														}
+														var cl = "<tr>" +
+																"<td>"+(i+1)+"</td>" +
+																"<td>"+item._mtid+"</td>"+
+																"<td>"+item.name+"</td>"+
+																"<td>"+item.email+"</td>"+
+																"<td>"+item.field1+"</td>"+
+																columnfield+
+																"</tr>";
+														column += cl;
+													}
+													var table = "<table class ='table table-hover'>"+column+"</table>";
+													$("#user_table").append(table);
                                                     console.log(data.users);
                                                 }
 					},
