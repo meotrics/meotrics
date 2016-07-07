@@ -21,7 +21,7 @@ export class LocationMgr {
 
 	public parse(ip: string, callback: (data: Location ) => void) {
 		var loc = this.lookup.get(ip);
-		if (loc === null) loc = { country: { names: { en: null } }, city: { names: { en: null } } };
+		if (loc == null ) loc = { country: { names: { en: null } }, city: { names: { en: null } } };
 		console.log(loc.city.names.en, loc.country.names.en);
 		return callback(new Location(loc.city.names.en, loc.country.names.en));
 	}
