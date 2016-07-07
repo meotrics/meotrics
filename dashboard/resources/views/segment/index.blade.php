@@ -417,10 +417,24 @@ $props = isset($props) ? $props : [];
 													$("#user_table").empty();
 													$("#user_table").append(table);
 													console.log(data.users);
+													getTable(segment_id,field1,field2);
                                                 }
 					},
 				});
 			}
+		}
+
+		function getTable(segment_id,field1,field2){
+			var url =  '{{ URL::to('segment/'. $appcode .'/'.segment_id.'/listUser/1/'.field1.'/'.field2)}}';
+			$.ajax({
+				type: 'GET',
+				dataType: 'JSON',
+				url: url,
+				success: function (data) {
+					window.listuser = data;
+					console.log(data);
+				}
+			});
 		}
 
 
