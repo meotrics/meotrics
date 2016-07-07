@@ -274,6 +274,7 @@ $props = isset($props) ? $props : [];
 			var segment_id = $('#segment').val();
 			var field1 = $('select[name="Prop[one]"]').val();
 			var field2 = $('select[name="Prop[two]"]').val();
+			var appcode  =  '{{$appcode}}';
 			var url = '';
 			var data_get = {};
 			var label_field = '';
@@ -296,6 +297,7 @@ $props = isset($props) ? $props : [];
 				label_field = field1 ? $('select[name="Prop[one]"]').find(':selected').text() : $('select[name="Prop[two]"]').find(':selected').text()
 				demonstrate = field1 ? $('select[name="Prop[one]"]').find(':selected').text().toUpperCase() : $('select[name="Prop[two]"]').find(':selected').text().toUpperCase()
 			}
+//			getTable(appcode,segment_id,field1,field2);
 			if (url) {
 				$.ajax({
 					type: 'GET',
@@ -417,10 +419,25 @@ $props = isset($props) ? $props : [];
 													$("#user_table").empty();
 													$("#user_table").append(table);
 													console.log(data.users);
+													getTable(appcode,segment_id,field1,field2);
                                                 }
 					},
 				});
 			}
+		}
+
+		function getTable(appcode,segment_id,field1,field2){
+			{{--var url =  '{{ URL::to('segment/'+ $appcode +'/'+segment_id+'/listUser/1/'+field1+'/'+field2)}}';--}}
+			var url =  ''+ appcode +'/'+segment_id+'/listUser/1/'+field1+'/'+field2;
+			$.ajax({
+				type: 'GET',
+				dataType: 'JSON',
+				url: url,
+				success: function (data) {
+					window.listuser = data;
+					console.log(data);
+				}
+			});
 		}
 
 
