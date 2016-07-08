@@ -386,59 +386,73 @@ $props = isset($props) ? $props : [];
                                                     /*
                                                      * set list user here
                                                      */
-													var field1 = $('select[name="Prop[one]"]').val();
-													var field2 = $('select[name="Prop[two]"]').val();
-													var column2 = "";
-													if(field2){
-														column2 = "<td>"+field2+"</td>";
-													}
-													var column = "<tr><td>#</td>" +
-															"<td>id</td>" +
-															"<td>name</td>" +
-															"<td>email</td>" +
-															"<td>"+field1+"</td>" +
-															column2+
-															"</tr>";
-													for(var i = 0; i < data.users.length; i++){
-														var item = data.users[i];
-														var columnfield = "";
-														if(field2){
-															columnfield = "<td>"+item[field2]+"</td>";
-														}
-														var cl = "<tr>" +
-																"<td>"+(i+1)+"</td>" +
-																"<td>"+item._mtid+"</td>"+
-																"<td>"+item.name+"</td>"+
-																"<td>"+item.email+"</td>"+
-																"<td>"+item[field1]+"</td>"+
-																columnfield+
-																"</tr>";
-														column += cl;
-													}
-													var table = "<table class ='table table-hover'>"+column+"</table>";
-													$("#user_table").empty();
-													$("#user_table").append(table);
-													console.log(data.users);
-													getTable(appcode,segment_id,field1,field2);
+                                                    var field1 = $('select[name="Prop[one]"]').val();
+                                                    var field2 = $('select[name="Prop[two]"]').val();
+                                                    setTable(data.users, field1, field2);
                                                 }
 					},
 				});
 			}
 		}
 
-		function getTable(appcode,segment_id,field1,field2){
-			{{--var url =  '{{ URL::to('segment/'+ $appcode +'/'+segment_id+'/listUser/1/'+field1+'/'+field2)}}';--}}
-			var url =  ''+ appcode +'/'+segment_id+'/listUser/1/'+field1+'/'+field2;
-			$.ajax({
-				type: 'GET',
-				dataType: 'JSON',
-				url: url,
-				success: function (data) {
-					window.listuser = data;
-					console.log(data);
-				}
-			});
+		function getTable(segment_id, field1, field2, page){
+                    var url =  '{{ URL::to('segment/'. $appcode .'/usersbyfield') }}';
+                    $.ajax({
+                        type: 'GET',
+                        dataType: 'JSON',
+                        data: {
+                            segment_id: segment_id,
+                            field1: field1,
+                            field2: field2,
+                            page: page
+                        },
+                        url: url,
+                        success: function (data) {
+                            if(data.success && data.users){
+                                setTable(data.users);
+                            }
+                            window.listuser = data;
+                            console.log(data);
+                        }
+                    });
 		}
+                
+                function setTable(users, field1, field2){
+                    if(!Array.isArray(users)){
+                        return false;
+                    }
+                    var column2 = "";
+                    if(field2){
+                        column2 = "<td>"+field2+"</td>";
+                    }
+                    var column = "<tr><td>#</td>" +
+                                    "<td>id</td>" +
+                                    "<td>name</td>" +
+                                    "<td>email</td>" +
+                                    "<td>"+field1+"</td>" +
+                                    column2+
+                                    "</tr>";
+                    for(var i = 0; i < users.length; i++){
+                        var item = users[i];
+                        var columnfield = "";
+                        if(field2){
+                                columnfield = "<td>"+item[field2]+"</td>";
+                        }
+                        var cl = "<tr>" +
+                                        "<td>"+(i+1)+"</td>" +
+                                        "<td>"+item._mtid+"</td>"+
+                                        "<td>"+item.name+"</td>"+
+                                        "<td>"+item.email+"</td>"+
+                                        "<td>"+item[field1]+"</td>"+
+                                        columnfield+
+                                        "</tr>";
+                        column += cl;
+                    }
+                    var table = "<table class ='table table-hover'>"+column+"</table>";
+                    $("#user_table").empty();
+                    $("#user_table").append(table);
+                    return true;
+                }
 
 
 		// Get context with jQuery - using jQuery's .get() method.

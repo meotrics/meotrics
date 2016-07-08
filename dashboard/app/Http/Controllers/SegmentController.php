@@ -502,4 +502,19 @@ if(Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permiss
 		$result['labels'] = $labels;
 		return $result;
 	}
+        
+    public function getUsersbyfield(Request $request, $app_id){
+        if(Access::can_view($request->user()->id, $app_id) == false) 
+            abort(500, "Permission Denied");
+        $result = ['success' => false];
+        if ($request->input('segment_id') && $request->input('field1') && $request->input('page')) {
+            $get_url = "segment/$app_id/".$request->input('segment_id')."/listUser/".$request->input('page')."/".$request->input('field1');
+            if($request->input('field2')){
+                $get_url .= "/".$request->input('field2');
+            }
+            $result['users'] = MtHttp::get($get_url);
+            $result['success'] = true;
+        }
+        return $result;
+    }
 }
