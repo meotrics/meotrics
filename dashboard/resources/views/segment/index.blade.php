@@ -388,7 +388,7 @@ $props = isset($props) ? $props : [];
                                                      */
                                                     var field1 = $('select[name="Prop[one]"]').val();
                                                     var field2 = $('select[name="Prop[two]"]').val();
-                                                    setTable(data.users, field1, field2);
+                                                    getTable(data.users, field1, field2);
                                                 }
 					},
 				});
@@ -409,7 +409,7 @@ $props = isset($props) ? $props : [];
                         url: url,
                         success: function (data) {
                             if(data.success && data.users){
-                                setTable(data.users);
+                                setTable(data.users,field1, field2);
                             }
                             window.listuser = data;
                             console.log(data);
@@ -417,7 +417,7 @@ $props = isset($props) ? $props : [];
                     });
 		}
                 
-                function setTable(users, field1, field2){
+        function setTable(users, field1, field2){
                     if(!Array.isArray(users)){
                         return false;
                     }
