@@ -451,7 +451,7 @@ $props = isset($props) ? $props : [];
                     var table = "<table class ='table table-hover'>"+column+"</table>";
 					var b = "";
 					for(var i = 0; i < 10; i++){
-						b += "<li onclick='getTable("+segment_id+", "+field1+", "+field2+", "+i+")'><a href='#'>"+i+"</a></li>";
+						b += "<li onclick='onSelectPage("+i+")'><a href='#'>"+i+"</a></li>";
 					}
 					var select_page = "<nav>" +
 							"<ul class='pagination'>" +
@@ -464,6 +464,13 @@ $props = isset($props) ? $props : [];
                     $("#user_table").append(table);
                     return true;
                 }
+
+		function onSelectPage(i){
+			var segment_id = $('#segment').val();
+			var field1 = $('select[name="Prop[one]"]').val();
+			var field2 = $('select[name="Prop[two]"]').val();
+			getTable(segment_id,field1,field2,i);
+		}
 
 
 
