@@ -370,7 +370,7 @@
 			};
 			
 			
-			converter.toIDs(['_mtid', '_isUser', '_typeid'], function (ids) {
+			converter.toIDs(['_mtid', '_isUser', '_typeid', '_ctime', '_link'], function (ids) {
 			var keys = {};
 				keys[ids._mtid] = 1;
 				db.collection(prefix + "app" + appid).createIndex(keys, function () {
@@ -389,6 +389,8 @@
 
 							db.collection(prefix + "app" + appid).createIndex(keys, function () {
 								//console.log('googd');
+									db.collection(prefix + "app" + appid).createIndex({[key[ids._link]]: 1}, {sparse: true}, function(){
+});
 							});
 						});
 					});
