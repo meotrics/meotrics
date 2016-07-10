@@ -388,7 +388,7 @@ $props = isset($props) ? $props : [];
                                                      */
                                                     var field1 = $('select[name="Prop[one]"]').val();
                                                     var field2 = $('select[name="Prop[two]"]').val();
-                                                    getTable(data.users, field1, field2);
+                                                    getTable(segment_id, field1, field2);
                                                 }
 					},
 				});
