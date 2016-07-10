@@ -409,7 +409,7 @@ $props = isset($props) ? $props : [];
                         url: url,
                         success: function (data) {
                             if(data.success && data.users){
-                                setTable(data.users,field1, field2);
+                                setTable(data.users,field1, field2,segment_id);
                             }
                             window.listuser = data;
                             console.log(data);
@@ -417,7 +417,7 @@ $props = isset($props) ? $props : [];
                     });
 		}
                 
-        function setTable(users, field1, field2){
+        function setTable(users, field1, field2,segment_id){
                     if(!Array.isArray(users)){
                         return false;
                     }
