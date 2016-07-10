@@ -388,7 +388,7 @@ $props = isset($props) ? $props : [];
                                                      */
                                                     var field1 = $('select[name="Prop[one]"]').val();
                                                     var field2 = $('select[name="Prop[two]"]').val();
-                                                    getTable(segment_id, field1, field2);
+                                                    getTable(segment_id, field1, field2,1);
                                                 }
 					},
 				});
@@ -449,10 +449,22 @@ $props = isset($props) ? $props : [];
                         column += cl;
                     }
                     var table = "<table class ='table table-hover'>"+column+"</table>";
+					var b = "";
+					for(var i = 0; i < 10; i++){
+						b += "<li onclick='getTable(segment_id, field1, field2, i)'><a href='#'>1</a></li>";
+					}
+					var select_page = "<nav>" +
+							"<ul class='pagination'>" +
+							"<li><a href='#' aria-label='Previous'><span aria-hidden='true'>&laquo;</span></a></li>" +
+							b+
+							"<li><a href='#' aria-label='Next'><span aria-hidden='true'>&laquo;</span></a></li>" +
+							"</ul></nav>";
+					table += select_page;
                     $("#user_table").empty();
                     $("#user_table").append(table);
                     return true;
                 }
+
 
 
 		// Get context with jQuery - using jQuery's .get() method.
