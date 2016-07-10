@@ -68,7 +68,7 @@ export class ActionMgr {
 		delete data._deltat;
 
 		if (data._link !== undefined) {
-			collection.find({ _id: new mongodb.ObjectID(data._link) }).limit(1).toArray(function (err, ret) {
+				collection.find({ _id: new mongodb.ObjectID(data._link) }).limit(1).toArray(function (err, ret) {
 				if (err) throw err;
 				if (ret.length == 0) throw "link not found: " + data._link + ", in app: " + appid;
 				let link = ret[0];
@@ -273,14 +273,13 @@ export class ActionMgr {
 	// + data: action data
 	public fixRaw(appid: string, actionids: string, lastactionidstr: string, data, callback: () => void) {
 		let me = this;
-		console.log("fix " + actionids);
+		if(actionids == null) return callback(); //wrong actionid
 		let actionid = new mongodb.ObjectID(actionids);
 		if (data._mtid) data._mtid = new mongodb.ObjectID(data._mtid);
 		var collection = me.db.collection(me.prefix + "app" + appid);
 		//make sure dont change typeid
 		delete data._typeid;
-
-		me.converter.toIDs(['_utm_source', '_utm_campaign', '_utm_term', '_utm_content',
+			me.converter.toIDs(['_mtid','_utm_source', '_utm_campaign', '_utm_term', '_utm_content',
 			'_utm_medium', '_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
 			'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype', '_deltat', 'actionid',
 			'lastactionid', '_ref', '_callback', '_numberPurchase', '_listProduct'], function (ids) {
@@ -304,10 +303,15 @@ export class ActionMgr {
 			return store(ids);
 		});
 		function store(ids) {
-			me.updateChainCampaign(appid, actionids, data);
+			//me.updateChainCampaign(appid, actionids, data);
 			me.valuemgr.cineObject(appid, "pageview", data);
 			// set referal type
-			data._reftype = me.referer.getRefType(data._url, data._ref);
+				collection.find({_id: actionid}).limit(1).toArray(function(err,r){
+						if(err) throw err;
+						if(r.length ===0) throw "action not found 400: " + actionid;
+						
+						data._mtid = r[0][ids._mtid];
+						data._reftype = me.referer.getRefType(data._url, data._ref);
 			me.converter.toObject(data, function (datax) {
 				collection.update({ _id: actionid }, { $set: datax }, function (err, r) {
 					if (err) throw err;
@@ -319,7 +323,7 @@ export class ActionMgr {
 							});
 					});
 				});
-			});
+			});});
 		}
 	}
 
@@ -626,10 +630,12 @@ export class ActionMgr {
 	private updateChainCampaign(appid: string, actionid: string, data: any) {
 		var me = this;
 		var collection = me.prefix + "app" + appid;
-		me.converter.toIDs(['_utm_source', '_utm_campaign', '_utm_term', '_utm_content', '_utm_medium', '_link'], function (ids) {
+			return;
+me.converter.toIDs(['_utm_source', '_utm_campaign', '_utm_term', '_utm_content', '_utm_medium', '_link'], function (ids) {
 			var match = {};
 			match[ids._link] = new mongodb.ObjectID(actionid);
-			me.db.collection(collection).find(match).toArray(function (err, res: any[]) {
+		
+		me.db.collection(collection).find(match).toArray(function (err, res: any[]) {
 				if (err) throw err;
 
 				if (res.length == 0)
