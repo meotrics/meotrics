@@ -298,6 +298,7 @@ $props = isset($props) ? $props : [];
 				demonstrate = field1 ? $('select[name="Prop[one]"]').find(':selected').text().toUpperCase() : $('select[name="Prop[two]"]').find(':selected').text().toUpperCase()
 			}
 //			getTable(appcode,segment_id,field1,field2);
+			setTable(null,'23','23');
 			if (url) {
 				$.ajax({
 					type: 'GET',
@@ -418,9 +419,9 @@ $props = isset($props) ? $props : [];
 		}
                 
         function setTable(users, field1, field2){
-                    if(!Array.isArray(users)){
-                        return false;
-                    }
+//                    if(!Array.isArray(users)){
+//                        return false;
+//                    }
                     var column2 = "";
                     if(field2){
                         column2 = "<td>"+field2+"</td>";
@@ -451,7 +452,7 @@ $props = isset($props) ? $props : [];
                     var table = "<table class ='table table-hover'>"+column+"</table>";
 					var b = "";
 					for(var i = 0; i < 10; i++){
-						b += "<li onclick='getTable(segment_id, field1, field2, i)'><a href='#'>1</a></li>";
+						b += "<li onclick='getTable("+segment_id+", "+field1+", "+field2+", "+i+")'><a href='#'>"+i+"</a></li>";
 					}
 					var select_page = "<nav>" +
 							"<ul class='pagination'>" +
