@@ -189,7 +189,8 @@ class SegmentController extends Controller
 
 	public function loadModel($app_id, $id)
 	{
-        if(Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permission Denied");
+        
+        if(Access::can_view(\Auth::user()->id, $app_id) == false) abort(500, "Permission Denied");
 		$model = MtHttp::get('segment/' . $app_id . '/' . $id);
 		if ($model) {
 			return $model;

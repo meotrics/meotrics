@@ -171,13 +171,13 @@ class PermController extends Controller
 	{
 		$email = $request->input('email');
 		$uid = \Auth::user()->id;
-		if(Access::can_editPerm($uid, $appcode) == false) abort(500, "Permission denied");
+		if(Access::can_editPerm($uid, $appcode) == false) abort(300, "Permission denied");
 		//get userid from email
 		$user = DB::table('users')->where('email', $email)->first();
-		if ($user == null) abort(500, 'user not found: ' . $email);
+		if ($user == null) abort(300, 'user not found: ' . $email);
 		$userid = $user->id;
 		if ($userid == null)
-			abort(500, 'cannot find user with email ' . $email);
+			abort(300, 'cannot find user with email ' . $email);
 
 		$status = Access::setPerm($uid, $userid, $appcode, null, null, null);
 		if ($status == 0)
