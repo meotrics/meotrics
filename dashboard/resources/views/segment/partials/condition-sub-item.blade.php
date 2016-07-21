@@ -10,14 +10,39 @@ $c_condition = isset($c_condition) ? $c_condition : (object)[
 ];
 $i_condition = isset($i_condition) ? $i_condition : 'i_condition_replace';
 $i_condition_sub = isset($i_condition_sub) ? $i_condition_sub : 'i_condition_sub_replace';
-$condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators();
+
+// Vitle - 21/7
+$operator_behavior = array(
+		'>' => 'greater than',
+		'>=' => 'less or equal',
+		'=' => 'equal',
+		'<' => 'less than',
+		'<=' => 'greater or equal'
+);
+
+$operator_default = array(
+		'equal' => 'Equal',
+		'contain'=> 'Contain',
+		'start_with' => 'Start with',
+		'end_with' => 'end_with'
+);
+
+$condtion_sub_operators = $operator_default;
 ?>
+@if ($condition->fields)
+	@if($c_condition->cs_field == 'pid' || $c_condition->cs_field == 'cid' || $c_condition->cs_field == 'price' ||
+            $c_condition->cs_field == 'quantity' || $c_condition->cs_field == '_ctime' || $c_condition->cs_field == 'oid' ||
+            $c_condition->cs_field == 'level' || $c_condition->cs_field == 'userid')
+		@if($condtion_sub_operators = $operator_behavior)
+		@endif
+	@endif
+@endif
+
 <div class="row" data-name="condition-sub-item" data-i-condition-sub="{{ $i_condition_sub }}">
     <div class="col-md-2 col-md-offset-2" >
 		<select class="form-control "
 		        name="Segment[{{ $i_condition }}][conditions][{{ $i_condition_sub }}][cs_field]"
                         value="{{ $condition->field }}" onchange="changeSubField(this)">
-
 			@if ($condition->fields)
 				@foreach ($condition->fields as $c_field)
 					<option value="{{ $c_field->pcode }}" {{ $c_condition->cs_field == $c_field->pcode ? 'selected=""' : '' }}>{{$c_field->pname }}</option>
