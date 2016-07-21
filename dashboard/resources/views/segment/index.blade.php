@@ -86,6 +86,7 @@ $props = isset($props) ? $props : [];
 						</div>
 						<div class="col-md-6 content">
 							@if(isset($segment_first->startTime ))
+                                                                <!--
 								<div class="col-md-3">
 									Time range:
 								</div>
@@ -93,6 +94,7 @@ $props = isset($props) ? $props : [];
 									<span id="startTime">{{$segment_first->startTime}}</span>
 									to {{$segment_first->endTime}}
 								</div>
+                                                                -->
 							@endif
 							<div class="col-md-4">
 								<div class="col-md-6">
