@@ -388,7 +388,7 @@ $props = isset($props) ? $props : [];
                                                      */
                                                     var field1 = $('select[name="Prop[one]"]').val();
                                                     var field2 = $('select[name="Prop[two]"]').val();
-                                                    setTable(data.users, field1, field2);
+                                                    getTable(segment_id, field1, field2,1);
                                                 }
 					},
 				});
@@ -409,7 +409,7 @@ $props = isset($props) ? $props : [];
                         url: url,
                         success: function (data) {
                             if(data.success && data.users){
-                                setTable(data.users);
+                                setTable(data.users,field1, field2,segment_id);
                             }
                             window.listuser = data;
                             console.log(data);
@@ -417,7 +417,7 @@ $props = isset($props) ? $props : [];
                     });
 		}
                 
-                function setTable(users, field1, field2){
+        function setTable(users, field1, field2,segment_id){
                     if(!Array.isArray(users)){
                         return false;
                     }
@@ -449,10 +449,29 @@ $props = isset($props) ? $props : [];
                         column += cl;
                     }
                     var table = "<table class ='table table-hover'>"+column+"</table>";
+					var b = "";
+					for(var i = 0; i < 10; i++){
+						b += "<li onclick='onSelectPage("+i+")'><a href='#'>"+i+"</a></li>";
+					}
+					var select_page = "<nav>" +
+							"<ul class='pagination'>" +
+							"<li><a href='#' aria-label='Previous'><span aria-hidden='true'>&laquo;</span></a></li>" +
+							b+
+							"<li><a href='#' aria-label='Next'><span aria-hidden='true'>&laquo;</span></a></li>" +
+							"</ul></nav>";
+					table += select_page;
                     $("#user_table").empty();
                     $("#user_table").append(table);
                     return true;
                 }
+
+		function onSelectPage(i){
+			var segment_id = $('#segment').val();
+			var field1 = $('select[name="Prop[one]"]').val();
+			var field2 = $('select[name="Prop[two]"]').val();
+			getTable(segment_id,field1,field2,i);
+		}
+
 
 
 		// Get context with jQuery - using jQuery's .get() method.

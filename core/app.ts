@@ -21,29 +21,29 @@ function buildconnstr(): string {
 //Using connection pool. Initialize mongodb once
 var option: mongodb.MongoClientOptions = {};
 option.server = {};
-option.server.poolSize = 40;
+option.server.poolSize = 10;
 
 function ensureIndex(db: mongodb.Db, prefix: string, callback: () => void) {
 	console.log('indexing ...');
-	db.collection(prefix + "actiontype").createIndex({ _appid: 1 }, function () {
-		db.collection(prefix + "actiontype").createIndex({ _appid: 1, _id: 1 }, function () {
-			db.collection(prefix + "dashboard").createIndex({ appid: 1, starttime: 1, endtime: 1 }, function () {
-				db.collection(prefix + "ip").createIndex({ ip: 1 }, function () {
-					db.collection(prefix + "mapping").createIndex({ anomtid: 1 }, function () {
-						db.collection(prefix + "mapping").createIndex({ idemtid: 1 }, function () {
-							db.collection(prefix + "mapping").createIndex({ idemtid: 1 }, function () {
-								db.collection(prefix + "segment").createIndex({ _appid: 1, _id: 1 }, function () {
-									db.collection(prefix + "segment").createIndex({ _appid: 1 }, function () {
-										db.collection(prefix + "trend").createIndex({ _appid: 1, _id: 1 }, function () {
-											db.collection(prefix + "trend").createIndex({ _appid: 1 }, function () {
-												db.collection(prefix + "valuedomain").createIndex({ appid: 1, typeid: 1, field: 1 }, function () {
-													callback();
-												});
+		db.collection(prefix + "actiontype").createIndex({ _appid: 1 },{background:true}, function () {
+		db.collection(prefix + "actiontype").createIndex({ _appid: 1, _id: 1 },{background:true}, function () {
+			db.collection(prefix + "dashboard").createIndex({ appid: 1, starttime: 1, endtime: 1 },{background:true}, function () {
+				db.collection(prefix + "ip").createIndex({ ip: 1 },{background:true}, function () {
+					db.collection(prefix + "mapping").createIndex({ anomtid: 1 },{background:true}, function () {
+						db.collection(prefix + "mapping").createIndex({ idemtid: 1 },{background:true}, function () {
+							db.collection(prefix + "mapping").createIndex({ idemtid: 1 },{background:true}, function () {
+								db.collection(prefix + "segment").createIndex({ _appid: 1, _id: 1 },{background:true}, function () {
+									db.collection(prefix + "segment").createIndex({ _appid: 1 },{background:true}, function () {
+										db.collection(prefix + "trend").createIndex({ _appid: 1, _id: 1 },{background:true}, function () {
+											db.collection(prefix + "trend").createIndex({ _appid: 1 },{background:true}, function () {
+													db.collection(prefix + "valuedomain").createIndex({ appid: 1, typeid: 1, field: 1 },{background:true}, function () {
+																										callback();																							
+													});
 											});
 										});
 									});
 								});
-							});
+						});
 						});
 					});
 				});
