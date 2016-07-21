@@ -447,32 +447,36 @@ if(Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permiss
 					'data' => $tmp_data,
 				];
 			} elseif (property_exists($tmp_charts_first, 'key') && is_array($tmp_charts_first->key)) {
-				$tmp_data = [];
-				foreach ($charts as $tmp_chart) {
-					foreach ($tmp_chart->key as $tmp_label) {
-						if (!in_array($tmp_label, $labels)) {
+                            $tmp_data = [];
+                            foreach ($charts as $tmp_chart) {
+                                $tmp_chart_keys = isset($tmp_chart->key) && is_array($tmp_chart->key) ? $tmp_chart->key : [];
+                                foreach ($tmp_chart_keys as $tmp_label) {
+                                    if (!in_array($tmp_label, $labels)) {
 
-								$labels[] = $tmp_label;
-							$tmp_data[$tmp_label] = 0;
-						}
-						$tmp_data[$tmp_label] += (int)$tmp_chart->count;
-					}
-				}
-				$chart_data = [];
-				foreach ($labels as $label) {
-					$chart_data[] = $tmp_data[$label];
-				}
-				$datasets[] = (object)[
-					'data' => $chart_data,
-				];
+                                        $labels[] = $tmp_label;
+                                        $tmp_data[$tmp_label] = 0;
+                                    }
+                                    $tmp_data[$tmp_label] += (int) $tmp_chart->count;
+                                }
+                            }
+                            $chart_data = [];
+                            foreach ($labels as $label) {
+                                $chart_data[] = $tmp_data[$label];
+                            }
+                            $datasets[] = (object) [
+                                        'data' => $chart_data,
+                            ];
 
-				if ($f === '_reftype') {
-					$labels = [];foreach ($charts as $tmp_chart)
-					foreach ($tmp_chart->key as $tmp_label)
-						if (!in_array($tmp_label, $labels))
-							$labels[] = $this->reftypemap[$tmp_label];
-					}
-			} else {
+                            if ($f === '_reftype') {
+                                $labels = [];
+                                foreach ($charts as $tmp_chart){
+                                    $tmp_chart_keys = isset($tmp_chart->key) && is_array($tmp_chart->key) ? $tmp_chart->key : [];
+                                    foreach ($tmp_chart_keys as $tmp_label)
+                                        if (!in_array($tmp_label, $labels))
+                                            $labels[] = $this->reftypemap[$tmp_label];
+                                }
+                            }
+                        } else {
 				foreach ($charts as $tmp_chart) {
 					if (!isset($tmp_chart->key))
 						$tmp_chart->key = "N/A";
