@@ -1,16 +1,16 @@
 var assert = require('chai').assert;
 
-var synccam = require('../utils/synccam.js');
+var synccam = require('../../utils/synccam.js');
 var config = require('config');
 var async = require('async');
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
-var converter = require('../utils/fakeidmanager.js');
+var converter = require('../../utils/fakeidmanager.js');
 converter = new converter.IdManager();
 
-var UserG = require('../utils/generateUsers.js');
-var ActionG = require('../utils/generateLog.js');
-var Valuemgr = require('../module/valuemgr.js').ValueMgr;
+var UserG = require('../../utils/generateUsers.js');
+var ActionG = require('../../utils/generateLog.js');
+var Valuemgr = require('../../module/valuemgr.js').ValueMgr;
 
 var url = 'mongodb://' + config.get('mongod.host') + ':' + config.get('mongod.port') + '/' + config.get('mongod.database');
 
@@ -46,15 +46,20 @@ function samplingData(db, done)
 	});
 }
 
-describe("Sync campaign", function(){
+describe("Test async", function(done){
+	it("should end in 1 sec", function(done){
+		setTimeout(function(){
+			done();
+		},1000);
+	});
+});
+
+describe("Sync campaign",function(){
 	it("should copy all os from pageview to user", function(done){
-	console.log('helere')
 			MongoClient.connect(url , function (err, db) {
 				if(err) throw err;
 				samplingData(db, function(){
-					console.log(4);
 	synccam.sync(appid, function(){
-console.log(43);	
 				db.collection(col).find({_isUser: {$exists: true}}).toArray(function(err, ret){
 						if(err) throw err;
 						for(var i in ret) if(ret.hasOwnProperty(i)){
@@ -63,8 +68,10 @@ console.log(43);
 								if(err) throw err;
 								for(var j in ret) if(ret.hasOwnProperty(j)){
 									var action = ret[j];
-									if( user._os.indexOf(action._os) == -1)
+									if(new Set([].concat(user._os).concat(action._os)).size != [].concat(user._os).length)
+									//if( user._os.indexOf(action._os) == -1)
 									{
+										console.log(user._os, action._os);
 										assert.fail(0, 1,"some os not merged");
 										return;
 									}
