@@ -13,7 +13,7 @@ MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get(
 	var userSegment = new UserSegment(db, mongodb,  converter,async, config.get('mongod.prefix'));
 
 	userSegment.getUsers('abc', '5772c2a2a1df59ac329cbc25', ['_os', 'gender'], 0, function(users){
-		console.log(users);
+//		console.log(users);
 	});
 
 	// this.getUsers = function(appName, segmentId, fields, start, callback)

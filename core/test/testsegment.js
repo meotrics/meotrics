@@ -1,3 +1,4 @@
+return;
 var SegmentExr = require('../module/segment.js').SegmentExr;
 var MongoClient = require('mongodb').MongoClient;
 var config = require('config');
@@ -33,14 +34,14 @@ MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get(
 		_appid: process.argv[2]
 	};
 
-	console.time('mr1');
+	//console.time('mr1');
 	seg.runSegment(segment, function (out) {
-		console.timeEnd('mr1');
-		console.log(JSON.stringify(out));
-		console.time('mr2');
+		//console.timeEnd('mr1');
+		//console.log(JSON.stringify(out));
+		//console.time('mr2');
 		seg.runSegment(testSegment2, function(out){
-			console.timeEnd('mr2');
-			console.log(JSON.stringify(out));
+			//console.timeEnd('mr2');
+			//console.log(JSON.stringify(out));
 		})
 	});
 

@@ -7,6 +7,6 @@ var    client = redis.createClient( config.get('redis.port'),config.get('redis.h
 client.auth(config.get('redis.password'), function(){
   client.set("some key", "some val");
   client.get('some key',function(value, err){
-  console.log(value);
+//  console.log(value);
 });
 });

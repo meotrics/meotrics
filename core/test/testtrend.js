@@ -10,7 +10,7 @@ var converter = require('../utils/fakeidmanager.js');
 converter = new converter.IdManager();
 
 var appid = 1;
-
+if(1==1)return;
 var prefix = config.get('mongod.prefix');
 MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get('mongod.port') + '/' + config.get('mongod.database'), function (err, db) {
 	if (err) throw err;
@@ -27,9 +27,9 @@ MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get(
 
 	//create a trend
 	trendCrud.createRaw(appid, t, function (data) {
-		console.log(data);
+		//console.log(data);
 		trend.queryRaw(appid, data, function ( results) {
-			console.log(results);
+			//console.log(results);
 
 			var t2 = {
 				operation: 'count',
@@ -38,11 +38,11 @@ MongoClient.connect("mongodb://" + config.get("mongod.host") + ":" + config.get(
 				typeid: 'pageview',
 				order: -1
 			};
-			console.time('t2');
+			//console.time('t2');
 			trendCrud.createRaw(appid, t2, function (data) {
 				trend.queryRaw(appid, data, function ( results) {
-					console.timeEnd('t2');
-					console.log(results);
+					//console.timeEnd('t2');
+					//console.log(results);
 				});
 			});
 		});

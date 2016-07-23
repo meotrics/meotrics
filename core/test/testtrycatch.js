@@ -9,5 +9,5 @@ idmgr.toIDs("adf", function(data)
 })
 }, function(err)
 {
-	console.log("hihi" + err);
+//	console.log("hihi" + err);
 });

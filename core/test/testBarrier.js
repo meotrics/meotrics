@@ -2,7 +2,7 @@ var Barrier = require('../utils/barrier.js').Barrier;
 
 function simpletest() {
 	var b = new Barrier(2, function (param) {
-		console.log(param);
+//		console.log(param);
 	});
 
 	function t1() {

@@ -5,7 +5,7 @@ var mongodb = require('mongodb'),
 
 MongoClient.connect(url)
     .then(function(database){
-        console.log('[MongoDB] connected');
+        //console.log('[MongoDB] connected');
         db = database;
         
         db.collection('meotrics_1').mapReduce(
@@ -15,24 +15,24 @@ MongoClient.connect(url)
                 out: {replace: 'hehe'}
             }
         ).then(function(r){
-            console.log(r);
+            //console.log(r);
         }).catch(function(e){
-            console.log(e);
+            //console.log(e);
         });
 
         // Listen for some events
         db.on('reconnect', function(data){
-          console.log(data);
-          console.log('[MongoDB] reconnect success');
+          //console.log(data);
+          //console.log('[MongoDB] reconnect success');
         });
         db.on('error', function(err){
-          console.log('[MongoDB] error', err.message);
+          //console.log('[MongoDB] error', err.message);
         });
         db.on('close', function(err){
-          console.log('[MongoDB] disconnected');
+          //console.log('[MongoDB] disconnected');
         });
     }).catch(function(err){
-        console.error("[MongoDB]", err.message);
+        //console.error("[MongoDB]", err.message);
         setTimeout(getUsers, 2000);
     }); 
 
