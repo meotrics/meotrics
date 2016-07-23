@@ -1,7 +1,4 @@
-
-
-var assert = require('chai').assert;
-
+var test = require('tape');
 var config = require('config');
 var async = require('async');
 var mongodb = require('mongodb');
@@ -47,9 +44,8 @@ function samplingData(db, done)
 	});
 }
 
-describe("Sync campaign", function(t){
+test("Sync campaign should copy all os from pageview to user", function(t){
 
-it("should copy all os from pageview to user", function(done){
 	MongoClient.connect(url , function (err, db) {
 
 		samplingData(db, function(){
@@ -65,7 +61,7 @@ it("should copy all os from pageview to user", function(done){
 						if( user._os.indexOf(action._os) == -1)
 						{
 							console.log(j);
-							assert.equal(-1, 1);//("some os not merged");
+							t.fail("some os not merged");
 							return;
 						}
 					}
@@ -75,11 +71,11 @@ it("should copy all os from pageview to user", function(done){
 
 //		expect(true).toBe(true);
 		setTimeout(function(){
+			t.equal(true,true);
 			done();
-			assert.equal(true,true);
 		}, 2000);
 		});
 	
-});
+
 	});
 });
