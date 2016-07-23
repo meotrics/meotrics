@@ -1,5 +1,6 @@
 var assert = require('chai').assert;
 
+var synccam = require('../utils/synccam.js');
 var config = require('config');
 var async = require('async');
 var mongodb = require('mongodb');
@@ -31,52 +32,53 @@ function samplingData(db, done)
 	var valuemgr = new Valuemgr(db, prefix);
 	checkIfCollectionHaveData(db, function(out){
 		if(out == true)
-			{
-				done();
-				}
+		{
+			done();
+		}
 		else
-			{
-				UserG.generate(appid, valuemgr, converter, url, 10, col, function(){
-					ActionG.generate(appid, valuemgr, converter, url, 100, 100, col, "pageview", "purchase", function(){
-						done();
-						});
-					});
-				}
-		});
+		{
+			UserG.generate(appid, valuemgr, converter, url, 10, col, function(){
+				ActionG.generate(appid, valuemgr, converter, url, 100, 100, col, "pageview", "purchase", function(){
+					done();
+				});
+			});
+		}
+	});
 }
 
-describe("Sync campaign", function(t){
+describe("Sync campaign", function(){
 	it("should copy all os from pageview to user", function(done){
-		
-		assert.equal(true,true);
-		return done();
-		MongoClient.connect(url , function (err, db) {
-			if(err) throw err;
-						
-			samplingData(db, function(){
+	console.log('helere')
+			MongoClient.connect(url , function (err, db) {
+				if(err) throw err;
+				samplingData(db, function(){
+					console.log(4);
+	synccam.sync(appid, function(){
+console.log(43);	
 				db.collection(col).find({_isUser: {$exists: true}}).toArray(function(err, ret){
-					if(err) throw err;
-					for(var i in ret) if(ret.hasOwnProperty(i)){
-						var user = ret[i];
-						db.collection(col).find({_mtid: user._id, _typeid: "pageview"}).toArray(function(err, ret){
-							if(err) throw err;
-							for(var j in ret) if(ret.hasOwnProperty(j)){
-								var action = ret[j];
-								if( user._os.indexOf(action._os) == -1)
-								{
-									assert.equal(-1, 1);//("some os not merged");
-									return;
+						if(err) throw err;
+						for(var i in ret) if(ret.hasOwnProperty(i)){
+							var user = ret[i];
+							db.collection(col).find({_mtid: user._id, _typeid: "pageview"}).toArray(function(err, ret){
+								if(err) throw err;
+								for(var j in ret) if(ret.hasOwnProperty(j)){
+									var action = ret[j];
+									if( user._os.indexOf(action._os) == -1)
+									{
+										assert.fail(0, 1,"some os not merged");
+										return;
+									}
 								}
-							}
-						});
-					}
-				});
+							});
+						}
+					});
 
-				//expect(true).toBe(true);
-				setTimeout(function(){
-					done();
-					assert.equal(true,true);
-				}, 2000);
+					//expect(true).toBe(true);
+					setTimeout(function(){
+						assert.equal(true,true);
+						done();
+					}, 2000);
+				});
 			});
 		});
 	});
