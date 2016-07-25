@@ -183,6 +183,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		var lastactionid = req.lastactionid;
 		var data = trackBasic(req);
 		getMtid(req, appid, res, function (mtid) {
+			console.log(mtid);
 			data._mtid = mtid;
 			actionmgr.fixRaw(appid, actionid, lastactionid, data, function () {
 				res.end();
@@ -243,6 +244,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
 			function handle(req, res, path) {
 				var parts = path.split('/');
+					console.log(path);
 				res.statusCode = 200;
 				req['appid'] = parts[1];
 				var action = parts[2];
@@ -252,6 +254,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 				else if (action === 'info') info(req, res);
 				else if (action === 'x') {
 					req['actionid'] = parts[3];
+				
 					x(req, res);
 				}
 				else if (action === 'suggest') {
@@ -264,6 +267,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 					var query = url.parse(path, true).query;
 					req['actionid'] = req.params.actionid;
 					req['lastactionid'] = req.params.lastactionid;
+						if(req.params.actionid==null) console.log('errfix: ', path);
 					fix(req, res);
 				} else {
 					res.statusCode = 404;

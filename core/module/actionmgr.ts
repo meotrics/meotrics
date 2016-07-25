@@ -124,6 +124,7 @@ export class ActionMgr {
 						var typeid = data._typeid;
 						me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
 							'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype', 'lastactionid', '_ref', 
+																'_lang', '_os', '_browser', '_country', '_city', '_campaign', '_devicetype', '_deviceid',
 																'_callback', '_numberPurchase', '_listProduct', '_deltat', 'actionid', '_lastSeen', '_utm_campaign'], function (ids) {
 								// increase revenue
 								var simpleprop = {};
@@ -455,6 +456,9 @@ export class ActionMgr {
 							}
 						}
 				userx[ids._campaign] = [... new Set(userx[ids._campaign])];
+
+				userx[ids._utm_campaign] = [...new Set( [].concat(userx[ids._utm_campaign]).concat(olduser[ids._utm_campaign])];
+
 						if (userx[ids._firstcampaign] == undefined) userx[ids._firstcampaign] = olduser[ids._firstcampaign];
 						if (userx[ids._lastcampaign] == undefined) userx[ids._lastcampaign] = olduser[ids._lastcampaign];
 

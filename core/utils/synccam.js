@@ -11,7 +11,6 @@ var url = 'mongodb://' + config.get('mongod.host') + ':' + config.get('mongod.po
 exports.sync = function(appid, done)
 {
 	var prefix = config.get('mongod.prefix');
-	var appid = "testsync";
 	var col = `${prefix}app${appid}`;
 	MongoClient.connect(url, function(err, db){
 		var actionmgr = new ActionMgr.ActionMgr(db, converter, prefix, "mapping", undefined, undefined);
@@ -21,7 +20,6 @@ exports.sync = function(appid, done)
 		usercursor.count(function(err, usercount){
 			if(usercount == 0 ) return done();
 			usercursor.forEach(function(user){
-				
 				// loop through each pageview of the user
 				var pageviewcursor = db.collection(col).find({_mtid: user._id, _typeid: "pageview"});
 				pageviewcursor.count(function(err, pageviewcount){
@@ -30,7 +28,6 @@ exports.sync = function(appid, done)
 						usercount--;
 						if(usercount == 0) return done();
 					}
-
 					pageviewcursor.forEach(function(pageview){
 						converter.toIDs(['_os', '_lang','_segment', '_devicetype', '_deviceid', '_browser', '_city', '_country', '_campaign'], function (ids) {
 							actionmgr.mergeInfo(pageview, user, ids);
@@ -50,3 +47,9 @@ exports.sync = function(appid, done)
 		});
 	});
 }
+
+exports.sync("toyotacomvn", function()
+{
+	console.log('done toyota');
+	
+})
