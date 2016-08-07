@@ -47,16 +47,16 @@
 		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
 		ga('create', 'UA-80655428-1', 'auto');
-		ga('send', 'pageview');
+		<?php
+			if (\Auth::user() != null){
+				$email = \Auth::user()->email;
+				echo "ga('set', '&uid', '".$email."');";
+			}
+		?>
+    ga('send', 'pageview');
 
 	</script>
-	<?php
-		if (\Auth::user() != null){
-			echo "<script>
-				ga('set', 'userId', '".\Auth::user()->email ."'); // Đặt User-ID sử dụng user_id đã đăng nhập.
-			</script>";
-		}
-	?>
+
 </head>
 <body>
 @if($verified == 0)
