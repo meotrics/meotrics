@@ -50,7 +50,7 @@
 		<?php
 			if (\Auth::user() != null){
 				$email = \Auth::user()->email;
-				echo "ga('set', '&uid', '".$email."');";
+				echo "ga('set', 'userId', '".$email."');";
 			}
 		?>
     ga('send', 'pageview');
