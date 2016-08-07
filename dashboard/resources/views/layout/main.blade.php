@@ -50,6 +50,13 @@
 		ga('send', 'pageview');
 
 	</script>
+	<?php
+		if (\Auth::user() != null){
+			echo "<script>
+				ga('set', 'userId', '".\Auth::user()->email ."'); // Đặt User-ID sử dụng user_id đã đăng nhập.
+			</script>";
+		}
+	?>
 </head>
 <body>
 @if($verified == 0)
