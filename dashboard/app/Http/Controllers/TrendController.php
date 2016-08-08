@@ -227,9 +227,10 @@ class TrendController extends Controller
 		return $result;
 	}
 
-	public function getUpdate(Request $requrest, $app_id, $id)
+	public function getUpdate(Request $request, $app_id, $id)
 	{
-        if(Access::can_editReport($request->user()->id, $app_id) == false) abort(500,'Permission Denied');
+        if(Access::can_editReport( $request->user()->id, $app_id) == false) abort(500,'Permission Denied');
+        
 		$trend = $this->loadTrend($app_id, $id);
 		$actiontypes = MtHttp::get('actiontype/' . $app_id);
 		$actiontype_first = $actiontypes && $actiontypes[0] ? $actiontypes[0] : (object)[
