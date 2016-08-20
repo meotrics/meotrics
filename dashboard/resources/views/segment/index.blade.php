@@ -306,6 +306,7 @@ $props = isset($props) ? $props : [];
 					data: data_get,
 					success: function (data) {
 						if (data.success && data.labels && data.datasets) {
+							console.log(data);
 //                        if($('#segment_chart').length){
 //                            $('#segment_chart').remove();
 //                        }

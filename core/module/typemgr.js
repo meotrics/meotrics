@@ -14,9 +14,13 @@ exports.TypeMgr = function (db, mongodb, converter, async, prefix, typecrud, col
 		{pname: "City", pcode: "_city"},
 		{pname: "Referer", pcode: "_ref"},
 		{pname: "Screen Resolution", pcode: "_scr"},
+		{pname: "Browser", pcode: "_browser" },
 		{pname: "Browser Version", pcode: "_browser"},
 		{pname: "OS Version", pcode: "_osver"},
-		{pname: "Location", pcode: "_location"}
+		{pname: "Location", pcode: "_location"},
+		{pname: "Country", pcode: "_country" },
+		{pname: "Device Type", pcode: "_devicetype" },
+		{pname: "Device", pcode: "_deviceid" }
 	];
 	this.create = function (req, res, callback) {
 		// TODO: check if typename existed
