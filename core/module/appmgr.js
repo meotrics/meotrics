@@ -415,9 +415,7 @@
 			var segment1 = {
 				name: "All visitor",
 				description: "All visitor in site",
-				condition: [ "_os", 
-                "con", 
-                ""]
+		condition: [{type: "user", "conditions": ["_os", "con", ""]}],
 			};
 			
 			
