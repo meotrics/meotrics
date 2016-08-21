@@ -155,6 +155,8 @@ export class ActionMgr {
 								}
 								if (typeid === 'pageview') {
 									datax[ids._campaign] = datax[ids._utm_campaign];
+									datax[ids._lastcampaign] = datax[ids._utm_campaign];
+									datax[ids._firstcampaign] = datax[ids._utm_campaign];
 								}
 
 								if (typeid === 'register' || typeid === 'login') {
@@ -177,7 +179,7 @@ export class ActionMgr {
 										arrayprop[p] = simpleprop[p];
 								
 								if (Object.keys(arrayprop).length !== 0)
-									me.updateArrayBasedUserInfo(collection, ids, mtid, user, arrayprop);
+										me.updateArrayBasedUserInfo(collection, mtid, ids, user, arrayprop);
 							});
 					});
 				});
@@ -194,9 +196,8 @@ export class ActionMgr {
 	private updateArrayBasedUserInfo(collection: mongodb.Collection, mtid: mongodb.ObjectID, ids, user, datax, callback?:()=>void) {
 		// append new element to the array or create one
 		var arr = [];
-	
-		this.mergeInfo(user, datax, ids);
-
+		user[ids._lastcampaign] = datax[ids._campaign];
+			this.mergeInfo(datax,user, ids);
 		delete datax[ids._mtid];
 		delete datax[ids._ctime];
 		delete datax[ids._segments];
@@ -204,8 +205,8 @@ export class ActionMgr {
 		delete datax[ids._typeid];
 		delete datax[ids._referer];
 		delete datax[ids._totalsec];
-		delete datax[ids._firstcampaign];
-		delete datax[ids._lastcampaign];
+//		delete datax[ids._firstcampaign];
+//		delete datax[ids._lastcampaign];
 		delete datax[ids._totalsec];
 		delete datax[ids._deltat];
 		delete datax[ids._ref];
@@ -214,7 +215,6 @@ export class ActionMgr {
 		delete datax[ids.lastactionid];
 		delete datax[ids.actionid];
 	
-
 		// remove unneed prop in user
 		for (var p in user) if (user.hasOwnProperty(p)) {
 			var found = false;
@@ -225,7 +225,7 @@ export class ActionMgr {
 				}
 			if (found == false) delete user[p];
 		}
-
+	
 		//sync data from datax to user
 		for (var p in datax) if (datax.hasOwnProperty(p)) {
 
@@ -239,10 +239,11 @@ export class ActionMgr {
 
 			if (arr instanceof Array === false) arr = [arr];
 
-			if (arr.indexOf(datax[p]) === -1) user[p] = arr.concat(datax[p]).sort();
-			else delete user[p];
-		}
+			 user[p] = arr.concat(datax[p]);
+			user[p] =[...new Set(user[p])];
 
+		}
+			delete user._id;
 		collection.update({ _id: mtid }, { $set: user }, function (err, r) {
 			if (err) throw err;
 			if (callback !== undefined) callback();
@@ -460,6 +461,7 @@ export class ActionMgr {
 				userx[ids._utm_campaign] = [...new Set( [].concat(userx[ids._utm_campaign]).concat(olduser[ids._utm_campaign])];
 
 						if (userx[ids._firstcampaign] == undefined) userx[ids._firstcampaign] = olduser[ids._firstcampaign];
+												
 						if (userx[ids._lastcampaign] == undefined) userx[ids._lastcampaign] = olduser[ids._lastcampaign];
 
 }
