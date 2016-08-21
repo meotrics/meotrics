@@ -458,7 +458,8 @@ export class ActionMgr {
 						}
 				userx[ids._campaign] = [... new Set(userx[ids._campaign])];
 
-				userx[ids._utm_campaign] = [...new Set( [].concat(userx[ids._utm_campaign]).concat(olduser[ids._utm_campaign])];
+				userx[ids._utm_campaign] = [].concat(userx[ids._utm_campaign]).concat(olduser[ids._utm_campaign]);
+				userx[ids._utm_campaign] =  [...new Set(userx[ids._utm_campaign])];
 
 						if (userx[ids._firstcampaign] == undefined) userx[ids._firstcampaign] = olduser[ids._firstcampaign];
 												
