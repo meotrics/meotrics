@@ -422,15 +422,15 @@ $props = isset($props) ? $props : [];
                     if(!Array.isArray(users)){
                         return false;
                     }
-                    var column2 = "";
+					var column2 = "";
                     if(field2){
-                        column2 = "<td>"+field2+"</td>";
+                        column2 = "<td>"+field2.substring(1)+"</td>";
                     }
                     var column = "<tr><td>#</td>" +
                                     "<td>id</td>" +
-                                    "<td>name</td>" +
-                                    "<td>email</td>" +
-                                    "<td>"+field1+"</td>" +
+                                    "<td>Name</td>" +
+                                    "<td>Email</td>" +
+                                    "<td>"+field1.substring(1)+"</td>" +
                                     column2+
                                     "</tr>";
                     for(var i = 0; i < users.length; i++){
