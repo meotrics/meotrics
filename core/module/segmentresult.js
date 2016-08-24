@@ -439,9 +439,9 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 		if (start >= maxNumberUsers) {
 			return callback([]);
 		}
-
+		start -=1;
 		let limit = numberUsersPerPage;
-		const skip = start;
+		const skip = start*limit;
 
 		if ((maxNumberUsers - start) < numberUsersPerPage) {
 			limit = maxNumberUsers - start;

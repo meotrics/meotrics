@@ -451,7 +451,7 @@ $props = isset($props) ? $props : [];
                     }
                     var table = "<table class ='table table-hover'>"+column+"</table>";
 					var b = "";
-					for(var i = 0; i < 10; i++){
+					for(var i = 1; i < 10; i++){
 						b += "<li onclick='onSelectPage("+i+")'><a href='#'>"+i+"</a></li>";
 					}
 					var select_page = "<nav>" +
