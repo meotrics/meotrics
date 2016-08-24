@@ -424,13 +424,13 @@ $props = isset($props) ? $props : [];
                     }
 					var column2 = "";
                     if(field2){
-                        column2 = "<td>"+field2.substring(1)+"</td>";
+                        column2 = "<td>"+field2.replace("_","")+"</td>";
                     }
-                    var column = "<tr><td>#</td>" +
-                                    "<td>id</td>" +
+                    var column = "<tr style='text-transform: capitalize'><td>#</td>" +
+                                    "<td>Id</td>" +
                                     "<td>Name</td>" +
                                     "<td>Email</td>" +
-                                    "<td>"+field1.substring(1)+"</td>" +
+                                    "<td>"+field1.replace("_","")+"</td>" +
                                     column2+
                                     "</tr>";
                     for(var i = 0; i < users.length; i++){
