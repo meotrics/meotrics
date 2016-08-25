@@ -451,7 +451,15 @@ $props = isset($props) ? $props : [];
                     }
                     var table = "<table class ='table table-hover'>"+column+"</table>";
 					var b = "";
-					for(var i = 1; i < 10; i++){
+					//vitle: take page
+					var count = 0;
+					@if(isset($segment_first->count))
+						count = {{$segment_first->count}};
+					@endif
+					var page = parseInt(count/15)+1;
+					// end take page
+
+                        for(var i = 1; i <= page; i++){
 						b += "<li onclick='onSelectPage("+i+")'><a href='#'>"+i+"</a></li>";
 					}
 					var select_page = "<nav>" +
