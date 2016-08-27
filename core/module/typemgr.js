@@ -8,19 +8,21 @@ exports.TypeMgr = function (db, mongodb, converter, async, prefix, typecrud, col
 		{pname: "Campaign Medium", pcode: "_utm_medium"},
 		{pname: "Campaign Term", pcode: "_utm_term"},
 		{pname: "Campaign Content", pcode: "_utm_content"},
-		{pname: "URL", pcode: "_url"},
-		{pname: "Operating System", pcode: "_os"},
-		{pname: "Language", pcode: "_lang"},
-		{pname: "City", pcode: "_city"},
+		{pname: "Channel", pcode: "_reftype"},
 		{pname: "Referer", pcode: "_ref"},
-		{pname: "Screen Resolution", pcode: "_scr"},
+		{pname: "Country", pcode: "_country" },
+		{pname: "City", pcode: "_city"},
+		{pname: "Location", pcode: "_location"},
+		{pname: "Operating System", pcode: "_os"},
+		{pname: "OS Version", pcode: "_osver"},
 		{pname: "Browser", pcode: "_browser" },
 		{pname: "Browser Version", pcode: "_browser"},
-		{pname: "OS Version", pcode: "_osver"},
-		{pname: "Location", pcode: "_location"},
-		{pname: "Country", pcode: "_country" },
+		{pname: "Device", pcode: "_deviceid" },
 		{pname: "Device Type", pcode: "_devicetype" },
-		{pname: "Device", pcode: "_deviceid" }
+		{pname: "Screen Resolution", pcode: "_scr"},
+		{pname: "Language", pcode: "_lang"}
+		// {pname: "URL", pcode: "_url"},
+
 	];
 	this.create = function (req, res, callback) {
 		// TODO: check if typename existed
