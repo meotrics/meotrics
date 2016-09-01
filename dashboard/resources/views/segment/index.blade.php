@@ -337,13 +337,13 @@ $props = isset($props) ? $props : [];
                                                                     display: false
                                                                 }
 							};
-//							data_chart.labels = data.labels;
+							data_chart.labels = data.labels;
 							data_chart.datasets = [];
 							var datasets_labels = data.datasets_labels ? data.datasets_labels : [];
 							$.each(data.datasets, function (di, dv) {
 
 								data_chart.datasets.push({
-									'label': datasets_labels[di] ? datasets_labels[di] : (label_field ? label_field : ''),
+//									'label': datasets_labels[di] ? datasets_labels[di] : (label_field ? label_field : ''),
 									'data': dv['data'],
 									'backgroundColor': chart_colors[di] ? chart_colors[di] : '',
 									'hoverBackgroundColor': chart_colors[di] ? chart_colors[di] : '',
