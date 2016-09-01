@@ -332,6 +332,9 @@ $props = isset($props) ? $props : [];
 										stacked: true,
 									}]
 								},
+								legend: {
+									display: false
+								},
 								stacked: true,
                                                                 gridLines: {
                                                                     display: false
@@ -343,7 +346,7 @@ $props = isset($props) ? $props : [];
 							$.each(data.datasets, function (di, dv) {
 
 								data_chart.datasets.push({
-//									'label': datasets_labels[di] ? datasets_labels[di] : (label_field ? label_field : ''),
+									'label': datasets_labels[di] ? datasets_labels[di] : (label_field ? label_field : ''),
 									'data': dv['data'],
 									'backgroundColor': chart_colors[di] ? chart_colors[di] : '',
 									'hoverBackgroundColor': chart_colors[di] ? chart_colors[di] : '',
