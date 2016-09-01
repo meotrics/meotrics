@@ -16,7 +16,7 @@ exports.TypeMgr = function (db, mongodb, converter, async, prefix, typecrud, col
 		{pname: "Operating System", pcode: "_os"},
 		{pname: "OS Version", pcode: "_osver"},
 		{pname: "Browser", pcode: "_browser" },
-		{pname: "Browser Version", pcode: "_browser"},
+		{pname: "Browser Version", pcode: "_browserver"},
 		{pname: "Device", pcode: "_deviceid" },
 		{pname: "Device Type", pcode: "_devicetype" },
 		{pname: "Screen Resolution", pcode: "_scr"},

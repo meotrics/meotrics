@@ -27,7 +27,6 @@ exports.ValueMgr = function (db, prefix) {
 		        if (ret[i].value == '' || ret[i].value == null || ret[i].value == undefined) continue;
 		        ret2.push(ret[i]);
 		    }
-
 			callback(ret2);
 		});
 	};

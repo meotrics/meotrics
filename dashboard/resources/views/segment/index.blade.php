@@ -155,9 +155,9 @@ $props = isset($props) ? $props : [];
 						</select>
 					</div>
 					<div class="col-md-1 col-add-filter fix-padding" id="div-filter-tool">
-						<i class="fa fa-plus fa-2 fix-padding" aria-hidden="true" onclick="addFilter(this)"></i>
-						<i class="fa fa-minus fa-2 fix-padding" aria-hidden="true" onclick="removeFilter(this)"
-						   style="display: none"></i>
+						{{--<i class="fa fa-plus fa-2 fix-padding" aria-hidden="true" onclick="addFilter(this)"></i>--}}
+						{{--<i class="fa fa-minus fa-2 fix-padding" aria-hidden="true" onclick="removeFilter(this)"--}}
+						   {{--style="display: none"></i>--}}
 					</div>
 				</div>
 				<div class="col-md-5 pull-right">
@@ -337,7 +337,7 @@ $props = isset($props) ? $props : [];
                                                                     display: false
                                                                 }
 							};
-							data_chart.labels = data.labels;
+//							data_chart.labels = data.labels;
 							data_chart.datasets = [];
 							var datasets_labels = data.datasets_labels ? data.datasets_labels : [];
 							$.each(data.datasets, function (di, dv) {

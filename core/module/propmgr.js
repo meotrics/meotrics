@@ -76,7 +76,39 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 				{name: "Start with", code: "sw"},
 				{name: "End with", code: "ew"},
 				{name: "Not contain", code: "ncon"}]
-		},/* {
+		},{
+			name: "Referrer", code: "_ref",
+			operators: [{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}]
+		},
+		{
+			name: "Location", code: "_location",
+			operators: [{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}]
+		},
+		{
+			name: "OS Version", code: "_osver",
+			operators: [{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}]
+		},{
+			name: "Browser Version", code: "_browserver",
+			operators: [{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}]
+		},
+
+		/* {
 			name: "Campaign", code: "_campaign",
 			operators: [{name: "Equal", code: "eq"},
 				{name: "Contain", code: "con"},
