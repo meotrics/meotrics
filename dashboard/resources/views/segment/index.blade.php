@@ -124,7 +124,7 @@ $props = isset($props) ? $props : [];
 			<div class=" content row">
 				<div class="row col-md-6">
 					<div class="col-md-3 fix-padding">
-						<h6>Filter By</h6>
+						<h6>Filter by</h6>
 					</div>
 					<div class="col-md-4 fix-padding" id="div-filter-one ">
 						<select name="Prop[one]" class="form-control">
@@ -312,7 +312,7 @@ $props = isset($props) ? $props : [];
 //                        }
 							$('div[data-name="canvas-chart"]').html('');
 							$('div[data-name="canvas-chart"]')
-											.append('<p>This chart demonstrates that the filter by ' + demonstrate + '</p>');
+											.append('<p style="font-size: 14px;margin-bottom: 30px;margin-top: 20px;">This chart demonstrates that the filter by ' + demonstrate + '</p>');
 							$('div[data-name="canvas-chart"]')
 											.append('<canvas id="segment_chart" width="400" height="100"></canvas>');
 							var ctx = $("#segment_chart").get(0).getContext("2d");
