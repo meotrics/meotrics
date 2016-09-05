@@ -148,10 +148,16 @@ var f_behavior = [
         ];
         <?php $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators(); ?>
 
-        $('#segment-date-range').dateRangePicker();
+        $('#segment-date-range').dateRangePicker({
+                    autoClose: true
+                });
         //load segment time range
-
-        $('#segment-date-range').data('dateRangePicker').setDateRange('2013-11-20', '2013-11-25');
+        var now = new Date();
+        var date_string = now.toLocaleDateString();
+        var arr_date = date_string.split("/");
+        var first_date = arr_date[2]+"-"+(arr_date[0]-1)+"-"+arr_date[1];
+        var end_date = arr_date[2]+"-"+arr_date[0]+"-"+arr_date[1];
+        $('#segment-date-range').data('dateRangePicker').setDateRange(first_date, end_date);
     </script>
 @endsection
 
