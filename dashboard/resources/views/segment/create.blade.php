@@ -134,8 +134,8 @@ var tmp_type_option = {
                 ];
                 ?>
 var f_behavior = [
-            {code: 'sum', name: 'Sum'},
-            {code: 'avg', name: 'Average'},
+//            {code: 'sum', name: 'Sum'},
+//            {code: 'avg', name: 'Average'},
             {code: 'count', name: 'Count'}
         ];
         var f_behavior_purchase = [{code: 'count', name: 'Count'}];
@@ -283,10 +283,6 @@ var f_behavior = [
                     if (v.select_type == 'user') {
                         containter.find('input[name="Segment[' + i_condition + '][select_type]"]').val('user');
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
-//						containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().removeClass('col-md-2');
-//						containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().addClass('col-md-4');
-                        //containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().removeClass('col-md-2');
-                        //containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().addClass('col-md-4');
                         containter.find('select[name="Segment[' + i_condition + '][f]"]').parent().hide();
                         containter.find('select[name="Segment[' + i_condition + '][field]"]').parent().hide();
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
@@ -307,9 +303,7 @@ var f_behavior = [
                         containter.find('input[name="Segment[' + i_condition + '][select_type]"]').val('behavior');
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().removeClass('col-md-4');
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().addClass('col-md-2');
-                        //containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().removeClass('col-md-4');
-                        //containter.find('select[name="Segment[' + i_condition + '][type]"]').parent().addClass('col-md-2');
-                        containter.find('select[name="Segment[' + i_condition + '][f]"]').parent().show();
+                        containter.find('select[name="Segment[' + i_condition + '][f]"]').parent().hide();
                         containter.find('select[name="Segment[' + i_condition + '][field]"]').parent().show();
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
                         $.each(operator_behavior, function (obi, obv) {
