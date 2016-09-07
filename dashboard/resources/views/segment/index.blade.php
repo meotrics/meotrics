@@ -413,7 +413,7 @@ $props = isset($props) ? $props : [];
                         url: url,
                         success: function (data) {
                             if(data.success && data.users){
-                                setTable(data.users,field1, field2,segment_id);
+                                setTable(data.users,field1, field2,segment_id,page);
                             }
                             window.listuser = data;
                             console.log(data);
@@ -421,7 +421,7 @@ $props = isset($props) ? $props : [];
                     });
 		}
                 
-        function setTable(users, field1, field2,segment_id){
+        function setTable(users, field1, field2,segment_id,page_selected){
                     if(!Array.isArray(users)){
                         return false;
                     }
@@ -457,13 +457,27 @@ $props = isset($props) ? $props : [];
 					//vitle: take page
 					var count = 0;
 					@if(isset($segment_first->count))
-						count = {{$segment_first->count}};
+						count = $("#count").text();
+						{{--console.log("fuck"+{{$segment_first->count}});--}}
+						{{--console.log($("#count").text());--}}
+						{{--console.log(document.getElementById("count").textContent);--}}
 					@endif
+					console.log("count: "+ count);
 					var page = parseInt(count/15)+1;
 					// end take page
-
-                        for(var i = 1; i <= page; i++){
-						b += "<li onclick='onSelectPage("+i+")'><a href='#'>"+i+"</a></li>";
+					var max_index = page;
+					var min_index = 1;
+					if(page_selected >=2){
+						min_index = page_selected-1;
+					}
+					if(page > page_selected + 8){
+						max_index = page_selected+8;
+					}
+                        for(var i = min_index; i <= max_index; i++){
+							var temp = "";
+							if(i==page_selected)
+								temp= "class='active'";
+						b += "<li onclick='onSelectPage("+i+")' "+ temp +"><a href='#'>"+i+"</a></li>";
 					}
 					var select_page = "<nav>" +
 							"<ul class='pagination'>" +

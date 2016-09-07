@@ -21,7 +21,11 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 		//		{name: "End with", code: "ew"},
 		//		{name: "Not contain", code: "ncon"}]
 		//},
-		{name: "Number of Purchase", code: '_numberPurchase', operators: [{name: "Equal", code: "eq"}]},
+		{
+			name: "Number of Purchase",
+			code: '_numberPurchase',
+			operators: [{name: "Equal", code: "eq"}]
+		},
 		 {
 			name: "Country", code: "_country",
 			operators: [{name: "Equal", code: "eq"},
@@ -116,14 +120,14 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 				{name: "End with", code: "ew"},
 				{name: "Not contain", code: "ncon"}]
 		},*/{
-			name: "Last-touch Campaign", code: "_firstcampaign",
+			name: "Last-touch Campaign", code: "_lastcampaign",
 			operators: [{name: "Equal", code: "eq"},
 				{name: "Contain", code: "con"},
 				{name: "Start with", code: "sw"},
 				{name: "End with", code: "ew"},
 				{name: "Not contain", code: "ncon"}]
 		},{
-			name: "First-touch Campaign", code: "_lastcampaign",
+			name: "First-touch Campaign", code: "_firstcampaign",
 			operators: [{name: "Equal", code: "eq"},
 				{name: "Contain", code: "con"},
 				{name: "Start with", code: "sw"},
@@ -135,7 +139,13 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 				{name: "Greater than", code: "gt"},
 				{name: "Equal", code: "eq"},
 				{name: "From .. to ..", code: "in"}]
-		}];
+		}
+		// , {
+		// 	name: "Did Purchase", code: "purchase",
+		// 	operators: [{name: "Count", code: "count"}]
+		// }
+
+	];
 		
 	this.list = function (req, res) {
 		
