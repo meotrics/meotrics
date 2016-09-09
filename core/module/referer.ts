@@ -373,7 +373,7 @@ export class RefererType {
 			return true;
 
 		url_parts = url.parse(referer, true);
-				for (var l of this.paidSearchs)
+				for (var l of this.socialnets)
 					if (url_parts.hostname != null && url_parts.hostname.endsWith(l))
 				return true;
 
