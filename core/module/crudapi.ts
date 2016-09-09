@@ -72,6 +72,7 @@ export class CrudApi {
 
 		app.getEx('/segment/:appid/:id/listUser/:page/:field1/:field2?', function (req, res) {
 			me.segMgr.listUser(req.params.appid, req.params.id, req.params.field1, req.params.field2, req.params.page, function (results) {
+				// console.log(results);
 				res.json(results);
 			});
 		});
@@ -82,6 +83,7 @@ export class CrudApi {
 		//update or
 		app.get('/segment/query1/:appid/:id/:field1/', function (req, res) {
 			me.segMgr.querySegment(req.params.appid, req.params.id, req.params.field1, undefined, function (results) {
+				console.log(results);
 				res.json(results);
 			});
 		});

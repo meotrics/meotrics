@@ -284,22 +284,28 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 	function oneFieldString(collection, segmentid, field1, callback) {
 		converter.toIDs(['_isUser', '_segments', field1], function (ids) {
 			//build match clause
-			var matchClause = getMatchClause(ids, segmentid);
+			// var matchClause = getMatchClause(ids, segmentid);
 
 			//build project clause
 			var projectClause = {$project: {_id: 0}};
 			projectClause.$project[ids[field1]] = 1;
-
-			var groupClause = {
-				$group: {
-					_id: '$' + ids[field1],
-					count: {
-						$sum: 1
+				var groupClause = {
+					$group: {
+						_id: '$' + ids[field1],
+						count: {
+							$sum: 1
+						}
 					}
-				}
-			};
-			var cursor = db.collection(collection).aggregate([matchClause, projectClause, groupClause]).toArray(function (err, docs) {
+				};
+			// console.log(matchClause);
+			// console.log(ids);
+			// console.log(segmentid);
+			// console.log(projectClause);
+			// console.log(groupClause);
+			// var cursor = db.collection(collection).aggregate([matchClause, projectClause, groupClause]).toArray(function (err, docs) {
+			var cursor = db.collection(collection).aggregate([ projectClause, groupClause]).toArray(function (err, docs) {
 				if (err) throw err;
+				// console.log(docs);
 				for (var i in docs) if (docs.hasOwnProperty(i)) {
 					docs[i].key = docs[i]._id;
 					delete docs[i]._id;
@@ -347,10 +353,12 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 				db.collection(collection).aggregate([matchClause, projectClause, groupClause]).toArray(function (err, r) {
 					if (err) throw err;
 					var temp = r[0];
+
 					for (var i = 0; i < length; i++) {
 						var fieldName = prefix + i;
 						results[i].count = temp[fieldName];
 					}
+					results[6].key = "";
 					callback(results);
 				});
 
@@ -364,12 +372,13 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 		var results = [];
 		//if field is age then split into [18, 24, 24, 44, 54, 54+]
 		if (field == 'age') {
-			results[0] = {count: 0, key: {to: 18}};
+			results[0] = {count: 0, key: {from: 0, to: 18}};
 			results[1] = {count: 0, key: {from: 18, to: 24}};
 			results[2] = {count: 0, key: {from: 24, to: 34}};
 			results[3] = {count: 0, key: {from: 34, to: 44}};
 			results[4] = {count: 0, key: {from: 44, to: 54}};
 			results[5] = {count: 0, key: {from: 54}};
+			results[6] = {count: 0, key: {to: 0}};
 		} else {
 			//else split in to 5 equal space using min, max
 			var spaces = 1;

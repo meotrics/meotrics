@@ -307,6 +307,11 @@ $props = isset($props) ? $props : [];
 					success: function (data) {
 						if (data.success && data.labels && data.datasets) {
 							console.log(data);
+							$.each(data.labels,function(index,value){
+								if(value == "" || value == null){
+									data.labels[index] = "N/A";
+								}
+							});
 //                        if($('#segment_chart').length){
 //                            $('#segment_chart').remove();
 //                        }
@@ -344,7 +349,6 @@ $props = isset($props) ? $props : [];
 							data_chart.datasets = [];
 							var datasets_labels = data.datasets_labels ? data.datasets_labels : [];
 							$.each(data.datasets, function (di, dv) {
-
 								data_chart.datasets.push({
 									'label': datasets_labels[di] ? datasets_labels[di] : (label_field ? label_field : ''),
 									'data': dv['data'],
@@ -442,12 +446,16 @@ $props = isset($props) ? $props : [];
                         if(field2){
                                 columnfield = "<td>"+item[field2]+"</td>";
                         }
+						var value_field1 = item[field1];
+						if(value_field1[0] == null){
+							value_field1 = "N/A";
+						}
                         var cl = "<tr>" +
                                         "<td>"+(i+1)+"</td>" +
                                         "<td>"+item._mtid+"</td>"+
                                         "<td>"+item.name+"</td>"+
                                         "<td>"+item.email+"</td>"+
-                                        "<td>"+item[field1]+"</td>"+
+                                        "<td>"+value_field1+"</td>"+
                                         columnfield+
                                         "</tr>";
                         column += cl;

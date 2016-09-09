@@ -40,10 +40,12 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 				{name: "Start with", code: "sw"},
 				{name: "End with", code: "ew"},
 				{name: "Not contain", code: "ncon"}]
-		}, {
-			name: "Time zone", code: "_timezone",
-			operators: [{name: "Equal", code: "eq"}]
-		}, {
+		},
+		// {
+		// 	name: "Time zone", code: "_timezone",
+		// 	operators: [{name: "Equal", code: "eq"}]
+		// },
+		{
 			name: "Device Type", code: "_devicetype",
 			operators: [{name: "Equal", code: "eq"}]
 		}, {
@@ -88,14 +90,14 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 				{name: "End with", code: "ew"},
 				{name: "Not contain", code: "ncon"}]
 		},
-		{
-			name: "Location", code: "_location",
-			operators: [{name: "Equal", code: "eq"},
-				{name: "Contain", code: "con"},
-				{name: "Start with", code: "sw"},
-				{name: "End with", code: "ew"},
-				{name: "Not contain", code: "ncon"}]
-		},
+		// {
+		// 	name: "Location", code: "_location",
+		// 	operators: [{name: "Equal", code: "eq"},
+		// 		{name: "Contain", code: "con"},
+		// 		{name: "Start with", code: "sw"},
+		// 		{name: "End with", code: "ew"},
+		// 		{name: "Not contain", code: "ncon"}]
+		// },
 		{
 			name: "OS Version", code: "_osver",
 			operators: [{name: "Equal", code: "eq"},
