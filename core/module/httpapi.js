@@ -12,7 +12,6 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	var actionmgr = new ActionMgr.ActionMgr(db, converter, prefix, "mapping", valuemgr, ref);
 	var me = this;
 	this.onchange = function () { };
-
 	function loadCode(appid, actionid, callback) {
 		// cache mtcode in code for minimize disk usage, lazy load
 		if (code === undefined) {
@@ -46,7 +45,6 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 			devicetype = 'phone';
 		else
 			devicetype = 'desktop';
-
 		if (uri === "" || uri.startsWith(request.headers.referer) === false) uri = request.headers.referer || '';
 		var res = {
 			_url: uri,
@@ -64,7 +62,9 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 			_lang: request.headers["accept-language"],
 			_devicetype: devicetype
 		};
-		for (var i in request.params) if (request.params.hasOwnProperty(i))
+
+		for (var i in request.params)
+			// if (request.params.hasOwnProperty(i))
 			if (i.startsWith('_') === false)
 				res[i] = isNaN(request.params[i]) ? request.params[i] : parseFloat(request.params[i]);
 
@@ -183,7 +183,6 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		var lastactionid = req.lastactionid;
 		var data = trackBasic(req);
 		getMtid(req, appid, res, function (mtid) {
-			console.log(mtid);
 			data._mtid = mtid;
 			actionmgr.fixRaw(appid, actionid, lastactionid, data, function () {
 				res.end();
@@ -244,7 +243,6 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
 			function handle(req, res, path) {
 				var parts = path.split('/');
-					console.log(path);
 				res.statusCode = 200;
 				req['appid'] = parts[1];
 				var action = parts[2];
