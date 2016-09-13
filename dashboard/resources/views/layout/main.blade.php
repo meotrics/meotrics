@@ -17,13 +17,13 @@
 	<link href="{{asset('css/pe-icon-7-stroke.css')}}" rel="stylesheet"/>
 	<link href="{{asset('css/gf-roboto.css')}}" rel='stylesheet' type='text/css'>
 	<!-- Fonts and icons -->
-	<link href="{{asset('css/font-awesome.min.css')}}" rel="stylesheet">
-	<link href="{{ asset('/css/style.css') }}" rel="stylesheet">
-	<link href="{{asset('css/fg.menu.css')}}" rel="stylesheet"/>
-	<link href="{{asset('css/daterangepicker.css')}}" rel="stylesheet"/>
-	<link href="{{asset('css/sweetalert.css')}}"/>
-	<link rel="stylesheet" href="{{asset('css/odometer-theme-minimal.css')}}"/>
-	<link rel="stylesheet" href="{{asset('css/select2.min.css')}}"/>
+	<link href="{{URL::asset('css/font-awesome.min.css')}}" rel="stylesheet">
+	<link href="{{ URL::asset('/css/style.css') }}" rel="stylesheet">
+	<link href="{{URL::asset('css/fg.menu.css')}}" rel="stylesheet"/>
+	<link href="{{URL::asset('css/daterangepicker.css')}}" rel="stylesheet"/>
+	<link href="{{URL::asset('css/sweetalert.css')}}"/>
+	<link rel="stylesheet" href="{{URL::asset('css/odometer-theme-minimal.css')}}"/>
+	<link rel="stylesheet" href="{{URL::asset('css/select2.min.css')}}"/>
 	@yield('style')
 	<link href="{{asset('css/app.css')}}" rel="stylesheet"/>
 	@yield('header-script')

@@ -433,11 +433,14 @@ $props = isset($props) ? $props : [];
                     if(field2){
                         column2 = "<td>"+field2.replace("_","")+"</td>";
                     }
+					var label_field1  = field1.replace("_","");
+					if(label_field1 == "reftype")
+						label_field1 = "channel"
                     var column = "<tr style='text-transform: capitalize'><td>#</td>" +
                                     "<td>Id</td>" +
                                     "<td>Name</td>" +
                                     "<td>Email</td>" +
-                                    "<td>"+field1.replace("_","")+"</td>" +
+                                    "<td>"+label_field1+"</td>" +
                                     column2+
                                     "</tr>";
                     for(var i = 0; i < users.length; i++){
