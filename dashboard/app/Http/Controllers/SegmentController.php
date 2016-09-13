@@ -600,6 +600,19 @@ class SegmentController extends Controller
                             $tmp_chart->key = null;
                     }
                 }
+                if($f == "_reftype"){
+                    foreach ($charts as $tmp_chart) {
+                        $label = $tmp_chart->key;
+                        if(is_object($label)){
+                            $arr_label = (array) $tmp_chart->key;
+                            $label = implode("",$arr_label);
+                        }
+                        if($label == null ){
+                            $tmp_chart->key = 0;
+                        }
+
+                    }
+                }
             }
             foreach ($charts as $tmp_chart) { // 1 object
 //                    $tmp_chart_keys = isset($tmp_chart->key) && is_array($tmp_chart->key) ? $tmp_chart->key : []; // arr key in object
@@ -615,14 +628,19 @@ class SegmentController extends Controller
                         $tmp_data[$tmp_label] += (int)$tmp_chart->count;
                     }
                 } else {
-                    if ($tmp_chart->key == null) {
-                        $tmp_chart->key = "N/A";
+                    $label = $tmp_chart->key;
+                    if(is_object($label)){
+                        $arr_label = (array) $tmp_chart->key;
+                        $label = implode("",$arr_label);
                     }
-                    if (!in_array($tmp_chart->key, $labels)) {
-                        $labels[] = $tmp_chart->key;
-                        $tmp_data[$tmp_chart->key] = 0;
+                    if ($label === null) {
+                        $label = "N/A";
                     }
-                    $tmp_data[$tmp_chart->key] += (int)$tmp_chart->count;
+                    if (!in_array($label, $labels)) {
+                        $labels[] = $label;
+                        $tmp_data[$label] = 0;
+                    }
+                    $tmp_data[$label] += (int)$tmp_chart->count;
                 }
             }
 
@@ -658,10 +676,10 @@ class SegmentController extends Controller
             if ($f === '_reftype') {
                 $label_reftype = [];
                 foreach ($labels as $label) {
-                    if($label != "N/A"){
+                    if($label !== "N/A"){
                         $label_reftype[] = $this->reftypemap[$label];
                     }else{
-                        $label_reftype[] = "N/A";
+                        $label_reftype[] =  "N/A";
                     }
                 }
                 $labels = $label_reftype;
