@@ -284,7 +284,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 	function oneFieldString(collection, segmentid, field1, callback) {
 		converter.toIDs(['_isUser', '_segments', field1], function (ids) {
 			//build match clause
-			// var matchClause = getMatchClause(ids, segmentid);
+			var matchClause = getMatchClause(ids, segmentid);
 
 			//build project clause
 			var projectClause = {$project: {_id: 0}};
@@ -297,13 +297,9 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 						}
 					}
 				};
-			// console.log(matchClause);
-			// console.log(ids);
-			// console.log(segmentid);
-			// console.log(projectClause);
-			// console.log(groupClause);
-			// var cursor = db.collection(collection).aggregate([matchClause, projectClause, groupClause]).toArray(function (err, docs) {
-			var cursor = db.collection(collection).aggregate([ projectClause, groupClause]).toArray(function (err, docs) {
+			console.log(matchClause, projectClause, groupClause);
+			var cursor = db.collection(collection).aggregate([matchClause, projectClause, groupClause]).toArray(function (err, docs) {
+			// var cursor = db.collection(collection).aggregate([ projectClause, groupClause]).toArray(function (err, docs) {
 				if (err) throw err;
 				// console.log(docs);
 				for (var i in docs) if (docs.hasOwnProperty(i)) {
@@ -489,8 +485,6 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 							if (isDemoGraphic(field)) {
 								// check if temp is array or not
 								if (Array.isArray(temp)) {
-									console.log(field);
-									console.log(temp);
 									usersReturn[i][ids[field]] = temp.pop() || '';
 									continue;
 								}

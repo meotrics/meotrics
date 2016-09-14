@@ -1,8 +1,20 @@
 <html>
 <head>
-<script>
-	parent.postMessage(JSON.stringify({appid: '$APPID$',actionid : '$ACTIONID$', lastactionid: sessionStorage.getItem('lastactionid')}), "*");
-	sessionStorage.setItem('lastactionid', '$ACTIONID$');
-</script>
+	<script>
+		var lastactionid = sessionStorage.getItem('lastactionid');
+		if(lastactionid == null || lastactionid == 'null' || lastactionid == '$ACTIONID$')
+			lastactionid = '{}';
+		var params = location.search.substr(3).split('-');
+		var appid = params[0];
+		var actionid = params[1];
+		lastactionid = JSON.parse(lastactionid);
+		lastid = lastactionid[appid];
+		lastactionid[appid] = actionid;
+		sessionStorage.setItem('lastactionid', JSON.stringify(lastactionid));
+		if(lastid == undefined)
+			parent.postMessage(JSON.stringify({actionid : actionid}), "*");
+		else
+			parent.postMessage(JSON.stringify({actionid : actionid, lastactionid: lastid}), "*");
+	</script>
 </head>
 </html>
