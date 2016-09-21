@@ -146,30 +146,6 @@
 				codename: "purchase",
 				name: "Purchase",
 				desc: "A purchase action",
-				// deftrendfields: [
-				// 	{pname: "Category", pcode: "cid"},
-				// 	{pname: "Product", pcode: "pid"},
-				// 	{pname: "Payment type", pcode: "paymentype"},
-				// 	{pname: "Time", pcode: "_ctime"},
-					// {pname: "Campaign", pcode: "_utm_campaign"},
-					// {pname: "Campaign Source", pcode: "_utm_source"},
-					// {pname: "Campaign Medium", pcode: "_utm_medium"},
-					// {pname: "Campaign Term", pcode: "_utm_term"},
-					// {pname: "Campaign Content", pcode: "_utm_content"},
-					// {pname: "Channel", pcode: "_reftype"},
-					// {pname: "Referer", pcode: "_ref"},
-					// {pname: "Country", pcode: "_country" },
-					// {pname: "City", pcode: "_city"},
-					// {pname: "Location", pcode: "_location"},
-					// {pname: "Operating System", pcode: "_os"},
-					// {pname: "OS Version", pcode: "_osver"},
-					// {pname: "Browser", pcode: "_browser" },
-					// {pname: "Browser Version", pcode: "_browser"},
-					// {pname: "Device", pcode: "_deviceid" },
-					// {pname: "Device Type", pcode: "_devicetype" },
-					// {pname: "Screen Resolution", pcode: "_scr"},
-					// {pname: "Language", pcode: "_lang"}
-				// ],
 				deftrendobjects: [
 					{desc: "Number of time purchased", operation: "count", param: "_id"},
 					{desc: "Number of people purchased", operation: "count", param: "_mtid"},
@@ -183,7 +159,8 @@
 					{pname: "Price", pcode: "price"},
 					{pname: "Amount", pcode: "amount"},
 					{pname: "Quantity", pcode: "quantity"},
-					{pname: "Payment Type", pcode: "paymentype"}]
+					{pname: "Payment Type", pcode: "paymentype"}
+				]
 			};
 
 			var pageview =
@@ -194,25 +171,6 @@
 				fields: [
 					{pname: "URL", pcode: "_url"}
 				],
-				// deftrendfields: [
-					// {pname: "Campaign", pcode: "_utm_campaign"},
-					// {pname: "Campaign Source", pcode: "_utm_source"},
-					// {pname: "Campaign Medium", pcode: "_utm_medium"},
-					// {pname: "Campaign Term", pcode: "_utm_term"},
-					// {pname: "Campaign Content", pcode: "_utm_content"},
-					// {pname: "Operating System", pcode: "_os"},
-					// {pname: "City", pcode: "_city"},
-					// {pname: "Referer", pcode: "_ref"},
-					// {pname: "Screen Resolution", pcode: "_scrres"},
-					// {pname: "Browser", pcode: "_browser" },
-					// {pname: "Browser Version", pcode: "_browserver" },
-					// {pname: "OS Version", pcode: "_osver"},
-					// {pname: "Location", pcode: "_location" },
-					// {pname: "Country", pcode: "_country" },
-					// {pname: "Language", pcode: "_lang" },
-					// {pname: "Device Type", pcode: "_devicetype"},
-					// {pname: "Device", pcode: "_deviceid"}
-				// ],
 				deftrendobjects: [
 					{desc: "Number of pageview", operation: "count", param: "_id"},
 					{desc: "Number of unique visitor", operation: "count", param: "_mtid"},

@@ -34,7 +34,6 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 
 		if (callback === undefined) callback = function () {
 		};
-
 		var outcollection = prefix + "segment" + segment._id.toString();
 		var col = db.collection(prefix + "app" + segment._appid);
 
@@ -118,9 +117,17 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 	// purpose: convert query in json to mongodb based query
 	function getQuery(json, callback) {
 		handleInput(json, function (query) {
+			console.log("json");
+			console.log(json);
+			console.log("query");
+			console.log(query);
 			queryFilter(query, function (r) {
+				console.log("r");
+				console.log(r);
 				buildMapReduce(json, function (ret) {
 					ret.option = r;
+					console.log("ret");
+					console.log(ret);
 					callback(ret);
 				});
 			});
@@ -243,7 +250,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 				};
 				break;
 			case 'eq':
-				query[conditions[i]] = conditions[i + 2];
+				query[conditions[i]] = new RegExp(conditions[i + 2],'i');
 				break;
 			case 'ne':
 				query[conditions[i]] = {
