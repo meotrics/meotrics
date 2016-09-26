@@ -715,6 +715,27 @@ class SegmentController extends Controller
                 }
             }
         }
+        if($request->input('field1') === "_osver"){
+            foreach ($result['users'] as $user) {
+                foreach($user->_osver as $key=>$item){
+                    if($item == 'null.null'){
+                        $user->_osver[$key] = "N/A";
+                    }
+                }
+            }
+        }
+        if($request->input('field1') === "_lang"){
+            foreach ($result['users'] as $user) {
+                foreach($user->_lang as $key=>$item){
+                    if($item == null){
+                        $user->_lang[$key] = 'N/A';
+                    }else{
+                        $arr_item = explode(",",$item);
+                        $user->_lang[$key] = $arr_item[0];
+                    }
+                }
+            }
+        }
         return $result;
     }
 }

@@ -21,7 +21,9 @@ $props = isset($props) ? $props : [];
 						segments['{{ $segment->_id }}'] = {
 			name: '{{ property_exists($segment, 'name') ? $segment->name : '' }}',
 			description: '{{property_exists($segment, 'description') ? $segment->description : '' }}',
-			count: '{{ property_exists($segment, 'count') ? $segment->count : '' }}'
+			count: '{{ property_exists($segment, 'count') ? $segment->count : '' }}',
+			startTime: '{{ property_exists($segment, 'startTime') ? $segment->startTime : '' }}',
+			endTime: '{{ property_exists($segment, 'endTime') ? $segment->endTime : '' }}',
 		};
 		<?php
 		endforeach;
@@ -90,8 +92,9 @@ $props = isset($props) ? $props : [];
 									Time range:
 								</div>
 								<div class="col-md-5">
-									<span id="startTime">{{$segment_first->startTime}}</span>
+									<span id="startTime">{{$segment_first->startTime}}
 									to {{$segment_first->endTime}}
+									</span>
 								</div>
 							@endif
 							<div class="col-md-4">
@@ -212,8 +215,10 @@ $props = isset($props) ? $props : [];
 		
 			$('#desc').html(segments[that.val()].description);
 			$('#count').html(segments[that.val()].count);
-
+			$('#startTime').html(segments[that.val()].startTime + ' to ' + segments[that.val()].endTime)
+			console.log(segments);
 			$('div[data-name="canvas-chart"]').html('');
+			$("#user_table").empty();
 			return false;
 		});
 

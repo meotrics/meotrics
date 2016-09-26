@@ -25,15 +25,30 @@ $f_behaviors = [
 				(object)['code' => 'avg', 'name' => 'Avg'],
 				(object)['code' => 'count', 'name' => 'Count']
 ];
-$operators_default = [
-				(object)['code' => '>', 'name' => '>'],
-				(object)['code' => '>=', 'name' => '>='],
-				(object)['code' => '=', 'name' => '='],
-				(object)['code' => '<', 'name' => '<'],
-				(object)['code' => '<=', 'name' => '<='],
-];
-?>
 
+$operators_default = [
+(object)['code' => '>', 'name' => '>'],
+(object)['code' => '>=', 'name' => '>='],
+(object)['code' => '=', 'name' => '='],
+(object)['code' => '<', 'name' => '<'],
+(object)['code' => '<=', 'name' => '<='],
+];
+;
+?>
+{{--$operators_default = [--}}
+{{--(object)['code' => 'eq', 'name' => 'Equal1'],--}}
+{{--(object)['code' => 'con', 'name' => 'Contain'],--}}
+{{--(object)['code' => 'sw', 'name' => 'Start with'],--}}
+{{--(object)['code' => 'ew', 'name' => 'End with'],--}}
+{{--(object)['code' => 'ncon', 'name' => 'Not contain'],--}}
+{{--]--}}
+{{--$operators_default = [--}}
+{{--(object)['code' => '>', 'name' => '>'],--}}
+{{--(object)['code' => '>=', 'name' => '>='],--}}
+{{--(object)['code' => '=', 'name' => '='],--}}
+{{--(object)['code' => '<', 'name' => '<'],--}}
+{{--(object)['code' => '<=', 'name' => '<='],--}}
+{{--];--}}
 
 
 <div class="condition-item row" data-name="condition-item" data-i-condition="{{$i_condition}}">
@@ -72,7 +87,7 @@ $operators_default = [
                 </select>
             </div>
             <div class="col-md-2" <?= $condition->select_type == 'user' ? 'style="display: none"' : '' ?>>
-                <select class="form-control" id="" name="Segment[<?= $i_condition ?>][field]" value="<?= $condition->field ?>"
+                <select class="form-control" id=""  name="Segment[<?= $i_condition ?>][field]" value="<?= $condition->field ?>"
                         onchange="changeField(this)">
                             <?php
                             foreach ($condition->fields as $c_field):

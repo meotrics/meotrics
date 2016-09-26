@@ -10,7 +10,8 @@
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 remote: {
-                    url: '//api.meotrics.com/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
+//                    url: '//api.meotrics.com/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
+                    url: '//api.meotrics.dev/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
                     wildcard: '%QUERY'
                 }
             });
@@ -35,7 +36,7 @@
                                 createSuggession(appid, 'user', "{{$condition->type}}", $('input[name="Segment[{{$i}}][value]"]'));
                         @endif
                 @else
-                @if($condition->operator == '=')
+                @if($condition->operator == '=' || $condition->operator == 'eq')
                         createSuggession(appid, "{{$condition->type}}", "{{$condition->field}}", $('input[name="Segment[{{$i}}][value]"]'));
                 @endif
                 <?php $i_cc = 0; ?>
@@ -97,7 +98,7 @@ var tmp_type_option = {
                 $type_options[] = (object)[
                                 'value' => $action->codename,
                                 'name' => 'Did ' . $action->name,
-                                'select_type' => 'behavior',
+                                'select_type' => $action->codename,
                 ];
                 ?>
 
@@ -118,7 +119,7 @@ var tmp_type_option = {
             value: '{{$action->codename ? $action->codename : ''}}',
             name: 'Did {{$action->name ? $action->name : ''}}',
             fields: fields,
-            select_type: 'behavior'
+            select_type: '{{$action->codename ? $action->codename : ''}}'
         };
         type_options.push(tmp_type_option);
                 <?php
@@ -134,8 +135,8 @@ var tmp_type_option = {
                 ];
                 ?>
 var f_behavior = [
-//            {code: 'sum', name: 'Sum'},
-//            {code: 'avg', name: 'Average'},
+            {code: 'sum', name: 'Sum'},
+            {code: 'avg', name: 'Average'},
             {code: 'count', name: 'Count'}
         ];
         var f_behavior_purchase = [{code: 'count', name: 'Count'}];
@@ -146,6 +147,13 @@ var f_behavior = [
             {code: '<', name: 'less than'},
             {code: '<=', name: 'greater or equal'}
         ];
+//        var operator_behavior = [
+//            {code: 'con', name: 'Contain'},
+//            {code: 'eq', name: 'Equal'},
+//            {code: 'sw', name: 'Start with'},
+//            {code: 'ew', name: 'End with'},
+//            {code: 'ncon', name: 'Not contain'},
+//        ];
         <?php $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators(); ?>
 
         $('#segment-date-range').dateRangePicker({
@@ -277,7 +285,6 @@ var f_behavior = [
             var containter = that.parent().parent();
             var condition_item = that.closest('div[data-name="condition-item"]');
             var i_condition = condition_item.attr('data-i-condition');
-            destroySuggession(containter.find('input[name="Segment[' + i_condition + '][value]"]'));
             $.each(type_options, function (i, v) {
                 if (v.value == that.val()) {
                     if (v.select_type == 'user') {
@@ -285,7 +292,7 @@ var f_behavior = [
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
                         containter.find('select[name="Segment[' + i_condition + '][f]"]').parent().hide();
                         containter.find('select[name="Segment[' + i_condition + '][field]"]').parent().hide();
-                        containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
+//                        containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
                         if (v.operators.length) {
                             $.each(v.operators, function (oi, ov) {
                                 containter.find('select[name="Segment[' + i_condition + '][operator]"]').append('<option value="' + ov.code + '">' + ov.name + '</option>');
@@ -304,12 +311,12 @@ var f_behavior = [
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().removeClass('col-md-4');
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().addClass('col-md-2');
                         containter.find('select[name="Segment[' + i_condition + '][f]"]').parent().hide();
-                        containter.find('select[name="Segment[' + i_condition + '][field]"]').parent().show();
+                        containter.find('select[name="Segment[' + i_condition + '][field]"]').parent().hide();
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
                         $.each(operator_behavior, function (obi, obv) {
                             containter.find('select[name="Segment[' + i_condition + '][operator]"]').append('<option value="' + obv.code + '">' + obv.name + '</option>');
                         });
-                        if (containter.find('select[name="Segment[' + i_condition + '][operator]"]').val() == '=') {
+                        if (containter.find('select[name="Segment[' + i_condition + '][operator]"]').val() == '='|| containter.find('select[name="Segment[' + i_condition + '][operator]"]').val() == 'eq') {
                             createSuggession(appid, containter.find('select[name="Segment[' + i_condition + '][type]"]').val(), containter.find('select[name="Segment[' + i_condition + '][field]"]').val(), containter.find('input[name="Segment[' + i_condition + '][value]"]'));
                         }
                         else {
@@ -353,8 +360,17 @@ var f_behavior = [
         function changeSubField(e) {
             var that = $(e);
             var containter = that.parent().parent();
-            var condition_item = that.closest('div[data-name="condition-item"]');
+            var condition_item = that.closest('div[data-name="condition-sub-item"]');
+            var i_condition = containter.attr("data-i-condition-sub");
+            containter.find('input[name="Segment[' + i_condition + '][conditions][' + i_condition + '][cs_value]"]').val('');
             getOperator(condition_item, 'condition-sub-operator', that.val());
+            if (containter.find('select[name="Segment[' + i_condition + '][conditions][' + i_condition + '][cs_field]"]').val() == '='|| containter.find('select[name="Segment[' + i_condition + '][conditions][' + i_condition + '][cs_field]"]').val() == 'eq') {
+                createSuggession(appid, containter.find('select[name="Segment[' + i_condition + '][type]"]').val(), containter.find('select[name="Segment[' + i_condition + '][conditions][' + i_condition + '][cs_field]"]').val(), containter.find('input[name="Segment[' + i_condition + '][conditions][' + i_condition + '][cs_value]"]'));
+            }
+            else {
+                destroySuggession(containter.find('input[name="Segment[' + i_condition + '][conditions][' + i_condition + '][cs_value]"]'));
+            }
+
         }
 
         function getOperator(item, operator_name, field_val) {
@@ -368,10 +384,11 @@ var f_behavior = [
                 {code: '<=', name: 'greater or equal'}
             ];
             var operator_default = [
-                {code: 'equal', name: 'Equal'},
                 {code: 'contain', name: 'Contain'},
+                {code: 'eq', name: 'Equal'},
                 {code: 'start_with', name: 'Start with'},
                 {code: 'end_with', name: 'End with'},
+                {code: 'ncon', name: 'Not contain'},
             ];
             var operator = operator_default;
             if (field_val == 'pid' || field_val == 'cid' || field_val == 'price' ||
@@ -451,6 +468,7 @@ var f_behavior = [
             var condition_sub_group = that.closest('div[data-name="condition-item"]').find('div[data-name="condition-sub-group"]');
 
             var condition_sub_item = that.closest('div[data-name="condition-sub-item"]');
+
             if (condition_sub_item.length) {
                 condition_sub_item.after(html);
                 /*
@@ -466,10 +484,12 @@ var f_behavior = [
                         return false;
                     }
                 });
-                html = condition_sub_item.next().html().replace(/i_condition_sub_replace/g, condition_sub_group.attr('data-i-condition-sub-max'));
+                html = condition_sub_item.next().html().replace(/i_condition_sub_replace/g, condition_item.find('div[data-name="condition-sub-item"]').length - 1);
                 html = html.replace(/i_condition_replace/g, condition_item.attr('data-i-condition'));
                 condition_sub_group.attr('data-i-condition-sub-max', parseInt(condition_sub_group.attr('data-i-condition-sub-max')) + 1);
                 condition_sub_item.next().html(html);
+                condition_sub_item.next().attr("data-i-condition-sub", condition_item.find('div[data-name="condition-sub-item"]').length - 1);
+
             }
             else {
                 condition_item.find('div[data-name="condition-sub-group"]').append(html);
@@ -490,10 +510,11 @@ var f_behavior = [
                         return false;
                     }
                 });
-                html = condition_item.find('div[data-name="condition-sub-item"]').last().html().replace(/i_condition_sub_replace/g, condition_item
-                                .find('div[data-name="condition-sub-item"]').length - 1);
+                html = condition_item.find('div[data-name="condition-sub-item"]').last().html().replace(/i_condition_sub_replace/g, condition_item.find('div[data-name="condition-sub-item"]').length - 1);
                 html = html.replace(/i_condition_replace/g, condition_item.attr('data-i-condition'));
                 condition_item.find('div[data-name="condition-sub-item"]').last().html(html);
+                condition_item.find('div[data-name="condition-sub-item"]').last().attr("data-i-condition-sub",condition_item.find('div[data-name="condition-sub-item"]').length - 1);
+
             }
             return false;
         }
@@ -508,18 +529,24 @@ var f_behavior = [
 
         function operatorChange(e) {
             var that = $(e);
-            var container = that.closest('div[data-name="condition-item"]');
+                var container = that.closest('div[data-name="condition-item"]');
             if (container.length) {
                 var i_condition = container.attr('data-i-condition');
-                if (container.find('input[name="Segment[' + i_condition + '][select_type]"]').val() == 'user'
-                        && container.find('select[name="Segment[' + i_condition + '][operator]"]').val() == 'eq') {
-                    createSuggession(appid, 'user', container.find('select[name="Segment[' + i_condition + '][type]"]').val(), container.find('input[name="Segment[' + i_condition + '][value]"]'));
-                }
-                else if (container.find('input[name="Segment[' + i_condition + '][select_type]"]').val() != 'user'
-                        && container.find('select[name="Segment[' + i_condition + '][operator]"]').val() == '=') {
+//                if (container.find('input[name="Segment[' + i_condition + '][select_type]"]').val() == 'user'
+//                        && container.find('select[name="Segment[' + i_condition + '][operator]"]').val() == 'eq') {
+//                    createSuggession(appid, 'user', container.find('select[name="Segment[' + i_condition + '][type]"]').val(), container.find('input[name="Segment[' + i_condition + '][value]"]'));
+//                }
+//                else if (container.find('input[name="Segment[' + i_condition + '][select_type]"]').val() != 'user'
+//                        && (container.find('select[name="Segment[' + i_condition + '][operator]"]').val() == '='|| container.find('select[name="Segment[' + i_condition + '][operator]"]').val() == 'eq')) {
+//                    createSuggession(appid, container.find('select[name="Segment[' + i_condition + '][type]"]').val(), container.find('select[name="Segment[' + i_condition + '][field]"]').val(), $('input[name="Segment[' + i_condition + '][value]"]'));
+//                }
+                console.log(container.find('select[name="Segment[' + i_condition + '][operator]"]').val());
+                if (container.find('select[name="Segment[' + i_condition + '][operator]"]').val() == '='|| container.find('select[name="Segment[' + i_condition + '][operator]"]').val() == 'eq') {
+                   console.log("create");
                     createSuggession(appid, container.find('select[name="Segment[' + i_condition + '][type]"]').val(), container.find('select[name="Segment[' + i_condition + '][field]"]').val(), $('input[name="Segment[' + i_condition + '][value]"]'));
                 }
                 else {
+                    console.log("destroy");
                     destroySuggession(container.find('input[name="Segment[' + i_condition + '][value]"]'));
                 }
             }
@@ -529,10 +556,18 @@ var f_behavior = [
             var that = $(e);
             var condition_item = that.closest('div[data-name="condition-item"]');
             var container_sub_item = that.closest('div[data-name="condition-sub-item"]');
+            console.log(that.val());
             if (condition_item.length && container_sub_item.length) {
+                console.log("1");
                 var i_condition = condition_item.attr('data-i-condition');
                 var i_sub_condition = container_sub_item.attr('data-i-condition-sub');
-                if (container_sub_item.find('select[name="Segment[' + i_condition + '][conditions][' + i_sub_condition + '][cs_operator]"]').val() == 'eq') {
+                console.log(i_condition);
+                console.log(i_sub_condition);
+                console.log(container_sub_item.find('select[name="Segment[' + i_condition + '][conditions][' + i_condition + '][cs_field]"]').val());
+
+//                if (container_sub_item.find('select[name="Segment[' + i_condition + '][conditions][' + i_sub_condition + '][cs_operator]"]').val() == 'eq') {
+                if (that.val() == 'eq') {
+                    console.log(2);
                     createSuggession(appid, condition_item.find('select[name="Segment[' + i_condition + '][type]"]').val(),
                             container_sub_item.find('select[name="Segment[' + i_condition + '][conditions][' + i_sub_condition + '][cs_field]"]').val(),
                             $('input[name="Segment[' + i_condition + '][conditions][' + i_sub_condition + '][cs_value]"]'));

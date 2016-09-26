@@ -21,10 +21,12 @@ $operator_behavior = array(
 );
 
 $operator_default = array(
-		'equal' => 'Equal',
-		'contain'=> 'Contain',
+		'con'=> 'Contain',
+		'eq' => 'Equal',
 		'start_with' => 'Start with',
-		'end_with' => 'end_with'
+		'end_with' => 'end_with',
+		'ncon' => 'Not contain',
+
 );
 
 $condtion_sub_operators = $operator_default;
