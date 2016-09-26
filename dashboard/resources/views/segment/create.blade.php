@@ -292,7 +292,8 @@ var f_behavior = [
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
                         containter.find('select[name="Segment[' + i_condition + '][f]"]').parent().hide();
                         containter.find('select[name="Segment[' + i_condition + '][field]"]').parent().hide();
-//                        containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
+                        containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
+                        destroySuggession(containter.find('input[name="Segment[' + i_condition + '][value]"]'));
                         if (v.operators.length) {
                             $.each(v.operators, function (oi, ov) {
                                 containter.find('select[name="Segment[' + i_condition + '][operator]"]').append('<option value="' + ov.code + '">' + ov.name + '</option>');
