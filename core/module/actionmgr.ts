@@ -302,7 +302,7 @@ export class ActionMgr {
 		function store(ids) {
 			//me.updateChainCampaign(appid, actionids, data);
 			me.valuemgr.cineObject(appid, "pageview", data);
-			me.valuemgr.cineObject(appid, "user", data);
+			// me.valuemgr.cineObject(appid, "user", data);
 			// set referal type
 				collection.find({_id: actionid}).limit(1).toArray(function(err,r){
 						if(err) throw err;
