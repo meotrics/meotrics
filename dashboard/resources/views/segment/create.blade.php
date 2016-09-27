@@ -11,8 +11,8 @@
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 remote: {
-                    url: '//api.meotrics.com/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
-//                    url: '//api.meotrics.dev/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
+//                    url: '//api.meotrics.com/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
+                    url: '//api.meotrics.dev/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
                     wildcard: '%QUERY'
                 }
             });
@@ -585,7 +585,7 @@ var f_behavior = [
             $('div[data-name="condition-item"]').each(function () {
                 var i_condition = $(this).attr('data-i-condition');
                 if ($(this).find('input[name="Segment[' + i_condition + '][select_type]"]').val() != 'user') {
-                    show_filter_date = true;
+                    show_filter_date = false;
                 }
             });
             if (show_filter_date) {

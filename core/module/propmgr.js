@@ -2,10 +2,13 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 	var me = this;
 	var props = [{
 			name: "Age", code: "age",
-			operators: [{name: "Less than", code: "lt"},
+			operators: [
 				{name: "Greater than", code: "gt"},
+				{name: "Greater or equal", code: "gte"},
 				{name: "Equal", code: "eq"},
-				{name: "From .. to ..", code: "in"}]
+				{name: "Less or equal", code: "lte"},
+				{name: "Less than", code: "lt"},
+			]
 		}, {
 			name: "Gender", code: "gender",
 			operators: [{name: "Equal", code: "eq"}]
@@ -71,10 +74,22 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 				{name: "Not contain", code: "ncon"}]
 		}, {
 			name: "Language", code: "_lang",
-			operators: [{name: "Equal", code: "eq"}]
+			operators: [
+				{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}
+			]
 		}, {
 			name: "Screen Resolution", code: "_scr",
-			operators: [{name: "Equal", code: "eq"}]
+			operators: [
+				{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}
+			]
 		}, {
 			name: "Channel", code: "_reftype",
 			operators: [{name: "Equal", code: "eq"},
@@ -137,10 +152,13 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 				{name: "Not contain", code: "ncon"}]
 		}, {
 			name: "Revenue", code: "_revenue",
-			operators: [{name: "Less than", code: "lt"},
+			operators: [
 				{name: "Greater than", code: "gt"},
+				{name: "Greater or equal", code: "gte"},
 				{name: "Equal", code: "eq"},
-				{name: "From .. to ..", code: "in"}]
+				{name: "Less or equal", code: "lte"},
+				{name: "Less than", code: "lt"},
+			]
 		}
 		// , {
 		// 	name: "Did Purchase", code: "purchase",

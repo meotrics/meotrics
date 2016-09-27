@@ -87,16 +87,16 @@ $props = isset($props) ? $props : [];
 							</div>
 						</div>
 						<div class="col-md-6 content">
-							@if(isset($segment_first->startTime ))
-								<div class="col-md-3">
-									Time range:
-								</div>
-								<div class="col-md-5">
-									<span id="startTime">{{$segment_first->startTime}}
-									to {{$segment_first->endTime}}
-									</span>
-								</div>
-							@endif
+							{{--@if(isset($segment_first->startTime ))--}}
+								{{--<div class="col-md-3">--}}
+									{{--Time range:--}}
+								{{--</div>--}}
+								{{--<div class="col-md-5">--}}
+									{{--<span id="startTime">{{$segment_first->startTime}}--}}
+									{{--to {{$segment_first->endTime}}--}}
+									{{--</span>--}}
+								{{--</div>--}}
+							{{--@endif--}}
 							<div class="col-md-4">
 								<div class="col-md-6">
 									Count:
