@@ -35,9 +35,10 @@ rq : []
 	mt.appid=s[0];
 	mt.actionid=s[1];
 	var script = document.createElement('script');
-	var host = "meotrics.com";
+	var host = "https://meotrics.com";
 	if(location.hostname == "client.meotrics.dev") host = "meotrics.dev";
-	script.setAttribute('src','//'+host+'/mtfull.js');
+	// script.setAttribute('src','https://'+host+'/mtfull.js');
+	script.setAttribute('src',host+'/mtfull.js');
 	script.setAttribute('defer', 'defer');
 	script.setAttribute('async', true);
 	document.head.appendChild(script);

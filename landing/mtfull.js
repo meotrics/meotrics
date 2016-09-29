@@ -1,7 +1,11 @@
 (function () {
 	
 	var host = "meotrics.com";
-	if(location.hostname == "client.meotrics.dev") host = "meotrics.dev";
+	var https = "https://";
+	if(location.hostname == "client.meotrics.dev"){
+		host = "meotrics.dev";
+		https = "http://";
+	}
 	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document;
 	
 	var T = 2;
@@ -82,7 +86,7 @@
 	function addIframeLink(){
 		var ifm = doc.createElement('iframe');
 		ifm.style.display="none";
-		ifm.src = "//" + host + "/iframe.html?x=" + mt.appid + '-' + mt.actionid;
+		ifm.src = https + host + "/iframe.html?x=" + mt.appid + '-' + mt.actionid;
 		if(doc.body === undefined) doc.head.appendChild(ifm);
 		else doc.body.appendChild(ifm);
 	}
@@ -114,7 +118,7 @@
 	function ajax(url, data, callback) {
 		var script = doc.createElement('script');
 		// script.type = 'text/javascript'; comment this because we dont need to excute the script
-		script.src = '//api.' + host + "/" + mt.appid + '/' + url + (data ? '?' + serialize(data) : '');
+		script.src = https+'api.' + host + "/" + mt.appid + '/' + url + (data ? '?' + serialize(data) : '');
 		script.style.display = 'none';
 		script.onreadystatechange = script.onload = callback;//for IE
 		doc.body === undefined ? doc.head.appendChild(script) : doc.body.appendChild(script);
