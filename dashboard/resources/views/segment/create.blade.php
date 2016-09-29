@@ -11,8 +11,8 @@
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 remote: {
-                    url: '//api.meotrics.com/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
-//                    url: '//api.meotrics.dev/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
+//                    url: '//api.meotrics.com/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
+                    url: '//api.meotrics.dev/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
                     wildcard: '%QUERY'
                 }
             });
@@ -20,7 +20,7 @@
                 name: 'best-pictures',
                 display: 'value',
                 source: source,
-                limit: 10
+                limit: 14
             });
         }
 

@@ -21,8 +21,6 @@ exports.TypeMgr = function (db, mongodb, converter, async, prefix, typecrud, col
 		{pname: "Device Type", pcode: "_devicetype" },
 		{pname: "Screen Resolution", pcode: "_scr"},
 		{pname: "Language", pcode: "_lang"}
-		// {pname: "URL", pcode: "_url"},
-
 	];
 	this.create = function (req, res, callback) {
 		// TODO: check if typename existed

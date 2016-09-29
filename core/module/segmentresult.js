@@ -266,26 +266,41 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 
 	// purpose: build match clause of user in a segment
 	function getMatchClause(ids, segmentid) {
-		var matchClause = {$match: {$and: []}};
 
+		var matchClause = {$match: {$and: []}};
 		// must be a user condition
 		var mustbeuser = {};
-		mustbeuser[ids._isUser] = true;
+		// mustbeuser[ids._isUser] = true;
 		matchClause.$match.$and.push(mustbeuser);
+
 
 		// must be in the segmetn condition
 		var mustbeinsegment = {};
 		mustbeinsegment[ids._segments] = {$elemMatch: {$eq: new mongodb.ObjectId(segmentid)}};
 		matchClause.$match.$and.push(mustbeinsegment);
-
+		console.log(segmentid);
+		console.log(matchClause);
 		return matchClause;
 	}
 
+
 	function oneFieldString(collection, segmentid, field1, callback) {
-		converter.toIDs(['_isUser', '_segments', field1], function (ids) {
+	converter.toIDs(['_isUser', '_segments', field1], function (ids) {
 			//build match clause
 			var matchClause = getMatchClause(ids, segmentid);
-
+			var groupByField = {$group:{
+				_id: "$_mtid",
+				field :{
+					$push : "$"+ids[field1]
+				}
+			}};
+			var unWind = {$unwind: '$field'};
+			var sumField = {$group:{
+				_id: "$field",
+				count:{
+					$sum: 1
+				}
+			}};
 			//build project clause
 			var projectClause = {$project: {_id: 0}};
 			projectClause.$project[ids[field1]] = 1;
@@ -297,11 +312,10 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 						}
 					}
 				};
-			console.log(matchClause, projectClause, groupClause);
-			var cursor = db.collection(collection).aggregate([matchClause, projectClause, groupClause]).toArray(function (err, docs) {
-			// var cursor = db.collection(collection).aggregate([ projectClause, groupClause]).toArray(function (err, docs) {
+
+			// db.collection(collection).aggregate([matchClause, projectClause, groupClause]).toArray(function (err, docs) {
+			db.collection(collection).aggregate([matchClause,groupByField,unWind,sumField]).toArray(function (err, docs) {
 				if (err) throw err;
-				// console.log(docs);
 				for (var i in docs) if (docs.hasOwnProperty(i)) {
 					docs[i].key = docs[i]._id;
 					delete docs[i]._id;

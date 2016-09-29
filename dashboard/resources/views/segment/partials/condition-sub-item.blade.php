@@ -34,7 +34,7 @@ $condtion_sub_operators = $operator_default;
 @if ($condition->fields)
 	@if($c_condition->cs_field == 'pid' || $c_condition->cs_field == 'cid' || $c_condition->cs_field == 'price' ||
             $c_condition->cs_field == 'quantity' || $c_condition->cs_field == '_ctime' || $c_condition->cs_field == 'oid' ||
-            $c_condition->cs_field == 'level' || $c_condition->cs_field == 'userid')
+            $c_condition->cs_field == 'level'  || $c_condition->cs_field == 'amount')
 		@if($condtion_sub_operators = $operator_behavior)
 		@endif
 	@endif

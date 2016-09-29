@@ -90,11 +90,9 @@ export class ActionMgr {
 			me.db.collection(collectionmapping).find({ anomtid: mtid }).limit(1).toArray(function (err, r) {
 				if (err) throw err;
 				if (r.length !== 0) mtid = r[0].idemtid;
-				me.valuemgr.cineObject(appid, data._typeid, data);
-
 				// set referal type
-				data._reftype = me.referer.getRefType(data._url, data._ref);
-
+				data._reftype = me.referer.getTypeName(parseInt(me.referer.getRefType(data._url, data._ref)));
+				me.valuemgr.cineObject(appid, data._typeid, data);
 				me.converter.toObject(data, function (datax) {
 					collection.insertOne(datax, function (err, r) {
 						if (err) throw err;
@@ -301,6 +299,7 @@ export class ActionMgr {
 		});
 		function store(ids) {
 			//me.updateChainCampaign(appid, actionids, data);
+			data._reftype = me.referer.getTypeName(parseInt(me.referer.getRefType(data._url, data._ref)));
 			me.valuemgr.cineObject(appid, "pageview", data);
 			// me.valuemgr.cineObject(appid, "user", data);
 			// set referal type
@@ -309,7 +308,7 @@ export class ActionMgr {
 						if(r.length ===0) throw "action not found 400: " + actionid;
 						
 						data._mtid = r[0][ids._mtid];
-						data._reftype = me.referer.getRefType(data._url, data._ref);
+
 			me.converter.toObject(data, function (datax) {
 				collection.update({ _id: actionid }, { $set: datax }, function (err, r) {
 					if (err) throw err;

@@ -117,17 +117,9 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 	// purpose: convert query in json to mongodb based query
 	function getQuery(json, callback) {
 		handleInput(json, function (query) {
-			console.log("json");
-			console.log(json);
-			console.log("query");
-			console.log(query);
 			queryFilter(query, function (r) {
-				console.log("r");
-				console.log(r);
 				buildMapReduce(json, function (ret) {
 					ret.option = r;
-					console.log("ret");
-					console.log(ret);
 					callback(ret);
 				});
 			});

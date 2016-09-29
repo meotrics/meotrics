@@ -6,29 +6,29 @@ exports.ValueMgr = function (db, prefix) {
 	var lock = Lock();
 	this.cineObject = function (appid, typeid, obj) {
 		for (var i in obj) if (obj.hasOwnProperty(i)) {
-			if (i === '_id' || i === "_mtid" || i === '_isUser' || i === 'ctime' || i === '_segments' || i === '_typeid')
+			if (i === '_id' || i === "_mtid" || i === '_isUser' || i === '_ctime' || i === '_segments' || i === '_typeid')
 				continue;
 			this.cineValue(appid, typeid, i, obj[i]);
 		}
 	};
 
 	this.suggest = function (appid, typeid, field, query, callback) {
-		db.collection(prefix + 'valuedomain').find({
-			appid: (appid + "").toLowerCase(),
-			typeid: (typeid + "").toLowerCase(),
-			field: (field + "").toLowerCase(),
-			value: new RegExp(regesc(query), "i")
-		}, {value: 1, _id: 0}).limit(50).toArray(function (err, ret) {
-		    if (err) throw err;
-            
-            // delete invalid element
-		    var ret2 = []
-		    for (var i in ret) if (ret.hasOwnProperty(i)) {
-		        if (ret[i].value == '' || ret[i].value == null || ret[i].value == undefined) continue;
-		        ret2.push(ret[i]);
-		    }
-			callback(ret2);
-		});
+			db.collection(prefix + 'valuedomain').find({
+				appid: (appid + "").toLowerCase(),
+				typeid: (typeid + "").toLowerCase(),
+				field: (field + "").toLowerCase(),
+				value: new RegExp(regesc(query), "i")
+			}, {value: 1, _id: 0}).limit(50).toArray(function (err, ret) {
+				if (err) throw err;
+
+				// delete invalid element
+				var ret2 = []
+				for (var i in ret) if (ret.hasOwnProperty(i)) {
+					if (ret[i].value == '' || ret[i].value == null || ret[i].value == undefined) continue;
+					ret2.push(ret[i]);
+				}
+				callback(ret2);
+			});
 	};
 
 	// create if not exist (cine)
@@ -48,6 +48,8 @@ exports.ValueMgr = function (db, prefix) {
 			field: (field + "").toLowerCase(),
 			value: (value + "").toLowerCase()
 		};
+		console.log("record");
+		console.log(record);
 
 		var lockstr = appid + ":" + typeid + ":" + field + ":" + value;
 		lock(lockstr, function (release) {
