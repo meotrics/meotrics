@@ -312,7 +312,6 @@ export class RefererType {
 		url_string = url_string || "";
 		referer = referer || "";
 				var url_parts = url.parse(url_string, true);
-
 				var medium = url_parts.query.utm_medium;
 			
 		url_parts = url.parse(referer, true);
@@ -373,6 +372,8 @@ export class RefererType {
 			return true;
 
 		url_parts = url.parse(referer, true);
+		console.log("url: "+url);
+		console.log("url_parts: "+url_parts.hostname);
 				for (var l of this.socialnets)
 					if (url_parts.hostname != null && url_parts.hostname.endsWith(l))
 				return true;
@@ -383,6 +384,7 @@ export class RefererType {
 	public getTypeName(code: number) : string
 	{
 		var names = ["Unknown", "Paid Search", "Organic Search", "Social Network", "Referral", "Email", "Direct"];
+		console.log(names[code]);
 		return names[code];
 	}
 
