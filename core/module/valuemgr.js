@@ -5,6 +5,7 @@ const regesc = require('escape-string-regexp');
 exports.ValueMgr = function (db, prefix) {
 	var lock = Lock();
 	this.cineObject = function (appid, typeid, obj) {
+		console.log("cineObject "+typeid);
 		for (var i in obj) if (obj.hasOwnProperty(i)) {
 			if (i === '_id' || i === "_mtid" || i === '_isUser' || i === '_ctime' || i === '_segments' || i === '_typeid')
 				continue;
@@ -48,8 +49,8 @@ exports.ValueMgr = function (db, prefix) {
 			field: (field + "").toLowerCase(),
 			value: (value + "").toLowerCase()
 		};
-		console.log("record");
-		console.log(record);
+		// console.log("record");
+		// console.log(record);
 
 		var lockstr = appid + ":" + typeid + ":" + field + ":" + value;
 		lock(lockstr, function (release) {

@@ -34,6 +34,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
 	// purpose: extract basic info from user agent and request parameter
 	function trackBasic(request) {
+		console.log("=====trace basic");
 		var useragent = request.headers['user-agent'];
 		var r = ua.parse(useragent);
 		var uri = request.params._url || '';
@@ -80,6 +81,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	}
 
 	function getMtid(req, appid, res, callback) {
+		console.log("=====get mtid");
 		var mtid = getCookie(req, "mtid");
 		if (mtid === undefined) {
 			mtid = req.params._mtid;
@@ -109,12 +111,14 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	}
 
 	function clear(req, res) {
+		console.log("=====clear");
 		// delete the cookie
 		eraseCookie(res, 'mtid', req.appid);
 		res.end();
 	}
 
 	function track(req, res) {
+		console.log("=====track");
 		var appid = req.appid;
 		var data = trackBasic(req);
 		var callback = (data._callback == 'true' || data._callback == true);
@@ -142,6 +146,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	// identify an user
 	// if mtid not exists in the parameter ->create one
 	function info(req, res) {
+		console.log("=====info");
 		var appid = req.appid;
 		getMtid(req, appid, res, function (mtid) {
 			var data = {};
@@ -178,6 +183,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	}
 
 	function fix(req, res) {
+		console.log("=====fix");
 		var appid = req.appid;
 		var actionid = req.actionid;
 		var lastactionid = req.lastactionid;
@@ -191,6 +197,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	}
 
 	function suggest(req, res) {
+		console.log("=====suggest");
 		valuemgr.suggest(req.appid + "", req.typeid + "", req.field + "", req.qr + "", function (results) {
 			res.setHeader('Content-Type', 'application/json');
 			res.setHeader('Access-Control-Allow-Origin', '*');
@@ -204,6 +211,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	}
 
 	function pageview(req, res) {
+		console.log("=====pageview");
 		var appid = req.appid;
 		// record an new pageview
 		var data = trackBasic(req);
@@ -232,10 +240,10 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 					body += data;
 				});
 				req.on('end', function () {
-					req['params'] = qs.parse(body);
-					handle(req, res, url_parts.pathname);
-				});
-			}
+				req['params'] = qs.parse(body);
+				handle(req, res, url_parts.pathname);
+			});
+		}
 			else if (req.method === 'GET') {
 				req['params'] = url_parts.query;
 				handle(req, res, url_parts.pathname);
