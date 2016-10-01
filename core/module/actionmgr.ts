@@ -55,6 +55,7 @@ export class ActionMgr {
 	// + data2
 	// + data3
 	public saveRaw(appid, data, callback) {
+		console.log("=====save raw");
 		let me = this;
 		var collection = me.db.collection(this.prefix + "app" + appid);
 		var collectionmapping = this.prefix + this.mapping;
@@ -86,6 +87,7 @@ export class ActionMgr {
 			lastsave();
 
 		function lastsave() {
+			console.log("=====lastsave");
 			// retrive real mtid because user can still use old mtid
 			me.db.collection(collectionmapping).find({ anomtid: mtid }).limit(1).toArray(function (err, r) {
 				if (err) throw err;
@@ -267,6 +269,7 @@ export class ActionMgr {
 	// + actionid: ObjectID, id of action
 	// + data: action data
 	public fixRaw(appid: string, actionids: string, lastactionidstr: string, data, callback: () => void) {
+		console.log("=====fix raw");
 		let me = this;
 		if(actionids == null) return callback(); //wrong actionid
 		let actionid = new mongodb.ObjectID(actionids);
@@ -294,33 +297,36 @@ export class ActionMgr {
 					if (data._utm_medium == undefined) data._utm_medium = lastaction[ids._utm_meidum];
 					return store(ids);
 				});
-			}
+			}else{
 			return store(ids);
+		}
 		});
 		function store(ids) {
+			console.log("=====store");
 			//me.updateChainCampaign(appid, actionids, data);
 			data._reftype = me.referer.getTypeName(parseInt(me.referer.getRefType(data._url, data._ref)));
 			me.valuemgr.cineObject(appid, "pageview", data);
-			// me.valuemgr.cineObject(appid, "user", data);
 			// set referal type
-				collection.find({_id: actionid}).limit(1).toArray(function(err,r){
+			collection.find({_id: actionid}).limit(1).toArray(function(err,r){
 						if(err) throw err;
 						if(r.length ===0) throw "action not found 400: " + actionid;
 						
 						data._mtid = r[0][ids._mtid];
-
-			me.converter.toObject(data, function (datax) {
-				collection.update({ _id: actionid }, { $set: datax }, function (err, r) {
-					if (err) throw err;
-					collection.find({ _id: data._mtid }).limit(1).toArray(function (err, r) { 
+				console.log("data.mtid in store: "+ data._mtid);
+				me.converter.toObject(data, function (datax) {
+					collection.update({ _id: actionid }, { $set: datax }, function (err, r) {
 						if (err) throw err;
-						if (r.length == 0) throw "user not found 309: " + data._mtid;
-							me.updateArrayBasedUserInfo(collection, data._mtid, ids, r[0], datax, function () {
-								callback();
-							});
+						collection.find({ _id: data._mtid }).limit(1).toArray(function (err, r) {
+							if (err) throw err;
+							if (r.length == 0) throw "user not found 309: " + data._mtid;
+								me.updateArrayBasedUserInfo(collection, data._mtid, ids, r[0], datax, function () {
+									callback();
+								});
+						});
 					});
 				});
-			});});
+
+			});
 		}
 	}
 
