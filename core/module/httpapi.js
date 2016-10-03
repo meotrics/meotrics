@@ -182,9 +182,9 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
 	function checkMtid(req,res){
 		// check duplicate
-		if(checkDuplicateMtid(req,res)){
+		if(checkNotDuplicateMtid(req,res)){
 			// check worng mtid
-			var mtid = getCookie(req,"mtid");
+		var mtid = getCookie(req,"mtid");
 		if(mtid !== undefined && mtid.length != 24){
 				console.log("wrong mtid");
 				clear(req, res);
@@ -192,8 +192,11 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		}
 	}
 
-	function checkDuplicateMtid(req,res){
-		var cookie = req.headers.cookie.split(";");
+	function checkNotDuplicateMtid(req,res){
+		console.log("checkDuplicate");
+		var cookieHeaders = req.headers.cookie;
+		if(cookieHeaders === undefined) return true;
+		var cookie = cookieHeaders.split(';');
 		var count = 0;
 		var value = "";
 		for(var i =0; i< cookie.length;i++){
