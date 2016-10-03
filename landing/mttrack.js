@@ -30,10 +30,10 @@ rq : []
 	}
 
 	var s = getStyle(document.getElementById('meotrics29101992'), "font-family");
-	if(s.charAt(0) === '"') s=s.substr(1, s.length - 2);
+	if(s.charAt(0) === '"' || s.charAt(0) === "'") s=s.substr(1, s.length - 2);
 	s = s.split('-');
 	mt.appid=s[0];
-	mt.actionid=s[1];
+		mt.actionid=s[1];
 	var script = document.createElement('script');
 	var host = "https://meotrics.com";
 	if(location.hostname == "client.meotrics.dev") host = "meotrics.dev";

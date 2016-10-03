@@ -7,7 +7,6 @@
 		https = "http://";
 	}
 	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document;
-	
 	var T = 2;
 	var SESSIONGAP = 1200;
 	var STARTANDLEAVE;
@@ -115,7 +114,34 @@
 		return setTimeout(backgroundtimer, T*1000)
 	}
 
+	function fixDuplicate(){
+		var count = 0;
+		var value = "";
+		var cookie = document.cookie.split(";");
+		for(var i =0; i< cookie.length;i++){
+			var c = cookie[i];
+			while (c.charAt(0)==' ') {
+				c = c.substring(1);
+			}
+			if (c.indexOf("mtid") == 0) {
+				if(count == 0){
+					var cmtid = "mtid=";
+					value = c.substring(cmtid.length,c.length);
+				}
+				count++;
+			}
+		}
+		if(count > 1){
+			// path=/
+			var tenyearlater = new Date().getYear() + 10 + 1900;
+			document.cookie = "mtid=; expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+			document.cookie = "mtid=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+			document.cookie = "mtid="+value+"; expires=Wed, 21 Aug " + tenyearlater + " 11:11:11 GMT; path=/";
+		}
+	}
+
 	function ajax(url, data, callback) {
+		fixDuplicate();
 		var script = doc.createElement('script');
 		// script.type = 'text/javascript'; comment this because we dont need to excute the script
 		script.src = https+'api.' + host + "/" + mt.appid + '/' + url + (data ? '?' + serialize(data) : '');

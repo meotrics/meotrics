@@ -83,6 +83,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	function getMtid(req, appid, res, callback) {
 		console.log("=====get mtid");
 		var mtid = getCookie(req, "mtid");
+		console.log("mtid: "+mtid);
 		if (mtid === undefined) {
 			mtid = req.params._mtid;
 			if (mtid === undefined) {
@@ -174,12 +175,14 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 			var parts = cookie.split('=');
 			list[parts.shift().trim()] = decodeURIComponent(parts.join('='));
 		});
+		console.log("list cookie: "+ list);
 		return list[name];
 	}
 
 	function setCookie(res, name, value, path) {
 		var tenyearlater = new Date().getYear() + 10 + 1900;
 		res.setHeader('Set-Cookie', name + '=' + encodeURIComponent(value) + "; expires=Wed, 21 Aug " + tenyearlater + " 11:11:11 GMT; path=/" + path);
+
 	}
 
 	function fix(req, res) {
