@@ -113,7 +113,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	}
 
 	function eraseCookieDuplicate(res, name, path) {
-		res.setHeader('Set-Cookie', name + "=x; expires=Wed, 21 Aug 1995 11:11:11 GMT;path=/");
+		res.setHeader('Set-Cookie', name + "=x; expires=Wed, 21 Aug 1995 11:11:11 GMT");
 	}
 
 	function clearDuplicate(req, res){
