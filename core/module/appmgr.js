@@ -399,7 +399,7 @@
 
 							db.collection(prefix + "app" + appid).createIndex(keys, function () {
 								//console.log('googd');
-									db.collection(prefix + "app" + appid).createIndex({[key[ids._link]]: 1}, {sparse: true}, function(){
+									db.collection(prefix + "app" + appid).createIndex({[keys[ids._link]]: 1}, {sparse: true}, function(){
 });
 							});
 						});
