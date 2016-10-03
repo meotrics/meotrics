@@ -80,11 +80,12 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		return res;
 	}
 
+
 	function getMtid(req, appid, res, callback) {
 		console.log("=====get mtid");
 		var mtid = getCookie(req, "mtid");
 		console.log("mtid: "+mtid);
-		if (mtid === undefined) {
+		if (mtid === undefined || mtid.length != 24) {
 			mtid = req.params._mtid;
 			if (mtid === undefined) {
 				return actionmgr.setupRaw(appid, function (mtid) {
@@ -109,6 +110,16 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
 	function eraseCookie(res, name, path) {
 		res.setHeader('Set-Cookie', name + "=x; expires=Wed, 21 Aug 1995 11:11:11 GMT; path=/" + path);
+	}
+
+	function eraseCookieDuplicate(res, name, path) {
+		res.setHeader('Set-Cookie', name + "=x; expires=Wed, 21 Aug 1995 11:11:11 GMT;path=/");
+	}
+
+	function clearDuplicate(req, res){
+		console.log("clear duplicate");
+		eraseCookieDuplicate(res, 'mtid', req.appid);
+		res.end();
 	}
 
 	function clear(req, res) {
@@ -169,13 +180,48 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		});
 	}
 
+	function checkMtid(req,res){
+		// check duplicate
+		if(checkDuplicateMtid(req,res)){
+			// check worng mtid
+			var mtid = getCookie(req,"mtid");
+		if(mtid !== undefined && mtid.length != 24){
+				console.log("wrong mtid");
+				clear(req, res);
+			}
+		}
+	}
+
+	function checkDuplicateMtid(req,res){
+		var cookie = req.headers.cookie.split(";");
+		var count = 0;
+		var value = "";
+		for(var i =0; i< cookie.length;i++){
+			var c = cookie[i];
+			while (c.charAt(0)==' ') {
+				c = c.substring(1);
+			}
+			if (c.indexOf("mtid") == 0) {
+				if(count == 0){
+					var cmtid = "mtid=";
+					value = c.substring(cmtid.length,c.length);
+				}
+				count++;
+			}
+		}
+		if(count > 1){
+			clearDuplicate(req,res);
+			return false;
+		}
+		return true;
+	}
+
 	function getCookie(req, name) {
 		var list = {}, rc = req.headers.cookie;
 		rc && rc.split(';').forEach(function (cookie) {
 			var parts = cookie.split('=');
 			list[parts.shift().trim()] = decodeURIComponent(parts.join('='));
 		});
-		console.log("list cookie: "+ list);
 		return list[name];
 	}
 
@@ -258,6 +304,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 				req['appid'] = parts[1];
 				var action = parts[2];
 				if (action === 'track') track(req, res);
+				else if(action == 'check') checkMtid(req,res);
 				else if (action === '' || action === undefined) pageview(req, res);
 				else if (action === 'clear') clear(req, res);
 				else if (action === 'info') info(req, res);
