@@ -183,6 +183,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	function checkMtid(req,res){
 		// check duplicate
 		if(checkNotDuplicateMtid(req,res)){
+			console.log("true");
 			// check worng mtid
 		var mtid = getCookie(req,"mtid");
 		if(mtid !== undefined && mtid.length != 24){
@@ -190,6 +191,9 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 				clear(req, res);
 			}
 		}
+			res.setHeader('Content-Type', 'text/plain');
+			res.end();
+
 	}
 
 	function checkNotDuplicateMtid(req,res){
