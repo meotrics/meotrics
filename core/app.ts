@@ -5,6 +5,8 @@ import * as WS from './module/ws';
 import * as CrudApi from './module/crudapi';
 import * as referer from './module/referer';
 import bodyParser = require('body-parser');
+const globalVariables = require('./lib/utils/global-variables.js');
+const routes = require('./routes');
 var converter = require('./utils/fakeidmanager.js');
 var appException = require('./module/appException.js');
 import * as http  from 'http';
@@ -54,6 +56,7 @@ function ensureIndex(db: mongodb.Db, prefix: string, callback: () => void) {
 
 mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.MongoError, db: mongodb.Db) {
 	if (err) throw err;
+	globalVariables.set('db', db);
 	var prefix: string = config.get<string>("mongod.prefix") || "meotrics_";
 	ensureIndex(db, prefix, function () {
 		var ref = new referer.RefererType();
@@ -64,6 +67,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.Mongo
 		converter = new converter.IdManager();
 		var crudapi = new CrudApi.CrudApi(db, converter, prefix, ref, config.get("dashboard.delay"));
 		crudapi.route(app); //bind route
+		routes(app);
 
 		//run the backend bashboard
 		var crudport = config.get("port") || 2108;
