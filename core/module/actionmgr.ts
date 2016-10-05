@@ -368,7 +368,7 @@ export class ActionMgr {
 									userx[ids._os] = [olduser[ids._os]].concat(userx[ids._os]);
 							}
 				}
-				if(userx[ids._os]!= null || userx[ids._os] !== undefined)
+				if(userx[ids._os]!= null && userx[ids._os] !== undefined)
 					userx[ids._os] = [...Array.from((userx[ids._os]))];
 						if (olduser[ids._segment] != undefined) {
 							if (olduser[ids._segment] instanceof Array) {
@@ -380,7 +380,7 @@ export class ActionMgr {
 									userx[ids._segment] = [olduser[ids._segment]].concat(userx[ids._segment]);
 							}
 						}
-			if(userx[ids._segment]!= null || userx[ids._segment] !== undefined)
+			if(userx[ids._segment]!= null && userx[ids._segment] !== undefined)
 						userx[ids._segment] = [...Array.from((userx[ids._segment]))];
 
 						if (olduser[ids._devicetype] != undefined) {
@@ -393,7 +393,7 @@ export class ActionMgr {
 									userx[ids._devicetype] = [olduser[ids._devicetype]].concat(userx[ids._devicetype]);
 							}
 						}
-			if(userx[ids._devicetype]!= null || userx[ids._devicetype] !== undefined)
+			if(userx[ids._devicetype]!= null && userx[ids._devicetype] !== undefined)
 				userx[ids._devicetype] =[...Array.from((userx[ids._devicetype]))];
 
 						if (olduser[ids._deviceid] != null) {
@@ -406,7 +406,7 @@ export class ActionMgr {
 									userx[ids._deviceid] = [olduser[ids._deviceid]].concat(userx[ids._deviceid]);
 							}
 						}
-			if(userx[ids._deviceid]!= null || userx[ids._deviceid] !== undefined)
+			if(userx[ids._deviceid]!= null && userx[ids._deviceid] !== undefined)
 				userx[ids._deviceid] = [...Array.from((userx[ids._deviceid]))];
 
 						if (olduser[ids._lang] != undefined) {
@@ -419,8 +419,8 @@ export class ActionMgr {
 									userx[ids._lang] = [olduser[ids._lang]].concat(userx[ids._lang]);
 							}
 						}
-			if(userx[ids._lang]!= null || userx[ids._lang] !== undefined)
-				userx[ids._lang] = [...Array.from((userx[ids.lang]))];
+			if(userx[ids._lang]!= null && userx[ids._lang] !== undefined)
+				userx[ids._lang] = [...Array.from((userx[ids._lang]))];
 
 						if (olduser[ids._city] != undefined) {
 							if (olduser[ids._city] instanceof Array) {
@@ -432,7 +432,7 @@ export class ActionMgr {
 									userx[ids._city] = [olduser[ids._city]].concat(userx[ids._city]);
 							}
 						}
-			if(userx[ids._city]!= null || userx[ids._city] !== undefined)
+			if(userx[ids._city]!= null && userx[ids._city] !== undefined)
 				userx[ids._city] = [...Array.from((userx[ids._city]))];
 
 						if (olduser[ids._country] != undefined) {
@@ -445,7 +445,7 @@ export class ActionMgr {
 									userx[ids._country] = [olduser[ids._country]].concat(userx[ids._country]);
 							}
 						}
-			if(userx[ids._country]!= null || userx[ids._country] !== undefined)
+			if(userx[ids._country]!= null && userx[ids._country] !== undefined)
 				userx[ids._country] = [...Array.from((userx[ids._country]))];
 
 						if (olduser[ids._browser] != undefined) {
@@ -458,7 +458,7 @@ export class ActionMgr {
 									userx[ids._browser] = [olduser[ids._browser]].concat(userx[ids._browser]);
 							}
 						}
-			if(userx[ids._browser]!= null || userx[ids._browser] !== undefined)
+			if(userx[ids._browser]!= null && userx[ids._browser] !== undefined)
 				userx[ids._browser] = [...Array.from((userx[ids._browser]))];
 
 						if (olduser[ids._campaign] != undefined) {
@@ -470,13 +470,13 @@ export class ActionMgr {
 								if (userx[ids._campaign] != undefined)
 									userx[ids._campaign] = [olduser[ids._campaign]].concat(userx[ids._campaign]);
 							}
-							if(userx[ids._campaign]!= null || userx[ids._browser] !== undefined)
+							if(userx[ids._campaign]!= null && userx[ids._browser] !== undefined)
 							userx[ids._campaign] = [...Array.from((userx[ids._campaign]))];
 						}
 
 
 						userx[ids._utm_campaign] = [].concat(userx[ids._utm_campaign]).concat(olduser[ids._utm_campaign]);
-			if(userx[ids._utm_campaign]!= null || userx[ids._utm_campaign] !== undefined)
+			if(userx[ids._utm_campaign]!= null && userx[ids._utm_campaign] !== undefined)
 						userx[ids._utm_campaign] =  [...Array.from((userx[ids._utm_campaign]))];
 
 						if (userx[ids._firstcampaign] == undefined) userx[ids._firstcampaign] = olduser[ids._firstcampaign];
