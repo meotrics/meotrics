@@ -9,6 +9,7 @@ const config = require('config');
 const validator = require('validator');
 const async = require('async');
 const mongodb = require('mongodb');
+const segmentUtils = require('../../lib/utils/segment-utils.js');
 
 const router = express.Router();
 
@@ -20,9 +21,9 @@ router.post('/segment-result/:appid/:_id', validate, function(req, res, next){
     const inf = req.body.inf;
 
     if(type === 'action') {
-        // const queryAction = mongoUtils.translateOperator(inf.fieldName, inf.oper, inf.value);
-        const queryAction = {};
+        const queryAction = mongoUtils.translateOperator(inf.fieldName, inf.oper, inf.value);
         queryAction._typeid = inf._typeid;
+
         const match1 = {
             $match: {
                 $or: [
@@ -35,9 +36,10 @@ router.post('/segment-result/:appid/:_id', validate, function(req, res, next){
                     queryAction
                 ]
             }
-        }
+        };
 
-        const project = {
+
+        const project1 = {
             $project: {
                 _mtid: 1,
                 [inf.fieldName]: 1,
@@ -60,7 +62,9 @@ router.post('/segment-result/:appid/:_id', validate, function(req, res, next){
 
         const match2 = {
             $match: {
-                _isUser: 0
+                _isUser: {
+                    $eq: 0
+                }
             }
         }
 
@@ -71,28 +75,40 @@ router.post('/segment-result/:appid/:_id', validate, function(req, res, next){
             }
         }
 
-        const sort = {
+        const sort1 = {
             $sort: {
                 count: -1
             }
         }
 
+        const project2 = {
+            $project: {
+                key: "$_id",
+                count: 1,
+                _id: 0,
+            }
+        };
+
         const collection = config.mongod.prefix + "app" + appid;
 
-        globalVariables.get('db').collection(collection).aggregate([match1, project, group1, match2, group2, sort]).toArray(function (err, r) {
-            if (err) {
-                return next(err);
-            }
-
-            console.log(r);
-            res.json({
-                ec: consts.CODE.SUCCESS,
-                data: {
-                    string: r.splice(0, 10),
-                    number: {}
+        globalVariables
+            .get('db')
+            .collection(collection)
+            .aggregate([match1, project1, group1, match2, group2, sort1, project2])
+            .toArray( (err, r) => {
+                if (err) {
+                    return next(err);
                 }
+
+                console.log(r);
+                res.json({
+                    ec: consts.CODE.SUCCESS,
+                    data: {
+                        string: r.splice(0, 10),
+                        number: handleNumberCase(r, inf)
+                    }
+                });
             });
-        });
     } else {
         res.json({
             ec: consts.CODE.FAIL,
@@ -121,46 +137,48 @@ function validate(req, res, next) {
 }
 
 function handleNumberCase(data, inf) {
+    let r = [];
+    let min = undefined;
+    let max = undefined;
+    const numArray = [];
+    data.forEach(e => {
+        const value = e.key;
+        if(_.isNumber(value)) {
+            if(min === undefined) {
+                min = value;
+                max = value;
+            } else if(value < min) {
+                min = value;
+            } else if(value > max) {
+                max = value;
+            }
 
-}
-
-function range(min, max, field) {
-    var results = [];
-    //if field is age then split into [18, 24, 24, 44, 54, 54+]
-    if (field == 'age') {
-        results[0] = {count: 0, key: {from: 0, to: 18}};
-        results[1] = {count: 0, key: {from: 18, to: 24}};
-        results[2] = {count: 0, key: {from: 24, to: 34}};
-        results[3] = {count: 0, key: {from: 34, to: 44}};
-        results[4] = {count: 0, key: {from: 44, to: 54}};
-        results[5] = {count: 0, key: {from: 54}};
-        results[6] = {count: 0, key: {to: 0}};
-    } else {
-        //else split in to 5 equal space using min, max
-        var spaces = 1;
-        var distance = 0;
-
-        if (max - min >= 5) {
-            spaces = 5;
-            distance = Math.floor((max - min) / 5);
+            numArray.push(e);
         }
 
-        for (var i = 0; i < spaces; i++) {
-            var element = {};
-            element.key = {
-                from: min + i * distance,
-                to: min + (i + 1) * distance
-            };
-            if (i == spaces - 1) {
-                element.key.to = max;
-            }
-            element.count = 0;
-            results.push(element);
+    });
+
+    if(min !== undefined) {
+        r = segmentUtils.calculateRange(min, max);
+        const distance = (max - min) / r.length;
+
+        if(distance === 0) {
+            console.log(numArray);
+           r[0].count = numArray[0].count;
+        } else {
+            numArray.forEach(e => {
+                const value = e.key;
+                let index = (value - min) / distance;
+                if(index === r.length) {
+                    index--;
+                }
+                r[index].count += e.count;
+            });
         }
     }
-    return results;
-}
 
+    return r;
+}
 
 module.exports = function (app) {
     app.use('/', router);
