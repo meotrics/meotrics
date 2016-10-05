@@ -336,8 +336,10 @@ export class ActionMgr {
 	public x(req, res, callback) {
 		var me = this;
 		var data = req.params;
-		if(req.actionid.length != 24)
-			callback();
+		if(req.actionid.length != 24){
+			res.writeHead(200);
+			res.end();
+		}
 		var collection = me.prefix + "app" + req.appid;
 		var actionid = new mongodb.ObjectID(req.actionid);
 		me.converter.toIDs(['_ctime', 'totalsec'], function (ids) {
