@@ -270,7 +270,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 		var matchClause = {$match: {$and: []}};
 		// must be a user condition
 		var mustbeuser = {};
-		// mustbeuser[ids._isUser] = true;
+		mustbeuser[ids._isUser] = true;
 		matchClause.$match.$and.push(mustbeuser);
 
 
@@ -313,13 +313,14 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 					}
 				};
 
-			// db.collection(collection).aggregate([matchClause, projectClause, groupClause]).toArray(function (err, docs) {
-			db.collection(collection).aggregate([matchClause,groupByField,unWind,sumField]).toArray(function (err, docs) {
+			db.collection(collection).aggregate([matchClause, projectClause, groupClause]).toArray(function (err, docs) {
+			// db.collection(collection).aggregate([matchClause,groupByField,unWind,sumField]).toArray(function (err, docs) {
 				if (err) throw err;
 				for (var i in docs) if (docs.hasOwnProperty(i)) {
 					docs[i].key = docs[i]._id;
 					delete docs[i]._id;
 				}
+				console.dir(docs[0].key);
 				callback(docs);
 			});
 		});
