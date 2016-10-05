@@ -336,28 +336,31 @@ export class ActionMgr {
 	public x(req, res, callback) {
 		var me = this;
 		var data = req.params;
+		console.log(req.actionid);
 		if(req.actionid.length != 24){
 			res.writeHead(200);
 			res.end();
-		}
-		var collection = me.prefix + "app" + req.appid;
-		var actionid = new mongodb.ObjectID(req.actionid);
-		me.converter.toIDs(['_ctime', 'totalsec'], function (ids) {
-			var projection = {};
-			projection[ids._ctime] = 1;
-			me.db.collection(collection).find({ _id: actionid }, projection).limit(1).toArray(function (err, r) {
-				if (err) throw err;
-				if (r.length === 0) throw "not found pageview to close, actionid: " + actionid;
-				var newaction = {};
-				newaction[ids.totalsec] = data.sessiontime;// Math.round(new Date().getTime() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0) - r[0][ids._ctime];
-				me.db.collection(collection).update({ _id: actionid }, { $set: newaction }, function (err, r) {
+			callback();
+		}else{
+			var collection = me.prefix + "app" + req.appid;
+			var actionid = new mongodb.ObjectID(req.actionid);
+			me.converter.toIDs(['_ctime', 'totalsec'], function (ids) {
+				var projection = {};
+				projection[ids._ctime] = 1;
+				me.db.collection(collection).find({ _id: actionid }, projection).limit(1).toArray(function (err, r) {
 					if (err) throw err;
-					res.writeHead(200);
-					res.end();
-					callback();
+					if (r.length === 0) throw "not found pageview to close, actionid: " + actionid;
+					var newaction = {};
+					newaction[ids.totalsec] = data.sessiontime;// Math.round(new Date().getTime() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0) - r[0][ids._ctime];
+					me.db.collection(collection).update({ _id: actionid }, { $set: newaction }, function (err, r) {
+						if (err) throw err;
+						res.writeHead(200);
+						res.end();
+						callback();
+					});
 				});
 			});
-		});
+		}
 	}
 
 	private mergeInfo(olduser, userx, ids)
