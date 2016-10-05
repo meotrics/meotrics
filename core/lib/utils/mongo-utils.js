@@ -38,7 +38,11 @@ module.exports = {
             case 'ew':
                 query[fieldName]['$regex'] = regesc(value) + '$';
                 break;
+            default:
+                query = {};
+                break;
         }
+
         return query;
     }
 }
