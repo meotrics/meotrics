@@ -61,7 +61,7 @@ export class ActionMgr {
 		var collectionmapping = this.prefix + this.mapping;
 		var mtid = new mongodb.ObjectID(data._mtid);
 		data._mtid = mtid;
-		
+
 		data._segments = [];
 
 		// correct timming
@@ -69,7 +69,7 @@ export class ActionMgr {
 		delete data._deltat;
 
 		if (data._link !== undefined) {
-				collection.find({ _id: new mongodb.ObjectID(data._link) }).limit(1).toArray(function (err, ret) {
+			collection.find({_id: new mongodb.ObjectID(data._link)}).limit(1).toArray(function (err, ret) {
 				if (err) throw err;
 				if (ret.length == 0) throw "link not found: " + data._link + ", in app: " + appid;
 				let link = ret[0];
@@ -85,6 +85,7 @@ export class ActionMgr {
 		}
 		else
 			lastsave();
+
 
 		function lastsave() {
 			console.log("=====lastsave");
@@ -123,7 +124,7 @@ export class ActionMgr {
 						if (user == null) throw "mtid " + mtid + " did not match any user";
 						var typeid = data._typeid;
 						me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
-							'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype', 'lastactionid', '_ref', 
+							'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype', 'lastactionid', '_ref',
 																'_lang', '_os', '_browser', '_country', '_city', '_devicetype', '_deviceid',
 																'_callback', '_numberPurchase', '_listProduct', '_deltat', 'actionid', '_lastSeen', '_utm_campaign'], function (ids) {
 								// increase revenue
@@ -136,13 +137,13 @@ export class ActionMgr {
 									if (data.amount == undefined) data.amount = data.price * data.quantity;
 									datax[ids._revenue] = user[ids._revenue] + data.amount;
 
-									// Increase number of purchasing                                                                               
+									// Increase number of purchasing
 									if (user[ids._numberPurchase] == null) {
 										user[ids._numberPurchase] = 0;
 									}
 									datax[ids._numberPurchase] = user[ids._numberPurchase] + 1;
 
-									// Add purchase product up to 5                                                                                
+									// Add purchase product up to 5
 									if (user[ids._listProduct] == null) {
 										user[ids._listProduct] = [];
 									}
@@ -176,7 +177,7 @@ export class ActionMgr {
 								for (p in simpleprop) if (simpleprop.hasOwnProperty(p))
 									if (p.startsWith('_') == false)
 										arrayprop[p] = simpleprop[p];
-								
+
 								if (Object.keys(arrayprop).length !== 0)
 										me.updateArrayBasedUserInfo(collection, mtid, ids, user, arrayprop);
 							});
@@ -239,7 +240,9 @@ export class ActionMgr {
 			if (arr instanceof Array === false) arr = [arr];
 
 			 user[p] = arr.concat(datax[p]);
-			user[p] =[...new Set(user[p])+''];
+			// user[p] =[...new Set(user[p])];
+			user[p] =[...Array.from(new Set(user[p]))];
+			// user[p] =[...new Set(user[p])+''];
 
 		}
 			delete user._id;
@@ -278,7 +281,7 @@ export class ActionMgr {
 		//make sure dont change typeid
 		delete data._typeid;
 			me.converter.toIDs(['_mtid','_utm_source', '_utm_campaign', '_utm_term', '_utm_content',
-			'_utm_medium', '_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
+			'_utm_medium', '_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid','_devicetype',
 			'_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype', '_deltat', 'actionid',
 			'lastactionid', '_ref', '_callback', '_numberPurchase', '_listProduct'], function (ids) {
 		if (lastactionidstr !== null && lastactionidstr !== undefined && lastactionidstr !== '') {
@@ -365,8 +368,8 @@ export class ActionMgr {
 									userx[ids._os] = [olduser[ids._os]].concat(userx[ids._os]);
 							}
 				}
-				userx[ids._os] = [...new Set(userx[ids._os])+''];
-
+				if(userx[ids._os]!= null || userx[ids._os] !== undefined)
+					userx[ids._os] = [...Array.from((userx[ids._os]))];
 						if (olduser[ids._segment] != undefined) {
 							if (olduser[ids._segment] instanceof Array) {
 								if (userx[ids._segment] != null)
@@ -377,7 +380,8 @@ export class ActionMgr {
 									userx[ids._segment] = [olduser[ids._segment]].concat(userx[ids._segment]);
 							}
 						}
-						userx[ids._segment] = [...new Set(userx[ids._segment])+''];
+			if(userx[ids._segment]!= null || userx[ids._segment] !== undefined)
+						userx[ids._segment] = [...Array.from((userx[ids._segment]))];
 
 						if (olduser[ids._devicetype] != undefined) {
 							if (olduser[ids._devicetype] instanceof Array) {
@@ -389,7 +393,8 @@ export class ActionMgr {
 									userx[ids._devicetype] = [olduser[ids._devicetype]].concat(userx[ids._devicetype]);
 							}
 						}
-				userx[ids._devicetype] =[...new Set(userx[ids._devicetype])+''];
+			if(userx[ids._devicetype]!= null || userx[ids._devicetype] !== undefined)
+				userx[ids._devicetype] =[...Array.from((userx[ids._devicetype]))];
 
 						if (olduser[ids._deviceid] != null) {
 							if (olduser[ids._deviceid] instanceof Array) {
@@ -401,7 +406,8 @@ export class ActionMgr {
 									userx[ids._deviceid] = [olduser[ids._deviceid]].concat(userx[ids._deviceid]);
 							}
 						}
-				userx[ids._deviceid] = [...new Set(userx[ids._deviceid])+''];
+			if(userx[ids._deviceid]!= null || userx[ids._deviceid] !== undefined)
+				userx[ids._deviceid] = [...Array.from((userx[ids._deviceid]))];
 
 						if (olduser[ids._lang] != undefined) {
 							if (olduser[ids._lang] instanceof Array) {
@@ -413,7 +419,8 @@ export class ActionMgr {
 									userx[ids._lang] = [olduser[ids._lang]].concat(userx[ids._lang]);
 							}
 						}
-				userx[ids._lang] = [...new Set(userx[ids.lang])+''];
+			if(userx[ids._lang]!= null || userx[ids._lang] !== undefined)
+				userx[ids._lang] = [...Array.from((userx[ids.lang]))];
 
 						if (olduser[ids._city] != undefined) {
 							if (olduser[ids._city] instanceof Array) {
@@ -425,7 +432,8 @@ export class ActionMgr {
 									userx[ids._city] = [olduser[ids._city]].concat(userx[ids._city]);
 							}
 						}
-				userx[ids._city] = [...new Set(userx[ids._city])+''];
+			if(userx[ids._city]!= null || userx[ids._city] !== undefined)
+				userx[ids._city] = [...Array.from((userx[ids._city]))];
 
 						if (olduser[ids._country] != undefined) {
 							if (olduser[ids._country] instanceof Array) {
@@ -437,7 +445,8 @@ export class ActionMgr {
 									userx[ids._country] = [olduser[ids._country]].concat(userx[ids._country]);
 							}
 						}
-				userx[ids._country] = [...new Set(userx[ids._country])+''];
+			if(userx[ids._country]!= null || userx[ids._country] !== undefined)
+				userx[ids._country] = [...Array.from((userx[ids._country]))];
 
 						if (olduser[ids._browser] != undefined) {
 							if (olduser[ids._browser] instanceof Array) {
@@ -449,7 +458,8 @@ export class ActionMgr {
 									userx[ids._browser] = [olduser[ids._browser]].concat(userx[ids._browser]);
 							}
 						}
-				userx[ids._browser] = [... new Set(userx[ids._browser])+''];
+			if(userx[ids._browser]!= null || userx[ids._browser] !== undefined)
+				userx[ids._browser] = [...Array.from((userx[ids._browser]))];
 
 						if (olduser[ids._campaign] != undefined) {
 							if (olduser[ids._campaign] instanceof Array) {
@@ -460,12 +470,14 @@ export class ActionMgr {
 								if (userx[ids._campaign] != undefined)
 									userx[ids._campaign] = [olduser[ids._campaign]].concat(userx[ids._campaign]);
 							}
-							userx[ids._campaign] = [... new Set(userx[ids._campaign])+''];
+							if(userx[ids._campaign]!= null || userx[ids._browser] !== undefined)
+							userx[ids._campaign] = [...Array.from((userx[ids._campaign]))];
 						}
 
 
 						userx[ids._utm_campaign] = [].concat(userx[ids._utm_campaign]).concat(olduser[ids._utm_campaign]);
-						userx[ids._utm_campaign] =  [...new Set(userx[ids._utm_campaign])+''];
+			if(userx[ids._utm_campaign]!= null || userx[ids._utm_campaign] !== undefined)
+						userx[ids._utm_campaign] =  [...Array.from((userx[ids._utm_campaign]))];
 
 						if (userx[ids._firstcampaign] == undefined) userx[ids._firstcampaign] = olduser[ids._firstcampaign];
 												

@@ -39,7 +39,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		var r = ua.parse(useragent);
 		var uri = request.params._url || '';
 		var md = new MD(useragent);
-		var devicetype;
+		var devicetype = 'desktop';
 		if (md.tablet() !== null)
 			devicetype = 'tablet';
 		else if (md.phone() !== null)
