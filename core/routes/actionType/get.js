@@ -9,45 +9,56 @@ const validator = require('validator');
 const async = require('async');
 
 const router = express.Router();
+
 // Get all action type
-router.get('/action-type/:appid', validate, function(req, res, next){
-    const defaultField = [
+router.get('/action-type/:appid', validate, handleMoreFields, function(req, res, next){
+    const appid = req.params.appid;
+
+    const query = {
+        _appid: appid
+    };
+
+    const defaultFields = [
         'name',
         '_id',
     ];
-
-    const appid = req.params.appid;
-
     const projection = {};
-    const totalFields = defaultField.concat(req.moreFields);
-    totalFields.forEach(v => {
+    defaultFields.concat(req.moreFields).forEach(v => {
         projection[v] = 1;
     });
 
+
     const options = {
-        sort: '_ctime'
+        sort: "name" // alpha-beta sort
     };
 
     const collection = config.mongod.prefix + consts.ACTION_TYPE_COLLECTION;
 
-    globalVariables.get('db').collection(collection).find({
-        _appid: appid
-    }, projection, options).toArray((err, r) => {
-        if(err) {
-            return next(err);
-        }
+    globalVariables
+        .get('db')
+        .collection(collection)
+        .find(query, projection, options)
+        .toArray((err, r) => {
+            if(err) {
+                return next(err);
+            }
 
-        console.log(r);
-        res.json({
-            ec: consts.CODE.SUCCESS,
-            data: r
+            console.log(r);
+            res.json({
+                ec: consts.CODE.SUCCESS,
+                data: r
+            });
         });
-    })
 });
 
 // Middleware for checking data
 function validate(req, res, next) {
-    console.log('action-type:get:', req.params, req.query);
+    console.log(req.params);
+    next();
+}
+
+// Handle get more fields
+function handleMoreFields(req, res, next) {
     let moreFields = [];
     let extras = req.query.extras;
     if(!_.isUndefined(extras)) {
@@ -62,6 +73,7 @@ function validate(req, res, next) {
     req.moreFields = moreFields;
     next();
 }
+
 
 module.exports = function (app) {
     app.use('/', router);
