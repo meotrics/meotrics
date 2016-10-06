@@ -205,11 +205,8 @@ export class ActionMgr {
 		delete datax[ids._typeid];
 		delete datax[ids._referer];
 		delete datax[ids._totalsec];
-		delete datax[ids._firstcampaign];
-		delete datax[ids._lastcampaign];
 		delete datax[ids._totalsec];
 		delete datax[ids._deltat];
-		delete datax[ids._ref];
 		delete datax[ids._callback];
 		delete datax[ids._link];
 		delete datax[ids.lastactionid];
