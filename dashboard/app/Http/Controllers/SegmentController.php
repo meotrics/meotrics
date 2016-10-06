@@ -673,17 +673,17 @@ class SegmentController extends Controller
             $datasets[] = (object)[
                 'data' => $chart_data,
             ];
-            if ($f === '_reftype') {
-                $label_reftype = [];
-                foreach ($labels as $label) {
-                    if($label !== "N/A"){
-                        $label_reftype[] = $this->reftypemap[$label];
-                    }else{
-                        $label_reftype[] =  "N/A";
-                    }
-                }
-                $labels = $label_reftype;
-            }
+//            if ($f === '_reftype') {
+//                $label_reftype = [];
+//                foreach ($labels as $label) {
+//                    if($label !== "N/A"){
+//                        $label_reftype[] = $this->reftypemap[$label];
+//                    }else{
+//                        $label_reftype[] =  "N/A";
+//                    }
+//                }
+//                $labels = $label_reftype;
+//            }
         }
         $result['datasets'] = $datasets;
         $result['labels'] = $labels;
