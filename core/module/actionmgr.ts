@@ -390,6 +390,22 @@ export class ActionMgr {
 			if(userx[ids._segment]!= null && userx[ids._segment] !== undefined)
 						userx[ids._segment] = [...Array.from((userx[ids._segment]))];
 
+
+			if (olduser[ids._ref] != undefined) {
+				if (olduser[ids._ref] instanceof Array) {
+					if (userx[ids._ref] != null)
+						userx[ids._ref] = olduser[ids._ref].concat(userx[ids._ref]);
+				}
+				else {
+					if (userx[ids._ref] != undefined)
+						userx[ids._ref] = [olduser[ids._ref]].concat(userx[ids._ref]);
+				}
+			}
+			if(userx[ids._ref]!= null && userx[ids._ref] !== undefined)
+				userx[ids._ref] = [...Array.from((userx[ids._ref]))];
+
+
+
 						if (olduser[ids._devicetype] != undefined) {
 							if (olduser[ids._devicetype] instanceof Array) {
 								if (userx[ids._devicetype] != undefined)
@@ -531,7 +547,7 @@ export class ActionMgr {
 		user = userex;
 
 		var themtid: mongodb.ObjectID = new mongodb.ObjectID(data.mtid);
-		me.converter.toIDs(['_isUser', 'userid', '_mtid', '_segment', '_os', '_deviceid', '_devicetype', '_lang', '_city', '_country', '_browser', '_firstcampaign', '_lastcampaign', '_campaign'], function (ids) {
+		me.converter.toIDs(['_isUser', 'userid', '_mtid', '_segment', '_os','_ref', '_deviceid', '_devicetype', '_lang', '_city', '_country', '_browser', '_firstcampaign', '_lastcampaign', '_campaign'], function (ids) {
 			me.valuemgr.cineObject(appid, 'user', user);
 			me.converter.toObject(user, function (userx) {
 				// check for case 4
