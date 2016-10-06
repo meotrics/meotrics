@@ -562,16 +562,20 @@ class SegmentController extends Controller
             foreach ($charts as $tmp_chart) {
                 if ($f === "_ref") {
                     // conver url
-                    foreach ($charts as $tmp_chart) {
-                        //remove https
-                        if($tmp_chart->key === ""){
-                            $tmp_chart->key = "None (direct)";
-                        }else{
-                            $tmp = str_replace("https://", "", $tmp_chart->key);
-                            $tmp = str_replace("http://", "", $tmp);
-                            $arr_url_have_uri = explode("/", $tmp);
-                            $server_name = $arr_url_have_uri[0];
-                            $tmp_chart->key = $server_name;
+                    foreach ($charts as $tmp_charts) {
+                        foreach($tmp_charts as $tmp_chart) {
+                            //remove https
+                            if(!isset($tmp_chart->key))
+                                continue;
+                            if ($tmp_chart->key === "") {
+                                $tmp_chart->key = "None (direct)";
+                            } else {
+                                $tmp = str_replace("https://", "", $tmp_chart->key);
+                                $tmp = str_replace("http://", "", $tmp);
+                                $arr_url_have_uri = explode("/", $tmp);
+                                $server_name = $arr_url_have_uri[0];
+                                $tmp_chart->key = $server_name;
+                            }
                         }
                     }
                 }
