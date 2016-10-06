@@ -42,7 +42,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		var devicetype = 'desktop';
 		if (md.tablet() !== null)
 			devicetype = 'tablet';
-		else if (md.phone() !== null)
+		else if (md.phone() !== null || md.mobile() != null)
 			devicetype = 'phone';
 		else
 			devicetype = 'desktop';
