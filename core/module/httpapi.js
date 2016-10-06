@@ -46,6 +46,8 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 			devicetype = 'phone';
 		else
 			devicetype = 'desktop';
+
+		console.log(devicetype);
 		if (uri === "" || uri.startsWith(request.headers.referer) === false) uri = request.headers.referer || '';
 		var res = {
 			_url: uri,
