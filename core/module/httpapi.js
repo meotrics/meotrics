@@ -191,9 +191,6 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 				console.log("wrong mtid");
 				clear(req, res);
 			}
-		}else{
-			res.setHeader('Content-Type', 'text/plain');
-			res.end();
 		}
 	}
 
