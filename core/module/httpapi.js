@@ -190,8 +190,14 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		if(mtid !== undefined && mtid.length != 24){
 				console.log("wrong mtid");
 				clear(req, res);
-			}
+			}else{
+			res.setHeader('Content-Type', 'text/plain');
+			res.end();
 		}
+
+		}
+
+
 	}
 
 	function checkNotDuplicateMtid(req,res){
