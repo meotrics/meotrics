@@ -7,6 +7,7 @@ var fs = require('fs');
 var ua = require('ua-parser');
 var MD = require('mobile-detect');
 var ActionMgr = require('./actionmgr');
+var ObjectID = require('bson-objectid');
 exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	var code;
 	var actionmgr = new ActionMgr.ActionMgr(db, converter, prefix, "mapping", valuemgr, ref);
@@ -78,7 +79,6 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		res._utm_term = query.utm_term;
 		res._utm_content = query.utm_content;
 		res._utm_medium = query.utm_medium;
-
 		return res;
 	}
 
@@ -96,7 +96,6 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 				});
 			}
 		}
-
 		// check if mtid is valid
 		actionmgr.ismtidValid(appid, mtid, function (ret) {
 			if (ret) callback(mtid);
@@ -163,7 +162,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		console.log("=====info");
 		var appid = req.appid;
 		getMtid(req, appid, res, function (mtid) {
-			var data = {};
+			var data = {}; 
 			for (var i in req.params) if (req.params.hasOwnProperty(i))
 				if (i.startsWith('_') === false) data[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
 
@@ -276,14 +275,14 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		getMtid(req, appid, res, function (mtid) {
 			data._mtid = mtid;
 			data._typeid = 'pageview';
-
+			var newId = ObjectID();
+			data._id = newId;
+			loadCode(appid, newId.toString(), function (code) {
+				res.setHeader('Content-Type', 'text/css');
+				res.end(code);
+			});
 			actionmgr.saveRaw(appid, data, function (actionid) {
 				me.onchange(appid, 'type.pageview');
-				// return code
-				loadCode(appid, actionid, function (code) {
-					res.setHeader('Content-Type', 'text/css');
-					res.end(code);
-				});
 			});
 		});
 	}

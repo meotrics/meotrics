@@ -4,6 +4,7 @@ import * as express from 'express';
 import * as referer from './referer';
 
 import * as location from './location';
+var ObjectID = require('bson-objectid');
 
 export class ActionMgr {
 	private location: location.LocationMgr;
@@ -100,19 +101,19 @@ export class ActionMgr {
 					collection.insertOne(datax, function (err, r) {
 						if (err) throw err;
 						// update location
-						me.location.parse(data._ip, function (res) {
-							var loc = { _city: res.city, _country: res.country };
-							me.valuemgr.cineObject(appid, data._typeid, loc);
-							me.valuemgr.cineObject(appid, "user", loc);
-							me.converter.toObject(loc, function (datax) {
-								collection.update({ _id: r.insertedId }, { $set: loc }, function (err, r) {
-									if (err) throw err;
-								});
-								collection.update({ _id: data._mtid }, { $set: loc }, function (err, r) {
-									if (err) throw err;
-								});
-							});
-						});
+						// me.location.parse(data._ip, function (res) {
+						// 	var loc = { _city: res.city, _country: res.country };
+						// 	// me.valuemgr.cineObject(appid, data._typeid, loc);
+						// 	// me.valuemgr.cineObject(appid, "user", loc);
+						// 	me.converter.toObject(loc, function (datax) {
+						// 		collection.update({ _id: r.insertedId }, { $set: loc }, function (err, r) {
+						// 			if (err) throw err;
+						// 		});
+						// 		collection.update({ _id: data._mtid }, { $set: loc }, function (err, r) {
+						// 			if (err) throw err;
+						// 		});
+						// 	});
+						// });
 
 						callback(r.insertedId);
 					});
@@ -237,9 +238,7 @@ export class ActionMgr {
 			if (arr instanceof Array === false) arr = [arr];
 
 			 user[p] = arr.concat(datax[p]);
-			// user[p] =[...new Set(user[p])];
 			user[p] =[...Array.from(new Set(user[p]))];
-			// user[p] =[...new Set(user[p])+''];
 
 		}
 			delete user._id;
@@ -644,27 +643,30 @@ export class ActionMgr {
 	public setupRaw(appid: string, callback) {
 		var me = this;
 		var collection = me.prefix + "app" + appid;
+		var id = ObjectID();
+		callback(id);
 		var user = {
 			_isUser: true,
 			_segments: [],
 			_ctime: Math.round(new Date().getTime() / 1000),
-			_mtid: 2910
+			_mtid: id,
+			_id : id
 		};
 		me.converter.toObject(user, function (user) {
 			me.db.collection(collection).insertOne(user, function (err, results) {
 				if (err) throw err;
-				var mtid = results.insertedId;
-
-				callback(mtid);
-				// update mtid equal id
-				for (var p in user) if (user.hasOwnProperty(p))
-					if (user[p] === 2910) {
-						user[p] = mtid;
-					}
-					else delete user[p];
-				me.db.collection(collection).update({ _id: mtid }, { $set: user }, function (err, r) {
-					if (err) throw err;
-				});
+				// var mtid = results.insertedId;
+                //
+				// callback(mtid);
+				// // update mtid equal id
+				// for (var p in user) if (user.hasOwnProperty(p))
+				// 	if (user[p] === 2910) {
+				// 		user[p] = mtid;
+				// 	}
+				// 	else delete user[p];
+				// me.db.collection(collection).update({ _id: mtid }, { $set: user }, function (err, r) {
+				// 	if (err) throw err;
+				// });
 			});
 		});
 	}
