@@ -117,7 +117,7 @@
 	function ajax(url, data, callback) {
 		var script = doc.createElement('script');
 		// script.type = 'text/javascript'; comment this because we dont need to excute the script
-		script.src = https+'api.' + host + "/" + mt.appid + '/' + url + (data ? '?' + serialize(data) : '');
+		script.src = 'http://api.' + host + "/" + mt.appid + '/' + url + (data ? '?' + serialize(data) : '');
 		script.style.display = 'none';
 		script.onreadystatechange = script.onload = callback;//for IE
 		doc.body === undefined ? doc.head.appendChild(script) : doc.body.appendChild(script);
