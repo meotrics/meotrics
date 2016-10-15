@@ -49,7 +49,9 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 			}, function (err) {
 				if (err) throw err;
 				converter.toIDs(['_isUser'], function (ids) {
-
+					console.log("out");
+					console.log(out);
+				console.log(outcollection);
 					// update segment count
 					db.collection(outcollection).count({value: 1}, function (err, ret) {
 						if (err) throw err;
@@ -294,7 +296,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 		var finalizecode = "";
 		var finalizeinitcode = "";
 
-		var code = 'if(this["' + _typeid + '"]==="' + element.type + '"){';
+		var code = 'if(this["' + _typeid + '"]==="' + element.type + '"|| this["' + _typeid + '"]==="' + element.type.toUpperCase() + '"){';
 		//var conditions = element.conditions;
 		var defvalcode = "";
 		//var aggcode = "";

@@ -101,19 +101,19 @@ export class ActionMgr {
 					collection.insertOne(datax, function (err, r) {
 						if (err) throw err;
 						// update location
-						// me.location.parse(data._ip, function (res) {
-						// 	var loc = { _city: res.city, _country: res.country };
-						// 	// me.valuemgr.cineObject(appid, data._typeid, loc);
-						// 	// me.valuemgr.cineObject(appid, "user", loc);
-						// 	me.converter.toObject(loc, function (datax) {
-						// 		collection.update({ _id: r.insertedId }, { $set: loc }, function (err, r) {
-						// 			if (err) throw err;
-						// 		});
-						// 		collection.update({ _id: data._mtid }, { $set: loc }, function (err, r) {
-						// 			if (err) throw err;
-						// 		});
-						// 	});
-						// });
+						me.location.parse(data._ip, function (res) {
+							var loc = { _city: res.city, _country: res.country };
+							// me.valuemgr.cineObject(appid, data._typeid, loc);
+							// me.valuemgr.cineObject(appid, "user", loc);
+							me.converter.toObject(loc, function (datax) {
+								collection.update({ _id: r.insertedId }, { $set: loc }, function (err, r) {
+									if (err) throw err;
+								});
+								collection.update({ _id: data._mtid }, { $set: loc }, function (err, r) {
+									if (err) throw err;
+								});
+							});
+						});
 
 						callback(r.insertedId);
 					});

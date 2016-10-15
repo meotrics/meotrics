@@ -64,7 +64,8 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 			_deviceid: r.device.family,
 			_scr: request.params._scr,
 			_lang: request.headers["accept-language"],
-			_devicetype: devicetype
+			_devicetype: devicetype,
+			_mtid:  request.params._mtid
 		};
 
 		for (var i in request.params)
@@ -162,9 +163,10 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		console.log("=====info");
 		var appid = req.appid;
 		getMtid(req, appid, res, function (mtid) {
-			var data = {}; 
-			for (var i in req.params) if (req.params.hasOwnProperty(i))
-				if (i.startsWith('_') === false) data[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
+			var data = {};
+			console.log(req.params);
+			for (var i in req.params)
+					if (i.startsWith('_') === false) data[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
 
 			actionmgr.identifyRaw(appid, { mtid: mtid, user: data }, function (mtid) {
 				//set new mtid if need
@@ -270,6 +272,42 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		});
 	}
 
+	function pageviewtwo(req,res){
+		var appid = req.appid;
+		var data = trackBasic(req);
+		console.log(data);
+
+		var mtid = handlerMtid(data._mtid,appid,res);
+			data._typeid = 'pageview';
+			data._mtid = mtid;
+		console.log(mtid);
+		actionmgr.saveRaw(appid, data);
+	}
+
+	function handlerMtid(mtid,appid,res){
+		if(mtid == undefined || mtid == 'undefined'){
+			actionmgr.setupRaw(appid, function (_mtid) {
+				mtid = _mtid
+			});
+			console.log("new user");
+		}
+		sendMtid(mtid,res);
+		return mtid;
+	}
+
+	function sendMtid(mtid,res){
+		var id = {};
+		id._mtid = mtid;
+		var json = JSON.stringify(id);
+		res.setHeader('Content-Type', 'application/json');
+		res.setHeader('Access-Control-Allow-Origin', '*');
+		res.setHeader('Access-Control-Allow-Methods', 'GET');
+		res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+		res.setHeader('Access-Control-Allow-Credentials', true);
+		res.setHeader('Content-Type', 'application/json');
+		res.end(json);
+	}
+
 	function pageview(req, res) {
 		console.log("=====pageview");
 		var appid = req.appid;
@@ -317,6 +355,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 				if (action === 'track') track(req, res);
 				else if(action == 'check') checkMtid(req,res);
 				else if (action === '' || action === undefined) pageview(req, res);
+				else if (action === 'pageviewtwo') pageviewtwo(req, res);
 				else if (action === 'clear') clear(req, res);
 				else if (action === 'info') info(req, res);
 				else if (action === 'x') {

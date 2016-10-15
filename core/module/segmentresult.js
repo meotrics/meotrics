@@ -279,7 +279,6 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 		mustbeinsegment[ids._segments] = {$elemMatch: {$eq: new mongodb.ObjectId(segmentid)}};
 		matchClause.$match.$and.push(mustbeinsegment);
 		console.log(segmentid);
-		console.log(matchClause);
 		return matchClause;
 	}
 
@@ -320,7 +319,6 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 					docs[i].key = docs[i]._id;
 					delete docs[i]._id;
 				}
-				console.dir(docs[0].key);
 				callback(docs);
 			});
 		});
