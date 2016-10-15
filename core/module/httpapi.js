@@ -290,6 +290,14 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 				mtid = _mtid
 			});
 			console.log("new user");
+		}else{
+			actionmgr.ismtidValid(appid, mtid, function (ret) {
+				if (!ret){
+					actionmgr.setupRaw(appid, function (_mtid) {
+						mtid = _mtid;
+					});
+				}
+			});
 		}
 		sendMtid(mtid,res);
 		return mtid;
