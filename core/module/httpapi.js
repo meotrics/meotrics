@@ -275,32 +275,37 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	function pageviewtwo(req,res){
 		var appid = req.appid;
 		var data = trackBasic(req);
-		console.log(data);
-
-		var mtid = handlerMtid(data._mtid,appid,res);
+		handlerMtid(data._mtid,appid,res,function(mtid){
 			data._typeid = 'pageview';
 			data._mtid = mtid;
-		console.log(mtid);
-		actionmgr.saveRaw(appid, data);
+			console.log("mtid: "+mtid);
+			actionmgr.saveRaw(appid, data);
+		});
 	}
 
-	function handlerMtid(mtid,appid,res){
+	function handlerMtid(mtid,appid,res,callback){
 		if(mtid == undefined || mtid == 'undefined'){
 			actionmgr.setupRaw(appid, function (_mtid) {
-				mtid = _mtid
+				console.log("new user 1");
+				mtid = _mtid;
+				sendMtid(mtid,res);
+				callback(mtid);
 			});
-			console.log("new user");
 		}else{
 			actionmgr.ismtidValid(appid, mtid, function (ret) {
 				if (!ret){
+					console.log("new user 2");
 					actionmgr.setupRaw(appid, function (_mtid) {
 						mtid = _mtid;
+						sendMtid(mtid,res);
+						callback(mtid);
 					});
+				}else{
+					sendMtid(mtid,res);
+					callback(mtid);
 				}
 			});
 		}
-		sendMtid(mtid,res);
-		return mtid;
 	}
 
 	function sendMtid(mtid,res){
