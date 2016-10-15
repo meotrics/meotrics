@@ -1,7 +1,11 @@
 (function () {
 
 	var host = "meotrics.com";
-	if(location.hostname == "client.meotrics.dev") host = "meotrics.dev";
+	var https = "https://";
+	if(location.hostname == "client.meotrics.dev"){
+		host = "meotrics.dev";
+		https = "http://";
+	}
 	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document;
 
 	var T = 2;
@@ -153,18 +157,11 @@
 	}
 
 	function ajax(url, data, callback) {
-		console.log(mt.appid);
-		console.log(window.mtapp);
-		var theurl = '//' + host + ":1711/" + window.mtapp + '/' + url + (data ? '?' + serialize(data) : '');
+		var theurl = 'https://api.' + host + "/" + window.mtapp + '/' + url + (data ? '?' + serialize(data) : '');
+
 		callback(httpGetAsync(theurl,function(value){
 			callback(value);
 		}));
-		// var script = doc.createElement('script');
-		// // script.type = 'text/javascript'; comment this because we dont need to excute the script
-		// script.src = '//' + host + ":1711/" + mt.appid + '/' + url + (data ? '?' + serialize(data) : '');
-		// script.style.display = 'none';
-		// script.onreadystatechange = script.onload = callback;//for IE
-		// doc.body === undefined ? doc.head.appendChild(script) : doc.body.appendChild(script);
 
 	}
 
@@ -248,6 +245,7 @@
 
 	mt.excute = function(event){
 		var data = JSON.parse(event.data);
+		console.log(data);
 		actionPageview();
 		cleanRequest();// excute delayed request in queue
 	}
