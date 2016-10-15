@@ -115,7 +115,7 @@ export class ActionMgr {
 							});
 						});
 
-						callback(r.insertedId);
+						// callback(r.insertedId);
 					});
 
 					//get user infomation
