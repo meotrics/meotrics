@@ -6,7 +6,8 @@
     <script src="{{asset('/js/typehead.js')}}"></script>
     <script type="text/javascript">
         function createSuggession(appid, typeid, field, $dom) {
-            typeid = 'pageview';
+            if(typeid == 'user')
+                typeid = 'pageview';
             var source = new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
