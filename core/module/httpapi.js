@@ -276,6 +276,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		var appid = req.appid;
 		var data = trackBasic(req);
 		handlerMtid(data._mtid,appid,res,function(mtid){
+			me.onchange(appid, 'type.pageview');
 			data._typeid = 'pageview';
 			data._mtid = mtid;
 			console.log("mtid: "+mtid);
