@@ -92,7 +92,6 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 			mtid = req.params._mtid;
 			if (mtid === undefined) {
 				return actionmgr.setupRaw(appid, function (mtid) {
-					setCookie(res, "mtid", mtid, appid);
 					callback(mtid);
 				});
 			}
@@ -103,33 +102,12 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 			else {
 				eraseCookie(res, "mtid", appid);
 				actionmgr.setupRaw(appid, function (mtid) {
-					setCookie(res, "mtid", mtid, appid);
 					callback(mtid);
 				});
 			}
 		});
 	}
 
-	function eraseCookie(res, name, path) {
-		res.setHeader('Set-Cookie', name + "=x; expires=Wed, 21 Aug 1995 11:11:11 GMT; path=/" + path);
-	}
-
-	function eraseCookieDuplicate(res, name, path) {
-		res.setHeader('Set-Cookie', name + "=x; expires=Wed, 21 Aug 1995 11:11:11 GMT");
-	}
-
-	function clearDuplicate(req, res){
-		console.log("clear duplicate");
-		eraseCookieDuplicate(res, 'mtid', req.appid);
-		res.end();
-	}
-
-	function clear(req, res) {
-		console.log("=====clear");
-		// delete the cookie
-		eraseCookie(res, 'mtid', req.appid);
-		res.end();
-	}
 
 	function track(req, res) {
 		console.log("=====track");
@@ -138,19 +116,17 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		var callback = (data._callback == 'true' || data._callback == true);
 		delete data._callback;
 
-		getMtid(req, appid, res, function (mtid) {
+		handlerMtid(data._mtid, appid, res, function (mtid) {
 			data._mtid = mtid;
 			actionmgr.saveRaw(appid, data, function (actionid) {
 				me.onchange(appid, "type." + data._typeid);
 				
 				if (callback === true)
 				{
-					res.setHeader('Content-Type', 'application/javascript');
-					res.end("mt.actionid = \"" + mtid + "\";");
+					sendMtid(mtid,res);
 				}
 				else {
-					res.setHeader('Content-Type', 'text/plain');
-					res.end("\"" + mtid + "\"");
+					sendMtid(mtid,res);
 				}
 	
 			});
@@ -162,7 +138,8 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	function info(req, res) {
 		console.log("=====info");
 		var appid = req.appid;
-		getMtid(req, appid, res, function (mtid) {
+		var data = trackBasic(req);
+		handlerMtid(data._mtid, appid, res, function (mtid) {
 			var data = {};
 			console.log(req.params);
 			for (var i in req.params)
@@ -170,10 +147,6 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
 			actionmgr.identifyRaw(appid, { mtid: mtid, user: data }, function (mtid) {
 				//set new mtid if need
-				setCookie(res, "mtid", mtid, appid);
-				res.setHeader('Content-Type', 'text/plain');
-
-				res.end("\"" + mtid + "\"");
 			});
 		});
 	}
@@ -183,80 +156,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		});
 	}
 
-	function checkMtid(req,res){
-		// check duplicate
-		if(checkNotDuplicateMtid(req,res)){
-			console.log("true");
-			// check worng mtid
-		var mtid = getCookie(req,"mtid");
-		if(mtid !== undefined && mtid.length != 24){
-				console.log("wrong mtid");
-				clear(req, res);
-			}else{
-			res.setHeader('Content-Type', 'text/plain');
-			res.end();
-		}
 
-		}
-
-
-	}
-
-	function checkNotDuplicateMtid(req,res){
-		console.log("checkDuplicate");
-		var cookieHeaders = req.headers.cookie;
-		if(cookieHeaders === undefined) return true;
-		var cookie = cookieHeaders.split(';');
-		var count = 0;
-		var value = "";
-		for(var i =0; i< cookie.length;i++){
-			var c = cookie[i];
-			while (c.charAt(0)==' ') {
-				c = c.substring(1);
-			}
-			if (c.indexOf("mtid") == 0) {
-				if(count == 0){
-					var cmtid = "mtid=";
-					value = c.substring(cmtid.length,c.length);
-				}
-				count++;
-			}
-		}
-		if(count > 1){
-			clearDuplicate(req,res);
-			return false;
-		}
-		return true;
-	}
-
-	function getCookie(req, name) {
-		var list = {}, rc = req.headers.cookie;
-		rc && rc.split(';').forEach(function (cookie) {
-			var parts = cookie.split('=');
-			list[parts.shift().trim()] = decodeURIComponent(parts.join('='));
-		});
-		return list[name];
-	}
-
-	function setCookie(res, name, value, path) {
-		var tenyearlater = new Date().getYear() + 10 + 1900;
-		res.setHeader('Set-Cookie', name + '=' + encodeURIComponent(value) + "; expires=Wed, 21 Aug " + tenyearlater + " 11:11:11 GMT; path=/" + path);
-
-	}
-
-	function fix(req, res) {
-		console.log("=====fix");
-		var appid = req.appid;
-		var actionid = req.actionid;
-		var lastactionid = req.lastactionid;
-		var data = trackBasic(req);
-		getMtid(req, appid, res, function (mtid) {
-			data._mtid = mtid;
-			actionmgr.fixRaw(appid, actionid, lastactionid, data, function () {
-				res.end();
-			});
-		});
-	}
 
 	function suggest(req, res) {
 		console.log("=====suggest");
@@ -319,6 +219,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
 		res.setHeader('Access-Control-Allow-Credentials', true);
 		res.setHeader('Content-Type', 'application/json');
+		console.log("sended");
 		res.end(json);
 	}
 

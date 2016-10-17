@@ -20,21 +20,18 @@
 		mt.appid = window.mtapp;
 		var data = {};
 		addVisitorPlatform(data);
-		getMtid(data,function(callback){
-			data._mtid = callback;
-			console.log(data._mtid);
-			ajax('pageviewtwo',data,function(callback){
+		ajax('pageviewtwo',data,function(callback){
 				console.log(1);
 				if(callback!= undefined){
 					var mtid = JSON.parse(callback)._mtid;
 					document.cookie = "_mtid="+mtid;
 				}
 			});
-		});
-
+		cleanRequest();
 	}
 
-	function getMtid(data,callback){
+	function getMtid(){
+		var mtid;
 		var cookieHeaders = doc.cookie;
 		if(cookieHeaders === undefined) return false;
 		var cookie = cookieHeaders.split(';');
@@ -48,10 +45,10 @@
 			if (c.indexOf("_mtid") == 0) {
 				var cmtid = "_mtid=";
 				value = c.substring(cmtid.length,c.length);
-				data._mtid = value;
+				mtid = value;
 			}
 		}
-		callback(data._mtid);
+		return mtid;
 	}
 
 
@@ -157,6 +154,8 @@
 	}
 
 	function ajax(url, data, callback) {
+		data._mtid  = getMtid();
+		console.log(data._mtid);
 		var theurl = 'https://api.' + host + "/" + window.mtapp + '/' + url + (data ? '?' + serialize(data) : '');
 
 		callback(httpGetAsync(theurl,function(value){
@@ -187,8 +186,14 @@
 
 	mt.info = function (data, callback, callback2, callback3) {
 		if(typeof data == 'string') data = {userid: data};
-		if(isready)
-			ajax('info', data, callback || callback3)
+		if(isready){
+			ajax('info',data,function(callback){
+				if(callback!= undefined){
+					var mtid = JSON.parse(callback)._mtid;
+					document.cookie = "_mtid="+mtid;
+				}
+			});
+		}
 		else{
 			request_queue2.push(['info', data]);
 			(callback || callback3)();
@@ -207,7 +212,12 @@
 	mt.track = function (event, data, time, callback) {
 		data._deltat = (new Date() - time) / 1000;
 		data._typeid = event;
-		if(isready) ajax('track', addVisitorPlatform(data), callback)
+		if(isready) ajax('track', addVisitorPlatform(data), function(callback){
+			if(callback!= undefined){
+				var mtid = JSON.parse(callback)._mtid;
+				document.cookie = "_mtid="+mtid;
+			}
+		});
 		else
 		{
 			request_queue2.push(['track', event, data, new Date()]);
