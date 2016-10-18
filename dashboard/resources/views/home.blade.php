@@ -6,16 +6,23 @@
 	<script src="{{asset('/js/Chart.js')}}"></script>
 	<script>
 		onPageLoad(function () {
-			
+			var pending_pageview = false;
+
 			function update_pageview(){
-				throttle(function(){
-					$.post('/app/getpageview/{{$appcode}}', function(data){
-						data = JSON.parse(data);
-						$('.id_newv').html(data.newVisitors);
-						$('.id_retu').html(data.returningVisitors);
-						drawVisitChart(data.newVisitors, data.returningVisitors);
-					});
-				}, 1000)();
+				if(!pending_pageview){
+					pending_pageview = true;
+					throttle(function(){
+						$.post('/app/getpageview/{{$appcode}}', function(data){
+							pending_pageview = false;
+							data = JSON.parse(data);
+							$('.id_newv').html(data.newVisitors);
+							if(data.returningVisitors >= 0) {
+								$('.id_retu').html(data.returningVisitors);
+							}
+							drawVisitChart(data.newVisitors, data.returningVisitors);
+						});
+					}, 1000)();
+				}
 			}
 			
 			function update_register() {
@@ -30,7 +37,6 @@
 					})
 				}, 1000)();
 			}
-			
 			websock.appChange('{{$appcode}}', 'type.pageview', update_pageview);
 			websock.appChange('{{$appcode}}', 'type.register', update_register);
 			
