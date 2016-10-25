@@ -35,7 +35,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
 	// purpose: extract basic info from user agent and request parameter
 	function trackBasic(request) {
-		console.log("=====trace basic");
+		// console.log("=====trace basic");
 		var useragent = request.headers['user-agent'];
 		var r = ua.parse(useragent);
 		var uri = request.params._url || '';
@@ -47,8 +47,6 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 			devicetype = 'phone';
 		else
 			devicetype = 'desktop';
-
-		console.log(devicetype);
 		if (uri === "" || uri.startsWith(request.headers.referer) === false) uri = request.headers.referer || '';
 		var res = {
 			_url: uri,
@@ -84,33 +82,9 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	}
 
 
-	function getMtid(req, appid, res, callback) {
-		console.log("=====get mtid");
-		var mtid = getCookie(req, "mtid");
-		console.log("mtid: "+mtid);
-		if (mtid === undefined || mtid.length != 24) {
-			mtid = req.params._mtid;
-			if (mtid === undefined) {
-				return actionmgr.setupRaw(appid, function (mtid) {
-					callback(mtid);
-				});
-			}
-		}
-		// check if mtid is valid
-		actionmgr.ismtidValid(appid, mtid, function (ret) {
-			if (ret) callback(mtid);
-			else {
-				eraseCookie(res, "mtid", appid);
-				actionmgr.setupRaw(appid, function (mtid) {
-					callback(mtid);
-				});
-			}
-		});
-	}
-
 
 	function track(req, res) {
-		console.log("=====track");
+		// console.log("=====track");
 		var appid = req.appid;
 		var data = trackBasic(req);
 		var callback = (data._callback == 'true' || data._callback == true);
@@ -136,12 +110,12 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	// identify an user
 	// if mtid not exists in the parameter ->create one
 	function info(req, res) {
-		console.log("=====info");
+		// console.log("=====info");
 		var appid = req.appid;
 		var data = trackBasic(req);
 		handlerMtid(data._mtid, appid, res, function (mtid) {
 			var data = {};
-			console.log(req.params);
+			// console.log(req.params);
 			for (var i in req.params)
 					if (i.startsWith('_') === false) data[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
 
@@ -159,7 +133,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
 
 	function suggest(req, res) {
-		console.log("=====suggest");
+		// console.log("=====suggest");
 		valuemgr.suggest(req.appid + "", req.typeid + "", req.field + "", req.qr + "", function (results) {
 			res.setHeader('Content-Type', 'application/json');
 			res.setHeader('Access-Control-Allow-Origin', '*');
@@ -179,7 +153,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 			me.onchange(appid, 'type.pageview');
 			data._typeid = 'pageview';
 			data._mtid = mtid;
-			console.log("mtid: "+mtid);
+			// console.log("mtid: "+mtid);
 			actionmgr.saveRaw(appid, data);
 		});
 	}
@@ -187,7 +161,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	function handlerMtid(mtid,appid,res,callback){
 		if(mtid == undefined || mtid == 'undefined'){
 			actionmgr.setupRaw(appid, function (_mtid) {
-				console.log("new user 1");
+				// console.log("new user 1");
 				mtid = _mtid;
 				sendMtid(mtid,res);
 				callback(mtid);
@@ -195,7 +169,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		}else{
 			actionmgr.ismtidValid(appid, mtid, function (ret) {
 				if (!ret){
-					console.log("new user 2");
+					// console.log("new user 2");
 					actionmgr.setupRaw(appid, function (_mtid) {
 						mtid = _mtid;
 						sendMtid(mtid,res);
@@ -219,28 +193,8 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
 		res.setHeader('Access-Control-Allow-Credentials', true);
 		res.setHeader('Content-Type', 'application/json');
-		console.log("sended");
+		// console.log("sended");
 		res.end(json);
-	}
-
-	function pageview(req, res) {
-		console.log("=====pageview");
-		var appid = req.appid;
-		// record an new pageview
-		var data = trackBasic(req);
-		getMtid(req, appid, res, function (mtid) {
-			data._mtid = mtid;
-			data._typeid = 'pageview';
-			var newId = ObjectID();
-			data._id = newId;
-			loadCode(appid, newId.toString(), function (code) {
-				res.setHeader('Content-Type', 'text/css');
-				res.end(code);
-			});
-			actionmgr.saveRaw(appid, data, function (actionid) {
-				me.onchange(appid, 'type.pageview');
-			});
-		});
 	}
 
 	this.route = function (req, res) {
@@ -268,10 +222,8 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 				req['appid'] = parts[1];
 				var action = parts[2];
 				if (action === 'track') track(req, res);
-				else if(action == 'check') checkMtid(req,res);
-				else if (action === '' || action === undefined) pageview(req, res);
+				else if (action === '' || action === undefined) pageviewtwo(req, res);
 				else if (action === 'pageviewtwo') pageviewtwo(req, res);
-				else if (action === 'clear') clear(req, res);
 				else if (action === 'info') info(req, res);
 				else if (action === 'x') {
 					req['actionid'] = parts[3];
@@ -284,13 +236,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 					req['qr'] = parts[5];
 					suggest(req, res);
 				}
-				else if (action === 'fix') {
-					var query = url.parse(path, true).query;
-					req['actionid'] = req.params.actionid;
-					req['lastactionid'] = req.params.lastactionid;
-						if(req.params.actionid==null) console.log('errfix: ', path);
-					fix(req, res);
-				} else {
+				else {
 					res.statusCode = 404;
 					res.end('action "' + action + '" not found, action must be one of [x, clear, info, fix, track]');
 				}
@@ -298,7 +244,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		}, function (err) {
 			res.statusCode = 500;
 			res.end();
-			console.log(err, err.stack);
+			// console.log(err, err.stack);
 		});
 	};
 };

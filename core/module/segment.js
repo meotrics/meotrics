@@ -49,9 +49,9 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 			}, function (err) {
 				if (err) throw err;
 				converter.toIDs(['_isUser'], function (ids) {
-					console.log("out");
-					console.log(out);
-				console.log(outcollection);
+					//console.log("out");
+					//console.log(out);
+				//console.log(outcollection);
 					// update segment count
 					db.collection(outcollection).count({value: 1}, function (err, ret) {
 						if (err) throw err;

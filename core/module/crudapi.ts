@@ -82,7 +82,6 @@ export class CrudApi {
 		//update or
 		app.get('/segment/query1/:appid/:id/:field1/', function (req, res) {
 			me.segMgr.querySegment(req.params.appid, req.params.id, req.params.field1, undefined, function (results) {
-				console.log(results);
 				res.json(results);
 			});
 		});

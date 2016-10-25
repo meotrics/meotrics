@@ -278,7 +278,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 		var mustbeinsegment = {};
 		mustbeinsegment[ids._segments] = {$elemMatch: {$eq: new mongodb.ObjectId(segmentid)}};
 		matchClause.$match.$and.push(mustbeinsegment);
-		console.log(segmentid);
+		//console.log(segmentid);
 		return matchClause;
 	}
 

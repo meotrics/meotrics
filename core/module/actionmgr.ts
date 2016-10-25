@@ -56,7 +56,7 @@ export class ActionMgr {
 	// + data2
 	// + data3
 	public saveRaw(appid, data, callback) {
-		console.log("=====save raw");
+		//console.log("=====save raw");
 		let me = this;
 		var collection = me.db.collection(this.prefix + "app" + appid);
 		var collectionmapping = this.prefix + this.mapping;
@@ -89,7 +89,7 @@ export class ActionMgr {
 
 
 		function lastsave() {
-			console.log("=====lastsave");
+			//console.log("=====lastsave");
 			// retrive real mtid because user can still use old mtid
 			me.db.collection(collectionmapping).find({ anomtid: mtid }).limit(1).toArray(function (err, r) {
 				if (err) throw err;
@@ -103,8 +103,8 @@ export class ActionMgr {
 						// update location
 						me.location.parse(data._ip, function (res) {
 							var loc = { _city: res.city, _country: res.country };
-							// me.valuemgr.cineObject(appid, data._typeid, loc);
-							// me.valuemgr.cineObject(appid, "user", loc);
+							me.valuemgr.cineObject(appid, data._typeid, loc);
+							me.valuemgr.cineObject(appid, "user", loc);
 							me.converter.toObject(loc, function (datax) {
 								collection.update({ _id: r.insertedId }, { $set: loc }, function (err, r) {
 									if (err) throw err;
@@ -268,7 +268,7 @@ export class ActionMgr {
 	// + actionid: ObjectID, id of action
 	// + data: action data
 	public fixRaw(appid: string, actionids: string, lastactionidstr: string, data, callback: () => void) {
-		console.log("=====fix raw");
+		//console.log("=====fix raw");
 		let me = this;
 		if(actionids == null) return callback(); //wrong actionid
 		let actionid = new mongodb.ObjectID(actionids);
@@ -301,7 +301,7 @@ export class ActionMgr {
 		}
 		});
 		function store(ids) {
-			console.log("=====store");
+			//console.log("=====store");
 			//me.updateChainCampaign(appid, actionids, data);
 			data._reftype = me.referer.getTypeName(parseInt(me.referer.getRefType(data._url, data._ref)));
 			me.valuemgr.cineObject(appid, "pageview", data);
@@ -311,7 +311,7 @@ export class ActionMgr {
 						if(r.length ===0) throw "action not found 400: " + actionid;
 						
 						data._mtid = r[0][ids._mtid];
-				console.log("data.mtid in store: "+ data._mtid);
+				//console.log("data.mtid in store: "+ data._mtid);
 				me.converter.toObject(data, function (datax) {
 					collection.update({ _id: actionid }, { $set: datax }, function (err, r) {
 						if (err) throw err;
@@ -332,14 +332,13 @@ export class ActionMgr {
 	public x(req, res, callback) {
 		var me = this;
 		var data = req.params;
-		console.log(req.actionid);
-		if(req.actionid.length != 24){
+		if(data._mtid.length != 24){
 			res.writeHead(200);
 			res.end();
 			callback();
 		}else{
 			var collection = me.prefix + "app" + req.appid;
-			var actionid = new mongodb.ObjectID(req.actionid);
+			var actionid = new mongodb.ObjectID(data._mtid);
 			me.converter.toIDs(['_ctime', 'totalsec'], function (ids) {
 				var projection = {};
 				projection[ids._ctime] = 1;
