@@ -10,26 +10,46 @@ const validator = require('validator');
 const async = require('async');
 const mongodb = require('mongodb');
 const segmentUtils = require('../../lib/utils/segment-utils.js');
+let util = require('util');
 
 const router = express.Router();
 
+let allFields = [
+    '_id',
+    '_typeid',
+    '_isUser',
+    '_segments',
+    '_mtid'
+];
+
+let bodyFormat = {
+    type: '',
+    inf: {
+        _typeid: '',
+        oper: '',
+        fieldName: '',
+        value: ''
+    }
+};
+
 // filter segment in action type
-router.post('/segment-result/:appid/:_id', validate, function(req, res, next){
-    const appid = req.params.appid;
-    const _id = req.params._id;
-    const type = req.body.type;
-    const inf = req.body.inf;
+router.post('/segment-result/:_appid/:_id', validate, getConverter, function(req, res, next){
+    let _appid = req.params._appid;
+    let _id = req.params._id;
+    let type = req.body.type;
+    let inf = req.body.inf;
 
     if(type === 'action') {
-        const queryAction = mongoUtils.translateOperator(inf.fieldName, inf.oper, inf.value);
-        queryAction._typeid = inf._typeid;
 
-        const match1 = {
+        let queryAction = mongoUtils.translateOperator(req.meotrics_converters[inf.fieldName], inf.oper, inf.value);
+        queryAction[req.meotrics_converters['_typeid']] = inf._typeid;
+
+        let match1 = {
             $match: {
                 $or: [
                     {
-                        _isUser: true,
-                        _segments: {
+                        [req.meotrics_converters['_isUser']]: true,
+                        [req.meotrics_converters['_segments']]: {
                             $in: [new mongodb.ObjectID(_id)]
                         }
                     },
@@ -39,28 +59,30 @@ router.post('/segment-result/:appid/:_id', validate, function(req, res, next){
         };
 
 
-        const project1 = {
+        let project1 = {
             $project: {
-                _mtid: 1,
-                [inf.fieldName]: 1,
-                _isUser: {
+                [req.meotrics_converters['_mtid']]: 1,
+                [req.meotrics_converters[inf.fieldName]]: 1,
+                [req.meotrics_converters['_isUser']]: {
                     $ifNull: [0, 1]
                 },
-                _id: 0
+                [req.meotrics_converters['_id']]: 0
             }
         }
 
-        const group1 = {
+        let group1 = {
             $group: {
                 _id: {
-                    _mtid: '$_mtid',
-                    [inf.fieldName]: `$${inf.fieldName}`
+                    _mtid: `$${req.meotrics_converters['_mtid']}`,
+                    [inf.fieldName]: `$${req.meotrics_converters[inf.fieldName]}`
                 },
-                _isUser: {$sum: '$_isUser'}
+                _isUser: {
+                    $sum: `$${req.meotrics_converters['_isUser']}`
+                }
             }
         }
 
-        const match2 = {
+         let match2 = {
             $match: {
                 _isUser: {
                     $eq: 0
@@ -68,20 +90,20 @@ router.post('/segment-result/:appid/:_id', validate, function(req, res, next){
             }
         }
 
-        const group2 = {
+        let group2 = {
             $group: {
                 _id: `$_id.${inf.fieldName}`,
                 count: {$sum: 1}
             }
         }
 
-        const sort1 = {
+        let sort1 = {
             $sort: {
                 count: -1
             }
         }
 
-        const project2 = {
+        let project2 = {
             $project: {
                 key: "$_id",
                 count: 1,
@@ -89,95 +111,99 @@ router.post('/segment-result/:appid/:_id', validate, function(req, res, next){
             }
         };
 
-        const collection = config.mongod.prefix + "app" + appid;
+        let collection = config.mongod.prefix + 'app' + _appid;
 
         globalVariables
             .get('db')
             .collection(collection)
             .aggregate([match1, project1, group1, match2, group2, sort1, project2])
-            .toArray( (err, r) => {
+            .toArray( (err, result) => {
                 if (err) {
-                    return next(err);
+                    return res.json({
+                        ec: consts.CODE.ERROR,
+                        error: util.inspect(err)
+                    });
                 }
 
-                console.log(r);
                 res.json({
                     ec: consts.CODE.SUCCESS,
                     data: {
-                        string: r.splice(0, 10),
-                        number: handleNumberCase(r, inf)
+                        string: result.splice(0, 10),
+                        number: handleNumberCase(result, inf.fieldName)
                     }
                 });
             });
     } else {
         res.json({
             ec: consts.CODE.FAIL,
-            reason: `not supported yet for ${type}`
+            reason: `not supported yet for type: ${type}`
         });
     }
 });
 
 // Middleware for checking data
 function validate(req, res, next) {
-    const appid = req.params.appid;
-    const _id = req.params._id;
-    const type = req.body.type;
-    const inf = req.body.inf;
+    let _id = req.params._id;
 
     if(!validator.isMongoId(_id)) {
-        res.json({
-            ec: consts.CODE.WRONG_PARAM,
-            reason: '_id must be an object id'
+        return res.json({
+            ec: consts.CODE.ERROR,
+            error: util.inspect((new TypeError('_id must be an ObjectId')))
         });
-
-        return next('route');
     }
+
+    req.body = _.merge(_.cloneDeep(bodyFormat), req.body);
 
     next();
 }
 
-function handleNumberCase(data, inf) {
-    let r = [];
-    let min = undefined;
-    let max = undefined;
-    const numArray = [];
+function handleNumberCase(data, fieldName) {
+    let numbers = [];
     data.forEach(e => {
-        const value = e.key;
+        let value = e.key;
         if(_.isNumber(value)) {
-            if(min === undefined) {
-                min = value;
-                max = value;
-            } else if(value < min) {
-                min = value;
-            } else if(value > max) {
-                max = value;
-            }
-
-            numArray.push(e);
+            numbers.push(e);
         }
-
     });
 
-    if(min !== undefined) {
-        r = segmentUtils.calculateRange(min, max);
-        const distance = (max - min) / r.length;
-
-        if(distance === 0) {
-            console.log(numArray);
-           r[0].count = numArray[0].count;
-        } else {
-            numArray.forEach(e => {
-                const value = e.key;
-                let index = (value - min) / distance;
-                if(index === r.length) {
-                    index--;
-                }
-                r[index].count += e.count;
-            });
-        }
+    if(numbers.length === 0) {
+        return [];
     }
 
-    return r;
+    let max = _.maxBy(numbers, element => {
+        return element.key;
+    }).key;
+
+    let min = _.minBy(numbers, element => {
+        return element.key;
+    }).key;
+
+    let ranges = segmentUtils.calculateRange(min, max, fieldName);
+    let distance = (max - min) / ranges.length;
+
+    if(distance === 0) {
+        ranges[0].count = numbers[0].count;
+    } else {
+        numbers.forEach(e => {
+            let value = e.key;
+            let index = Math.floor((value - min) / distance);
+            if(index === ranges.length) {
+                index--;
+            }
+            ranges[index].count += e.count;
+        });
+    }
+
+    return ranges;
+}
+
+function getConverter(req, res, next) {
+    let fieldName = req.body.inf.fieldName;
+
+    globalVariables.get('converter').toIDs([fieldName, ...allFields], ids => {
+        req.meotrics_converters = ids;
+        return next();
+    });
 }
 
 module.exports = function (app) {
