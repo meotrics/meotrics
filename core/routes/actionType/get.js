@@ -7,73 +7,44 @@ const _ = require('lodash');
 const config = require('config');
 const validator = require('validator');
 const async = require('async');
-
+const util = require('util');
 const router = express.Router();
 
 // Get all action type
-router.get('/action-type/:appid', validate, handleMoreFields, function(req, res, next){
-    const appid = req.params.appid;
-
-    const query = {
-        _appid: appid
-    };
-
-    const defaultFields = [
-        'name',
-        '_id',
-    ];
-    const projection = {};
-    defaultFields.concat(req.moreFields).forEach(v => {
-        projection[v] = 1;
-    });
-
-
-    const options = {
-        sort: "name" // alpha-beta sort
-    };
-
-    const collection = config.mongod.prefix + consts.ACTION_TYPE_COLLECTION;
+router.get('/action-type/:appid', validate, getConverter, function(req, res, next){
+    let appid = req.params.appid;
+    let collection = config.mongod.prefix + 'app' + appid;
+    let fieldMapped = req.meotrics_converters._typeid;
 
     globalVariables
         .get('db')
         .collection(collection)
-        .find(query, projection, options)
-        .toArray((err, r) => {
+        .distinct(fieldMapped, (err, result) => {
             if(err) {
-                return next(err);
+                return res.json({
+                    ec: consts.CODE.ERROR,
+                    error: util.inspect(err)
+                });
             }
 
-            console.log(r);
             res.json({
                 ec: consts.CODE.SUCCESS,
-                data: r
+                data: result
             });
         });
 });
 
 // Middleware for checking data
 function validate(req, res, next) {
-    console.log(req.params);
-    next();
+    return next();
 }
 
-// Handle get more fields
-function handleMoreFields(req, res, next) {
-    let moreFields = [];
-    let extras = req.query.extras;
-    if(!_.isUndefined(extras)) {
-        let temp = extras.split(',');
-        temp.forEach(v => {
-            if(validator.isLength(v, 1)) {
-                moreFields.push(v);
-            }
-        });
-    }
-
-    req.moreFields = moreFields;
-    next();
+function getConverter(req, res, next) {
+    globalVariables.get('converter').toIDs(['_typeid'], ids => {
+        req.meotrics_converters = ids;
+        return next();
+    });
 }
-
 
 module.exports = function (app) {
     app.use('/', router);
