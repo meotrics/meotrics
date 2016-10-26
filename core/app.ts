@@ -65,6 +65,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.Mongo
 		appException(app);
 		app.use(bodyParser.json()); // parse application/json
 		converter = new converter.IdManager();
+		globalVariables.set('converter', converter);
 		var crudapi = new CrudApi.CrudApi(db, converter, prefix, ref, config.get("dashboard.delay"));
 		crudapi.route(app); //bind route
 		routes(app);
