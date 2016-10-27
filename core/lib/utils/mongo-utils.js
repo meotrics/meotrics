@@ -44,5 +44,17 @@ module.exports = {
         }
 
         return query;
+    },
+    generateProjection: (converters, returnFields, restrictFields = []) => {
+        let projection = {};
+
+        returnFields.forEach(field => {
+            projection[converters[field]] = 1;
+        });
+        restrictFields.forEach(field => {
+            projection[converters[field]] = 0;
+        });
+
+        return projection;
     }
 }
