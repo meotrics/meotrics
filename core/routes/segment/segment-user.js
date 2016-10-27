@@ -48,10 +48,8 @@ router.get('/segment-user/:_appid/:_id', validate, handleMoreFields, getConverte
 
     let query = {
         [req.meotrics_converters['_isUser']]: true,
-        [req.meotrics_converters['_segments']]: {
-            $in: [new mongodb.ObjectID(segmentId)]
-        }
-    }
+        [req.meotrics_converters['_segments']]: new mongodb.ObjectID(segmentId)
+    };
 
     let projection = mongoUtils.generateProjection(req.meotrics_converters, moreFields, restrictFields);
 
@@ -77,7 +75,7 @@ router.get('/segment-user/:_appid/:_id', validate, handleMoreFields, getConverte
 
             result.forEach(data => {
                 moreFields.forEach(field => {
-                    if(!_.has(data, req.meotrics_converters[field])) {
+                    if(!_.has(data, req.meotrics_converters[field]) && defaultFields.indexOf(field) === -1) {
                         data[field] = '';
                     }
                 });
