@@ -49,9 +49,7 @@ router.post('/segment-result/:_appid/:_id', validate, getConverter, function(req
                 $or: [
                     {
                         [req.meotrics_converters['_isUser']]: true,
-                        [req.meotrics_converters['_segments']]: {
-                            $in: [new mongodb.ObjectID(_id)]
-                        }
+                        [req.meotrics_converters['_segments']]: new mongodb.ObjectID(_id)
                     },
                     queryAction
                 ]
