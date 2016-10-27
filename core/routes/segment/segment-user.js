@@ -77,7 +77,7 @@ router.get('/segment-user/:_appid/:_id', validate, handleMoreFields, getConverte
 
             result.forEach(data => {
                 moreFields.forEach(field => {
-                    if(!_.has(data, field)) {
+                    if(!_.has(data, req.meotrics_converters[field])) {
                         data[field] = '';
                     }
                 });
