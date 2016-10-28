@@ -1,18 +1,19 @@
 'use strict';
 
+const config = require('config');
+const validator = require('validator');
+const async = require('async');
 const globalVariables = require('../../lib/utils/global-variables.js');
 const mongoUtils = require('../../lib/utils/mongo-utils.js');
 const express = require('express');
 const consts = require('../../lib/consts/consts.js');
 const _ = require('lodash');
-const config = require('config');
-const validator = require('validator');
-const async = require('async');
 const mongodb = require('mongodb');
-const segmentUtils = require('../../lib/utils/segment-utils.js');
-let util = require('util');
+const util = require('util');
 
 const router = express.Router();
+
+const LIMIT = 10;
 
 let fieldsForWork = [
     '_id',
@@ -32,10 +33,8 @@ let restrictFields = [
 
 let queryFormat = {
     page: '',
-    forceMore: ''
+    more: ''
 };
-
-let LIMIT = 10;
 
 router.get('/segment-user/:_appid/:_id', validate, handleMoreFields, getConverter, function(req, res, next){
     let segmentId = req.params._id;
@@ -59,7 +58,7 @@ router.get('/segment-user/:_appid/:_id', validate, handleMoreFields, getConverte
         },
         limit: LIMIT,
         skip: skip
-    }
+    };
 
     globalVariables
         .get('db')
@@ -73,18 +72,10 @@ router.get('/segment-user/:_appid/:_id', validate, handleMoreFields, getConverte
                 });
             }
 
-            result.forEach(data => {
-                moreFields.forEach(field => {
-                    if(!_.has(data, req.meotrics_converters[field]) && defaultFields.indexOf(field) === -1) {
-                        data[field] = '';
-                    }
-                });
-            });
-
             return res.json({
                 ec: consts.CODE.SUCCESS,
                 data: result
-            })
+            });
         });
 });
 
@@ -95,7 +86,7 @@ function validate(req, res, next) {
     if(!validator.isMongoId(_id)) {
         return res.json({
             ec: consts.CODE.ERROR,
-            error: util.inspect((new TypeError('_id must be an ObjectId')))
+            error: util.inspect((new TypeError('segment id must be an ObjectId')))
         });
     }
 
@@ -112,7 +103,7 @@ function validate(req, res, next) {
 }
 
 function handleMoreFields(req, res, next) {
-    let more = req.query.forceMore;
+    let more = req.query.more;
     let moreFields = more.split(',');
 
     let temp = [];
@@ -124,7 +115,7 @@ function handleMoreFields(req, res, next) {
 
     req.meotrics_moreFields = temp;
 
-    next();
+    return next();
 }
 
 function getConverter(req, res, next) {
