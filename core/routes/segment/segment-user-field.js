@@ -24,7 +24,8 @@ let fieldsForWork = [
 ];
 
 let defaultFields = [
-    '_lastSeen'
+    '_lastSeen',
+    '_ctime'
 ];
 
 let restrictFields = [
