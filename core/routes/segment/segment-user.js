@@ -19,7 +19,9 @@ let fieldsForWork = [
     '_id',
     '_segments',
     '_isUser',
-    '_lastSeen'
+    '_lastSeen',
+    '_mtid',
+    'email'
 ];
 
 let defaultFields = [
@@ -44,13 +46,14 @@ router.get('/segment-user/:_appid/:_id', validate, handleMoreFields, getConverte
 
     let skip = page*LIMIT;
     let collection = config.mongod.prefix + 'app' + _appid;
+    let returnFields = moreFields.concat(defaultFields);
 
     let query = {
         [req.meotrics_converters['_isUser']]: true,
         [req.meotrics_converters['_segments']]: new mongodb.ObjectID(segmentId)
     };
 
-    let projection = mongoUtils.generateProjection(req.meotrics_converters, moreFields, restrictFields);
+    let projection = mongoUtils.generateProjection(req.meotrics_converters, returnFields, restrictFields);
 
     let options = {
         sort: {
@@ -107,14 +110,13 @@ function handleMoreFields(req, res, next) {
     let moreFields = more.split(',');
 
     let temp = [];
-    moreFields.concat(defaultFields).forEach(field => {
+    moreFields.forEach(field => {
         if(field) {
             temp.push(field);
         }
     });
 
     req.meotrics_moreFields = temp;
-
     return next();
 }
 

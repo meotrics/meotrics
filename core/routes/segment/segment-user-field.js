@@ -37,8 +37,6 @@ let queryFormat = {
 let LIMIT = 10;
 
 router.get('/segment-user-field/:_appid/:_mtid', validate, handleMoreFields, getConverter, function(req, res, next){
-    let _mtid = req.params._mtid;
-    let _appid = req.params._appid;
     let type = req.query.type;
 
     if(type === 'user') {
@@ -60,7 +58,7 @@ function validate(req, res, next) {
     if(!validator.isMongoId(_mtid)) {
         return res.json({
             ec: consts.CODE.ERROR,
-            error: util.inspect((new TypeError('_mtid must be an ObjectId')))
+            error: util.inspect((new TypeError('meotrics id must be an ObjectId')))
         });
     }
 
