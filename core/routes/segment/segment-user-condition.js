@@ -15,16 +15,19 @@ let util = require('util');
 const router = express.Router();
 
 let fieldsForWork = [
+    '_id',
     '_typeid',
     '_mtid',
     '_isUser',
-    '_segments'
+    '_segments',
+    '_mtid',
+    'email',
+    '_lastSeen'
 ];
 
 let defaultFields = [
     '_mtid',
     'email',
-    '_lastSeen'
 ];
 
 let restrictFields = [
@@ -36,8 +39,12 @@ let bodyFormat = {
     inf: {
         _typeid: '',
         fieldName: '',
-        value: '' // '' || {from: , to: }
+        // value: '' // '' || {from: , to: }
     }
+};
+
+let queryFormat = {
+    more: ''
 };
 
 let LIMIT = 10;
@@ -66,28 +73,28 @@ function validate(req, res, next) {
     if(!validator.isMongoId(_id)) {
         return res.json({
             ec: consts.CODE.ERROR,
-            error: util.inspect((new TypeError('_id must be an ObjectId')))
+            error: util.inspect((new TypeError('segment id must be an ObjectId')))
         });
     }
 
     req.body = _.merge(_.cloneDeep(bodyFormat), req.body);
+    req.query = _.merge(_.cloneDeep(queryFormat), req.query);
 
-    console.log(req.body);
     return next();
 }
 
 function handleMoreFields(req, res, next) {
-    let more = req.query.more || '';
+    let more = req.query.more;
     let moreFields = more.split(',');
     let temp = [];
 
     moreFields.forEach(field => {
-        if(field && defaultFields.indexOf(field) === -1) {
+        if(field) {
             temp.push(field);
         }
     });
 
-    req.meotrics_moreFields = defaultFields.concat(temp);
+    req.meotrics_moreFields = temp;
     next();
 }
 
@@ -95,7 +102,7 @@ function getConverter(req, res, next) {
     let moreFields = req.meotrics_moreFields;
     let field = req.body.inf.fieldName;
 
-    globalVariables.get('converter').toIDs([field, ...moreFields, ...defaultFields, ...fieldsForWork, ...restrictFields], ids => {
+    globalVariables.get('converter').toIDs([field, ...moreFields, ...fieldsForWork], ids => {
         req.meotrics_converters = ids;
         return next();
     });
@@ -120,7 +127,7 @@ function handleUserField(req, res) {
         [req.meotrics_converters['_segments']]: new mongodb.ObjectID(segmentId)
     }, getOperatorCompare(req.meotrics_converters, field, value));
 
-    let projection = mongoUtils.generateProjection(req.meotrics_converters, [field, ...defaultFields], restrictFields);
+    let projection = mongoUtils.generateProjection(req.meotrics_converters, [field, ...req.meotrics_moreFields,  ...defaultFields], restrictFields);
 
     let options = {
         sort: {
@@ -173,11 +180,9 @@ function getOperatorCompare(converters, field, value) {
 }
 
 function checkEnoughCondition(field, value) {
-    if(!field) {
-        return false;
-    }
-
-    if(_.isPlainObject(value) && (!_.isNumber(value.from) || !_.isNumber(value.to))) {
+    if(    !field
+        || _.isUndefined(value)
+        || (_.isPlainObject(value) && (!_.isNumber(value.from) || !_.isNumber(value.to))) ) {
         return false;
     }
 
