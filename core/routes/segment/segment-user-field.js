@@ -15,13 +15,16 @@ let util = require('util');
 const router = express.Router();
 
 let fieldsForWork = [
+    '_id',
     '_typeid',
     '_mtid',
-    '_isUser'
+    '_isUser',
+    '_ctime',
+    '_lastSeen'
 ];
 
 let defaultFields = [
-    '_ctime'
+    '_lastSeen'
 ];
 
 let restrictFields = [
@@ -75,7 +78,7 @@ function getConverter(req, res, next) {
     let moreFields = req.meotrics_moreFields;
     let field = req.query.field;
 
-    globalVariables.get('converter').toIDs([field, ...moreFields, ...defaultFields, ...fieldsForWork, ...restrictFields], ids => {
+    globalVariables.get('converter').toIDs([field, ...moreFields, ...fieldsForWork], ids => {
         req.meotrics_converters = ids;
         return next();
     });
@@ -85,6 +88,7 @@ function handleUserField(req, res) {
     let field = req.query.field;
     let _mtid = req.params._mtid;
     let _appid = req.params._appid;
+
     let collection = config.mongod.prefix + 'app' + _appid;
 
     if(!field) {
@@ -97,7 +101,7 @@ function handleUserField(req, res) {
     let query = {
         [req.meotrics_converters['_isUser']]: true,
         [req.meotrics_converters['_mtid']]: new mongodb.ObjectID(_mtid)
-    }
+    };
 
     let projection = mongoUtils.generateProjection(req.meotrics_converters, [field, ...defaultFields], restrictFields);
     let options = {};
@@ -118,15 +122,15 @@ function handleUserField(req, res) {
                 result[req.meotrics_converters[field]] = '';
             }
 
-            if(!_.has(result, req.meotrics_converters['_ctime'])) {
-                result[req.meotrics_converters['_ctime']] = Date.now();
+            if(!_.has(result, req.meotrics_converters['_lastSeen'])) {
+                result[req.meotrics_converters['_lastSeen']] = Date.now();
             }
 
             return res.json({
                 ec: consts.CODE.SUCCESS,
                 data: [{
                     value: result[req.meotrics_converters[field]],
-                    time: result[req.meotrics_converters['_ctime']]
+                    time: result[req.meotrics_converters['_lastSeen']]
                 }]
             });
         });
@@ -159,7 +163,6 @@ function handleActionField(req, res) {
         },
         limit: LIMIT
     };
-    // console.log(query, projection, options);
 
     globalVariables
         .get('db')
