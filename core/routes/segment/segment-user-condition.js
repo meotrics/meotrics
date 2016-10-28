@@ -312,7 +312,7 @@ function handleActionField(req, res) {
                 [req.meotrics_converters['_isUser']]: true
             };
 
-            let projection = mongoUtils.generateProjection(req.meotrics_converters, [field, ...req.meotrics_moreFields], restrictFields);
+            let projection = mongoUtils.generateProjection(req.meotrics_converters, [field, ...req.meotrics_moreFields, ...defaultFields], restrictFields);
 
             let options = {
                 sort: {
