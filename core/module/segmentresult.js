@@ -287,19 +287,6 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 	converter.toIDs(['_isUser', '_segments', field1], function (ids) {
 			//build match clause
 			var matchClause = getMatchClause(ids, segmentid);
-			var groupByField = {$group:{
-				_id: "$_mtid",
-				field :{
-					$push : "$"+ids[field1]
-				}
-			}};
-			var unWind = {$unwind: '$field'};
-			var sumField = {$group:{
-				_id: "$field",
-				count:{
-					$sum: 1
-				}
-			}};
 			//build project clause
 			var projectClause = {$project: {_id: 0}};
 			projectClause.$project[ids[field1]] = 1;
@@ -311,9 +298,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 						}
 					}
 				};
-
 			db.collection(collection).aggregate([matchClause, projectClause, groupClause]).toArray(function (err, docs) {
-			// db.collection(collection).aggregate([matchClause,groupByField,unWind,sumField]).toArray(function (err, docs) {
 				if (err) throw err;
 				for (var i in docs) if (docs.hasOwnProperty(i)) {
 					docs[i].key = docs[i]._id;

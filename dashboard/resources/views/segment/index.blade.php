@@ -455,7 +455,7 @@ $props = isset($props) ? $props : [];
                                 columnfield = "<td>"+item[field2]+"</td>";
                         }
 						var value_field1 = item[field1];
-						if(value_field1[0] == null){
+						if(value_field1 == null){
 							value_field1 = "N/A";
 						}
                         var cl = "<tr>" +

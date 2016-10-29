@@ -8,6 +8,8 @@ var ua = require('ua-parser');
 var MD = require('mobile-detect');
 var ActionMgr = require('./actionmgr');
 var ObjectID = require('bson-objectid');
+var NanoTimer = require('nanotimer');
+var timerObject = new NanoTimer();
 exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	var code;
 	var actionmgr = new ActionMgr.ActionMgr(db, converter, prefix, "mapping", valuemgr, ref);
@@ -94,15 +96,6 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 			data._mtid = mtid;
 			actionmgr.saveRaw(appid, data, function (actionid) {
 				me.onchange(appid, "type." + data._typeid);
-				
-				if (callback === true)
-				{
-					sendMtid(mtid,res);
-				}
-				else {
-					sendMtid(mtid,res);
-				}
-	
 			});
 		});
 	}
@@ -133,7 +126,6 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
 
 	function suggest(req, res) {
-		// console.log("=====suggest");
 		valuemgr.suggest(req.appid + "", req.typeid + "", req.field + "", req.qr + "", function (results) {
 			res.setHeader('Content-Type', 'application/json');
 			res.setHeader('Access-Control-Allow-Origin', '*');
@@ -146,6 +138,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		});
 	}
 
+
 	function pageviewtwo(req,res){
 		var appid = req.appid;
 		var data = trackBasic(req);
@@ -153,27 +146,24 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 			me.onchange(appid, 'type.pageview');
 			data._typeid = 'pageview';
 			data._mtid = mtid;
-			// console.log("mtid: "+mtid);
-			actionmgr.saveRaw(appid, data);
+			actionmgr.saveRaw(appid, data,function(callback){});
 		});
 	}
 
 	function handlerMtid(mtid,appid,res,callback){
 		if(mtid == undefined || mtid == 'undefined'){
-			actionmgr.setupRaw(appid, function (_mtid) {
-				// console.log("new user 1");
-				mtid = _mtid;
-				sendMtid(mtid,res);
-				callback(mtid);
+			mtid = ObjectID();
+			sendMtid(mtid,res);
+			actionmgr.setupRaw(appid,mtid, function (id) {
+				callback(id);
 			});
 		}else{
 			actionmgr.ismtidValid(appid, mtid, function (ret) {
 				if (!ret){
-					// console.log("new user 2");
-					actionmgr.setupRaw(appid, function (_mtid) {
-						mtid = _mtid;
-						sendMtid(mtid,res);
-						callback(mtid);
+					mtid = ObjectID();
+					sendMtid(mtid,res);
+					actionmgr.setupRaw(appid,mtid, function (id) {
+						callback(id);
 					});
 				}else{
 					sendMtid(mtid,res);
@@ -182,6 +172,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 			});
 		}
 	}
+
 
 	function sendMtid(mtid,res){
 		var id = {};
@@ -193,8 +184,8 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
 		res.setHeader('Access-Control-Allow-Credentials', true);
 		res.setHeader('Content-Type', 'application/json');
-		// console.log("sended");
-		res.end(json);
+		res.write(json);
+		res.end();
 	}
 
 	this.route = function (req, res) {
@@ -244,7 +235,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		}, function (err) {
 			res.statusCode = 500;
 			res.end();
-			// console.log(err, err.stack);
+			console.log(err, err.stack);
 		});
 	};
 };

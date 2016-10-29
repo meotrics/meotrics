@@ -1,4 +1,4 @@
-@extends('layout.master')
+    @extends('layout.master')
 @section('title', 'Meotrics')
 @section('style')
 @endsection
@@ -92,7 +92,6 @@
 		traffic24 = {!! json_encode($dashboard->traffic24) !!};
 		var traffic24labels =[];
 		traffic24labels = {!! json_encode($dashboard->traffic24labels) !!};
-		//console.log(traffic24, traffic24lable, labels, totalrevenues);
 		var retenratechart = new Chart($("#revenuechart"), {
 			type: 'line',
 			data: {
@@ -293,7 +292,7 @@
 								<h6 style="margin: 0; color: #0e1a35">USER GROWTH RATE</h6>
 							</div>
 							<div class="content text-center" style="padding-top: 0">
-								<span class="big id_newsignup" style="color: #4164c2;">{{$dashboard->usergrowth_rate}}</span>
+								<span class="big id_newsignup" style="color: #4164c2;">{{$dashboard->usergrowth_rate}}%</span>
 							</div>
 						</div>
 					</div>

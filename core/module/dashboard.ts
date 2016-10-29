@@ -161,16 +161,17 @@ export class Dashboard {
 		db.collection(prefix + "app" + appid).count(query, function (err, c) {
 			if (err) throw err;
 			var startc = c;
-
+			if(startc==0){
+				return callback(0);
+			}
 			query[ids._stime] = {
 				$gt: startsec, $lte: endsec
 			}
 			db.collection(prefix + "app" + appid).count(query, function (err, c) {
 				if (err) throw err;
 				var deltac = c;
-
 				if (deltac + startc == 0) return callback(0);
-				else return callback(deltac / (deltac + startc));
+				else return callback(deltac * 100/ startc );
 			});
 		});
 	}
