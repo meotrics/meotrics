@@ -105,7 +105,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.Mongo
 					ws.change(key,"type.pageview");
 				}
 			};
-		},5000);
+		},30000);
 		httpapi.onchange = function (appid, code) {
 			if(delayRq[appid] == undefined) {
 				delayRq[appid] = false;
