@@ -7,28 +7,39 @@
 		function confirmDelete(acode) {
 			return confirm('Are you sure ? Detele `' + acode + '` action type !');
 		}
-
+		// ko cho realtime nua
 		onPageLoad(function () {
-
+			var status_app_pending = {};
 			function update_status(app) {
-				$.post('/app/count_traffic/' + app, function(data){
-					$('.traffic_' + app).html(data);
-				});
+				if(status_app_pending[app] == undefined || status_app_pending[app] == false){
+					status_app_pending[app] = true;
+					$.post('/app/count_traffic/' + app, function(data){
+						$('.traffic_' + app).html(data);
+							var $st = $('.status_' + app);
+							$st.empty();
+						if (data >0) {
+							$st.append('<span class="greendot"></span> <span style="color:#0ea622">OK</span>');
+						}else{
+							$st.append('<span class="graydot"></span> <span style="color:#aaa;" >NOT CONNECTED</span>')
+						}
+//						status_app_pending[app] = false;
+//						$.post('/app/setup_status/' + app, function (data) {
+//							var $st = $('.status_' + app);
+//							$st.empty();
+//
+//							if (data == 'true') {
+//								$st.append('<span class="greendot"></span> <span style="color:#0ea622">OK</span>');
+//							}
+//
+//							if (data == 'false') {
+//								$st.append('<span class="graydot"></span> <span style="color:#aaa;" >NOT CONNECTED</span>')
+//							}
+//							status_app_pending[app] = false;
+//						});
 
-				$.post('/app/setup_status/' + app, function (data) {
-					var $st = $('.status_' + app);
-					$st.empty();
-
-					if (data == 'true') {
-						$st.append('<span class="greendot"></span> <span style="color:#0ea622">OK</span>');
-					}
-
-					if (data == 'false') {
-						$st.append('<span class="graydot"></span> <span style="color:#aaa;" >NOT CONNECTED</span>')
-					}
-				});
+					});
+				}
 			}
-
 			@foreach($apps as $ap)
 			update_status('{{$ap->code}}');
 			websock.appChange('{{$ap->code}}','type.pageview', update_status);

@@ -81,12 +81,15 @@
 		//
 		var totalrevenues = [];
 		totalrevenues = {!! json_encode($dashboard->revenues) !!};
+
 		//
 		//var usergrowthrates = [];
 		//usergrowthrates = {-- !! json_encode($dashboard->usergrowth_rates) !! --};
 		//
 		var npurchases = [];
 		npurchases = {!! json_encode($dashboard->n_purchases) !!};
+		console.log(totalrevenues);
+		console.log(npurchases);
 		//
 		var traffic24 = [];
 		traffic24 = {!! json_encode($dashboard->traffic24) !!};
@@ -99,6 +102,7 @@
 				datasets: [
 					{
 						label: "Revenue",
+						yAxisID: "y-axis-0",
 						lineTension: 0.5,
 						borderCapStyle: 'round',
 						borderDash: [],
@@ -119,8 +123,10 @@
 						pointBorderWidth: 1,
 						data: totalrevenues
 					},
+
 					{
 						label: "Number of purchase",
+						yAxisID: "y-axis-1",
 						lineTension: 0.5,
 						borderCapStyle: 'round',
 						borderDash: [],
@@ -149,7 +155,16 @@
 				legend: {display: false},
 				animation: false,
 				scales: {
-					yAxes: [{display: false}], xAxes: [{display: true}]
+					yAxes: [
+						{
+						position: "left",
+						"id": "y-axis-0"
+						}, {
+							position: "right",
+							"id": "y-axis-1"
+						}
+					]
+					, xAxes: [{display: true}]
 				}
 			}
 		});
@@ -439,7 +454,7 @@
 						</div>
 						<div class="content text-center pull-right mr">
 							<h6 style="position: absolute;right: 30px; text-align: right;width: 80%;margin-top: 0;color:#25396e">
-								{{$dashboard->most_effective_ref or "N/A"}}
+								{{$dashboard->most_effective_ref or "None"}}
 							</h6>
 						</div>
 					</div>
