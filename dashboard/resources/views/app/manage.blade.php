@@ -67,22 +67,22 @@
                                             </a>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <h6>Traffic</h6>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <h6 style="color: black">{{$traffic}}</h6>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <h6>Status</h6>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <h6 style="color: black">{{$status}}</h6>
-                                        </div>
-                                    </div>
+                                    {{--<div class="row">--}}
+                                        {{--<div class="col-md-3">--}}
+                                            {{--<h6>Traffic</h6>--}}
+                                        {{--</div>--}}
+                                        {{--<div class="col-md-4">--}}
+                                            {{--<h6 style="color: black">{{$traffic}}</h6>--}}
+                                        {{--</div>--}}
+                                    {{--</div>--}}
+                                    {{--<div class="row">--}}
+                                        {{--<div class="col-md-3">--}}
+                                            {{--<h6>Status</h6>--}}
+                                        {{--</div>--}}
+                                        {{--<div class="col-md-4">--}}
+                                            {{--<h6 style="color: black">{{$status}}</h6>--}}
+                                        {{--</div>--}}
+                                    {{--</div>--}}
                                     <div class="row">
                                         <div class="col-md-3">
                                             <h6>Your role</h6>

@@ -26,9 +26,7 @@
 			}
 			
 			function update_register() {
-				console.log('fc');
 				throttle(function(){
-					console.log('d');
 					var endtime= $tp.val().split(' ')[2];
 					var starttime = $tp.val().split(' ')[0];
 					$.post('/app/getsignup/{{$appcode}}/' + starttime + "/" + endtime, function(data){
@@ -88,8 +86,6 @@
 		//
 		var npurchases = [];
 		npurchases = {!! json_encode($dashboard->n_purchases) !!};
-		console.log(totalrevenues);
-		console.log(npurchases);
 		//
 		var traffic24 = [];
 		traffic24 = {!! json_encode($dashboard->traffic24) !!};
