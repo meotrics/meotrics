@@ -280,8 +280,10 @@ class SegmentController extends Controller
             $id = isset($_POST['id']) && $_POST['id'] ? $_POST['id'] : 0;
 
             $times = explode(" ", $_POST['timerange']);
-            $startTime = $times[0];
-            $endTime = $times[2];
+//            $startTime = $times[0];
+//            $endTime = $times[2];
+            $startTime = '';
+            $endTime = '';
             if (!$id) {
                 $id = MtHttp::post('segment/' . $appcode, [
                     'condition' => $query,
