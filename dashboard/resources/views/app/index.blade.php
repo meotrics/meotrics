@@ -55,34 +55,34 @@
 				highlightSpotColor: undefined,
 				spotRadius: 0
 			});
-		@foreach($apps as $ap)
+		{{--@foreach($apps as $ap)--}}
 
-		$.post('/app/traffic14/{{$ap->code}}', function(data){
-			$spl = $(".spl_{{$ap->code}}");
-			$spl.empty();
-			$spl.sparkline(data, {
-				type: 'line',
-				lineColor: '#00007f',
-				lineWidth: 1,
-				spotColor: undefined,
-				minSpotColor: undefined,
-				maxSpotColor: undefined,
-				highlightSpotColor: undefined,
-				spotRadius: 0
-			});
-		});
-			@endforeach
+		{{--$.post('/app/traffic14/{{$ap->code}}', function(data){--}}
+			{{--$spl = $(".spl_{{$ap->code}}");--}}
+			{{--$spl.empty();--}}
+			{{--$spl.sparkline(data, {--}}
+				{{--type: 'line',--}}
+				{{--lineColor: '#00007f',--}}
+				{{--lineWidth: 1,--}}
+				{{--spotColor: undefined,--}}
+				{{--minSpotColor: undefined,--}}
+				{{--maxSpotColor: undefined,--}}
+				{{--highlightSpotColor: undefined,--}}
+				{{--spotRadius: 0--}}
+			{{--});--}}
+		{{--});--}}
+			{{--@endforeach--}}
 
-			$('.id_add').click(function () {
-				$.post('/app/create', {name: $('.id_name').val(), url:$('.id_url').val()}, function (appcode) {
-					showCodeDialog(appcode, function () {
-						location.reload();
-					});
-				}).fail(function () {
-					alert('cannot create app');
-				});
-				$('.id_name').val("");
-			});
+			{{--$('.id_add').click(function () {--}}
+				{{--$.post('/app/create', {name: $('.id_name').val(), url:$('.id_url').val()}, function (appcode) {--}}
+					{{--showCodeDialog(appcode, function () {--}}
+						{{--location.reload();--}}
+					{{--});--}}
+				{{--}).fail(function () {--}}
+					{{--alert('cannot create app');--}}
+				{{--});--}}
+				{{--$('.id_name').val("");--}}
+			{{--});--}}
 		});
 	</script>
 @endsection
