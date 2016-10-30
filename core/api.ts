@@ -81,10 +81,10 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.Mongo
 			console.log("HTTP API SERVER     | OK |    " + httpport);
 		});
 
-		// let wsport = config.get<number>('websocket.port') || 2910;
-		let wsport = 2910;
-		// let keypath = config.get<string>('websocket.key');
-		// let certpath = config.get<string>('websocket.cert');
+		let wsport = config.get<number>('websocket.port') || 2910;
+		// let wsport = 2910;
+		let keypath = config.get<string>('websocket.key');
+		let certpath = config.get<string>('websocket.cert');
 		var ws = new WS.WS(wsport);
 		// bind change event
 		var countRq = {};
@@ -105,7 +105,7 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.Mongo
 					ws.change(key,"type.pageview");
 				}
 			};
-		},1000);
+		},5000);
 		httpapi.onchange = function (appid, code) {
 			if(delayRq[appid] == undefined) {
 				delayRq[appid] = false;
