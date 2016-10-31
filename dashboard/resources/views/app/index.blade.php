@@ -13,31 +13,31 @@
 			function update_status(app) {
 				if(status_app_pending[app] == undefined || status_app_pending[app] == false){
 					status_app_pending[app] = true;
-					$.post('/app/count_traffic/' + app, function(data){
-						$('.traffic_' + app).html(data);
-							var $st = $('.status_' + app);
-							$st.empty();
-						if (data >0) {
-							$st.append('<span class="greendot"></span> <span style="color:#0ea622">OK</span>');
-						}else{
-							$st.append('<span class="graydot"></span> <span style="color:#aaa;" >NOT CONNECTED</span>')
-						}
-//						status_app_pending[app] = false;
-//						$.post('/app/setup_status/' + app, function (data) {
+//					$.post('/app/count_traffic/' + app, function(data){
+//						$('.traffic_' + app).html(data);
 //							var $st = $('.status_' + app);
 //							$st.empty();
+//						if (data >0) {
+//							$st.append('<span class="greendot"></span> <span style="color:#0ea622">OK</span>');
+//						}else{
+//							$st.append('<span class="graydot"></span> <span style="color:#aaa;" >NOT CONNECTED</span>')
+//						}
+////						status_app_pending[app] = false;
+////						$.post('/app/setup_status/' + app, function (data) {
+////							var $st = $('.status_' + app);
+////							$st.empty();
+////
+////							if (data == 'true') {
+////								$st.append('<span class="greendot"></span> <span style="color:#0ea622">OK</span>');
+////							}
+////
+////							if (data == 'false') {
+////								$st.append('<span class="graydot"></span> <span style="color:#aaa;" >NOT CONNECTED</span>')
+////							}
+////							status_app_pending[app] = false;
+////						});
 //
-//							if (data == 'true') {
-//								$st.append('<span class="greendot"></span> <span style="color:#0ea622">OK</span>');
-//							}
-//
-//							if (data == 'false') {
-//								$st.append('<span class="graydot"></span> <span style="color:#aaa;" >NOT CONNECTED</span>')
-//							}
-//							status_app_pending[app] = false;
-//						});
-
-					});
+//					});
 				}
 			}
 			@foreach($apps as $ap)
@@ -73,16 +73,16 @@
 		{{--});--}}
 			{{--@endforeach--}}
 
-			{{--$('.id_add').click(function () {--}}
-				{{--$.post('/app/create', {name: $('.id_name').val(), url:$('.id_url').val()}, function (appcode) {--}}
-					{{--showCodeDialog(appcode, function () {--}}
-						{{--location.reload();--}}
-					{{--});--}}
-				{{--}).fail(function () {--}}
-					{{--alert('cannot create app');--}}
-				{{--});--}}
-				{{--$('.id_name').val("");--}}
-			{{--});--}}
+			$('.id_add').click(function () {
+				$.post('/app/create', {name: $('.id_name').val(), url:$('.id_url').val()}, function (appcode) {
+					showCodeDialog(appcode, function () {
+						location.reload();
+					});
+				}).fail(function () {
+					alert('cannot create app');
+				});
+				$('.id_name').val("");
+			});
 		});
 	</script>
 @endsection
