@@ -151,22 +151,20 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	}
 
 	function handlerMtid(mtid,appid,res,callback){
-		if(mtid == undefined || mtid == 'undefined'){
+		if(mtid == undefined || mtid == 'undefined' || mtid.length != 24){
 			mtid = ObjectID();
 			sendMtid(mtid,res);
 			actionmgr.setupRaw(appid,mtid, function (id) {
 				callback(id);
 			});
 		}else{
+			sendMtid(mtid,res);
 			actionmgr.ismtidValid(appid, mtid, function (ret) {
 				if (!ret){
-					mtid = ObjectID();
-					sendMtid(mtid,res);
 					actionmgr.setupRaw(appid,mtid, function (id) {
-						callback(id);
+						callback(mtid);
 					});
 				}else{
-					sendMtid(mtid,res);
 					callback(mtid);
 				}
 			});
