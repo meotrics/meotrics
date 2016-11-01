@@ -187,27 +187,6 @@
 					{pname: "Object ID", pcode: "oid"},
 					{pname: "Object Type", pcode: "type"}
 				],
-				// deftrendfields: [
-				// 	{pname: "Object ID", pcode: "oid"},
-				// 	{pname: "Object Type", pcode: "type"},
-				// 	{pname: "Campaign", pcode: "_utm_campaign"},
-				// 	{pname: "Campaign Source", pcode: "_utm_source"},
-				// 	{pname: "Campaign Medium", pcode: "_utm_medium"},
-				// 	{pname: "Campaign Term", pcode: "_utm_term"},
-				// 	{pname: "Campaign Content", pcode: "_utm_content"},
-				// 	{pname: "Operating System", pcode: "_os"},
-				// 	{pname: "City", pcode: "_city"},
-				// 	{pname: "Referer", pcode: "_ref"},
-				// 	{pname: "Screen Resolution", pcode: "_scrres"},
-				// 	{pname: "Browser", pcode: "_browser" },
-				// 	{pname: "Browser Version", pcode: "_browserver" },
-				// 	{pname: "OS Version", pcode: "_osver"},
-				// 	{pname: "Location", pcode: "_location" },
-				// 	{pname: "Country", pcode: "_country" },
-				// 	{pname: "Language", pcode: "_lang" },
-				// 	{pname: "Device Type", pcode: "_devicetype"},
-				// 	{pname: "Device", pcode: "_deviceid"}
-				// ],
 				deftrendobjects: [
 					{desc: "Number of time clicked", operation: "count", param: "_id"},
 					{desc: "Number of unique people clicked", operation: "count", param: "_mtid"}
@@ -226,26 +205,6 @@
 					{pname: "Category Name", pcode: "cname"},
 					{pname: "Level", pcode: "level"}
 				],
-				// deftrendfields: [
-					// {pname: "Product", pcode: "pid"},
-					// {pname: "Campaign", pcode: "_utm_campaign"},
-					// {pname: "Campaign Source", pcode: "_utm_source"},
-					// {pname: "Campaign Medium", pcode: "_utm_medium"},
-					// {pname: "Campaign Term", pcode: "_utm_term"},
-					// {pname: "Campaign Content", pcode: "_utm_content"},
-					// {pname: "Operating System", pcode: "_os"},
-					// {pname: "City", pcode: "_city"},
-					// {pname: "Referer", pcode: "_ref"},
-					// {pname: "Screen Resolution", pcode: "_scrres"},
-					// {pname: "Browser", pcode: "_browser" },
-					// {pname: "Browser Version", pcode: "_browserver" },
-					// {pname: "OS Version", pcode: "_osver"},
-					// {pname: "Location", pcode: "_location" },
-					// {pname: "Country", pcode: "_country" },
-					// {pname: "Language", pcode: "_lang" },
-					// {pname: "Device Type", pcode: "_devicetype"},
-					// {pname: "Device", pcode: "_deviceid"}
-				// ],
 				deftrendobjects: [
 					{desc: "Number of time rated", operation: "count", param: "_id"},
 					{desc: "Number of unique people rated", operation: "count", param: "_mtid"}
@@ -284,26 +243,6 @@
 				fields: [
 					{pname: "User ID", pcode: "userid"},
 				],
-				// deftrendfields: [
-					// {pname: "Campaign", pcode: "_utm_campaign"},
-					// {pname: "Campaign Source", pcode: "_utm_source"},
-					// {pname: "Campaign Medium", pcode: "_utm_medium"},
-					// {pname: "Campaign Term", pcode: "_utm_term"},
-					// {pname: "Campaign Content", pcode: "_utm_content"},
-					// {pname: "Operating System", pcode: "_os"},
-					// {pname: "Language", pcode: "_lang"},
-					// {pname: "City", pcode: "_city"},
-					// {pname: "Referer", pcode: "_ref"},
-					// {pname: "Screen Resolution", pcode: "_scrres"},
-					// {pname: "Browser", pcode: "_browser" },
-					// {pname: "Browser Version", pcode: "_browserver" },
-					// {pname: "OS Version", pcode: "_osver"},
-					// {pname: "Location", pcode: "_location" },
-					// {pname: "Country", pcode: "_country" },
-					// {pname: "Language", pcode: "_lang" },
-					// {pname: "Device Type", pcode: "_devicetype" },
-					// {pname: "Device", pcode: "_deviceid" }
-				// ]
 			};
 
 			var search = {
