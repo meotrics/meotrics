@@ -268,7 +268,8 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 				break;
 			case 'ncon':
 				query[conditions[i]] = {
-					$regex: "^((?!" + regesc(conditions[i + 2]) + ").)*$/"
+					// $regex: "^((?!" + regesc(conditions[i + 2]) + ").)*$/"
+					$not: /conditions[i + 2]/
 				};
 				break;
 			case 'sw':

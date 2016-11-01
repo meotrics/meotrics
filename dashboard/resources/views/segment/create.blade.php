@@ -200,10 +200,8 @@ var f_behavior = [
                         </div>
                         <div class="col-md-6">
                             <!--<label class="col-md-12" style="margin-top: 10px">Segment description</label>-->
-
                             <input type="text" class="form-control" name="description" placeholder="Enter description"
                                    value="{{isset($segment->description) ? $segment->description : ''}}"/>
-
                         </div>
                     </div>
                     <div>
@@ -290,6 +288,8 @@ var f_behavior = [
             $.each(type_options, function (i, v) {
                 if (v.value == that.val()) {
                     if (v.select_type == 'user') {
+                        $('#label_for_did_action').parent().hide();
+
                         containter.find('input[name="Segment[' + i_condition + '][select_type]"]').val('user');
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
                         containter.find('select[name="Segment[' + i_condition + '][f]"]').parent().hide();
@@ -310,6 +310,9 @@ var f_behavior = [
                         condition_item.find('div[data-name="add-condition"]').hide();
                     }
                     else {
+                        $('#label_for_did_action').parent().show();
+                        $('#label_for_did_action').text('With number of time');
+
                         containter.find('input[name="Segment[' + i_condition + '][select_type]"]').val('behavior');
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().removeClass('col-md-4');
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().addClass('col-md-2');
@@ -330,7 +333,6 @@ var f_behavior = [
                         $.each(tmp_behavior, function (fi, fv) {
                             containter.find('select[name="Segment[' + i_condition + '][f]"]').append('<option value="' + fv.code + '">' + fv.name + '</option>');
                         });
-
                         $('select[name="Segment[' + i_condition + '][field]"]').html('');
                         if (v.fields.length) {
                             $.each(v.fields, function (fieldi, fieldv) {

@@ -72,7 +72,7 @@ $operators_default = [
                         ?>
                 </select>
             </div>
-            <div class="col-md-2" <?= $condition->select_type == 'user' ? 'style="display: none"' : '' ?>>
+            <div class="col-md-2" <?= $condition->select_type == 'user' ? 'style="display: none"' : 'style="display: none"' ?>>
                 <select class="form-control" id="" name="Segment[<?= $i_condition ?>][f]" value="<?= $condition->f ?>">
                     <?php
                     foreach ($f_behaviors as $f_behavior):
@@ -86,7 +86,7 @@ $operators_default = [
                     ?>
                 </select>
             </div>
-            <div class="col-md-2" <?= $condition->select_type == 'user' ? 'style="display: none"' : '' ?>>
+            <div class="col-md-2" <?= $condition->select_type == 'user' ? 'style="display: none"' : 'style="display: none"' ?>>
                 <select class="form-control" id=""  name="Segment[<?= $i_condition ?>][field]" value="<?= $condition->field ?>"
                         onchange="changeField(this)">
                             <?php
@@ -98,6 +98,9 @@ $operators_default = [
                     endforeach;
                     ?>
                 </select>
+            </div>
+            <div class="col-md-2" <?= $condition->select_type == 'user'? 'style="display: none"' : ''  ?>>
+                <h6 style="margin-bottom:0px" id="label_for_did_action"><?= $condition->select_type == 'user'? '' : 'With number of time'  ?></h6>
             </div>
             <div class="col-md-2" data-name="condition-item-operator">
                 <select class="form-control" id="" name="Segment[<?= $i_condition ?>][operator]" onchange="operatorChange(this)">

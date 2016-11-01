@@ -15,6 +15,9 @@
 						$.post('/app/getpageview/{{$appcode}}', function(data){
 							pending_pageview = false;
 							data = JSON.parse(data);
+							if(data.newVisitors > 0){
+								window.localStorage['{{$appcode}}'] = true;
+							}
 							$('.id_newv').html(data.newVisitors);
 							if(data.returningVisitors >= 0) {
 								$('.id_retu').html(data.returningVisitors);
@@ -46,8 +49,8 @@
 			@else
 			// 30 ngay truoc do
 			var today = new Date().toISOString().substr(0, 10);
-			var lastyear = new Date(new Date().getTime() - 31104000000).toISOString();
-			$tp.data('dateRangePicker').setDateRange(lastyear, today);
+			var lastday = new Date(new Date().getTime() - 86400000).toISOString();
+			$tp.data('dateRangePicker').setDateRange(lastday, today);
 			@endif
 
 			tp.bind('datepicker-change', function () {
