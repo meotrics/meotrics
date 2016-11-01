@@ -40,10 +40,10 @@
 //					});
 				}
 			}
-			@foreach($apps as $ap)
-			update_status('{{$ap->code}}');
-			websock.appChange('{{$ap->code}}','type.pageview', update_status);
-			@endforeach
+			{{--@foreach($apps as $ap)--}}
+			{{--update_status('{{$ap->code}}');--}}
+			{{--websock.appChange('{{$ap->code}}','type.pageview', update_status);--}}
+			{{--@endforeach--}}
 
 		$(".sparkline").sparkline([ 0,0,0,0,0,0,0,0,0,0,0,0,0,0], {
 				type: 'line',
@@ -113,7 +113,8 @@
 								<td>{{$ap->name}}
 									<br/>
 									<code class="fmonospaced">{{$ap->code}}</code></td>
-								<td><span class="traffic_{{$ap->code}}">{{$ap->count}}</span>
+								<td>
+									{{--<span class="traffic_{{$ap->code}}">{{$ap->count}}</span>--}}
 									<div class="spl_{{$ap->code}} sparkline"></div>
 								</td>
 

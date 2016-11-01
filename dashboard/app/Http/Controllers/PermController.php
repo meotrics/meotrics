@@ -34,7 +34,7 @@ class PermController extends Controller
 		foreach ($apps as $ap) {
 			$ap->owner = \App\User::find($ap->ownerid);
 			$ap->agencies = DB::table('user_app')->join('users', 'users.id', '=', 'user_app.userid')->where('user_app.appid', $ap->id)->get();
-			$ap->count = MtHttp::get('app/count_traffic/' . $ap->code);
+//			$ap->count = MtHttp::get('app/count_traffic/' . $ap->code);
 		}
 		
 		return view('app/index', [
