@@ -458,8 +458,8 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 				[ids['_isUser']]: true
 			};
 
-			let sort = {
-				[ids['_lastSeen']]: -1
+			var sort = {
+				[ids['_lastSeen']]: 1
 			}
 			db.collection(prefix + "app" + appName).find(query).sort(sort).skip(skip).limit(limit).toArray((err, users) => {
 				if (err) throw err;
