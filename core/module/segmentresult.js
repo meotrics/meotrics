@@ -459,7 +459,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 			};
 
 			var sort = {
-				[ids['_lastSeen']]: 1
+				[ids['_lastSeen']]: -1
 			}
 			db.collection(prefix + "app" + appName).find(query).sort(sort).skip(skip).limit(limit).toArray((err, users) => {
 				if (err) throw err;
@@ -473,6 +473,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 						usersReturn[i][ids['name']] = users[i][ids['name']] || '';
 						usersReturn[i][ids['_mtid']] = users[i][ids['_mtid']] || '';
 						usersReturn[i][ids['email']] = users[i][ids['email']] || '';
+						usersReturn[i][ids['_lastSeen']] = users[i][ids['_lastSeen']] || '';
 					}
 
 					for (let j = 0; j < fields.length; j++) {

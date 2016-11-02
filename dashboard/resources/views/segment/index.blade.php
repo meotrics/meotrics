@@ -442,9 +442,10 @@ $props = isset($props) ? $props : [];
 					if(label_field1 == "reftype")
 						label_field1 = "channel"
                     var column = "<tr style='text-transform: capitalize'><td>#</td>" +
-                                    "<td>Id</td>" +
+                                    "<td width='100px'>Id</td>" +
                                     "<td>Name</td>" +
                                     "<td>Email</td>" +
+                                    "<td>Last seen</td>" +
                                     "<td>"+label_field1+"</td>" +
                                     column2+
                                     "</tr>";
@@ -458,11 +459,14 @@ $props = isset($props) ? $props : [];
 						if(value_field1 == null){
 							value_field1 = "N/A";
 						}
+						var date = new Date(item._lastSeen*1000);
+						var lastSeen = date.toLocaleString();
                         var cl = "<tr>" +
                                         "<td>"+(i+1)+"</td>" +
                                         "<td>"+item._mtid+"</td>"+
                                         "<td>"+item.name+"</td>"+
                                         "<td>"+item.email+"</td>"+
+                                        "<td>"+lastSeen+"</td>"+
                                         "<td>"+value_field1+"</td>"+
                                         columnfield+
                                         "</tr>";
