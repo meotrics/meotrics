@@ -501,9 +501,9 @@ $props = isset($props) ? $props : [];
 					}
 					var select_page = "<nav>" +
 							"<ul class='pagination'>" +
-							"<li><a href='#' aria-label='Previous'><span aria-hidden='true'>&laquo;</span></a></li>" +
+							"<li onclick='onSelectPage(1)' "+ temp +"><a href='#' aria-label='Previous'><span aria-hidden='true'>&lt;&lt;</span></a></li>" +
 							b+
-							"<li><a href='#' aria-label='Next'><span aria-hidden='true'>&laquo;</span></a></li>" +
+							"<li onclick='onSelectPage("+page+")' "+ temp +"><a href='#' aria-label='Next'><span aria-hidden='true'>&gt;&gt;</span></a></li>" +
 							"</ul></nav>";
 					table += select_page;
                     $("#user_table").empty();
