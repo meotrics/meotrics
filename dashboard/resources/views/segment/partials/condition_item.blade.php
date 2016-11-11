@@ -27,11 +27,11 @@ $f_behaviors = [
 ];
 
 $operators_default = [
-(object)['code' => '>', 'name' => '>'],
-(object)['code' => '>=', 'name' => '>='],
-(object)['code' => '=', 'name' => '='],
-(object)['code' => '<', 'name' => '<'],
-(object)['code' => '<=', 'name' => '<='],
+(object)['code' => 'gt', 'name' => '>'],
+(object)['code' => 'gte', 'name' => '>='],
+(object)['code' => 'eq', 'name' => '='],
+(object)['code' => 'lt', 'name' => '<'],
+(object)['code' => 'lte', 'name' => '<='],
 ];
 ;
 ?>
@@ -118,7 +118,7 @@ $operators_default = [
                     ?>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2" data-name="condition-item-value">
                 <input type="text" class="form-control " name="Segment[<?= $i_condition ?>][value]"
                        value="<?= Input::old('Segment[' . $i_condition . '][value]', $condition->value) ?>"/>
             </div>

@@ -31,7 +31,6 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 
 	//Excute segment based on segment data
 	this.runSegment = function runSegment(segment, callback) {
-
 		if (callback === undefined) callback = function () {
 		};
 		var outcollection = prefix + "segment" + segment._id.toString();
@@ -44,16 +43,18 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 			col.mapReduce(out.map, out.reduce, {
 				out: outcollection,
 				query: out.option,
-				finalize: out.finalize/*,
-				sort: {_mtid: 1}*/
+				finalize: out.finalize,
+				sort: {_mtid: 1}
 			}, function (err) {
 				if (err) throw err;
 				converter.toIDs(['_isUser'], function (ids) {
-					//console.log("out");
-					//console.log(out);
-				//console.log(outcollection);
-					// update segment count
+				// 	console.log("out");
+				// 	console.dir(out);
+				// console.log(outcollection);
+					// update segment count=
 					db.collection(outcollection).count({value: 1}, function (err, ret) {
+						// console.log("ret");
+						// console.log(ret);
 						if (err) throw err;
 						db.collection(prefix + 'segment').update({'_id': new mongodb.ObjectId(segment._id)}, {$set: {count: ret}}, function (err, ret) {
 							if (err) throw err;
@@ -68,7 +69,8 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 					doNext();
 					function doNext() {
 						cursor.next(function (err, doc) {
-
+							// console.log("doc");
+							// console.log(doc);
 							// the last docs
 							if (null === doc) {
 								return updateUser(function () {
@@ -77,11 +79,15 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 									if (callback) callback(outcollection);
 								});
 							}
-
 							//check if is in segment
+							// console.log("outcollection");
+							// console.log(outcollection);
 							db.collection(outcollection).find({_id: doc._id}).toArray(function (err, docs) {
 								if (err) throw err;
+								// console.log("docs");
+								// console.log(docs);
 								arr.push({pp: docs[0] && docs[0].value === 1.0 ? 1 : -1, id: doc._id});
+								// console.log(arr);
 								if (arr.length === 100) {
 									// clean the stack by calling setTimeout
 									setTimeout(function () {
@@ -100,9 +106,9 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 						var bulk = col.initializeUnorderedBulkOp();
 						for (var i in arr) if (arr.hasOwnProperty(i))
 							if (arr[i].pp === 1)
-								bulk.find({_mtid: arr[i].id}).update({$addToSet: {_segments: segment._id}});
+								bulk.find({_mtid: arr[i].id,_isUser: true}).update({$addToSet: {_segments: segment._id}});
 							else
-								bulk.find({_mtid: arr[i].id}).update({$pull: {_segments: segment._id}});
+								bulk.find({_mtid: arr[i].id, _isUser: true}).update({$pull: {_segments: segment._id}});
 						// clean the array first
 						arr = [];
 
@@ -122,6 +128,14 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 			queryFilter(query, function (r) {
 				buildMapReduce(json, function (ret) {
 					ret.option = r;
+                    //
+					// console.log("json");
+					// console.log(json);
+					// console.log("query");
+					// console.log("r");
+					// console.log(r);
+					// console.log("ret");
+					// console.log(ret);
 					callback(ret);
 				});
 			});
@@ -185,24 +199,35 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 			if (length === 0) return callback({});
 			var query = {};
 			var queryuser = {};
-
-			let c = Math.ceil(length / 2);
+			var queryaction = {};
+			query.$or = [];
+			var c = Math.ceil(length / 2);
 			for (var i = 0; i < length; i += 2) {
 				conditionToQuery(object[i], queryuser, function () {
 					c--;
 					if (c !== 0) return;
-					if (Object.keys(queryuser).length !== 0) {
+					// console.log(queryuser);
+				if (Object.keys(queryuser).length !== 0) {
 						queryuser[isUser] = true;
-						query.$or = [];
 						query.$or.push(queryuser);
-						var queryaction = {};
-						queryaction[isUser] = {$exists: false};
-						query.$or.push(queryaction);
-						callback(query);
 					}
-					return callback(query);
+				});
+				conditionToQueryAction(object[i],queryaction,function(){
+					converter.toID('_typeid', function (_typeid) {
+						// console.log(queryaction);
+						if (Object.keys(queryaction).length !== 0) {
+							queryaction[_typeid] = object[i].type;
+							// console.log("fuck");
+							// console.log(object[i].conditions);
+							// console.dir(query);
+							query.$or.push(queryaction);
+						}
+					});
 				});
 			}
+			// console.log('query');
+			// console.log(query);
+			return callback(query);
 		});
 	}
 
@@ -215,6 +240,15 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 		//	});
 		//	return;
 		//}
+		// if(element.type !== 'user'){
+		// 	var conditions = element.conditions;
+		// 	var size = conditions.length;
+		// 	for (var i = 0; i < size; i += 4) {
+		// 		var returnValue = translateOperator(conditions, i);
+		// 		var key = Object.keys(returnValue)[0];
+		// 		query[conditions[i]] = returnValue[key];
+		// 	}
+		// 	return callback();		}
 
 		if (element.type === 'user') {
 			var conditions = element.conditions;
@@ -228,6 +262,21 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 		}
 		callback();
 	}
+
+function conditionToQueryAction(element, query, callback){
+		if(element.type !== 'user'){
+			var conditions = element.conditions;
+			var size = conditions.length;
+			for (var i = 0; i < size; i += 4) {
+				var returnValue = translateOperator(conditions, i);
+				var key = Object.keys(returnValue)[0];
+				query[conditions[i]] = returnValue[key];
+				// console.log("haha");
+				// console.dir(query);
+			}
+			return callback();
+		}
+}
 
 //really, put conditions[i+2] to a variable, its much easier to read
 	function translateOperator(conditions, i) {
@@ -312,7 +361,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 			reduceinitcode += "returnObject.f" + ind + "=0;";
 			reduceaggcode += "if(value.f" + ind + "===undefined) value.f" + ind + "=0;returnObject.f" + ind + "+=value.f" + ind + ";";
 			defvalcode += "value.f" + ind + "=0;";
-			finalizecode += "(value.f" + ind + element.operator + JSON.stringify(element.value) + ") &&";
+			finalizecode += "(value.f" + ind + element.operator + JSON.stringify(element.value) + ")";
 			finalizeinitcode += "if(value.f" + ind + "==null) value.f" + ind + "=0;";
 		} else if (element.f === "sum") {
 			code += "value.f" + ind + "=(" + inlineconditions + ")?this." + element_field + ":0;";
@@ -336,6 +385,18 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 		} else throw "wrong operator " + element;
 
 		code = defvalcode + code + "};";
+		// console.log("=========#");
+		// console.dir("code");
+		// console.dir(code);
+		// console.dir("reduceinitcode");
+		// console.dir(reduceinitcode);
+		// console.dir("reduceaggcode");
+		// console.dir(reduceaggcode);
+		// console.dir("finalizecode");
+		// console.dir(finalizecode);
+		// console.dir("finalizeinitcode");
+		// console.dir(finalizeinitcode);
+
 		return {
 			mapcode: code,
 			reduceinitcode: reduceinitcode,
@@ -391,10 +452,12 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 				}
 				i++;
 			}
+			// console.log("joinop");
+			// console.log(joinop);
 			var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true){userid=this["' + ids._mtid + '"];value._hasUser=true;}else{userid=this["' + ids._mtid + '"];';
 			mapfunccode = mapinitcode + mapfunccode + "}emit(userid,value);}";
 			var reducefunccode = "function(key,values){var returnObject={};" + reduceinitcode + "for(var i in values){var value=values[i];if(value._hasUser!==undefined)returnObject._hasUser=true;" + reduceaggcode + "};return returnObject;}";
-			finalizecode = 'function(key, value){' + finalizeinitcode + 'return ' + finalizecode  + 'value._hasUser?1:0}';
+			finalizecode = 'function(key, value){' + finalizeinitcode + 'return ' + finalizecode  + '?1:0}';
 
 if (callback !== undefined)
 				callback({

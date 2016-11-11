@@ -13,11 +13,11 @@ $i_condition_sub = isset($i_condition_sub) ? $i_condition_sub : 'i_condition_sub
 
 // Vitle - 21/7
 $operator_behavior = array(
-		'>' => 'greater than',
-		'>=' => 'less or equal',
-		'=' => 'equal',
-		'<' => 'less than',
-		'<=' => 'greater or equal'
+		'gt' => 'greater than',
+		'gte' => 'greater or equal',
+		'eq' => 'equal',
+		'lt' => 'less than',
+		'lte' => 'less or equal'
 );
 
 $operator_default = array(
@@ -64,10 +64,11 @@ $condtion_sub_operators = $operator_default;
 			@endforeach
 		</select>
 	</div>
-	<div class="col-md-2">
+	<div class="col-md-2" data-name="condition-sub-value">
 		<input type="text" class="form-control "
 		       name="Segment[{{ $i_condition }}][conditions][{{ $i_condition_sub }}][cs_value]"
 		       value="{{ $c_condition->cs_value }}"/>
+		
 	</div>
 	<div class="col-md-1 col-add-filter add">
 		<i class="fa fa-minus fa-2" aria-hidden="true" onclick="deleteCondition(this)"></i>
