@@ -98,6 +98,11 @@ $props = isset($props) ? $props : [];
 								{{--</div>--}}
 							{{--@endif--}}
 							<div class="col-md-4">
+								<button type="button" data-loading-text="Loading..." autocomplete="off" class="action button blue button-radius" id="refresh" >
+									<span class="label">Refresh</span>
+								</button>
+							</div>
+							<div class="col-md-4">
 								<div class="col-md-6">
 									Count:
 								</div>
@@ -199,6 +204,15 @@ $props = isset($props) ? $props : [];
 	<script src="{{asset('js/Chart.js')}}"></script>
 	<script type="text/javascript">
 		$('select').select2();
+
+		$('#refresh').on('click',function(){
+			var that = $('#segment');
+			var $btn = $(this).button('loading');
+			$.get('/segment/{{$appcode}}/execute/' + that.val(),function(data){
+				$btn.button('reset');
+				$('#count').html(data.count);
+			});
+		});
 
 		$('#segment').on('change', function () {
 			var that = $(this);

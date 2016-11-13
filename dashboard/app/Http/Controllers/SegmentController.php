@@ -25,6 +25,12 @@ class SegmentController extends Controller
         return json_encode($model);
     }
 
+    public function getRefresh(Request $request, $appcode, $segid){
+        if (Access::can_view($request->user()->id, $appcode) == false) abort(500, "Permission Denied");
+        $model = MtHttp::get('segment/refresh/' . $appcode . '/' . $segid);
+        return json_encode($model);
+    }
+
     public function getIndex(Request $request, $appcode, $segid = null)
     {
         if (Access::can_view($request->user()->id, $appcode) == false) abort(500, "Permission Denied");
