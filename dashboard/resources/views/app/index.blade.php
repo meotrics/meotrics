@@ -7,32 +7,43 @@
 		function confirmDelete(acode) {
 			return confirm('Are you sure ? Detele `' + acode + '` action type !');
 		}
-
+		// ko cho realtime nua
 		onPageLoad(function () {
-
+			var status_app_pending = {};
 			function update_status(app) {
-				$.post('/app/count_traffic/' + app, function(data){
-					$('.traffic_' + app).html(data);
-				});
-
-				$.post('/app/setup_status/' + app, function (data) {
-					var $st = $('.status_' + app);
-					$st.empty();
-
-					if (data == 'true') {
-						$st.append('<span class="greendot"></span> <span style="color:#0ea622">OK</span>');
-					}
-
-					if (data == 'false') {
-						$st.append('<span class="graydot"></span> <span style="color:#aaa;" >NOT CONNECTED</span>')
-					}
-				});
+				if(status_app_pending[app] == undefined || status_app_pending[app] == false){
+					status_app_pending[app] = true;
+//					$.post('/app/count_traffic/' + app, function(data){
+//						$('.traffic_' + app).html(data);
+//							var $st = $('.status_' + app);
+//							$st.empty();
+//						if (data >0) {
+//							$st.append('<span class="greendot"></span> <span style="color:#0ea622">OK</span>');
+//						}else{
+//							$st.append('<span class="graydot"></span> <span style="color:#aaa;" >NOT CONNECTED</span>')
+//						}
+////						status_app_pending[app] = false;
+////						$.post('/app/setup_status/' + app, function (data) {
+////							var $st = $('.status_' + app);
+////							$st.empty();
+////
+////							if (data == 'true') {
+////								$st.append('<span class="greendot"></span> <span style="color:#0ea622">OK</span>');
+////							}
+////
+////							if (data == 'false') {
+////								$st.append('<span class="graydot"></span> <span style="color:#aaa;" >NOT CONNECTED</span>')
+////							}
+////							status_app_pending[app] = false;
+////						});
+//
+//					});
+				}
 			}
-
-			@foreach($apps as $ap)
-			update_status('{{$ap->code}}');
-			websock.appChange('{{$ap->code}}','type.pageview', update_status);
-			@endforeach
+			{{--@foreach($apps as $ap)--}}
+			{{--update_status('{{$ap->code}}');--}}
+			{{--websock.appChange('{{$ap->code}}','type.pageview', update_status);--}}
+			{{--@endforeach--}}
 
 		$(".sparkline").sparkline([ 0,0,0,0,0,0,0,0,0,0,0,0,0,0], {
 				type: 'line',
@@ -44,23 +55,23 @@
 				highlightSpotColor: undefined,
 				spotRadius: 0
 			});
-		@foreach($apps as $ap)
+		{{--@foreach($apps as $ap)--}}
 
-		$.post('/app/traffic14/{{$ap->code}}', function(data){
-			$spl = $(".spl_{{$ap->code}}");
-			$spl.empty();
-			$spl.sparkline(data, {
-				type: 'line',
-				lineColor: '#00007f',
-				lineWidth: 1,
-				spotColor: undefined,
-				minSpotColor: undefined,
-				maxSpotColor: undefined,
-				highlightSpotColor: undefined,
-				spotRadius: 0
-			});
-		});
-			@endforeach
+		{{--$.post('/app/traffic14/{{$ap->code}}', function(data){--}}
+			{{--$spl = $(".spl_{{$ap->code}}");--}}
+			{{--$spl.empty();--}}
+			{{--$spl.sparkline(data, {--}}
+				{{--type: 'line',--}}
+				{{--lineColor: '#00007f',--}}
+				{{--lineWidth: 1,--}}
+				{{--spotColor: undefined,--}}
+				{{--minSpotColor: undefined,--}}
+				{{--maxSpotColor: undefined,--}}
+				{{--highlightSpotColor: undefined,--}}
+				{{--spotRadius: 0--}}
+			{{--});--}}
+		{{--});--}}
+			{{--@endforeach--}}
 
 			$('.id_add').click(function () {
 				$.post('/app/create', {name: $('.id_name').val(), url:$('.id_url').val()}, function (appcode) {
@@ -102,7 +113,8 @@
 								<td>{{$ap->name}}
 									<br/>
 									<code class="fmonospaced">{{$ap->code}}</code></td>
-								<td><span class="traffic_{{$ap->code}}">{{$ap->count}}</span>
+								<td>
+									{{--<span class="traffic_{{$ap->code}}">{{$ap->count}}</span>--}}
 									<div class="spl_{{$ap->code}} sparkline"></div>
 								</td>
 

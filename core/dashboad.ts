@@ -5,8 +5,6 @@ import * as WS from './module/ws';
 import * as CrudApi from './module/crudapi';
 import * as referer from './module/referer';
 import bodyParser = require('body-parser');
-const globalVariables = require('./lib/utils/global-variables.js');
-const routes = require('./routes');
 var converter = require('./utils/fakeidmanager.js');
 var appException = require('./module/appException.js');
 import * as http  from 'http';
@@ -56,7 +54,6 @@ function ensureIndex(db: mongodb.Db, prefix: string, callback: () => void) {
 
 mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.MongoError, db: mongodb.Db) {
 	if (err) throw err;
-	globalVariables.set('db', db);
 	var prefix: string = config.get<string>("mongod.prefix") || "meotrics_";
 	ensureIndex(db, prefix, function () {
 		var ref = new referer.RefererType();
@@ -65,10 +62,8 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.Mongo
 		appException(app);
 		app.use(bodyParser.json()); // parse application/json
 		converter = new converter.IdManager();
-		globalVariables.set('converter', converter);
 		var crudapi = new CrudApi.CrudApi(db, converter, prefix, ref, config.get("dashboard.delay"));
 		crudapi.route(app); //bind route
-		routes(app);
 
 		//run the backend bashboard
 		var crudport = config.get("port") || 2108;
@@ -76,56 +71,5 @@ mongodb.MongoClient.connect(buildconnstr(), option, function (err: mongodb.Mongo
 			console.log('Meotrics CORE API   | OK |    ' + crudport);
 		});
 
-		var httpport = config.get<number>('apiserver.port') || 1711;
-		var httpapi = new HttpApi(db, converter, prefix, config.get('apiserver.codepath'), ref, crudapi.valuemgr);
-		var server = http.createServer(function (req: http.ServerRequest, res: http.ServerResponse) {
-			httpapi.route(req, res);
-		});
-
-		server.listen(httpport, function () {
-			console.log("HTTP API SERVER     | OK |    " + httpport);
-		});
-
-		let wsport = config.get<number>('websocket.port') || 2910;
-		// let wsport = 2910;
-		let keypath = config.get<string>('websocket.key');
-		let certpath = config.get<string>('websocket.cert');
-		var ws = new WS.WS(wsport);
-		// bind change event
-		var countRq = {};
-		var delayRq = {};
-		setInterval(function(){
-			for(var key in countRq){
-				countRq[key] = 0;
-			};
-		},1000);
-		setInterval(function(){
-			for(var key in delayRq){
-				delayRq[key] = false;
-			};
-		},10800000);
-		setInterval(function(){
-			for(var key in delayRq){
-				if(delayRq[key]){
-					ws.change(key,"type.pageview");
-				}
-			};
-		},1000);
-		httpapi.onchange = function (appid, code) {
-			console.log("vao roi: "+ appid);
-			if(delayRq[appid] == undefined) {
-				delayRq[appid] = false;
-				countRq[appid] = 0;
-			}else if(delayRq[appid] == false){
-				countRq[appid]++;
-				if(countRq[appid] >= 10){
-					delayRq[appid] = true;
-					countRq[appid] = 0;
-				}
-				ws.change(appid, code);
-			}
-
-		};
-		ws.run();
 	});
 });

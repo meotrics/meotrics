@@ -139,7 +139,6 @@ export class Dashboard {
 				}
 				data.push(value);
 			}
-			
 			callback(data.reverse(), labelarr.reverse());
 		});
 	}
@@ -161,16 +160,17 @@ export class Dashboard {
 		db.collection(prefix + "app" + appid).count(query, function (err, c) {
 			if (err) throw err;
 			var startc = c;
-
+			if(startc==0){
+				return callback(0);
+			}
 			query[ids._stime] = {
 				$gt: startsec, $lte: endsec
 			}
 			db.collection(prefix + "app" + appid).count(query, function (err, c) {
 				if (err) throw err;
 				var deltac = c;
-
 				if (deltac + startc == 0) return callback(0);
-				else return callback(deltac / (deltac + startc));
+				else return callback(deltac * 100/ startc );
 			});
 		});
 	}
@@ -193,9 +193,8 @@ export class Dashboard {
 					_id: null, sum: { $sum: "$sum" }, count: { $sum: 1 }, npurchase: { $sum: "$purchase" }
 				}
 			}];
-
 		revenue_pipeline[0]['$match'][ids._isUser] = { $exists: false };
-		revenue_pipeline[0]['$match'][ids._typeid] = "purchase";
+		revenue_pipeline[0]['$match'][ids._typeid] = {$regex: /^purchase/i};
 		revenue_pipeline[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
 		db.collection(prefix + "app" + appid).aggregate(revenue_pipeline, function (err, res) {
 			if (err) throw err;
@@ -217,7 +216,7 @@ export class Dashboard {
 		}];
 
 		revenue_pipeline[0]['$match'][ids._isUser] = { $exists: false };
-		revenue_pipeline[0]['$match'][ids._typeid] = "purchase";
+		revenue_pipeline[0]['$match'][ids._typeid] = {$regex: /^purchase/i};
 		revenue_pipeline[0]['$match'][ids._ctime] = { $gte: todaysec, $lt: todaysec + 86400 };
 		db.collection(prefix + "app" + appid).aggregate(revenue_pipeline, function (err, res) {
 			if (err) throw err;
@@ -312,7 +311,7 @@ export class Dashboard {
 			var nuservisit = res.length === 0 ? 0 : res[0].count;
 
 			piplelines[0]['$match'] = {};
-			piplelines[0]['$match'][ids._typeid] = "purchase";
+			piplelines[0]['$match'][ids._typeid] = {$regex: /^purchase/i};
 			piplelines[0]['$match'][ids._isUser] = { $exists: false };
 			piplelines[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
 
@@ -348,7 +347,7 @@ export class Dashboard {
 				$limit: 1
 			}];
 
-		pipeline[0]['$match'][ids._typeid] = 'purchase';
+		pipeline[0]['$match'][ids._typeid] = {$regex: /^purchase/i};
 		pipeline[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
 
 		db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
@@ -379,7 +378,7 @@ export class Dashboard {
 				$limit: 1
 			}];
 
-		pipeline[0]['$match'][ids._typeid] = 'purchase';
+		pipeline[0]['$match'][ids._typeid] = {$regex: /^purchase/i};
 		pipeline[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
 		pipeline[0]['$match'][ids._utm_campaign] = { $exists: true, $ne: null };
 		db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
@@ -410,7 +409,7 @@ export class Dashboard {
 				$limit: 1
 			}];
 
-		pipeline[0]['$match'][ids._typeid] = 'pageview';
+		pipeline[0]['$match'][ids._typeid] = {$regex: /^purchase/i};
 		pipeline[0]['$match'][ids._ctime] = { $gte: startsec, $lt: endsec };
 		db.collection(prefix + "app" + appid).aggregate(pipeline, function (err, res) {
 			if (err) throw err;

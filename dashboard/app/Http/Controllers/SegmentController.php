@@ -25,6 +25,12 @@ class SegmentController extends Controller
         return json_encode($model);
     }
 
+    public function getRefresh(Request $request, $appcode, $segid){
+        if (Access::can_view($request->user()->id, $appcode) == false) abort(500, "Permission Denied");
+        $model = MtHttp::get('segment/refresh/' . $appcode . '/' . $segid);
+        return json_encode($model);
+    }
+
     public function getIndex(Request $request, $appcode, $segid = null)
     {
         if (Access::can_view($request->user()->id, $appcode) == false) abort(500, "Permission Denied");
@@ -280,8 +286,10 @@ class SegmentController extends Controller
             $id = isset($_POST['id']) && $_POST['id'] ? $_POST['id'] : 0;
 
             $times = explode(" ", $_POST['timerange']);
-            $startTime = $times[0];
-            $endTime = $times[2];
+//            $startTime = $times[0];
+//            $endTime = $times[2];
+            $startTime = '';
+            $endTime = '';
             if (!$id) {
                 $id = MtHttp::post('segment/' . $appcode, [
                     'condition' => $query,
@@ -562,16 +570,20 @@ class SegmentController extends Controller
             foreach ($charts as $tmp_chart) {
                 if ($f === "_ref") {
                     // conver url
-                    foreach ($charts as $tmp_chart) {
-                        //remove https
-                        if($tmp_chart->key === ""){
-                            $tmp_chart->key = "None (direct)";
-                        }else{
-                            $tmp = str_replace("https://", "", $tmp_chart->key);
-                            $tmp = str_replace("http://", "", $tmp);
-                            $arr_url_have_uri = explode("/", $tmp);
-                            $server_name = $arr_url_have_uri[0];
-                            $tmp_chart->key = $server_name;
+                    foreach ($charts as $tmp_charts) {
+                        foreach($tmp_charts as $tmp_chart) {
+                            //remove https
+                            if(!isset($tmp_chart->key))
+                                continue;
+                            if ($tmp_chart->key === "") {
+                                $tmp_chart->key = "None (direct)";
+                            } else {
+                                $tmp = str_replace("https://", "", $tmp_chart->key);
+                                $tmp = str_replace("http://", "", $tmp);
+                                $arr_url_have_uri = explode("/", $tmp);
+                                $server_name = $arr_url_have_uri[0];
+                                $tmp_chart->key = $server_name;
+                            }
                         }
                     }
                 }
@@ -673,17 +685,17 @@ class SegmentController extends Controller
             $datasets[] = (object)[
                 'data' => $chart_data,
             ];
-            if ($f === '_reftype') {
-                $label_reftype = [];
-                foreach ($labels as $label) {
-                    if($label !== "N/A"){
-                        $label_reftype[] = $this->reftypemap[$label];
-                    }else{
-                        $label_reftype[] =  "N/A";
-                    }
-                }
-                $labels = $label_reftype;
-            }
+//            if ($f === '_reftype') {
+//                $label_reftype = [];
+//                foreach ($labels as $label) {
+//                    if($label !== "N/A"){
+//                        $label_reftype[] = $this->reftypemap[$label];
+//                    }else{
+//                        $label_reftype[] =  "N/A";
+//                    }
+//                }
+//                $labels = $label_reftype;
+//            }
         }
         $result['datasets'] = $datasets;
         $result['labels'] = $labels;

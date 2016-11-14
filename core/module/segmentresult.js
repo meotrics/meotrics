@@ -278,8 +278,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 		var mustbeinsegment = {};
 		mustbeinsegment[ids._segments] = {$elemMatch: {$eq: new mongodb.ObjectId(segmentid)}};
 		matchClause.$match.$and.push(mustbeinsegment);
-		console.log(segmentid);
-		console.log(matchClause);
+		//console.log(segmentid);
 		return matchClause;
 	}
 
@@ -288,19 +287,6 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 	converter.toIDs(['_isUser', '_segments', field1], function (ids) {
 			//build match clause
 			var matchClause = getMatchClause(ids, segmentid);
-			var groupByField = {$group:{
-				_id: "$_mtid",
-				field :{
-					$push : "$"+ids[field1]
-				}
-			}};
-			var unWind = {$unwind: '$field'};
-			var sumField = {$group:{
-				_id: "$field",
-				count:{
-					$sum: 1
-				}
-			}};
 			//build project clause
 			var projectClause = {$project: {_id: 0}};
 			projectClause.$project[ids[field1]] = 1;
@@ -312,15 +298,12 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 						}
 					}
 				};
-
 			db.collection(collection).aggregate([matchClause, projectClause, groupClause]).toArray(function (err, docs) {
-			// db.collection(collection).aggregate([matchClause,groupByField,unWind,sumField]).toArray(function (err, docs) {
 				if (err) throw err;
 				for (var i in docs) if (docs.hasOwnProperty(i)) {
 					docs[i].key = docs[i]._id;
 					delete docs[i]._id;
 				}
-				console.dir(docs[0].key);
 				callback(docs);
 			});
 		});
@@ -475,7 +458,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 				[ids['_isUser']]: true
 			};
 
-			let sort = {
+			var sort = {
 				[ids['_lastSeen']]: -1
 			}
 			db.collection(prefix + "app" + appName).find(query).sort(sort).skip(skip).limit(limit).toArray((err, users) => {
@@ -490,6 +473,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 						usersReturn[i][ids['name']] = users[i][ids['name']] || '';
 						usersReturn[i][ids['_mtid']] = users[i][ids['_mtid']] || '';
 						usersReturn[i][ids['email']] = users[i][ids['email']] || '';
+						usersReturn[i][ids['_lastSeen']] = users[i][ids['_lastSeen']] || '';
 					}
 
 					for (let j = 0; j < fields.length; j++) {

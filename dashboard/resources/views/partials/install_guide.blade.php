@@ -103,15 +103,21 @@
 	}
 	@if(isset($appcode) && $appcode != '')
 		$(document).ready(function () {
-			$.get('/app/setup_status/{{$appcode}}', function (response) {
-				if (response == "true" || response == 1) {
-					//'Integrated !'
-				} else {
+				if(window.localStorage['{{$appcode}}'] == undefined){
+					$.get('/app/setup_status/{{$appcode}}', function (response) {
+						if (response == "true" || response == 1) {
+							//'Integrated !'
+							window.localStorage['{{$appcode}}'] = true;
+						} else {
+							window.localStorage['{{$appcode}}'] = false;;
+							showCodeDialog('{{$appcode}}');
+						}
+					}).fail(function (err) {
+						_helper.notification.error('Failed to check installation !')
+					});
+				}else if(localStorage['{{$appcode}}'] == 'false'){
 					showCodeDialog('{{$appcode}}');
 				}
-			}).fail(function (err) {
-				_helper.notification.error('Failed to check installation !')
-			});
 		});
 	@endif
 </script>

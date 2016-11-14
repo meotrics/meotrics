@@ -1,4 +1,4 @@
-@extends('layout.master')
+    @extends('layout.master')
 @section('title', 'Meotrics')
 @section('style')
 @endsection
@@ -6,22 +6,30 @@
 	<script src="{{asset('/js/Chart.js')}}"></script>
 	<script>
 		onPageLoad(function () {
-			
+			var pending_pageview = false;
+
 			function update_pageview(){
-				throttle(function(){
-					$.post('/app/getpageview/{{$appcode}}', function(data){
-						data = JSON.parse(data);
-						$('.id_newv').html(data.newVisitors);
-						$('.id_retu').html(data.returningVisitors);
-						drawVisitChart(data.newVisitors, data.returningVisitors);
-					});
-				}, 1000)();
+				if(!pending_pageview){
+					pending_pageview = true;
+					throttle(function(){
+						$.post('/app/getpageview/{{$appcode}}', function(data){
+							pending_pageview = false;
+							data = JSON.parse(data);
+							if(data.newVisitors > 0){
+								window.localStorage['{{$appcode}}'] = true;
+							}
+							$('.id_newv').html(data.newVisitors);
+							if(data.returningVisitors >= 0) {
+								$('.id_retu').html(data.returningVisitors);
+							}
+							drawVisitChart(data.newVisitors, data.returningVisitors);
+						});
+					}, 1000)();
+				}
 			}
 			
 			function update_register() {
-				console.log('fc');
 				throttle(function(){
-					console.log('d');
 					var endtime= $tp.val().split(' ')[2];
 					var starttime = $tp.val().split(' ')[0];
 					$.post('/app/getsignup/{{$appcode}}/' + starttime + "/" + endtime, function(data){
@@ -30,7 +38,6 @@
 					})
 				}, 1000)();
 			}
-			
 			websock.appChange('{{$appcode}}', 'type.pageview', update_pageview);
 			websock.appChange('{{$appcode}}', 'type.register', update_register);
 			
@@ -42,8 +49,8 @@
 			@else
 			// 30 ngay truoc do
 			var today = new Date().toISOString().substr(0, 10);
-			var lastyear = new Date(new Date().getTime() - 31104000000).toISOString();
-			$tp.data('dateRangePicker').setDateRange(lastyear, today);
+			var lastday = new Date(new Date().getTime() - 86400000).toISOString();
+			$tp.data('dateRangePicker').setDateRange(lastday, today);
 			@endif
 
 			tp.bind('datepicker-change', function () {
@@ -75,6 +82,7 @@
 		//
 		var totalrevenues = [];
 		totalrevenues = {!! json_encode($dashboard->revenues) !!};
+
 		//
 		//var usergrowthrates = [];
 		//usergrowthrates = {-- !! json_encode($dashboard->usergrowth_rates) !! --};
@@ -86,7 +94,6 @@
 		traffic24 = {!! json_encode($dashboard->traffic24) !!};
 		var traffic24labels =[];
 		traffic24labels = {!! json_encode($dashboard->traffic24labels) !!};
-		//console.log(traffic24, traffic24lable, labels, totalrevenues);
 		var retenratechart = new Chart($("#revenuechart"), {
 			type: 'line',
 			data: {
@@ -94,6 +101,7 @@
 				datasets: [
 					{
 						label: "Revenue",
+						yAxisID: "y-axis-0",
 						lineTension: 0.5,
 						borderCapStyle: 'round',
 						borderDash: [],
@@ -114,8 +122,10 @@
 						pointBorderWidth: 1,
 						data: totalrevenues
 					},
+
 					{
 						label: "Number of purchase",
+						yAxisID: "y-axis-1",
 						lineTension: 0.5,
 						borderCapStyle: 'round',
 						borderDash: [],
@@ -144,7 +154,16 @@
 				legend: {display: false},
 				animation: false,
 				scales: {
-					yAxes: [{display: false}], xAxes: [{display: true}]
+					yAxes: [
+						{
+						position: "left",
+						"id": "y-axis-0"
+						}, {
+							position: "right",
+							"id": "y-axis-1"
+						}
+					]
+					, xAxes: [{display: true}]
 				}
 			}
 		});
@@ -287,7 +306,7 @@
 								<h6 style="margin: 0; color: #0e1a35">USER GROWTH RATE</h6>
 							</div>
 							<div class="content text-center" style="padding-top: 0">
-								<span class="big id_newsignup" style="color: #4164c2;">{{$dashboard->usergrowth_rate}}</span>
+								<span class="big id_newsignup" style="color: #4164c2;">{{$dashboard->usergrowth_rate}}%</span>
 							</div>
 						</div>
 					</div>
@@ -434,7 +453,7 @@
 						</div>
 						<div class="content text-center pull-right mr">
 							<h6 style="position: absolute;right: 30px; text-align: right;width: 80%;margin-top: 0;color:#25396e">
-								{{$dashboard->most_effective_ref or "N/A"}}
+								{{$dashboard->most_effective_ref or "None"}}
 							</h6>
 						</div>
 					</div>

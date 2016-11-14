@@ -6,13 +6,14 @@
     <script src="{{asset('/js/typehead.js')}}"></script>
     <script type="text/javascript">
         function createSuggession(appid, typeid, field, $dom) {
-            typeid = 'pageview';
+            if(typeid == 'user')
+                typeid = 'pageview';
             var source = new Bloodhound({
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 remote: {
-                    url: '//api.meotrics.com/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
-//                    url: '//api.meotrics.dev/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
+//                    url: '//api.meotrics.com/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
+                    url: '//api.meotrics.dev/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
                     wildcard: '%QUERY'
                 }
             });
@@ -127,26 +128,26 @@ var tmp_type_option = {
                 endforeach;
                 endif;
                 $f_behaviors = [
+                                            (object)['code' => 'count', 'name' => 'Count'],
                                             (object)['code' => 'sum', 'name' => 'Sum'],
-                                            (object)['code' => 'avg', 'name' => 'Average'],
-                                            (object)['code' => 'count', 'name' => 'Count']
+                                            (object)['code' => 'avg', 'name' => 'Average']
                 ];
                                         $f_behaviors_purchase = [
                                             (object)['code' => 'count', 'name' => 'Count'],
                 ];
                 ?>
 var f_behavior = [
+            {code: 'count', name: 'Count'},
             {code: 'sum', name: 'Sum'},
             {code: 'avg', name: 'Average'},
-            {code: 'count', name: 'Count'}
         ];
         var f_behavior_purchase = [{code: 'count', name: 'Count'}];
         var operator_behavior = [
-            {code: '>', name: 'greater than'},
-            {code: '>=', name: 'less or equal'},
-            {code: '=', name: 'equal'},
-            {code: '<', name: 'less than'},
-            {code: '<=', name: 'greater or equal'}
+            {code: 'gt', name: 'greater than'},
+            {code: 'gte', name: 'greater or equal'},
+            {code: 'eq', name: 'equal'},
+            {code: 'lt', name: 'less than'},
+            {code: 'lte', name: 'less or equal'}
         ];
 //        var operator_behavior = [
 //            {code: 'con', name: 'Contain'},
@@ -157,16 +158,36 @@ var f_behavior = [
 //        ];
         <?php $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators(); ?>
 
-        $('#segment-date-range').dateRangePicker({
-                    autoClose: true
-                });
+//        $('#segment-date-range').dateRangePicker({
+//                    autoClose: true
+//                });
         //load segment time range
         var now = new Date();
         var date_string = now.toLocaleDateString();
         var arr_date = date_string.split("/");
         var first_date = arr_date[2]+"-"+(arr_date[0]-1)+"-"+arr_date[1];
         var end_date = arr_date[2]+"-"+arr_date[0]+"-"+arr_date[1];
-        $('#segment-date-range').data('dateRangePicker').setDateRange(first_date, end_date);
+//        $('#segment-date-range').data('dateRangePicker').setDateRange(first_date, end_date);
+
+        function selectDate(id,input_date){
+            console.log(id);
+            $(function() {
+                var tp = $('#' + id).dateRangePicker({
+                        autoClose: true,
+                        singleDate : true,
+                        showShortcuts: false,
+                        singleMonth: true,
+                        format: 'DD-MM-YYYY'
+                        });
+                tp.bind('datepicker-change', function (event, obj) {
+                    var myDate= obj.value;
+                    myDate=myDate.split("-");
+                    var newDate=myDate[1]+"/"+myDate[0]+"/"+myDate[2];
+                    var date = new Date(newDate).getTime()/1000;
+                    input_date.val(date);
+                });
+            });
+        }
     </script>
 @endsection
 
@@ -199,10 +220,8 @@ var f_behavior = [
                         </div>
                         <div class="col-md-6">
                             <!--<label class="col-md-12" style="margin-top: 10px">Segment description</label>-->
-
                             <input type="text" class="form-control" name="description" placeholder="Enter description"
                                    value="{{isset($segment->description) ? $segment->description : ''}}"/>
-
                         </div>
                     </div>
                     <div>
@@ -289,6 +308,8 @@ var f_behavior = [
             $.each(type_options, function (i, v) {
                 if (v.value == that.val()) {
                     if (v.select_type == 'user') {
+                        $('#label_for_did_action').parent().hide();
+
                         containter.find('input[name="Segment[' + i_condition + '][select_type]"]').val('user');
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
                         containter.find('select[name="Segment[' + i_condition + '][f]"]').parent().hide();
@@ -309,6 +330,9 @@ var f_behavior = [
                         condition_item.find('div[data-name="add-condition"]').hide();
                     }
                     else {
+                        $('#label_for_did_action').parent().show();
+                        $('#label_for_did_action').text('With number of time');
+
                         containter.find('input[name="Segment[' + i_condition + '][select_type]"]').val('behavior');
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().removeClass('col-md-4');
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().addClass('col-md-2');
@@ -329,7 +353,6 @@ var f_behavior = [
                         $.each(tmp_behavior, function (fi, fv) {
                             containter.find('select[name="Segment[' + i_condition + '][f]"]').append('<option value="' + fv.code + '">' + fv.name + '</option>');
                         });
-
                         $('select[name="Segment[' + i_condition + '][field]"]').html('');
                         if (v.fields.length) {
                             $.each(v.fields, function (fieldi, fieldv) {
@@ -359,31 +382,43 @@ var f_behavior = [
             getOperator(condition_item, 'condition-item-operator', that.val());
         }
 
+
         function changeSubField(e) {
             var that = $(e);
             var containter = that.parent().parent();
             var condition_item = that.closest('div[data-name="condition-sub-item"]');
             var i_condition = containter.attr("data-i-condition-sub");
-            containter.find('input[name="Segment[' + i_condition + '][conditions][' + i_condition + '][cs_value]"]').val('');
+            var data_i_condition = containter.parent().parent().parent().parent().attr("data-i-condition");
             getOperator(condition_item, 'condition-sub-operator', that.val());
-            if (containter.find('select[name="Segment[' + i_condition + '][conditions][' + i_condition + '][cs_field]"]').val() == '='|| containter.find('select[name="Segment[' + i_condition + '][conditions][' + i_condition + '][cs_field]"]').val() == 'eq') {
-                createSuggession(appid, containter.find('select[name="Segment[' + i_condition + '][type]"]').val(), containter.find('select[name="Segment[' + i_condition + '][conditions][' + i_condition + '][cs_field]"]').val(), containter.find('input[name="Segment[' + i_condition + '][conditions][' + i_condition + '][cs_value]"]'));
+            // check ctime
+            if(that.val() == '_ctime'){
+                containter.find('input[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_value]"]').hide();
+                var id = data_i_condition+"a"+i_condition;
+                var time = '<input class="form-control mr" id="'+id+'">';
+                containter.find('div[data-name="condition-sub-value"]').append(time);
+                selectDate(id,containter.find('input[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_value]"]'));
+            }else{
+                containter.find('input[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_value]"]').val('');
+                if (containter.find('select[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_field]"]').val() == '='|| containter.find('select[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_field]"]').val() == 'eq') {
+                    createSuggession(appid, containter.find('select[name="Segment[' + i_condition + '][type]"]').val(),
+                            containter.find('select[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_field]"]').val(),
+                            containter.find('input[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_value]"]'));
+                }
+                else {
+                    destroySuggession(containter.find('input[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_value]"]'));
+                }
             }
-            else {
-                destroySuggession(containter.find('input[name="Segment[' + i_condition + '][conditions][' + i_condition + '][cs_value]"]'));
-            }
-
         }
 
         function getOperator(item, operator_name, field_val) {
             var div_operator = item.find('div[data-name="' + operator_name + '"]');
             var select_operator = div_operator.find('select');
             var operator_behavior = [
-                {code: '>', name: 'greater than'},
-                {code: '>=', name: 'less or equal'},
-                {code: '=', name: 'equal'},
-                {code: '<', name: 'less than'},
-                {code: '<=', name: 'greater or equal'}
+                {code: 'gt', name: 'greater than'},
+                {code: 'gte', name: 'greater or equal'},
+                {code: 'eq', name: 'equal'},
+                {code: 'lt', name: 'less than'},
+                {code: 'lte', name: 'less or equal'}
             ];
             var operator_default = [
                 {code: 'contain', name: 'Contain'},
@@ -560,15 +595,9 @@ var f_behavior = [
             var container_sub_item = that.closest('div[data-name="condition-sub-item"]');
             console.log(that.val());
             if (condition_item.length && container_sub_item.length) {
-                console.log("1");
                 var i_condition = condition_item.attr('data-i-condition');
                 var i_sub_condition = container_sub_item.attr('data-i-condition-sub');
-                console.log(i_condition);
-                console.log(i_sub_condition);
-                console.log(container_sub_item.find('select[name="Segment[' + i_condition + '][conditions][' + i_condition + '][cs_field]"]').val());
-
-//                if (container_sub_item.find('select[name="Segment[' + i_condition + '][conditions][' + i_sub_condition + '][cs_operator]"]').val() == 'eq') {
-                if (that.val() == 'eq') {
+                  if (that.val() == 'eq') {
                     console.log(2);
                     createSuggession(appid, condition_item.find('select[name="Segment[' + i_condition + '][type]"]').val(),
                             container_sub_item.find('select[name="Segment[' + i_condition + '][conditions][' + i_sub_condition + '][cs_field]"]').val(),

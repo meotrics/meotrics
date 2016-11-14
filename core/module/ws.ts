@@ -1,6 +1,7 @@
 ﻿import * as http from 'http';
 import * as websocket from 'websocket';
 
+
 class Message {
 	public  constructor(public appid:string, public code:string) {
 	}

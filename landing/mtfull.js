@@ -1,5 +1,5 @@
 (function () {
-	
+
 	var host = "meotrics.com";
 	var https = "https://";
 	if(location.hostname == "client.meotrics.dev"){
@@ -7,14 +7,53 @@
 		https = "http://";
 	}
 	var encodeFunction = encodeURIComponent, i = 0, j = 0, isready, request_queue2 = [], doc = document;
+
 	var T = 2;
 	var SESSIONGAP = 1200;
 	var STARTANDLEAVE;
 	var ISBLUR, lastcycle,totaltime,totalidle;
 	var lefttime;
 	var canstartnewsession = false;
+
+	// new script vitle
+	function actionPageview(){
+		mt.appid = window.mtapp;
+		var data = {};
+		addVisitorPlatform(data);
+		ajax('pageviewtwo',data,function(callback){
+				console.log(1);
+				if(callback!= undefined){
+					var mtid = JSON.parse(callback)._mtid;
+					document.cookie = "_mtid="+mtid;
+				}
+			});
+		cleanRequest();
+	}
+
+	function getMtid(){
+		var mtid;
+		var cookieHeaders = doc.cookie;
+		if(cookieHeaders === undefined) return false;
+		var cookie = cookieHeaders.split(';');
+		var count = 0;
+		var value = "";
+		for(var i =0; i< cookie.length;i++){
+			var c = cookie[i];
+			while (c.charAt(0)==' ') {
+				c = c.substring(1);
+			}
+			if (c.indexOf("_mtid") == 0) {
+				var cmtid = "_mtid=";
+				value = c.substring(cmtid.length,c.length);
+				mtid = value;
+			}
+		}
+		return mtid;
+	}
+
+
 	function init()
-	{	
+	{
 		totaltime = 0;
 		totalidle = 0;
 		STARTANDLEAVE = ISBLUR = lastcycle = lefttime = undefined;
@@ -37,7 +76,7 @@
 
 	attach("beforeunload", function (e) {
 		var delta = Math.round(new Date().getTime() / 1000) - lastcycle;
-		stopsession(totaltime+delta);
+		// stopsession(totaltime+delta);
 	});
 
 	attach('keydown', interact);
@@ -53,7 +92,7 @@
 		lefttime = Math.round(new Date().getTime() / 1000);
 	})
 
-	
+
 	attach('focus', function(){
 		if(ISBLUR === undefined){
 			startsession()
@@ -65,7 +104,7 @@
 			//the user has left for too long
 			if(delta > SESSIONGAP)
 			{
-				stopsession(totaltime);
+				// stopsession(totaltime);
 				startsession();
 				return;
 			}
@@ -79,13 +118,13 @@
 	function stopsession(sessiontime)
 	{
 		ISBLUR = undefined;
-		ajax('x/' + mt.actionid, {sessiontime: sessiontime});
+		('x/' + ajaxmt.actionid, {sessiontime: sessiontime});
 	}
 
 	function addIframeLink(){
 		var ifm = doc.createElement('iframe');
 		ifm.style.display="none";
-		ifm.src = https + host + "/iframe.html?x=" + mt.appid + '-' + mt.actionid;
+		ifm.src = "//" + host + "/iframe.html?x=" + mt.appid + '-' + mt.actionid;
 		if(doc.body === undefined) doc.head.appendChild(ifm);
 		else doc.body.appendChild(ifm);
 	}
@@ -115,12 +154,25 @@
 	}
 
 	function ajax(url, data, callback) {
-		var script = doc.createElement('script');
-		// script.type = 'text/javascript'; comment this because we dont need to excute the script
-		script.src = https+'api.' + host + "/" + mt.appid + '/' + url + (data ? '?' + serialize(data) : '');
-		script.style.display = 'none';
-		script.onreadystatechange = script.onload = callback;//for IE
-		doc.body === undefined ? doc.head.appendChild(script) : doc.body.appendChild(script);
+		data._mtid  = getMtid();
+		console.log(data._mtid);
+		var theurl = '//45.32.113.71:1711/' + window.mtapp + '/' + url + (data ? '?' + serialize(data) : '');
+
+		callback(httpGetAsync(theurl,function(value){
+			callback(value);
+		}));
+
+	}
+
+	function httpGetAsync(theUrl, callback)
+	{
+		var xmlHttp = new XMLHttpRequest();
+		xmlHttp.onreadystatechange = function() {
+			if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+				callback(xmlHttp.responseText);
+		}
+		xmlHttp.open("GET", theUrl, true); // true for asynchronous
+		xmlHttp.send(null);
 	}
 
 	function serialize(obj, prefix) {
@@ -134,8 +186,14 @@
 
 	mt.info = function (data, callback, callback2, callback3) {
 		if(typeof data == 'string') data = {userid: data};
-		if(isready)
-			ajax('info', data, callback || callback3)
+		if(isready){
+			ajax('info',data,function(callback){
+				if(callback!= undefined){
+					var mtid = JSON.parse(callback)._mtid;
+					document.cookie = "_mtid="+mtid;
+				}
+			});
+		}
 		else{
 			request_queue2.push(['info', data]);
 			(callback || callback3)();
@@ -144,7 +202,7 @@
 
 	mt.clear = function (callback, callback2, callback3, callback4) {
 		if(isready)
-			 ajax('clear', callback3 /*alway undefined, use callback3 for better minify*/, callback || callback4);
+			ajax('clear', callback3 /*alway undefined, use callback3 for better minify*/, callback || callback4);
 		else{
 			request_queue2.push(['clear']);
 			(callback || callback4)();
@@ -154,7 +212,12 @@
 	mt.track = function (event, data, time, callback) {
 		data._deltat = (new Date() - time) / 1000;
 		data._typeid = event;
-		if(isready) ajax('track', addVisitorPlatform(data), callback) 
+		if(isready) ajax('track', addVisitorPlatform(data), function(callback){
+			if(callback!= undefined){
+				var mtid = JSON.parse(callback)._mtid;
+				document.cookie = "_mtid="+mtid;
+			}
+		});
 		else
 		{
 			request_queue2.push(['track', event, data, new Date()]);
@@ -173,7 +236,7 @@
 	// clean request queue
 	function cleanRequest() {
 		// clean queue number 2 when out of element in queue number 1
-		if (i >= mt.rq.length) { 
+		if (i >= mt.rq.length) {
 			isready = 1;
 			return cleanRequest2();
 		}
@@ -192,26 +255,13 @@
 
 	mt.excute = function(event){
 		var data = JSON.parse(event.data);
-		mt.actionid = data.actionid;
-		if(data.lastactionid !== undefined)
-		{
-			var o1 = {
-				actionid : data.actionid, 
-				lastactionid: data.lastactionid
-			}
-			addVisitorPlatform(o1);
-			ajax('fix',o1);
-		}
-		else
-		{
-			var o2 = {actionid : data.actionid};
-			addVisitorPlatform(o2);
-			ajax('fix', o2);
-		}
+		console.log(data);
+		actionPageview();
 		cleanRequest();// excute delayed request in queue
 	}
 	init();
-	backgroundtimer();
-	addIframeLink();
+	actionPageview();
+	// backgroundtimer();
+	// addIframeLink();
 	mt.onready();
 })();

@@ -7,6 +7,9 @@ var fs = require('fs');
 var ua = require('ua-parser');
 var MD = require('mobile-detect');
 var ActionMgr = require('./actionmgr');
+var ObjectID = require('bson-objectid');
+var NanoTimer = require('nanotimer');
+var timerObject = new NanoTimer();
 exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	var code;
 	var actionmgr = new ActionMgr.ActionMgr(db, converter, prefix, "mapping", valuemgr, ref);
@@ -34,7 +37,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
 	// purpose: extract basic info from user agent and request parameter
 	function trackBasic(request) {
-		console.log("=====trace basic");
+		// console.log("=====trace basic");
 		var useragent = request.headers['user-agent'];
 		var r = ua.parse(useragent);
 		var uri = request.params._url || '';
@@ -42,7 +45,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		var devicetype = 'desktop';
 		if (md.tablet() !== null)
 			devicetype = 'tablet';
-		else if (md.phone() !== null)
+		else if (md.phone() !== null || md.mobile() != null)
 			devicetype = 'phone';
 		else
 			devicetype = 'desktop';
@@ -61,7 +64,8 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 			_deviceid: r.device.family,
 			_scr: request.params._scr,
 			_lang: request.headers["accept-language"],
-			_devicetype: devicetype
+			_devicetype: devicetype,
+			_mtid:  request.params._mtid
 		};
 
 		for (var i in request.params)
@@ -76,81 +80,22 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		res._utm_term = query.utm_term;
 		res._utm_content = query.utm_content;
 		res._utm_medium = query.utm_medium;
-
 		return res;
 	}
 
 
-	function getMtid(req, appid, res, callback) {
-		console.log("=====get mtid");
-		var mtid = getCookie(req, "mtid");
-		console.log("mtid: "+mtid);
-		if (mtid === undefined || mtid.length != 24) {
-			mtid = req.params._mtid;
-			if (mtid === undefined) {
-				return actionmgr.setupRaw(appid, function (mtid) {
-					setCookie(res, "mtid", mtid, appid);
-					callback(mtid);
-				});
-			}
-		}
-
-		// check if mtid is valid
-		actionmgr.ismtidValid(appid, mtid, function (ret) {
-			if (ret) callback(mtid);
-			else {
-				eraseCookie(res, "mtid", appid);
-				actionmgr.setupRaw(appid, function (mtid) {
-					setCookie(res, "mtid", mtid, appid);
-					callback(mtid);
-				});
-			}
-		});
-	}
-
-	function eraseCookie(res, name, path) {
-		res.setHeader('Set-Cookie', name + "=x; expires=Wed, 21 Aug 1995 11:11:11 GMT; path=/" + path);
-	}
-
-	function eraseCookieDuplicate(res, name, path) {
-		res.setHeader('Set-Cookie', name + "=x; expires=Wed, 21 Aug 1995 11:11:11 GMT");
-	}
-
-	function clearDuplicate(req, res){
-		console.log("clear duplicate");
-		eraseCookieDuplicate(res, 'mtid', req.appid);
-		res.end();
-	}
-
-	function clear(req, res) {
-		console.log("=====clear");
-		// delete the cookie
-		eraseCookie(res, 'mtid', req.appid);
-		res.end();
-	}
 
 	function track(req, res) {
-		console.log("=====track");
+		// console.log("=====track");
 		var appid = req.appid;
 		var data = trackBasic(req);
 		var callback = (data._callback == 'true' || data._callback == true);
 		delete data._callback;
 
-		getMtid(req, appid, res, function (mtid) {
+		handlerMtid(data._mtid, appid, res, function (mtid) {
 			data._mtid = mtid;
 			actionmgr.saveRaw(appid, data, function (actionid) {
 				me.onchange(appid, "type." + data._typeid);
-				
-				if (callback === true)
-				{
-					res.setHeader('Content-Type', 'application/javascript');
-					res.end("mt.actionid = \"" + mtid + "\";");
-				}
-				else {
-					res.setHeader('Content-Type', 'text/plain');
-					res.end("\"" + mtid + "\"");
-				}
-	
 			});
 		});
 	}
@@ -158,19 +103,17 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 	// identify an user
 	// if mtid not exists in the parameter ->create one
 	function info(req, res) {
-		console.log("=====info");
+		// console.log("=====info");
 		var appid = req.appid;
-		getMtid(req, appid, res, function (mtid) {
+		var data = trackBasic(req);
+		handlerMtid(data._mtid, appid, res, function (mtid) {
 			var data = {};
-			for (var i in req.params) if (req.params.hasOwnProperty(i))
-				if (i.startsWith('_') === false) data[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
+			// console.log(req.params);
+			for (var i in req.params)
+					if (i.startsWith('_') === false) data[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
 
 			actionmgr.identifyRaw(appid, { mtid: mtid, user: data }, function (mtid) {
 				//set new mtid if need
-				setCookie(res, "mtid", mtid, appid);
-				res.setHeader('Content-Type', 'text/plain');
-
-				res.end("\"" + mtid + "\"");
 			});
 		});
 	}
@@ -180,80 +123,9 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		});
 	}
 
-	function checkMtid(req,res){
-		// check duplicate
-		if(checkNotDuplicateMtid(req,res)){
-			console.log("true");
-			// check worng mtid
-		var mtid = getCookie(req,"mtid");
-		if(mtid !== undefined && mtid.length != 24){
-				console.log("wrong mtid");
-				clear(req, res);
-			}
-		}
-			res.setHeader('Content-Type', 'text/plain');
-			res.end();
 
-	}
-
-	function checkNotDuplicateMtid(req,res){
-		console.log("checkDuplicate");
-		var cookieHeaders = req.headers.cookie;
-		if(cookieHeaders === undefined) return true;
-		var cookie = cookieHeaders.split(';');
-		var count = 0;
-		var value = "";
-		for(var i =0; i< cookie.length;i++){
-			var c = cookie[i];
-			while (c.charAt(0)==' ') {
-				c = c.substring(1);
-			}
-			if (c.indexOf("mtid") == 0) {
-				if(count == 0){
-					var cmtid = "mtid=";
-					value = c.substring(cmtid.length,c.length);
-				}
-				count++;
-			}
-		}
-		if(count > 1){
-			clearDuplicate(req,res);
-			return false;
-		}
-		return true;
-	}
-
-	function getCookie(req, name) {
-		var list = {}, rc = req.headers.cookie;
-		rc && rc.split(';').forEach(function (cookie) {
-			var parts = cookie.split('=');
-			list[parts.shift().trim()] = decodeURIComponent(parts.join('='));
-		});
-		return list[name];
-	}
-
-	function setCookie(res, name, value, path) {
-		var tenyearlater = new Date().getYear() + 10 + 1900;
-		res.setHeader('Set-Cookie', name + '=' + encodeURIComponent(value) + "; expires=Wed, 21 Aug " + tenyearlater + " 11:11:11 GMT; path=/" + path);
-
-	}
-
-	function fix(req, res) {
-		console.log("=====fix");
-		var appid = req.appid;
-		var actionid = req.actionid;
-		var lastactionid = req.lastactionid;
-		var data = trackBasic(req);
-		getMtid(req, appid, res, function (mtid) {
-			data._mtid = mtid;
-			actionmgr.fixRaw(appid, actionid, lastactionid, data, function () {
-				res.end();
-			});
-		});
-	}
 
 	function suggest(req, res) {
-		console.log("=====suggest");
 		valuemgr.suggest(req.appid + "", req.typeid + "", req.field + "", req.qr + "", function (results) {
 			res.setHeader('Content-Type', 'application/json');
 			res.setHeader('Access-Control-Allow-Origin', '*');
@@ -266,24 +138,52 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 		});
 	}
 
-	function pageview(req, res) {
-		console.log("=====pageview");
-		var appid = req.appid;
-		// record an new pageview
-		var data = trackBasic(req);
-		getMtid(req, appid, res, function (mtid) {
-			data._mtid = mtid;
-			data._typeid = 'pageview';
 
-			actionmgr.saveRaw(appid, data, function (actionid) {
-				me.onchange(appid, 'type.pageview');
-				// return code
-				loadCode(appid, actionid, function (code) {
-					res.setHeader('Content-Type', 'text/css');
-					res.end(code);
-				});
-			});
+	function pageviewtwo(req,res){
+		var appid = req.appid;
+		var data = trackBasic(req);
+		handlerMtid(data._mtid,appid,res,function(mtid){
+			me.onchange(appid, 'type.pageview');
+			data._typeid = 'pageview';
+			data._mtid = mtid;
+			actionmgr.saveRaw(appid, data,function(callback){});
 		});
+	}
+
+	function handlerMtid(mtid,appid,res,callback){
+		if(mtid == undefined || mtid == 'undefined' || mtid.length != 24){
+			mtid = ObjectID();
+			sendMtid(mtid,res);
+			actionmgr.setupRaw(appid,mtid, function (id) {
+				callback(id);
+			});
+		}else{
+			sendMtid(mtid,res);
+			actionmgr.ismtidValid(appid, mtid, function (ret) {
+				if (!ret){
+					actionmgr.setupRaw(appid,mtid, function (id) {
+						callback(mtid);
+					});
+				}else{
+					callback(mtid);
+				}
+			});
+		}
+	}
+
+
+	function sendMtid(mtid,res){
+		var id = {};
+		id._mtid = mtid;
+		var json = JSON.stringify(id);
+		res.setHeader('Content-Type', 'application/json');
+		res.setHeader('Access-Control-Allow-Origin', '*');
+		res.setHeader('Access-Control-Allow-Methods', 'GET');
+		res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+		res.setHeader('Access-Control-Allow-Credentials', true);
+		res.setHeader('Content-Type', 'application/json');
+		res.write(json);
+		res.end();
 	}
 
 	this.route = function (req, res) {
@@ -311,9 +211,8 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 				req['appid'] = parts[1];
 				var action = parts[2];
 				if (action === 'track') track(req, res);
-				else if(action == 'check') checkMtid(req,res);
-				else if (action === '' || action === undefined) pageview(req, res);
-				else if (action === 'clear') clear(req, res);
+				else if (action === '' || action === undefined) pageviewtwo(req, res);
+				else if (action === 'pageviewtwo') pageviewtwo(req, res);
 				else if (action === 'info') info(req, res);
 				else if (action === 'x') {
 					req['actionid'] = parts[3];
@@ -326,13 +225,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 					req['qr'] = parts[5];
 					suggest(req, res);
 				}
-				else if (action === 'fix') {
-					var query = url.parse(path, true).query;
-					req['actionid'] = req.params.actionid;
-					req['lastactionid'] = req.params.lastactionid;
-						if(req.params.actionid==null) console.log('errfix: ', path);
-					fix(req, res);
-				} else {
+				else {
 					res.statusCode = 404;
 					res.end('action "' + action + '" not found, action must be one of [x, clear, info, fix, track]');
 				}

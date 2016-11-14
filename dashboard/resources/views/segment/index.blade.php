@@ -98,6 +98,11 @@ $props = isset($props) ? $props : [];
 								{{--</div>--}}
 							{{--@endif--}}
 							<div class="col-md-4">
+								<button type="button" data-loading-text="Loading..." autocomplete="off" class="action button blue button-radius" id="refresh" >
+									<span class="label">Refresh</span>
+								</button>
+							</div>
+							<div class="col-md-4">
 								<div class="col-md-6">
 									Count:
 								</div>
@@ -199,6 +204,15 @@ $props = isset($props) ? $props : [];
 	<script src="{{asset('js/Chart.js')}}"></script>
 	<script type="text/javascript">
 		$('select').select2();
+
+		$('#refresh').on('click',function(){
+			var that = $('#segment');
+			var $btn = $(this).button('loading');
+			$.get('/segment/{{$appcode}}/execute/' + that.val(),function(data){
+				$btn.button('reset');
+				$('#count').html(data.count);
+			});
+		});
 
 		$('#segment').on('change', function () {
 			var that = $(this);
@@ -442,9 +456,10 @@ $props = isset($props) ? $props : [];
 					if(label_field1 == "reftype")
 						label_field1 = "channel"
                     var column = "<tr style='text-transform: capitalize'><td>#</td>" +
-                                    "<td>Id</td>" +
+                                    "<td width='100px'>Id</td>" +
                                     "<td>Name</td>" +
                                     "<td>Email</td>" +
+                                    "<td>Last seen</td>" +
                                     "<td>"+label_field1+"</td>" +
                                     column2+
                                     "</tr>";
@@ -455,14 +470,17 @@ $props = isset($props) ? $props : [];
                                 columnfield = "<td>"+item[field2]+"</td>";
                         }
 						var value_field1 = item[field1];
-						if(value_field1[0] == null){
+						if(value_field1 == null){
 							value_field1 = "N/A";
 						}
+						var date = new Date(item._lastSeen*1000);
+						var lastSeen = date.toLocaleString();
                         var cl = "<tr>" +
                                         "<td>"+(i+1)+"</td>" +
                                         "<td>"+item._mtid+"</td>"+
                                         "<td>"+item.name+"</td>"+
                                         "<td>"+item.email+"</td>"+
+                                        "<td>"+lastSeen+"</td>"+
                                         "<td>"+value_field1+"</td>"+
                                         columnfield+
                                         "</tr>";
@@ -497,9 +515,9 @@ $props = isset($props) ? $props : [];
 					}
 					var select_page = "<nav>" +
 							"<ul class='pagination'>" +
-							"<li><a href='#' aria-label='Previous'><span aria-hidden='true'>&laquo;</span></a></li>" +
+							"<li onclick='onSelectPage(1)' "+ temp +"><a href='#' aria-label='Previous'><span aria-hidden='true'>&lt;&lt;</span></a></li>" +
 							b+
-							"<li><a href='#' aria-label='Next'><span aria-hidden='true'>&laquo;</span></a></li>" +
+							"<li onclick='onSelectPage("+page+")' "+ temp +"><a href='#' aria-label='Next'><span aria-hidden='true'>&gt;&gt;</span></a></li>" +
 							"</ul></nav>";
 					table += select_page;
                     $("#user_table").empty();
