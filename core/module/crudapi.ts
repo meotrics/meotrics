@@ -69,9 +69,9 @@ export class CrudApi {
 				// me.segMgr.excuteSegment(req.params.id);
 			});
 		});
-		app.getEx('segment/refresh/:appid/:id', function(req,res){
-			me.segMgr.excuteSegment(req.params.id, function(callback){
-				me.segCRUD.match(req, res);
+		app.getEx('/segment/refresh/:appid/:id', function(req,res){
+				me.segMgr.excuteSegment(req.params.id, function(callback){
+				me.segCRUD.match(req, res,callback);
 			});
 		});
 

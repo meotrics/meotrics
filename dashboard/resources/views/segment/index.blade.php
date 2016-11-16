@@ -208,8 +208,10 @@ $props = isset($props) ? $props : [];
 		$('#refresh').on('click',function(){
 			var that = $('#segment');
 			var $btn = $(this).button('loading');
-			$.get('/segment/{{$appcode}}/execute/' + that.val(),function(data){
+			$.get('/segment/{{$appcode}}/refresh/' + that.val(),function(data){
+				console.log(data);
 				$btn.button('reset');
+				data = JSON.parse(data);
 				$('#count').html(data.count);
 			});
 		});
