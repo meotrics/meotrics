@@ -40,14 +40,17 @@ $condtion_sub_operators = $operator_default;
 	@endif
 @endif
 
+
+
+
 <div class="row" data-name="condition-sub-item" data-i-condition-sub="{{ $i_condition_sub }}">
     <div class="col-md-2 col-md-offset-2" >
 		<select class="form-control "
 		        name="Segment[{{ $i_condition }}][conditions][{{ $i_condition_sub }}][cs_field]"
-                        value="{{ $condition->field }}" onchange="changeSubField(this)">
+                        value="@if($condition->field){{$c_condition->cs_field}}@endif" onchange="changeSubField(this)">
 			@if ($condition->fields)
 				@foreach ($condition->fields as $c_field)
-					<option value="{{ $c_field->pcode }}" {{ $c_condition->cs_field == $c_field->pcode ? 'selected=""' : '' }}>{{$c_field->pname }}</option>
+					<option value="{{ $c_field->pcode }}" {{ $c_condition->cs_field == $c_field->pcode ? 'selected' : '' }}>{{$c_field->pname }}</option>
 				@endforeach
 			@else
 			@endif
@@ -67,8 +70,8 @@ $condtion_sub_operators = $operator_default;
 	<div class="col-md-2" data-name="condition-sub-value">
 		<input type="text" class="form-control "
 		       name="Segment[{{ $i_condition }}][conditions][{{ $i_condition_sub }}][cs_value]"
-		       value="{{ $c_condition->cs_value }}"/>
-		
+		       value="{{ $c_condition->cs_value }}" />
+
 	</div>
 	<div class="col-md-1 col-add-filter add">
 		<i class="fa fa-minus fa-2" aria-hidden="true" onclick="deleteCondition(this)"></i>

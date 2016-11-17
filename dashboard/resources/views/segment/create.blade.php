@@ -149,28 +149,15 @@ var f_behavior = [
             {code: 'lt', name: 'less than'},
             {code: 'lte', name: 'less or equal'}
         ];
-//        var operator_behavior = [
-//            {code: 'con', name: 'Contain'},
-//            {code: 'eq', name: 'Equal'},
-//            {code: 'sw', name: 'Start with'},
-//            {code: 'ew', name: 'End with'},
-//            {code: 'ncon', name: 'Not contain'},
-//        ];
         <?php $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators(); ?>
-
-//        $('#segment-date-range').dateRangePicker({
-//                    autoClose: true
-//                });
         //load segment time range
         var now = new Date();
         var date_string = now.toLocaleDateString();
         var arr_date = date_string.split("/");
         var first_date = arr_date[2]+"-"+(arr_date[0]-1)+"-"+arr_date[1];
         var end_date = arr_date[2]+"-"+arr_date[0]+"-"+arr_date[1];
-//        $('#segment-date-range').data('dateRangePicker').setDateRange(first_date, end_date);
 
         function selectDate(id,input_date){
-            console.log(id);
             $(function() {
                 var tp = $('#' + id).dateRangePicker({
                         autoClose: true,
@@ -187,6 +174,23 @@ var f_behavior = [
                     input_date.val(date);
                 });
             });
+        }
+        window.onload = function(e){
+            var arrtime = $('select[value="_ctime"]');
+            for(var i = 0;i<arrtime.length;i++){
+                var that = $(arrtime[i]);
+                var container =  that.parent().parent();
+                var input = container.find($('input'));
+                input.hide();
+                var timeInt = input.val();
+                var datetime = new Date(timeInt*1000).toLocaleDateString();
+                datetime = datetime.replace(/[/]/g,'-');;
+                var id = "time_"+i;
+                var time = '<input class="form-control mr" id="' + id + '">';
+                container.find('div[data-name="condition-sub-value"]').append(time);
+                selectDate(id, that);
+                $('#'+id).val(datetime);
+            }
         }
     </script>
 @endsection
@@ -569,14 +573,6 @@ var f_behavior = [
                 var container = that.closest('div[data-name="condition-item"]');
             if (container.length) {
                 var i_condition = container.attr('data-i-condition');
-//                if (container.find('input[name="Segment[' + i_condition + '][select_type]"]').val() == 'user'
-//                        && container.find('select[name="Segment[' + i_condition + '][operator]"]').val() == 'eq') {
-//                    createSuggession(appid, 'user', container.find('select[name="Segment[' + i_condition + '][type]"]').val(), container.find('input[name="Segment[' + i_condition + '][value]"]'));
-//                }
-//                else if (container.find('input[name="Segment[' + i_condition + '][select_type]"]').val() != 'user'
-//                        && (container.find('select[name="Segment[' + i_condition + '][operator]"]').val() == '='|| container.find('select[name="Segment[' + i_condition + '][operator]"]').val() == 'eq')) {
-//                    createSuggession(appid, container.find('select[name="Segment[' + i_condition + '][type]"]').val(), container.find('select[name="Segment[' + i_condition + '][field]"]').val(), $('input[name="Segment[' + i_condition + '][value]"]'));
-//                }
                 console.log(container.find('select[name="Segment[' + i_condition + '][operator]"]').val());
                 if (container.find('select[name="Segment[' + i_condition + '][operator]"]').val() == '='|| container.find('select[name="Segment[' + i_condition + '][operator]"]').val() == 'eq') {
                    console.log("create");
@@ -598,7 +594,6 @@ var f_behavior = [
                 var i_condition = condition_item.attr('data-i-condition');
                 var i_sub_condition = container_sub_item.attr('data-i-condition-sub');
                   if (that.val() == 'eq') {
-                    console.log(2);
                     createSuggession(appid, condition_item.find('select[name="Segment[' + i_condition + '][type]"]').val(),
                             container_sub_item.find('select[name="Segment[' + i_condition + '][conditions][' + i_sub_condition + '][cs_field]"]').val(),
                             $('input[name="Segment[' + i_condition + '][conditions][' + i_sub_condition + '][cs_value]"]'));

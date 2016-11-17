@@ -453,6 +453,8 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
             var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true){userid=this["' + ids._mtid + '"];value._hasUser=true;}else{userid=this["' + ids._mtid + '"];';
             mapfunccode = mapinitcode + mapfunccode + "}emit(userid,value);}";
             var reducefunccode = "function(key,values){var returnObject={};" + reduceinitcode + "for(var i in values){var value=values[i];if(value._hasUser!==undefined)returnObject._hasUser=true;" + reduceaggcode + "};return returnObject;}";
+            if(finalizecode == '')
+                finalizecode = 'true';
             finalizecode = 'function(key, value){' + finalizeinitcode + 'return ' + finalizecode + '?1:0}';
 
             if (callback !== undefined)
