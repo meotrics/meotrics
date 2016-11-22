@@ -1,6 +1,62 @@
 exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 	var me = this;
-	var props = [{
+	var props = [
+		{
+			name: "Campaign", code: "_campaign",
+			operators: [{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}]
+		},
+		{
+			name: "Campaign Source", code: "_utm_source",
+			operators: [{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}]
+		},
+		{
+			name: "Campaign Medium", code: "_utm_medium",
+			operators: [{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}]
+		},
+		{
+			name: "Campaign Term", code: "_utm_term",
+			operators: [{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}]
+		},
+		{
+			name: "Campaign Content", code: "_utm_content",
+			operators: [{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}]
+		},
+		{
+			name: "Last-touch Campaign", code: "_lastcampaign",
+			operators: [{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}]
+		},{
+			name: "First-touch Campaign", code: "_firstcampaign",
+			operators: [{name: "Equal", code: "eq"},
+				{name: "Contain", code: "con"},
+				{name: "Start with", code: "sw"},
+				{name: "End with", code: "ew"},
+				{name: "Not contain", code: "ncon"}]
+		},
+		{
 			name: "Age", code: "age",
 			operators: [
 				{name: "Greater than", code: "gt"},
@@ -122,29 +178,6 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 				{name: "Not contain", code: "ncon"}]
 		},{
 			name: "Browser Version", code: "_browserver",
-			operators: [{name: "Equal", code: "eq"},
-				{name: "Contain", code: "con"},
-				{name: "Start with", code: "sw"},
-				{name: "End with", code: "ew"},
-				{name: "Not contain", code: "ncon"}]
-		},
-
-		/* {
-			name: "Campaign", code: "_campaign",
-			operators: [{name: "Equal", code: "eq"},
-				{name: "Contain", code: "con"},
-				{name: "Start with", code: "sw"},
-				{name: "End with", code: "ew"},
-				{name: "Not contain", code: "ncon"}]
-		},*/{
-			name: "Last-touch Campaign", code: "_lastcampaign",
-			operators: [{name: "Equal", code: "eq"},
-				{name: "Contain", code: "con"},
-				{name: "Start with", code: "sw"},
-				{name: "End with", code: "ew"},
-				{name: "Not contain", code: "ncon"}]
-		},{
-			name: "First-touch Campaign", code: "_firstcampaign",
 			operators: [{name: "Equal", code: "eq"},
 				{name: "Contain", code: "con"},
 				{name: "Start with", code: "sw"},
