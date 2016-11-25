@@ -451,7 +451,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 		}
 
 		// Get users from mongodb
-		let fieldToTranslate = fields.slice().concat(['_segments', '_lastSeen', '_isUser', '_mtid', 'name', 'email']);
+		let fieldToTranslate = fields.slice().concat(['_segments', '_lastSeen', '_isUser', '_mtid', 'name', 'email','phone']);
 		converter.toIDs(fieldToTranslate, (ids) => {
 			let query = {
 				[ids['_segments']]: segmentId,
@@ -473,6 +473,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 						usersReturn[i][ids['name']] = users[i][ids['name']] || '';
 						usersReturn[i][ids['_mtid']] = users[i][ids['_mtid']] || '';
 						usersReturn[i][ids['email']] = users[i][ids['email']] || '';
+						usersReturn[i][ids['phone']] = users[i][ids['phone']] || '';
 						usersReturn[i][ids['_lastSeen']] = users[i][ids['_lastSeen']] || '';
 					}
 

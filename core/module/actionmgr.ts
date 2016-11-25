@@ -1,4 +1,5 @@
-﻿import * as mongodb from 'mongodb';
+﻿declare function require(name:string);
+import * as mongodb from 'mongodb';
 import * as url from 'url';
 import * as express from 'express';
 import * as referer from './referer';
@@ -50,6 +51,32 @@ export class ActionMgr {
         });
     };
 
+    // purpose find user by key
+    // data: {name: key}
+    public findUserByKey(appid:string , data: Object,callback){
+        let collection = this.prefix + "app" + appid;
+        var me = this;
+        me.converter.toID('_isUser', function(isUser){
+            var query = data;
+            query[isUser] = true;
+            me.db.collection(collection).find(query).limit(1).toArray(function (err, ret){
+                if(ret.length === 0){
+                    callback(0);
+                }
+                else{
+                    callback(ret[0]._mtid);
+                }
+            })
+        })
+    }
+
+    // purpose insert offline data
+    public insertOfflinePurchase(appid: string){
+        var me = this;
+        var collection = me.db.collection(me.prefix + "app" + appid);
+        collection
+    }
+
     // purpose: record an action rawly
     // param:
     // + _deltat: number of delayed second before request sent
@@ -69,7 +96,7 @@ export class ActionMgr {
     // + data1
     // + data2
     // + data3
-    public saveRaw(appid, data, callback) {
+    public  saveRaw(appid, data, callback) {
         //console.log("=====save raw");
         let me = this;
         var collection = me.db.collection(this.prefix + "app" + appid);
@@ -619,6 +646,7 @@ export class ActionMgr {
                         db.collection(collection).find({_id: mtid}).limit(1).toArray(function (err, r) {
                             if (err) throw err;
                             var userx = {};
+                            console.log(mtid);
                             if (r[0][ids._stime] === undefined || r[0][ids._stime] === null) {
                                 userx[ids._stime] = Math.round(new Date().getTime() / 1000);
                                 db.collection(collection).update({_id: mtid}, {$set: userx}, function (err, result) {

@@ -461,6 +461,7 @@ $props = isset($props) ? $props : [];
                                     "<td width='100px'>Id</td>" +
                                     "<td>Name</td>" +
                                     "<td>Email</td>" +
+                                    "<td>Phone</td>" +
                                     "<td>Last seen</td>" +
                                     "<td>"+label_field1+"</td>" +
                                     column2+
@@ -482,6 +483,7 @@ $props = isset($props) ? $props : [];
                                         "<td>"+item._mtid+"</td>"+
                                         "<td>"+item.name+"</td>"+
                                         "<td>"+item.email+"</td>"+
+                                        "<td>"+item.phone+"</td>"+
                                         "<td>"+lastSeen+"</td>"+
                                         "<td>"+value_field1+"</td>"+
                                         columnfield+
