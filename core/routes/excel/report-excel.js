@@ -9,13 +9,16 @@ const config = require('config');
 const validator = require('validator');
 const mongodb = require('mongodb');
 const async = require('async');
-let util = require('util');
-let fs = require('fs');
+const util = require('util');
+const fs = require('fs');
 const router = express.Router();
-var Excel = require('exceljs');
+const Excel = require('exceljs');
 
 const defaultUserFields = ['name', 'email'];
-const fieldsForWork = ['_segments', '_ctime', '_mtid', '_isUser', '_typeid']
+const fieldsForWork = ['_segments', '_ctime', '_mtid', '_isUser', '_typeid'];
+const mappingFields = {
+  _id: '_mtid'
+}
 // filter segment in action type
 router.post('/report-excel/:appid/:segmentId', validate, getConverter, function(req, res, next){
   let appid = req.params.appid;
@@ -30,6 +33,10 @@ router.post('/report-excel/:appid/:segmentId', validate, getConverter, function(
                 [req.meotrics_converters['_isUser']]: true,
                 [req.meotrics_converters['_segments']]: {
                   $in: [new mongodb.ObjectID(segmentId)]
+                },
+                [req.meotrics_converters['_ctime']]: {
+                  $gt: req.body.time.from,
+                  $lt: req.body.time.to
                 }
             },
             generateQueryAction(req)
@@ -41,9 +48,7 @@ router.post('/report-excel/:appid/:segmentId', validate, getConverter, function(
     $group: generateGroup(req)
   }
 
-
-
-  console.log(JSON.stringify(match), group, collection)
+  console.log(`Match: ${util.inspect(match)}\r\nGroup: ${util.inspect(group)}`);
 
   globalVariables
       .get('db')
@@ -65,36 +70,60 @@ router.post('/report-excel/:appid/:segmentId', validate, getConverter, function(
 });
 
 function generateExcel(req, res, data) {
+  res.setHeader('Content-disposition', 'attachment; filename=report.xls');
+  res.setHeader('Content-type', 'application/vnd.ms-excel');
 
-  var options = {
-    filename: './streamed-workbook.xlsx',
+  let options = {
+    stream: res,
     useStyles: true,
     useSharedStrings: true
   };
-  var workbook = new Excel.stream.xlsx.WorkbookWriter(options);
-  var worksheet = workbook.addWorksheet('My Sheet', {properties:{tabColor:{argb:'FFC0000'}}});
+
+  let workbook = new Excel.stream.xlsx.WorkbookWriter(options);
+  let worksheet = workbook.addWorksheet('Report', {properties:{tabColor:{argb:'FFC0000'}}});
+
   let actionFields = req.body.actionFields.map(value => {
     return value.field;
   }) || [];
+  let totalFields = actionFields.concat(req.body.userFields).concat(['_id']);
+  totalFields.sort((e1, e2) => {
+    e1 = mappingFields[e1] ? mappingFields[e1] : e1;
+    e2 = mappingFields[e2] ? mappingFields[e2] : e2;
+
+    if(e1 === '_mtid') {
+      return false;
+    }
+
+    if(e2 === '_mtid') {
+      return true;
+    }
+
+    if(req.body.userFields.indexOf(e1) !== -1) {
+      return false;
+    }
+    return true;
+  });
+
+  console.log(totalFields);
 
   let columns = []
-  actionFields.push('_id')
-  actionFields.concat(req.body.userFields).forEach(value => {
+  totalFields.forEach(value => {
     columns.push({
-      header: value,
+      header: mappingFields[value] ? mappingFields[value] : value,
       key: value,
       width: 50
     })
   })
 
   worksheet.columns = columns;
-  console.log(columns);
+  for(let i=0;i<totalFields.length;i++) {
+    // worksheet.getColumn(3).outlineLevel = 1;
+  }
   data.forEach(row => {
     let obj = {};
-    actionFields.concat(req.body.userFields).forEach(key => {
-      obj[key] = Array.isArray(row[key]) ? row[key].join('\n') : row[key]
+    totalFields.forEach(key => {
+      obj[key] = Array.isArray(row[key]) ? row[key].join(`\n`) : row[key];
     });
-    console.log(obj);
     worksheet.addRow(obj).commit();
   });
 
@@ -103,7 +132,6 @@ function generateExcel(req, res, data) {
   // Finished the workbook.
   workbook.commit()
     .then(function() {
-      // the stream has been written
       res.end();
     });
 }
@@ -152,10 +180,9 @@ function validate(req, res, next) {
 function getConverter(req, res, next) {
     let fieldsAction = req.body.actionFields.map(value => {
       return value.field;
-    })
+    }) || [];
 
     globalVariables.get('converter').toIDs([
-      ...defaultUserFields,
       ...fieldsForWork,
       ...req.body.userFields,
       ...fieldsAction
@@ -176,7 +203,7 @@ function filterValidFields(values) {
 }
 
 function generateQueryAction(req) {
-  let actionFields = req.body.actionFields || [];
+  let actionFields = req.body.actionFields;
 
   let typesAction = actionFields.map(value => {
     return value.type;
@@ -185,6 +212,10 @@ function generateQueryAction(req) {
   return {
     [req.meotrics_converters['_typeid']]: {
       $in: typesAction || []
+    },
+    [req.meotrics_converters['_ctime']]: {
+      $gt: req.body.time.from,
+      $lt: req.body.time.to
     }
   }
 }
