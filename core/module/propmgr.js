@@ -1,14 +1,14 @@
 exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 	var me = this;
 	var props = [
-		{
-			name: "Campaign", code: "_campaign",
-			operators: [{name: "Equal", code: "eq"},
-				{name: "Contain", code: "con"},
-				{name: "Start with", code: "sw"},
-				{name: "End with", code: "ew"},
-				{name: "Not contain", code: "ncon"}]
-		},
+		// {
+		// 	name: "Campaign", code: "_campaign",
+		// 	operators: [{name: "Equal", code: "eq"},
+		// 		{name: "Contain", code: "con"},
+		// 		{name: "Start with", code: "sw"},
+		// 		{name: "End with", code: "ew"},
+		// 		{name: "Not contain", code: "ncon"}]
+		// },
 		{
 			name: "Campaign Source", code: "_utm_source",
 			operators: [{name: "Equal", code: "eq"},
@@ -55,6 +55,13 @@ exports.PropMgr = function (db, mongodb, async, converter, prefix, mtthrow) {
 				{name: "Start with", code: "sw"},
 				{name: "End with", code: "ew"},
 				{name: "Not contain", code: "ncon"}]
+		},
+		{
+			name: "Create time", code: "_ctime",
+			operators: [
+				{name: "From", code: "gte"},
+				{name: "To", code: "lte"},
+			]
 		},
 		{
 			name: "Age", code: "age",

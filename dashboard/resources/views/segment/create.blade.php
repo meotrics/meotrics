@@ -142,12 +142,19 @@ var f_behavior = [
             {code: 'avg', name: 'Average'},
         ];
         var f_behavior_purchase = [{code: 'count', name: 'Count'}];
+//        var operator_behavior = [
+//            {code: 'gt', name: 'greater than'},
+//            {code: 'gte', name: 'greater or equal'},
+//            {code: 'eq', name: 'equal'},
+//            {code: 'lt', name: 'less than'},
+//            {code: 'lte', name: 'less or equal'}
+//        ];
         var operator_behavior = [
-            {code: 'gt', name: 'greater than'},
-            {code: 'gte', name: 'greater or equal'},
-            {code: 'eq', name: 'equal'},
-            {code: 'lt', name: 'less than'},
-            {code: 'lte', name: 'less or equal'}
+            {code: '>', name: 'greater than'},
+            {code: '>=', name: 'greater or equal'},
+            {code: '=', name: 'equal'},
+            {code: '<', name: 'less than'},
+            {code: '<=', name: 'less or equal'}
         ];
         <?php $condtion_sub_operators = App\Enum\SegmentEnum::conditionSubOperators(); ?>
         //load segment time range
@@ -180,7 +187,12 @@ var f_behavior = [
             for(var i = 0;i<arrtime.length;i++){
                 var that = $(arrtime[i]);
                 var container =  that.parent().parent();
-                var input = container.find($('input'));
+                var divInput = $('div[data-name="condition-item-value"]')
+                if(divInput != undefined){
+                    var input = divInput.find($('input'));
+                }else{
+                    var input = container.find($('input'));
+                }
                 input.hide();
                 var timeInt = input.val();
                 var datetime = new Date(timeInt*1000).toLocaleDateString();
@@ -188,6 +200,7 @@ var f_behavior = [
                 var id = "time_"+i;
                 var time = '<input class="form-control mr" id="' + id + '">';
                 container.find('div[data-name="condition-sub-value"]').append(time);
+                container.find('div[data-name="condition-item-value"]').append(time);
                 selectDate(id, that);
                 $('#'+id).val(datetime);
             }
@@ -332,6 +345,13 @@ var f_behavior = [
                             destroySuggession(containter.find('input[name="Segment[' + i_condition + '][value]"]'));
                         }
                         condition_item.find('div[data-name="add-condition"]').hide();
+                        if(that.val() == '_ctime'){
+                            containter.find('input[name="Segment[' + i_condition + '][value]"]').hide();
+                            var id = "a"+i_condition;
+                            var time = '<input class="form-control mr" id="'+id+'">';
+                            containter.find('div[data-name="condition-item-value"]').append(time);
+                            selectDate(id,containter.find('input[name="Segment[' + i_condition + '][value]"]'));
+                        }
                     }
                     else {
                         $('#label_for_did_action').parent().show();
@@ -424,6 +444,13 @@ var f_behavior = [
                 {code: 'lt', name: 'less than'},
                 {code: 'lte', name: 'less or equal'}
             ];
+//            var operator_behavior = [
+//                {code: '>', name: 'greater than'},
+//                {code: '>=', name: 'greater or equal'},
+//                {code: '=', name: 'equal'},
+//                {code: '<', name: 'less than'},
+//                {code: '<=', name: 'less or equal'}
+//            ];
             var operator_default = [
                 {code: 'contain', name: 'Contain'},
                 {code: 'eq', name: 'Equal'},

@@ -57,7 +57,7 @@ $operators_default = [
             <!--<label class="col-md-2" style="margin-top: 10px">List top</label>-->
             <div class="col-md-2" data-name="condition-item-type">
                 <input class="row hidden" type="hidden" name="Segment[{{$i_condition}}][select_type]" value="{{$condition->select_type}}">
-                <select class="form-control" name="Segment[{{$i_condition}}][type]" onchange="typeChange(this)">
+                <select class="form-control" name="Segment[{{$i_condition}}][type]" onchange="typeChange(this)"  value = "{{$condition->type}}">
                     <?php
                     foreach ($type_options as $type_option):
                         ?>

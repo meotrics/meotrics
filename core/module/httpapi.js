@@ -69,8 +69,9 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
         };
 
         for (var i in request.params)
-            if (i.startsWith('_') === false)
+            if (i.startsWith('_') === false){
                 res[i] = isNaN(request.params[i]) ? request.params[i] : parseFloat(request.params[i]);
+            }
 
         // extract campaign
         var query = url.parse(uri, true).query;
@@ -105,13 +106,16 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
         var appid = req.appid;
         var data = trackBasic(req);
         handlerMtid(data._mtid, appid, res, function (mtid) {
-            var data = {};
+            var value = {};
             // console.log(req.params);
             for (var i in req.params)
-                if (i.startsWith('_') === false) data[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
+                if (i.startsWith('_') === false) value[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
 
-            actionmgr.identifyRaw(appid, {mtid: mtid, user: data}, function (mtid) {
+            actionmgr.identifyRaw(appid, {mtid: mtid, user: value}, function (mtid) {
                 //set new mtid if need
+                data._typeid = "login";
+                actionmgr.saveRaw(appid, data, function (actionid) {
+                });
             });
         });
     }
