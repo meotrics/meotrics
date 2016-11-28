@@ -2,12 +2,12 @@
 
 exports.TypeMgr = function (db, mongodb, converter, async, prefix, typecrud, col) {
 	var systemprops = [
-		{pname: "Time", pcode: "_ctime"},
 		{pname: "Campaign", pcode: "_utm_campaign"},
 		{pname: "Campaign Source", pcode: "_utm_source"},
 		{pname: "Campaign Medium", pcode: "_utm_medium"},
 		{pname: "Campaign Term", pcode: "_utm_term"},
 		{pname: "Campaign Content", pcode: "_utm_content"},
+		{pname: "Time", pcode: "_ctime"},
 		{pname: "Channel", pcode: "_reftype"},
 		{pname: "Referer", pcode: "_ref"},
 		{pname: "Country", pcode: "_country" },

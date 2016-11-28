@@ -184,11 +184,12 @@ var f_behavior = [
         }
         window.onload = function(e){
             var arrtime = $('select[value="_ctime"]');
+            console.log(arrtime);   
             for(var i = 0;i<arrtime.length;i++){
                 var that = $(arrtime[i]);
                 var container =  that.parent().parent();
-                var divInput = $('div[data-name="condition-item-value"]')
-                if(divInput != undefined){
+                var divInput =  container.find('div[data-name="condition-item-value"]');
+                if(divInput.length == 1){
                     var input = divInput.find($('input'));
                 }else{
                     var input = container.find($('input'));
@@ -199,8 +200,11 @@ var f_behavior = [
                 datetime = datetime.replace(/[/]/g,'-');;
                 var id = "time_"+i;
                 var time = '<input class="form-control mr" id="' + id + '">';
-                container.find('div[data-name="condition-sub-value"]').append(time);
-                container.find('div[data-name="condition-item-value"]').append(time);
+                if(divInput.length == 1){
+                    container.find('div[data-name="condition-item-value"]').append(time);
+                }else{
+                    container.find('div[data-name="condition-sub-value"]').append(time);
+                }
                 selectDate(id, that);
                 $('#'+id).val(datetime);
             }

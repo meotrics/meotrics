@@ -206,13 +206,20 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
             var queryaction = {};
             query.$or = [];
             var c = Math.ceil(length / 2);
+            console.log("haha");
             for (var i = 0; i < length; i += 2) {
                 conditionToQuery(object[i], queryuser, function () {
                     c--;
                     if (c !== 0) return;
-                    // console.log(queryuser);
+                    console.log("queryuser");
+                    console.log(queryuser);
                     if (Object.keys(queryuser).length !== 0) {
                         queryuser[isUser] = true;
+                        queryuser['logined'] = true;
+                        // var c = {'$or':[{email :{'$exists': true}},{phone :{'$exists': true}}]};
+                        // queryuser['$or'] = [{email :{'$exists': true}},{phone :{'$exists': true}}];
+                        console.log("queryuser");
+                        console.log(queryuser);
                         query.$or.push(queryuser);
                     }
                 });
@@ -340,8 +347,9 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
         var reduceaggcode = "";
         var finalizecode = "";
         var finalizeinitcode = "";
-
-        var code = 'if(this["' + _typeid + '"]==="' + element.type + '"|| this["' + _typeid + '"]==="' + element.type.toUpperCase() + '"){';
+        if(element.type == "login")
+            element.type = 'purchase';
+            var code = 'if(this["' + _typeid + '"]==="' + element.type + '"|| this["' + _typeid + '"]==="' + element.type.toUpperCase() + '"){';
         //var conditions = element.conditions;
         var defvalcode = "";
         //var aggcode = "";
