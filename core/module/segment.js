@@ -348,7 +348,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
         var finalizecode = "";
         var finalizeinitcode = "";
         if(element.type == "login")
-            element.type = 'purchase';
+            element.type = 'pageview';
             var code = 'if(this["' + _typeid + '"]==="' + element.type + '"|| this["' + _typeid + '"]==="' + element.type.toUpperCase() + '"){';
         //var conditions = element.conditions;
         var defvalcode = "";
@@ -458,7 +458,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
             }
             // console.log("joinop");
             // console.log(joinop);
-            var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true){userid=this["' + ids._mtid + '"];value._hasUser=true;}else{userid=this["' + ids._mtid + '"];';
+            var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true && this["logined"]==true){userid=this["' + ids._mtid + '"];value._hasUser=true;}else{userid=this["' + ids._mtid + '"];';
             mapfunccode = mapinitcode + mapfunccode + "}emit(userid,value);}";
             var reducefunccode = "function(key,values){var returnObject={};" + reduceinitcode + "for(var i in values){var value=values[i];if(value._hasUser!==undefined)returnObject._hasUser=true;" + reduceaggcode + "};return returnObject;}";
             if(finalizecode == '')
