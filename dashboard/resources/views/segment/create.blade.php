@@ -197,7 +197,11 @@ var f_behavior = [
                 input.hide();
                 var timeInt = input.val();
                 var datetime = new Date(timeInt*1000).toLocaleDateString();
-                datetime = datetime.replace(/[/]/g,'-');;
+//                datetime = datetime.replace(/[/]/g,'-');
+                var arrdatetime = datetime.split("/");
+                console.log(arrdatetime);
+                datetime = arrdatetime[1]+"-"+arrdatetime[0]+"-"+arrdatetime[2];
+                console.log(datetime);
                 var id = "time_"+i;
                 var time = '<input class="form-control mr" id="' + id + '">';
                 if(divInput.length == 1){

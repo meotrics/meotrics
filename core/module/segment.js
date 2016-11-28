@@ -77,7 +77,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
                                 return updateUser(function () {
                                     // unlock
                                     delete locksegment[segment._id.toString()];
-                                    if (callback) callback(outcollection);
+                                    if (callback) callback();
                                 });
                             }
                             //check if is in segment
