@@ -476,7 +476,8 @@ $props = isset($props) ? $props : [];
 						if(value_field1 == null){
 							value_field1 = "N/A";
 						}
-						var date = new Date(item._lastSeen*1000);
+						var timespant = item._lastSeen.length >10?item._lastSeen:item._lastSeen*1000;
+						var date = new Date(timespant);
 						var lastSeen = date.toLocaleString();
                         var cl = "<tr>" +
                                         "<td>"+(i+1)+"</td>" +
