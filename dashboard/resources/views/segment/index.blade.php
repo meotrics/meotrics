@@ -477,7 +477,8 @@ $props = isset($props) ? $props : [];
 							value_field1 = "N/A";
 						}
 						var timespant = item._lastSeen.length >10?item._lastSeen:item._lastSeen*1000;
-						console.log(timespant);
+						if(timespant.length > 13)
+							timespant = parseInt(timespant/1000);
 						var date = new Date(timespant);
 						var lastSeen = date.toLocaleString();
                         var cl = "<tr>" +
