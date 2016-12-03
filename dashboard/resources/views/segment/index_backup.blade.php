@@ -87,6 +87,16 @@ $props = isset($props) ? $props : [];
 							</div>
 						</div>
 						<div class="col-md-6 content">
+							{{--@if(isset($segment_first->startTime ))--}}
+								{{--<div class="col-md-3">--}}
+									{{--Time range:--}}
+								{{--</div>--}}
+								{{--<div class="col-md-5">--}}
+									{{--<span id="startTime">{{$segment_first->startTime}}--}}
+									{{--to {{$segment_first->endTime}}--}}
+									{{--</span>--}}
+								{{--</div>--}}
+							{{--@endif--}}
 							<div class="col-md-4">
 								<button type="button" data-loading-text="Loading..." autocomplete="off" class="action button blue button-radius" id="refresh" >
 									<span class="label">Refresh</span>
@@ -109,7 +119,8 @@ $props = isset($props) ? $props : [];
 			<!--    <div class="content col-md-12" data-name="name">
 <label class="col-md-2" style="margin-top: 4px">Segment name: </label>
 <p class="col-md-10"><?= isset($segment_first) && isset($segment_first->name) ? $segment_first->name : '' ?></p>
-						@if(isset($segment_first))
+</div>-->
+			<!--        @if(isset($segment_first))
 							<div class="content row" data-name="description">
 									<div class=" col-md-2">
 											<h6>Description</h6>
@@ -123,27 +134,32 @@ $props = isset($props) ? $props : [];
 					<div class="col-md-3 fix-padding">
 						<h6>Filter by</h6>
 					</div>
-						<div class="col-md-4 fix-padding" >
-							<select name="actiontype" id="actiontype" class="form-control" onchange="actiontypechange(this)" value="">
-								<option value="">Select action type</option>
-								<option value="user">
-									User
-								</option>
-								<?php
-								foreach ($actiontypes as $actiontype):
-								?>
-								<option value="<?= $actiontype->codename ?>">
-									<?= $actiontype->name ?>
-								</option>
-								<?php
-								endforeach;
-								?>
-							</select>
-						</div>
-
-					<div class="col-md-4 fix-padding" >
-						<select name="Prop[one]" id="slprop" class="form-control" >
+					<div class="col-md-4 fix-padding" id="div-filter-one ">
+						<select name="Prop[one]" class="form-control">
 							<option value="">Select property</option>
+							<?php
+							foreach ($props as $prop):
+							?>
+							<option value="<?= property_exists($prop, 'code') ? $prop->code : '' ?>">
+								<?= property_exists($prop, 'name') ? $prop->name : '' ?>
+							</option>
+							<?php
+							endforeach;
+							?>
+						</select>
+					</div>
+					<div class="col-md-4 fix-padding" id="div-filter-two" style="display: none">
+						<select name="Prop[two]" class="form-control">
+							<option value="">Select property</option>
+							<?php
+							foreach ($props as $prop):
+							?>
+							<option value="<?= property_exists($prop, 'code') ? $prop->code : '' ?>">
+								<?= property_exists($prop, 'name') ? $prop->name : '' ?>
+							</option>
+							<?php
+							endforeach;
+							?>
 						</select>
 					</div>
 					<div class="col-md-1 col-add-filter fix-padding" id="div-filter-tool">
@@ -188,6 +204,7 @@ $props = isset($props) ? $props : [];
 	<script src="{{asset('js/Chart.js')}}"></script>
 	<script type="text/javascript">
 		$('select').select2();
+
 		$('#refresh').on('click',function(){
 			var that = $('#segment');
 			var $btn = $(this).button('loading');
@@ -237,36 +254,6 @@ $props = isset($props) ? $props : [];
 			}
 		});
 
-		var listDataActionType = {!! json_encode($actiontypes) !!};
-		var listPropUser = {!! json_encode($props) !!};
-		function actiontypechange(e){
-			var actionValue = $('select[name="actiontype"]').val();
-//			var str = '<select name="Prop[one]" id="slprop" class="form-control" >' +
-//					'<option value="">Select property</option>';
-			var str = '<option value="">Select property</option>';
-			if(actionValue == 'user'){
-				console.log(listPropUser);
-				for(var i in listPropUser){
-					var item = listPropUser[i];
-					var option = "<option value='"+item.code+"'>"+item.name+"</option>";
-					str +=option;
-				}
-			}else{
-				for(var i in listDataActionType){
-					if(listDataActionType[i].codename == actionValue){
-						var item = listDataActionType[i].fields;
-						for(var j in item){
-							var option = "<option value='"+item[j].pcode+"'>"+item[j].pname+"</option>";
-							str +=option;
-						}
-					}
-				}
-			}
-//			str+='</select>';
-			$('#select2-slprop-container').text("Select property");
-			$('#slprop').html(str);
-		}
-
 		function addFilter(e) {
 			$('#div-filter-two').show();
 			$('#div-filter-two').find('span.select2-container').width('154px');
@@ -306,21 +293,23 @@ $props = isset($props) ? $props : [];
 		?>
 		function execute() {
 			var segment_id = $('#segment').val();
-			var fieldActionType = $('select[name="actiontype"]').val();
 			var field1 = $('select[name="Prop[one]"]').val();
+			var field2 = $('select[name="Prop[two]"]').val();
 			var appcode  =  '{{$appcode}}';
 			var url = '';
 			var data_get = {};
 			var label_field = '';
 			var demonstrate = '';
-			if(fieldActionType != 'user' && field1){
-				url = '{{ URL::to('segment/'.$appcode.'/getChartActionType') }}';
+			if (field1 && field2 && field1 != field2) {
+				url = '{{ URL::to('segment/'. $appcode .'/charttwofields') }}';
 				data_get = {
 					'segment_id': segment_id,
 					'field1': field1,
-					'actiontype':fieldActionType
-				}
-			}else if (fieldActionType == 'user' && field1) {
+					'field2': field2,
+				};
+				demonstrate = $('select[name="Prop[one]"]').find(':selected').text().toUpperCase() + ' and ' + $('select[name="Prop[two]"]').find(':selected').text().toUpperCase();
+			}
+			else if (field1 || field2) {
 				url = '{{ URL::to('segment/'. $appcode .'/chartonefield') }}';
 				data_get = {
 					'segment_id': segment_id,

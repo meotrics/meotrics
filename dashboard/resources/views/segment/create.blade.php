@@ -179,6 +179,7 @@ var f_behavior = [
                     myDate=myDate.split("-");
                     var newDate=myDate[1]+"/"+myDate[0]+"/"+myDate[2];
                     var date = new Date(newDate).getTime()/1000;
+                    window.test = input_date;
                     input_date.val(date);
                 });
             });
@@ -195,6 +196,7 @@ var f_behavior = [
                 }else{
                     var input = container.find($('input'));
                 }
+                var name  = input.attr('name');
                 input.hide();
                 var timeInt = input.val();
                 var datetime = new Date(timeInt*1000).toLocaleDateString();
@@ -210,7 +212,8 @@ var f_behavior = [
                 }else{
                     container.find('div[data-name="condition-sub-value"]').append(time);
                 }
-                selectDate(id, that);
+
+                selectDate(id, divInput.find($('input[name="'+name+'"]')));
                 $('#'+id).val(datetime);
             }
         }
@@ -333,6 +336,8 @@ var f_behavior = [
             var i_condition = condition_item.attr('data-i-condition');
             $.each(type_options, function (i, v) {
                 if (v.value == that.val()) {
+                    var input = '<input type="text" class="form-control " name="Segment[' + i_condition + '][value]" value="">';
+                    containter.find('div[data-name="condition-item-value"]').html(input);
                     if (v.select_type == 'user') {
                         $('#label_for_did_action').parent().hide();
 
@@ -355,10 +360,13 @@ var f_behavior = [
                         }
                         condition_item.find('div[data-name="add-condition"]').hide();
                         if(that.val() == '_ctime'){
-                            containter.find('input[name="Segment[' + i_condition + '][value]"]').hide();
+//                            containter.find('input[name="Segment[' + i_condition + '][value]"]').hide();
+                            var valueInput = $('input[name="Segment[' + i_condition + '][value]"]').val();
                             var id = "a"+i_condition;
+                            var input = '<input type="text" class="form-control " name="Segment[' + i_condition + '][value]" style="display: none; value="'+valueInput+'">';
                             var time = '<input class="form-control mr" id="'+id+'">';
-                            containter.find('div[data-name="condition-item-value"]').append(time);
+                            input +=time;
+                            containter.find('div[data-name="condition-item-value"]').html(input);
                             selectDate(id,containter.find('input[name="Segment[' + i_condition + '][value]"]'));
                         }
                     }
@@ -395,7 +403,8 @@ var f_behavior = [
                         var add_condition = containter.find('div[data-name="add-condition"]');
                         add_condition.show();
                     }
-                    containter.find('input[name="Segment[' + i_condition + '][value]"]').val('');
+
+//                    containter.find('input[name="Segment[' + i_condition + '][value]"]').val('');
                     return false;
                 }
 
@@ -425,13 +434,16 @@ var f_behavior = [
             getOperator(condition_item, 'condition-sub-operator', that.val());
             // check ctime
             if(that.val() == '_ctime'){
-                containter.find('input[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_value]"]').hide();
+//                containter.find('input[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_value]"]').hide();
                 var id = data_i_condition+"a"+i_condition;
+                var inputsubitem = '<input type="text" class="form-control " style="display:none" name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_value]">';
                 var time = '<input class="form-control mr" id="'+id+'">';
-                containter.find('div[data-name="condition-sub-value"]').append(time);
+                inputsubitem += time
+                containter.find('div[data-name="condition-sub-value"]').html(inputsubitem);
                 selectDate(id,containter.find('input[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_value]"]'));
             }else{
-                containter.find('input[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_value]"]').val('');
+                var inputsubitem = '<input type="text" class="form-control " name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_value]">';
+                containter.find('div[data-name="condition-sub-value"]').html(inputsubitem);
                 if (containter.find('select[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_field]"]').val() == '='|| containter.find('select[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_field]"]').val() == 'eq') {
                     createSuggession(appid, containter.find('select[name="Segment[' + i_condition + '][type]"]').val(),
                             containter.find('select[name="Segment[' + data_i_condition + '][conditions][' + i_condition + '][cs_field]"]').val(),

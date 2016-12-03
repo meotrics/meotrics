@@ -36,6 +36,7 @@ class SegmentController extends Controller
         if (Access::can_view($request->user()->id, $appcode) == false) abort(500, "Permission Denied");
         $props = MtHttp::get('prop/' . $appcode);
         $segments = MtHttp::get('segment/' . $appcode);
+        $actiontypes = MtHttp::get('actiontype/'. $appcode);
         //check if segment exist
         if ($segid !== null) {
             $seg = MtHttp::get('segment/' . $appcode . '/' . $segid);
@@ -45,7 +46,8 @@ class SegmentController extends Controller
         return view('segment/index', [
             'props' => $props,
             'segments' => $segments,
-            'segmentid' => $segid
+            'segmentid' => $segid,
+            'actiontypes' => $actiontypes
         ]);
     }
 
@@ -319,6 +321,29 @@ class SegmentController extends Controller
         $result = MtHttp::delete('segment/' . $app_id . '/' . $id, null);
         //check result overhere
         $result['success'] = true;
+        return $result;
+    }
+
+    public function getChartActionType(Request $request, $app_id){
+//        if (Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permission Denied");
+        $result = ['success' => false];
+        if ($request->input('segment_id') && $request->input('field1') && $request->input('actiontype')) {
+            $data = new \stdClass();
+            $data->type = "action";
+            $data->inf = array(
+                "_typeid"=> $request->input('actiontype'),
+                "fieldName"=> $request->input('field1'),
+            );
+            $url = 'segment-result/'.$app_id.'/'.$request->input('segment_id');
+
+            $tmp_charts = MtHttp::post($url,$data);
+            $tmp_charts = $tmp_charts->data->string;
+            $convert_data = $this->convertData($tmp_charts, $request->input('field'));
+            $result['labels'] = isset($convert_data['labels']) ? $convert_data['labels'] : [];
+            $result['datasets'] = isset($convert_data['datasets']) ? $convert_data['datasets'] : [];
+            $result['users'] = MtHttp::get("segment/$app_id/" . $request->input('segment_id') . "/listUser/1/" . $request->input('field1'));
+            $result['success'] = true;
+        }
         return $result;
     }
 

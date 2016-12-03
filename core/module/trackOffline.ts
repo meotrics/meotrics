@@ -15,21 +15,24 @@ export class trackOffline {
         let data = this.getInfo(req);
         data._ip = '127.0.0.1';
         data._typeid = 'purchase';
+        if(req.params['_ctime'] != undefined)
+            data._ctime = req.params['_ctime'];
         var _self = this;
         this.checkKey(data,function(mtid){
             if(mtid != 0){
                 data._mtid = mtid;
                 _self.insertHaveMtid(data);
-            }else{
-                mtid = ObjectID();
-                data._mtid = mtid;
-                _self.actionmgr.setupRaw(_self.appid, mtid, function (id) {
-                    _self.actionmgr.identifyRaw(_self.appid, {mtid: mtid, user: data}, function (id) {
-                        _self.insertHaveMtid(data);
-                    });
-                    console.log("create new user");
-                });
             }
+            // else{
+            //     mtid = ObjectID();
+            //     data._mtid = mtid;
+            //     _self.actionmgr.setupRaw(_self.appid, mtid, function (id) {
+            //         _self.actionmgr.identifyRaw(_self.appid, {mtid: mtid, user: data}, function (id) {
+            //             _self.insertHaveMtid(data);
+            //         });
+            //         console.log("create new user");
+            //     });
+            // }
         })
     }
 

@@ -54,6 +54,7 @@ Route::post('/segment/{appcode}/write', 'SegmentController@postWrite');
 Route::delete('/segment/{appcode}/remove/{id}', 'SegmentController@deleteRemove');
 Route::get('/segment/{appcode}/chartonefield', 'SegmentController@getChartonefield');
 Route::get('/segment/{appcode}/charttwofields', 'SegmentController@getCharttwofields');
+Route::get('/segment/{appcode}/getChartActionType', 'SegmentController@getChartActionType');
 Route::get('/segment/{appcode}/usersbyfield', 'SegmentController@getUsersbyfield');
 Route::get('/segment/{appcode}/{segid?}', 'SegmentController@getIndex');
 

@@ -1,6 +1,6 @@
+declare function require(name:string);
 import * as mongodb from 'mongodb';
 import * as async from 'async';
-
 var trycatch = require('trycatch');
 import bodyParser = require('body-parser');
 var CRUD = require('./crud.js').CRUD;

@@ -107,7 +107,11 @@ export class ActionMgr {
         data._segments = [];
 
         // correct timming
-        data._ctime = Math.round(new Date().getTime() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0);
+        if(data._ctime == undefined){
+            data._ctime = Math.round(new Date().getTime() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0);
+        }else{
+            data._ctimeupdate = Math.round(new Date().getTime() / 1000) - (parseInt(data._deltat) ? parseInt(data._deltat) : 0);
+        }
         delete data._deltat;
 
         if (data._link !== undefined) {

@@ -433,7 +433,7 @@ exports.SegmentResult = function (db, mongodb, converter, async, prefix) {
 		return projectClause;
 	}
 
-	const maxNumberUsers = 500;
+	const maxNumberUsers = 100000;
 	const numberUsersPerPage = 15;
 
 	this.getUsers = function (appName, segmentId, fields, start, callback) {

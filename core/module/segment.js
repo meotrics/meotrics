@@ -52,7 +52,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
                     // 	console.log("out");
                     // 	console.dir(out);
                     // console.log(outcollection);
-                    // update segment count=
+                    // update segment
                     db.collection(outcollection).count({value: 1}, function (err, ret) {
                         // console.log("ret");
                         // console.log(ret);
@@ -202,49 +202,34 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
             var length = object.length;
             if (length === 0) return callback({});
             var query = {};
-            var queryuser = {};
-            var queryaction = {};
             query.$or = [];
             var c = Math.ceil(length / 2);
-            console.log("haha");
+            console.log("object");
+            console.log(object);
             for (var i = 0; i < length; i += 2) {
-                conditionToQuery(object[i], queryuser, function () {
-                    c--;
-                    if (c !== 0) return;
-                    console.log("queryuser");
-                    console.log(queryuser);
-                    if (Object.keys(queryuser).length !== 0) {
-                        queryuser[isUser] = true;
-                        queryuser['logined'] = true;
-                        // var c = {'$or':[{email :{'$exists': true}},{phone :{'$exists': true}}]};
-                        // queryuser['$or'] = [{email :{'$exists': true}},{phone :{'$exists': true}}];
-                        console.log("queryuser");
-                        console.log(queryuser);
-                        query.$or.push(queryuser);
-                    }
-                });
-                conditionToQueryAction(object[i], queryaction, function () {
-                    converter.toID('_typeid', function (_typeid) {
-                        console.log("queryaction");
-                        console.log(queryaction);
-                        if (Object.keys(queryaction).length !== 0) {
-                            queryaction[_typeid] = object[i].type;
-                            // console.log("fuck");
-                            // console.log(object[i].conditions);
-                            // console.dir(query);
-                            query.$or.push(queryaction);
+                var queryuser = {};
+                var queryaction = {};
+                if(object[i].type === 'user'){
+                    conditionToQuery(object[i], queryuser, function () {
+                        c--;
+                        if (c !== 0) return;
+                        if (Object.keys(queryuser).length !== 0) {
+                            queryuser[isUser] = true;
+                            query.$or.push(queryuser);
                         }
                     });
-                });
+                }else{
+                    conditionToQueryAction(object[i], queryaction, function () {
+                        converter.toID('_typeid', function (_typeid) {
+                            queryaction[_typeid] = object[i].type;
+                            query.$or.push(queryaction);
+                        });
+                    });
+                }
             }
-            console.log('query');
-            console.log(query);
-            console.log(query.$or);
             if (query.$or.length == 0) {
-                console.log(1);
                 query = {};
             }
-            console.log(query);
             return callback(query);
         });
     }
@@ -266,15 +251,12 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 
     function conditionToQueryAction(element, query, callback) {
         if (element.type !== 'user') {
-            console.log(element);
             var conditions = element.conditions;
             var size = conditions.length;
             for (var i = 0; i < size; i += 4) {
                 var returnValue = translateOperator(conditions, i);
                 var key = Object.keys(returnValue)[0];
                 query[conditions[i]] = returnValue[key];
-                // console.log("haha");
-                // console.dir(query);
             }
             return callback();
         }
@@ -347,9 +329,8 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
         var reduceaggcode = "";
         var finalizecode = "";
         var finalizeinitcode = "";
-        if(element.type == "login")
-            element.type = 'pageview';
-            var code = 'if(this["' + _typeid + '"]==="' + element.type + '"|| this["' + _typeid + '"]==="' + element.type.toUpperCase() + '"){';
+
+        var code = 'if(this["' + _typeid + '"]==="' + element.type + '"|| this["' + _typeid + '"]==="' + element.type.toUpperCase() + '"){';
         //var conditions = element.conditions;
         var defvalcode = "";
         //var aggcode = "";
@@ -364,6 +345,9 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
             reduceinitcode += "returnObject.f" + ind + "=0;";
             reduceaggcode += "if(value.f" + ind + "===undefined) value.f" + ind + "=0;returnObject.f" + ind + "+=value.f" + ind + ";";
             defvalcode += "value.f" + ind + "=0;";
+            if(ind >0){
+                finalizecode+="&&";
+            }
             finalizecode += "(value.f" + ind + element.operator + JSON.stringify(element.value) + ")";
             finalizeinitcode += "if(value.f" + ind + "==null) value.f" + ind + "=0;";
         } else if (element.f === "sum") {
@@ -431,8 +415,6 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
 
         i = 0;
         converter.toIDs(zipfield, function (ids) {
-            console.log("query");
-            console.log(query);
             while (i < query.length) {
                 if (i % 2 === 0) {
                     //ignore user type
@@ -458,7 +440,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
             }
             // console.log("joinop");
             // console.log(joinop);
-            var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true && this["logined"]==true){userid=this["' + ids._mtid + '"];value._hasUser=true;}else{userid=this["' + ids._mtid + '"];';
+            var mapinitcode = 'function(){var value={};var userid=-1;if(this["' + ids._isUser + '"]==true){userid=this["' + ids._mtid + '"];value._hasUser=true;}else{userid=this["' + ids._mtid + '"];';
             mapfunccode = mapinitcode + mapfunccode + "}emit(userid,value);}";
             var reducefunccode = "function(key,values){var returnObject={};" + reduceinitcode + "for(var i in values){var value=values[i];if(value._hasUser!==undefined)returnObject._hasUser=true;" + reduceaggcode + "};return returnObject;}";
             if(finalizecode == '')
