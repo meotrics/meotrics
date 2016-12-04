@@ -1,5 +1,6 @@
 'use strict';
 
+const shortid = require('shortid')
 const globalVariables = require('../../lib/utils/global-variables.js');
 const mongoUtils = require('../../lib/utils/mongo-utils.js');
 const express = require('express');
@@ -70,11 +71,10 @@ router.post('/report-excel/:appid/:segmentId', validate, getConverter, function(
 });
 
 function generateExcel(req, res, data) {
-  res.setHeader('Content-disposition', 'attachment; filename=report.xls');
-  res.setHeader('Content-type', 'application/vnd.ms-excel');
+  let idFile = shortid.generate();
 
   let options = {
-    stream: res,
+    filename: `./public/${idFile}.xls`,
     useStyles: true,
     useSharedStrings: true
   };
@@ -132,8 +132,17 @@ function generateExcel(req, res, data) {
   // Finished the workbook.
   workbook.commit()
     .then(function() {
-      res.end();
-    });
+      res.json({
+        ec: consts.CODE.SUCCESS,
+        id: idFile
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.json({
+        ec: consts.CODE.ERROR
+      });
+    })
 }
 
 // Middleware for checking data
