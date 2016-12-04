@@ -482,7 +482,7 @@ var f_behavior = [
             var operator = operator_default;
             if (field_val == 'pid' || field_val == 'cid' || field_val == 'price' ||
                     field_val == 'quantity' || field_val == '_ctime' || field_val == 'oid' ||
-                    field_val == 'level' || field_val == 'userid') {
+                    field_val == 'level' || field_val == 'userid' || field_val == 'amount') {
                 operator = operator_behavior;
             }
             select_operator.html('');

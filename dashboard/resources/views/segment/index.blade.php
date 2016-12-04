@@ -88,9 +88,9 @@ $props = isset($props) ? $props : [];
 						</div>
 						<div class="col-md-6 content">
 							<div class="col-md-4">
-								<button type="button" data-loading-text="Loading..." autocomplete="off" class="action button blue button-radius" id="refresh" >
-									<span class="label">Refresh</span>
-								</button>
+								{{--<button type="button" data-loading-text="Loading..." autocomplete="off" class="action button blue button-radius" id="refresh" >--}}
+									{{--<span class="label">Refresh</span>--}}
+								{{--</button>--}}
 							</div>
 							<div class="col-md-4">
 								<div class="col-md-6">
@@ -154,6 +154,11 @@ $props = isset($props) ? $props : [];
 				</div>
 				<div class="col-md-5 pull-right">
 					<div class="col-md-12 col-md-offset-1" id="div-action">
+						<div class="col-md-4">
+							<button type="button" data-loading-text="Loading..." autocomplete="off" class="action button blue button-radius" id="refresh" >
+								<span class="label">Refresh</span>
+							</button>
+						</div>
 						<div class="col-md-4">
 							<button type="button" class="action button blue button-radius" onclick="execute()">
 								<span class="label">Generate</span>
