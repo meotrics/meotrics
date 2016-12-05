@@ -15,7 +15,7 @@ const fs = require('fs');
 const router = express.Router();
 const Excel = require('exceljs');
 
-const defaultUserFields = ['name', 'email'];
+const defaultUserFields = ['name', 'email','phone',"_ctime"];
 const fieldsForWork = ['_segments', '_ctime', '_mtid', '_isUser', '_typeid'];
 const mappingFields = {
   _id: '_mtid'
@@ -26,35 +26,36 @@ router.post('/report-excel/:appid/:segmentId', validate, getConverter, function(
   let segmentId = req.params.segmentId;
 
   let collection = config.mongod.prefix + 'app' + appid;
-
-  let match = {
-    $match: {
+  generateQueryAction(req,function(queryAction){
+    let match = {
+      $match: {
         $or: [
-            {
-                [req.meotrics_converters['_isUser']]: true,
-                [req.meotrics_converters['_segments']]: {
-                  $in: [new mongodb.ObjectID(segmentId)]
-                },
-                [req.meotrics_converters['_ctime']]: {
-                  $gt: req.body.time.from,
-                  $lt: req.body.time.to
-                }
+          {
+            [req.meotrics_converters['_isUser']]: true,
+            [req.meotrics_converters['_segments']]: {
+              $in: [new mongodb.ObjectID(segmentId)]
             },
-            generateQueryAction(req)
+            [req.meotrics_converters['_ctime']]: {
+              $gt: req.body.time.from,
+              $lt: req.body.time.to
+            }
+          },
+          queryAction
         ]
+      }
     }
-  }
+
+
 
   let group = {
     $group: generateGroup(req)
   }
 
-  console.log(`Match: ${util.inspect(match)}\r\nGroup: ${util.inspect(group)}`);
 
   globalVariables
       .get('db')
       .collection(collection)
-      .aggregate([match, group])
+      .aggregate([match])
       .toArray( (err, result) => {
           if (err) {
               return res.json({
@@ -62,19 +63,19 @@ router.post('/report-excel/:appid/:segmentId', validate, getConverter, function(
                   error: util.inspect(err)
               });
           }
-
           generateExcel(req, res, result);
       });
 
 
-
+  })
 });
 
 function generateExcel(req, res, data) {
   let idFile = shortid.generate();
 
   let options = {
-    filename: `./public/${idFile}.xls`,
+    // filename: `./public/${idFile}.xls`,
+    filename: `./export/${idFile}.xls`,
     useStyles: true,
     useSharedStrings: true
   };
@@ -103,13 +104,13 @@ function generateExcel(req, res, data) {
     }
     return true;
   });
+  totalFields.push("_mtid");
 
-  console.log(totalFields);
 
   let columns = []
   totalFields.forEach(value => {
     columns.push({
-      header: mappingFields[value] ? mappingFields[value] : value,
+      header: value,
       key: value,
       width: 50
     })
@@ -119,13 +120,39 @@ function generateExcel(req, res, data) {
   for(let i=0;i<totalFields.length;i++) {
     // worksheet.getColumn(3).outlineLevel = 1;
   }
+  // data.forEach(row => {
+  //   let obj = {};
+  //   totalFields.forEach(key => {
+  //     if(key == "_ctime" || key == "_lastSeen"){
+  //         var time =  new Date(row[key]*1000);
+  //         obj[key] = time.toLocaleString();
+  //     }else if(key == "_id" || key == "_mtid"){
+  //         var strkey = String(row[key]);
+  //         obj[key] = strkey;
+  //     }
+  //     else{
+  //     obj[key] = Array.isArray(row[key]) ? row[key].join(`\n`) : row[key];
+  //     }
+  //   });
+  //   worksheet.addRow(obj).commit();
+  // });
   data.forEach(row => {
+    console.log(row)
     let obj = {};
     totalFields.forEach(key => {
+      if(key == "_ctime" || key == "_lastSeen"){
+      var time =  new Date(row[key]*1000);
+      obj[key] = time.toLocaleString();
+    }else if(key == "_id" || key == "_mtid"){
+      var strkey = String(row[key]);
+      obj[key] = strkey;
+    }
+    else{
       obj[key] = Array.isArray(row[key]) ? row[key].join(`\n`) : row[key];
-    });
-    worksheet.addRow(obj).commit();
+    }
   });
+    worksheet.addRow(obj).commit();
+});
 
 
   worksheet.commit();
@@ -211,22 +238,39 @@ function filterValidFields(values) {
   return temp;
 }
 
-function generateQueryAction(req) {
-  let actionFields = req.body.actionFields;
+function getListMtidUser(req,callback){
+  let appid = req.params.appid;
+  let segmentId = req.params.segmentId;
+  let segments = config.mongod.prefix + 'segment' + segmentId;
+      globalVariables
+      .get('db')
+      .collection(segments).find({value:1},{value:0}).toArray(function(err,docs){
+        callback(docs);
+      });
+}
 
-  let typesAction = actionFields.map(value => {
-    return value.type;
-  })
-
-  return {
-    [req.meotrics_converters['_typeid']]: {
-      $in: typesAction || []
-    },
-    [req.meotrics_converters['_ctime']]: {
-      $gt: req.body.time.from,
-      $lt: req.body.time.to
-    }
-  }
+function generateQueryAction(req,callback) {
+  getListMtidUser(req,function(listuser){
+    let actionFields = req.body.actionFields;
+    let typesAction = actionFields.map(value => {
+          return value.type;
+    })
+      var val = {
+        [req.meotrics_converters['_typeid']]: {
+          $in: typesAction || []
+        },
+        [req.meotrics_converters['_mtid']]:{
+          $in: listuser.map(function(value){
+            return new mongodb.ObjectID(value._id);
+          })
+        },
+        [req.meotrics_converters['_ctime']]: {
+          $gt: req.body.time.from,
+          $lt: req.body.time.to
+        }
+      };
+    callback(val);
+  });
 }
 
 function generateGroup(req) {

@@ -339,8 +339,9 @@ var f_behavior = [
                     var input = '<input type="text" class="form-control " name="Segment[' + i_condition + '][value]" value="">';
                     containter.find('div[data-name="condition-item-value"]').html(input);
                     if (v.select_type == 'user') {
-                        $('#label_for_did_action').parent().hide();
-
+//                        $('#label_for_did_action').parent().hide();
+                        containter.find('div[data-name="label_for_did_action"]').hide();
+                        console.log(containter.find('div[data-name="label_for_did_action"]'));
                         containter.find('input[name="Segment[' + i_condition + '][select_type]"]').val('user');
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').html('');
                         containter.find('select[name="Segment[' + i_condition + '][f]"]').parent().hide();
@@ -371,9 +372,9 @@ var f_behavior = [
                         }
                     }
                     else {
-                        $('#label_for_did_action').parent().show();
-                        $('#label_for_did_action').text('With number of time');
-
+//                        $('#label_for_did_action').parent().show();
+//                        $('#label_for_did_action').text('With number of time');
+                        containter.find('div[data-name="label_for_did_action"]').show();
                         containter.find('input[name="Segment[' + i_condition + '][select_type]"]').val('behavior');
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().removeClass('col-md-4');
                         containter.find('select[name="Segment[' + i_condition + '][operator]"]').parent().addClass('col-md-2');
@@ -577,7 +578,7 @@ var f_behavior = [
                 html = html.replace(/i_condition_replace/g, condition_item.attr('data-i-condition'));
                 condition_sub_group.attr('data-i-condition-sub-max', parseInt(condition_sub_group.attr('data-i-condition-sub-max')) + 1);
                 condition_sub_item.next().html(html);
-                condition_sub_item.next().attr("data-i-condition-sub", condition_item.find('div[data-name="condition-sub-item"]').length - 1);
+                condition_sub_item.next().attr("data-i-condition-sub", condition_item.find('div[data-name="Pleiku"]').length - 1);
 
             }
             else {
