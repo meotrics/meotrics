@@ -32,23 +32,14 @@ $operators_default = [
 (object)['code' => 'eq', 'name' => '='],
 (object)['code' => 'lt', 'name' => '<'],
 (object)['code' => 'lte', 'name' => '<='],
+//(object)['code' => '>', 'name' => 'greater than'],
+//(object)['code' => '>=', 'name' => 'greater or equal'],
+//(object)['code' => '=', 'name' => 'equal'],
+//(object)['code' => '<', 'name' => 'less than'],
+//(object)['code' => '<=', 'name' => 'less or equal'],
 ];
 ;
 ?>
-{{--$operators_default = [--}}
-{{--(object)['code' => 'eq', 'name' => 'Equal1'],--}}
-{{--(object)['code' => 'con', 'name' => 'Contain'],--}}
-{{--(object)['code' => 'sw', 'name' => 'Start with'],--}}
-{{--(object)['code' => 'ew', 'name' => 'End with'],--}}
-{{--(object)['code' => 'ncon', 'name' => 'Not contain'],--}}
-{{--]--}}
-{{--$operators_default = [--}}
-{{--(object)['code' => '>', 'name' => '>'],--}}
-{{--(object)['code' => '>=', 'name' => '>='],--}}
-{{--(object)['code' => '=', 'name' => '='],--}}
-{{--(object)['code' => '<', 'name' => '<'],--}}
-{{--(object)['code' => '<=', 'name' => '<='],--}}
-{{--];--}}
 
 
 <div class="condition-item row" data-name="condition-item" data-i-condition="{{$i_condition}}">
@@ -71,6 +62,9 @@ $operators_default = [
                     endforeach;
                         ?>
                 </select>
+            </div>
+            <div class="col-md-2"  data-name="label_for_did_action" style="display:none">
+                <h6 style="margin-bottom:0px">With number of time</h6>
             </div>
             <div class="col-md-2" <?= $condition->select_type == 'user' ? 'style="display: none"' : 'style="display: none"' ?>>
                 <select class="form-control" id="" name="Segment[<?= $i_condition ?>][f]" value="<?= $condition->f ?>">
