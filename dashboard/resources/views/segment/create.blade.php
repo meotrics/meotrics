@@ -13,7 +13,7 @@
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 remote: {
 //                    url: '//api.meotrics.com/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
-                    url: '//45.32.113.71:1711/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
+                    url: 'http://45.32.113.71:1711/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
 //                    url: '//api.meotrics.dev/' + appid + '/suggest/' + typeid + '/' + field + '/%QUERY',
                     wildcard: '%QUERY'
                 }
