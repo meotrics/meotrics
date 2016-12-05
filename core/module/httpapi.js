@@ -120,6 +120,27 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
         });
     }
 
+    function registerevent(req, res) {
+        // console.log("=====info");
+        var appid = req.appid;
+        var data = trackBasic(req);
+        delete data._mtid;
+        handlerMtid(data._mtid, appid, res, function (mtid) {
+            var value = {};
+            // console.log(req.params);
+            for (var i in req.params)
+                if (i.startsWith('_') === false) value[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
+
+            actionmgr.identifyRaw(appid, {mtid: mtid, user: value}, function (mtid) {
+                //set new mtid if need
+                data._typeid = "login";
+                data._mtid = mtid;
+                actionmgr.saveRaw(appid, data, function (actionid) {
+                });
+            });
+        });
+    }
+
     function x(req, res) {
         actionmgr.x(req, res, function () {
         });
@@ -229,8 +250,9 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
                 req['appid'] = parts[1];
                 var action = parts[2];
                 if (action === 'track') track(req, res);
-                else if (action === '' || action === undefined) pageviewtwo(req, res);
+                // else if (action === '' || action === undefined) pageviewtwo(req, res);
                 else if (action === 'pageviewtwo') pageviewtwo(req, res);
+                else if( action === 'registerevent') registerevent(req,res);
                 else if (action === 'info') info(req, res);
                 else if (action === 'x') {
                     req['actionid'] = parts[3];

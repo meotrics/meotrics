@@ -26,7 +26,8 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
         db.collection(prefix + 'segment').find({_id: new mongodb.ObjectID(segmentid)}).toArray(function (err, segment) {
             if (err) throw err;
             me.runSegment(segment[0], function (callback1) {
-                callback();
+               if(callback)
+                   callback();
             });
         });
     };
@@ -83,7 +84,7 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
                             //check if is in segment
                             // console.log("outcollection");
                             // console.log(outcollection);
-                            db.collection(outcollection).find({_id: doc._id,_isUser:true}).toArray(function (err, docs) {
+                            db.collection(outcollection).find({_id: doc._id}).toArray(function (err, docs) {
                                 if (err) throw err;
                                 // console.log("docs");
                                 // console.log(docs);

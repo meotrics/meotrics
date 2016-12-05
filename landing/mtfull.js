@@ -200,13 +200,22 @@
 		}
 	};
 
+	mt.registerevent = function (data, callback, callback2, callback3) {
+		if(typeof data == 'string') data = {userid: data};
+		if(isready){
+			ajax('registerevent',data,function(callback){
+
+			});
+		}
+		else{
+			request_queue2.push(['registerevent', data]);
+			(callback || callback3)();
+		}
+	};
+
 	mt.clear = function (callback, callback2, callback3, callback4) {
 		if(isready)
-			ajax('clear', callback3 /*alway undefined, use callback3 for better minify*/, callback || callback4);
-		else{
-			request_queue2.push(['clear']);
-			(callback || callback4)();
-		}
+			document.cookie = "_mtid=''";
 	};
 
 	mt.track = function (event, data, time, callback) {

@@ -3,6 +3,9 @@ var mt ={
 track : function(t,r){
 	mt.rq.push(["track",t,r,new Date])
 },
+registerevent : function(t){
+		mt.rq.push(["registerevent",t])
+},
 info : function(t){
 	mt.rq.push(["info",t])
 },
