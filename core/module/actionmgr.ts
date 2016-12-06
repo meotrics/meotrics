@@ -61,7 +61,7 @@ export class ActionMgr {
             query[isUser] = true;
             me.db.collection(collection).find(query).limit(1).toArray(function (err, ret){
                 if(ret.length === 0){
-                    callback(0);
+                    callback('undefined');
                 }
                 else{
                     callback(ret[0]._mtid);
@@ -640,6 +640,7 @@ export class ActionMgr {
                 });
             });
         });
+
 
         // purpose: update info which mtid is mtid
         function updateUserInfo(db:mongodb.Db, mtid, userx, callback) {

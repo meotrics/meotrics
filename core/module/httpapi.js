@@ -69,7 +69,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
         };
 
         for (var i in request.params)
-            if (i.startsWith('_') === false){
+            if (i.startsWith('_') === false) {
                 res[i] = isNaN(request.params[i]) ? request.params[i] : parseFloat(request.params[i]);
             }
 
@@ -122,23 +122,35 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
     function registerevent(req, res) {
         // console.log("=====info");
+        var me = this;
         var appid = req.appid;
         var data = trackBasic(req);
-        delete data._mtid;
-        handlerMtid(data._mtid, appid, res, function (mtid) {
-            var value = {};
-            // console.log(req.params);
-            for (var i in req.params)
-                if (i.startsWith('_') === false) value[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
+        if(data.email != undefined){
+            var query = {};
+            query['email'] = data.email;
+            actionmgr.findUserByKey(appid, query, function (mtid) {
+                data._mtid = mtid.toString();
+                registerUser();
+            });
+        }else{
+            delete data._mtid;
+            registerUser();
+        }
+        function registerUser(){
+            handlerMtid(data._mtid, appid, res, function (mtid) {
+                var value = {};
+                for (var i in req.params)
+                    if (i.startsWith('_') === false) value[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
 
-            actionmgr.identifyRaw(appid, {mtid: mtid, user: value}, function (mtid) {
-                //set new mtid if need
-                data._typeid = "login";
-                data._mtid = mtid;
-                actionmgr.saveRaw(appid, data, function (actionid) {
+                actionmgr.identifyRaw(appid, {mtid: mtid, user: value}, function (mtid) {
+                    //set new mtid if need
+                    data._typeid = "login";
+                    data._mtid = mtid;
+                    actionmgr.saveRaw(appid, data, function (actionid) {
+                    });
                 });
             });
-        });
+        }
     }
 
     function x(req, res) {
@@ -228,7 +240,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
                 handle(req, res, url_parts.pathname);
             }
 
-            function checkOffline(req,res){
+            function checkOffline(req, res) {
                 var appid = req.appid
                 res.setHeader('Content-Type', 'application/json');
                 res.setHeader('Access-Control-Allow-Origin', '*');
@@ -236,7 +248,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
                 res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
                 res.setHeader('Access-Control-Allow-Credentials', true);
                 res.setHeader('Content-Type', 'application/json');
-                var trackOffline = new TrackOffline.trackOffline(appid,actionmgr);
+                var trackOffline = new TrackOffline.trackOffline(appid, actionmgr);
                 trackOffline.purchaseOffline(req);
                 var json = {};
                 json.status = "success";
@@ -252,7 +264,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
                 if (action === 'track') track(req, res);
                 // else if (action === '' || action === undefined) pageviewtwo(req, res);
                 else if (action === 'pageviewtwo') pageviewtwo(req, res);
-                else if( action === 'registerevent') registerevent(req,res);
+                else if (action === 'registerevent') registerevent(req, res);
                 else if (action === 'info') info(req, res);
                 else if (action === 'x') {
                     req['actionid'] = parts[3];
@@ -264,7 +276,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
                     req['field'] = parts[4];
                     req['qr'] = parts[5];
                     suggest(req, res);
-                }else if(action == 'offPurchase') checkOffline(req,res);
+                } else if (action == 'offPurchase') checkOffline(req, res);
                 else {
                     res.statusCode = 404;
                     res.end('action "' + action + '" not found, action must be one of [x, clear, info, fix, track]');
