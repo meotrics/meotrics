@@ -355,6 +355,8 @@ class SegmentController extends Controller
         if(count($actionFields) >0 ){
             $data = new \stdClass();
             $data->actionFields = $actionFields;
+            $data->time['from']= 0;
+            $data->time['to']= 99999999999999;
             $url = 'report-excel/'.$app_id.'/'.$segment_id;
             $tmp_charts = MtHttp::post($url,$data);
             if($tmp_charts->ec == 1){
