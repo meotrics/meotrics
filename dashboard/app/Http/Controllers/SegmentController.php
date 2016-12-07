@@ -325,7 +325,7 @@ class SegmentController extends Controller
     }
 
     public function getChartActionType(Request $request, $app_id){
-//        if (Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permission Denied");
+        if (Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permission Denied");
         $result = ['success' => false];
         if ($request->input('segment_id') && $request->input('field1') && $request->input('actiontype')) {
             $data = new \stdClass();
@@ -345,6 +345,26 @@ class SegmentController extends Controller
             $result['success'] = true;
         }
         return $result;
+    }
+
+    public function postExportExcel(Request $request, $app_id){
+        if (Access::can_view($request->user()->id, $app_id) == false) abort(500, "Permission Denied");
+        $result = ['success' => false];
+        $actionFields = $_POST['data'];
+        $segment_id = $_POST['segment_id'];
+        if(count($actionFields) >0 ){
+            $data = new \stdClass();
+            $data->actionFields = $actionFields;
+            $url = 'report-excel/'.$app_id.'/'.$segment_id;
+            $tmp_charts = MtHttp::post($url,$data);
+            if($tmp_charts->ec == 1){
+                $result['success'] = true;
+                $result['result'] = $_SERVER['HTTP_HOST'].'/exportexcel/'.$tmp_charts->id;
+            }else{
+                $result['result'] = 'Error';
+            }
+            return $result;
+        }
     }
 
     public function getChartonefield(Request $request, $app_id)

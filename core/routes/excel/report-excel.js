@@ -15,11 +15,44 @@ const fs = require('fs');
 const router = express.Router();
 const Excel = require('exceljs');
 
-const defaultUserFields = ['name', 'email','phone',"_ctime"];
+const defaultUserFields = ['name', 'email','phone',"_ctime",'_utm_campaign','_utm_source','_utm_medium','_utm_term','_utm_content','_reftype','_ref','_country','_city','_location','_os','_osver',
+'_browser','_browserver','_deviceid','_devicetype','_scr','_lang'];
+const purchase = ['pid','pname','cid','cname','price','amount','quantity','paymentype'];
+const pageview = ['_url'];
+const click  = ['oid','type'];
+const rate = ['pid','pname','cid','cname','level'];
+const like = ['pid','pname'];
+const download = ['pid','pname','cid','cname'];
+const register = ['userid'];
+const search = ['keyword'];
+const login = [];
+
 const fieldsForWork = ['_segments', '_ctime', '_mtid', '_isUser', '_typeid'];
 const mappingFields = {
   _id: '_mtid'
 }
+
+function getFieldInActiontype(actiontype){
+  if(actiontype == 'purchase')
+      return purchase;
+  if(actiontype == "pageview")
+      return pageview;
+  if(actiontype == "click")
+      return click;
+  if(actiontype == "rate")
+    return rate;
+  if(actiontype == "like")
+    return like;
+  if(actiontype == "download")
+    return download;
+  if(actiontype == "register")
+    return register;
+  if(actiontype == "search")
+    return search;
+  if(actiontype == "login")
+    return login;
+}
+
 // filter segment in action type
 router.post('/report-excel/:appid/:segmentId', validate, getConverter, function(req, res, next){
   let appid = req.params.appid;
@@ -65,8 +98,6 @@ router.post('/report-excel/:appid/:segmentId', validate, getConverter, function(
           }
           generateExcel(req, res, result);
       });
-
-
   })
 });
 
@@ -75,7 +106,8 @@ function generateExcel(req, res, data) {
 
   let options = {
     // filename: `./public/${idFile}.xls`,
-    filename: `./export/${idFile}.xls`,
+    // filename: `./export/${idFile}.xls`,
+    filename: `./home/vietld/meotrics/dashboard/public/exportexcel/${idFile}.xls`,
     useStyles: true,
     useSharedStrings: true
   };
@@ -86,7 +118,17 @@ function generateExcel(req, res, data) {
   let actionFields = req.body.actionFields.map(value => {
     return value.field;
   }) || [];
-  let totalFields = actionFields.concat(req.body.userFields).concat(['_id']);
+  // let actiontype = req.body.actionFields.map(value =>{
+  //       console.log("value1");
+  //       console.log(value);
+  //       console.log("value2");
+  //      return getFieldInActiontype(value.type);
+  //     });
+  var actiontype = [];
+  for(var item in req.body.actionFields){
+    actiontype = actiontype.concat(getFieldInActiontype(req.body.actionFields[item].type));
+  }
+  let totalFields = actiontype.concat(req.body.userFields).concat(['_id']);
   totalFields.sort((e1, e2) => {
     e1 = mappingFields[e1] ? mappingFields[e1] : e1;
     e2 = mappingFields[e2] ? mappingFields[e2] : e2;
@@ -137,7 +179,6 @@ function generateExcel(req, res, data) {
   //   worksheet.addRow(obj).commit();
   // });
   data.forEach(row => {
-    console.log(row)
     let obj = {};
     totalFields.forEach(key => {
       if(key == "_ctime" || key == "_lastSeen"){

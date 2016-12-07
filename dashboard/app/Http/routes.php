@@ -51,6 +51,7 @@ Route::get('/segment/{appcode}/refresh/{id}', 'SegmentController@getRefresh');
 Route::get('/segment/{appcode}/create', 'SegmentController@getCreate');
 Route::get('/segment/{appcode}/update/{id}', 'SegmentController@getUpdate');
 Route::post('/segment/{appcode}/write', 'SegmentController@postWrite');
+Route::post('/segment/{appcode}/exportexcel', 'SegmentController@postExportexcel');
 Route::delete('/segment/{appcode}/remove/{id}', 'SegmentController@deleteRemove');
 Route::get('/segment/{appcode}/chartonefield', 'SegmentController@getChartonefield');
 Route::get('/segment/{appcode}/charttwofields', 'SegmentController@getCharttwofields');

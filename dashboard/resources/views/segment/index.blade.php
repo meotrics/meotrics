@@ -87,11 +87,11 @@ $props = isset($props) ? $props : [];
 							</div>
 						</div>
 						<div class="col-md-6 content">
-							<div class="col-md-4">
+							{{--<div class="col-md-4">--}}
 								{{--<button type="button" data-loading-text="Loading..." autocomplete="off" class="action button blue button-radius" id="refresh" >--}}
-									{{--<span class="label">Refresh</span>--}}
+									{{--<span class="label">Export</span>--}}
 								{{--</button>--}}
-							</div>
+							{{--</div>--}}
 							<div class="col-md-4">
 								<div class="col-md-6">
 									Count:
@@ -129,15 +129,11 @@ $props = isset($props) ? $props : [];
 								<option value="user">
 									User
 								</option>
-								<?php
-								foreach ($actiontypes as $actiontype):
-								?>
+								@foreach ($actiontypes as $actiontype):
 								<option value="<?= $actiontype->codename ?>">
 									<?= $actiontype->name ?>
 								</option>
-								<?php
-								endforeach;
-								?>
+								@endforeach;
 							</select>
 						</div>
 
@@ -165,8 +161,8 @@ $props = isset($props) ? $props : [];
 							</button>
 						</div>
 						<div class="col-md-4">
-							<button type="button" class="action button red button-radius" onclick="cancelExecute()">
-								<span class="label">Cancel</span>
+							<button type="button" class="action button red button-radius" data-toggle="modal" data-target="#myModal">
+								<span class="label">Export</span>
 							</button>
 						</div>
 					</div>
@@ -187,11 +183,87 @@ $props = isset($props) ? $props : [];
 			</div>
 		</div>
 	</div>
-@endsection
+	{{--<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">--}}
+		{{--Launch demo modal--}}
+	{{--</button>--}}
 
+@endsection
+		<!-- Modal -->
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">Export Data</h4>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid bd-example-row">
+						@foreach ($actiontypes as $actiontype)
+							<div class="col-md-6">
+								<label class="form-check-label">
+									<input class="form-check-input" type="checkbox" value="<?= $actiontype->codename ?>">
+									<?= $actiontype->name ?>
+								</label>
+							</div>
+						@endforeach
+						<div class="col-md-12">
+							<label id="messageexport"></label>
+						</div>
+						<div class="col-md-12">
+							<label id="resultexport"></label>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" onclick="exportdata()">Export</button>
+				</div>
+			</div>
+		</div>
+	</div>
 @section('additional')
 	<script src="{{asset('js/Chart.js')}}"></script>
 	<script type="text/javascript">
+		function exportdata(){
+			var checkedValue = $('.form-check-input:checked');
+			var data = [];
+			for(var i = 0; i < checkedValue.length;i++){
+				var item = {};
+				item['type'] = checkedValue[i].value;
+				item['field'] = '_url';
+				data.push(item);
+			}
+			var segment_id = $('#segment').val();
+			console.log(data);
+			if(data.length > 0){
+				url = '{{ URL::to('segment/'.$appcode.'/exportexcel') }}';
+				data_get = {
+					'data': JSON.stringify(data),
+					'segment_id': segment_id
+				}
+				if (url) {
+					$.ajax({
+						type: 'POST',
+						dataType: 'JSON',
+						url: url,
+						data: data_get,
+						success: function (data) {
+							if(data.success){
+								var linkexport = '//'+ data.result + '.xls' ;
+								var texturl = '<a href='+linkexport+'> https://'+linkexport+'</a>';
+								$('#messageexport').html('Surrcess! Url: ')
+								$('#resultexport').html(texturl);
+							}else{
+								$('#messageexport').html('Error');
+							}
+						}
+					})
+				}
+			}
+
+		}
 		$('select').select2();
 		$('#refresh').on('click',function(){
 			var that = $('#segment');
@@ -244,6 +316,8 @@ $props = isset($props) ? $props : [];
 
 		var listDataActionType = {!! json_encode($actiontypes) !!};
 		var listPropUser = {!! json_encode($props) !!};
+		console.log(listDataActionType);
+		console.log(listPropUser);
 		function actiontypechange(e){
 			var actionValue = $('select[name="actiontype"]').val();
 //			var str = '<select name="Prop[one]" id="slprop" class="form-control" >' +
