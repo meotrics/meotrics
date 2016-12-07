@@ -107,7 +107,7 @@ function generateExcel(req, res, data) {
   let options = {
     // filename: `./public/${idFile}.xls`,
     // filename: `./export/${idFile}.xls`,
-    filename: `./home/vietld/meotrics/dashboard/public/exportexcel/${idFile}.xls`,
+    filename: `/home/vietld/meotrics/dashboard/public/exportexcel/${idFile}.xls`,
     useStyles: true,
     useSharedStrings: true
   };
