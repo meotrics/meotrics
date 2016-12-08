@@ -19,7 +19,7 @@ export class trackOffline {
             data._ctime = req.params['_ctime'];
         var _self = this;
         this.checkKey(data,function(mtid){
-            if(mtid != 0){
+            if(mtid != 0 && mtid.length == 24){
                 data._mtid = mtid;
                 _self.insertHaveMtid(data);
             }
@@ -43,9 +43,6 @@ export class trackOffline {
         });
     }
 
-    security() {
-
-    }
 
     public getInfo(request) : any {
         let res = {};
@@ -61,9 +58,13 @@ export class trackOffline {
         for (let key in this.keyUser) {
             (function(key){
                 var value = _self.keyUser[key];
+                // console.log(value);
+                // console.log(req[value]);
+                // console.log(req);
                 if(req[value] != undefined){
                     var data = {};
                     data[value] = req[value];
+                    // console.log(data);
                     _self.actionmgr.findUserByKey(_self.appid,data,function(mtid){
                         if(mtid != 0 && mtid != undefined){
                             callback(mtid);
