@@ -2,7 +2,7 @@
 @section('title', 'Marketing')
 @section('content')
     <div>
-        <img src="/img/Meotrics_userprofile.png" style="width: 100%">
+        <img src="/img/User Profile_Final.png" style="width: 100%">
     </div>
 @endsection
 

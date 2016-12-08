@@ -110,14 +110,14 @@
                         <p>Funnel</p>
                     </a>
                 </li>
-                <li class="{{ Route::getCurrentRoute()->getPath() == 'revenue' ? 'active' : '' }}">
-                    <a href="/revenue/{{$appcode}}">
-                        <i class="pe-7s-cash"></i>
-                        <p>Revenue</p>
-                    </a>
-                </li>
-                <li class="{{ Route::getCurrentRoute()->getPath() == 'marketing' ? 'active' : '' }}">
-                    <a href="/marketing/{{$appcode}}">
+                {{--<li class="{{ Route::getCurrentRoute()->getPath() == 'revenue' ? 'active' : '' }}">--}}
+                    {{--<a href="/revenue/{{$appcode}}">--}}
+                        {{--<i class="pe-7s-cash"></i>--}}
+                        {{--<p>Revenue</p>--}}
+                    {{--</a>--}}
+                {{--</li>--}}
+                <li class="{{ Route::getCurrentRoute()->getPath() == 'segment' ? 'active' : '' }}">
+                    <a href="/segment/{{$appcode}}">
                         <i class="pe-7s-graph3"></i>
                         <p>Marketing Campaign</p>
                     </a>

@@ -106,8 +106,8 @@ function generateExcel(req, res, data) {
 
   let options = {
     // filename: `./public/${idFile}.xls`,
-    // filename: `./export/${idFile}.xls`,
-    filename: `/home/vietld/meotrics/dashboard/public/exportexcel/${idFile}.xls`,
+    // filename: `./export/${idFile}.xlsx`,
+    filename: `/home/vietld/meotrics/dashboard/public/exportexcel/${idFile}.xlsx`,
     useStyles: true,
     useSharedStrings: true
   };
@@ -162,22 +162,6 @@ function generateExcel(req, res, data) {
   for(let i=0;i<totalFields.length;i++) {
     // worksheet.getColumn(3).outlineLevel = 1;
   }
-  // data.forEach(row => {
-  //   let obj = {};
-  //   totalFields.forEach(key => {
-  //     if(key == "_ctime" || key == "_lastSeen"){
-  //         var time =  new Date(row[key]*1000);
-  //         obj[key] = time.toLocaleString();
-  //     }else if(key == "_id" || key == "_mtid"){
-  //         var strkey = String(row[key]);
-  //         obj[key] = strkey;
-  //     }
-  //     else{
-  //     obj[key] = Array.isArray(row[key]) ? row[key].join(`\n`) : row[key];
-  //     }
-  //   });
-  //   worksheet.addRow(obj).commit();
-  // });
   data.forEach(row => {
     let obj = {};
     totalFields.forEach(key => {

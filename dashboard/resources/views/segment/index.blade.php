@@ -125,9 +125,9 @@ $props = isset($props) ? $props : [];
 					</div>
 						<div class="col-md-4 fix-padding" >
 							<select name="actiontype" id="actiontype" class="form-control" onchange="actiontypechange(this)" value="">
-								<option value="">Select action type</option>
+								<option value="">-Select action type-</option>
 								<option value="user">
-									User
+									User's property
 								</option>
 								@foreach ($actiontypes as $actiontype):
 								<option value="<?= $actiontype->codename ?>">
@@ -139,7 +139,7 @@ $props = isset($props) ? $props : [];
 
 					<div class="col-md-4 fix-padding" >
 						<select name="Prop[one]" id="slprop" class="form-control" >
-							<option value="">Select property</option>
+							<option value="">-Select property-</option>
 						</select>
 					</div>
 					<div class="col-md-1 col-add-filter fix-padding" id="div-filter-tool">
@@ -150,18 +150,18 @@ $props = isset($props) ? $props : [];
 				</div>
 				<div class="col-md-5 pull-right">
 					<div class="col-md-12 col-md-offset-1" id="div-action">
-						<div class="col-md-4">
+						<div class="col-md-12">
 							<button type="button" data-loading-text="Loading..." autocomplete="off" class="action button blue button-radius" id="refresh" >
-								<span class="label">Refresh</span>
+								<span class="label">Update data</span>
 							</button>
-						</div>
-						<div class="col-md-4">
+						{{--</div>--}}
+						{{--<div class="col-md-4">--}}
 							<button type="button" class="action button blue button-radius" onclick="execute()">
 								<span class="label">Generate</span>
 							</button>
-						</div>
-						<div class="col-md-4">
-							<button type="button" class="action button red button-radius" data-toggle="modal" data-target="#myModal">
+						{{--</div>--}}
+						{{--<div class="col-md-4">--}}
+							<button type="button" class="action button blue button-radius" data-toggle="modal" data-target="#myModal">
 								<span class="label">Export</span>
 							</button>
 						</div>
@@ -200,25 +200,32 @@ $props = isset($props) ? $props : [];
 				</div>
 				<div class="modal-body">
 					<div class="container-fluid bd-example-row">
+						<div class="col-md-12">
+						<p>Chose the added field(s) you want to export</p>
 						@foreach ($actiontypes as $actiontype)
 							<div class="col-md-6">
-								<label class="form-check-label">
+								<p class="form-check-label">
 									<input class="form-check-input" type="checkbox" value="<?= $actiontype->codename ?>">
 									<?= $actiontype->name ?>
-								</label>
+								</p>
 							</div>
 						@endforeach
-						<div class="col-md-12">
-							<label id="messageexport"></label>
-						</div>
-						<div class="col-md-12">
-							<label id="resultexport"></label>
-						</div>
+							</div>
+					<div class="col-md-12">
+							<p id="messageexport"></p>
+					</div>
+					<div class="col-md-12">
+							<p id="resultexport"></label>
+					</div>
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary" onclick="exportdata()">Export</button>
+					<button type="button" class="action button red button-radius" data-dismiss="modal">
+						<span class="label">Close</span>
+					</button>
+					<button type="button" class="action button blue button-radius" id="exportdata" onclick="exportdata()">
+						<span class="label">Export</span>
+					</button>
 				</div>
 			</div>
 		</div>
@@ -237,6 +244,7 @@ $props = isset($props) ? $props : [];
 			}
 			var segment_id = $('#segment').val();
 			console.log(data);
+			var $btn = $('#exportdata').button('loading');
 			if(data.length > 0){
 				url = '{{ URL::to('segment/'.$appcode.'/exportexcel') }}';
 				data_get = {
@@ -252,12 +260,13 @@ $props = isset($props) ? $props : [];
 						success: function (data) {
 							if(data.success){
 								var linkexport = '//'+ data.result + '.xls' ;
-								var texturl = '<a href='+linkexport+'> https://'+linkexport+'</a>';
-								$('#messageexport').html('Surrcess! Url: ')
+								var texturl = '<a href='+linkexport+'> https:'+linkexport+'</a>';
+								$('#messageexport').html('Click this URL link to download!');
 								$('#resultexport').html(texturl);
 							}else{
 								$('#messageexport').html('Error');
 							}
+							$btn.button('reset');
 						}
 					})
 				}

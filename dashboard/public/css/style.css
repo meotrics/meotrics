@@ -4,6 +4,9 @@
     vertical-align: text-top;
     width: 3px;
 }
+.button:focus {
+    outline: none;
+}
 .select2-selection__rendered
 {
     padding-left: 16px !important;
