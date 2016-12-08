@@ -596,7 +596,7 @@ $props = isset($props) ? $props : [];
                                         "</tr>";
                         column += cl;
                     }
-                    var table = "<table class ='table table-hover'>"+column+"</table>";
+                    var table = "<table class ='table table-hover' style='font-size: 14px;'>"+column+"</table>";
 					var b = "";
 					//vitle: take page
 					var count = 0;
