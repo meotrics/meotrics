@@ -156,7 +156,12 @@
 	function ajax(url, data, callback) {
 		data._mtid  = getMtid();
 		console.log(data._mtid);
-		var theurl = 'http://45.32.113.71:1711/' + window.mtapp + '/' + url + (data ? '?' + serialize(data) : '');
+		var address = 'http://45.32.113.71:1711/';
+		if(location.protocol == 'https')
+			address = "https://api.meotrics.com/";
+
+		var theurl = address + window.mtapp + '/' + url + (data ? '?' + serialize(data) : '');
+
 
 		callback(httpGetAsync(theurl,function(value){
 			callback(value);
