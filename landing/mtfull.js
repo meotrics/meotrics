@@ -157,7 +157,7 @@
 		data._mtid  = getMtid();
 		console.log(data._mtid);
 		var address = 'http://45.32.113.71:1711/';
-		if(location.protocol == 'https')
+		if(location.protocol == 'https:')
 			address = "https://api.meotrics.com/";
 
 		var theurl = address + window.mtapp + '/' + url + (data ? '?' + serialize(data) : '');
