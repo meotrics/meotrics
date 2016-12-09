@@ -36,25 +36,11 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
     this.runSegment = function runSegment(segment, callback) {
         if (callback === undefined) callback = function () {
         };
-        var arr = [];
+        var outcollection = prefix + "segment" + segment._id.toString();
+        var col = db.collection(prefix + "app" + segment._appid);
         // check the lock first
         if (locksegment[segment._id.toString()] !== undefined) return callback(outcollection);
         locksegment[segment._id.toString()] = true;
-        // remove old segment
-        var outcollection = prefix + "segment" + segment._id.toString();
-        var col = db.collection(prefix + "app" + segment._appid);
-        db.collection(outcollection).find({value:1}).toArray(function(err, data){
-            for(var i in data){
-                arr.push({pp: -1, id: data[i].value});
-                if(i == data.length -1){
-                    updateUser(function(){
-                    });
-
-                }
-            }
-        });
-
-        // create new segment
         getQuery(segment.condition, function (out) {
             col.mapReduce(out.map, out.reduce, {
                 out: outcollection,
@@ -64,87 +50,81 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
             }, function (err) {
                 if (err) throw err;
                 converter.toIDs(['_isUser'], function (ids) {
+                    // 	console.log("out");
+                    // 	console.dir(out);
+                    // console.log(outcollection);
                     // update segment
                     db.collection(outcollection).count({value: 1}, function (err, ret) {
+                        // console.log("ret");
+                        // console.log(ret);
                         if (err) throw err;
                         db.collection(prefix + 'segment').update({'_id': new mongodb.ObjectId(segment._id)}, {$set: {count: ret}}, function (err, ret) {
                             if (err) throw err;
                         });
                     });
 
-                    // var matchquery = {};
-                    // matchquery[ids._isUser] = true;
-                    //
-                    // var cursor = col.find(matchquery);
-                    // arr = []; //array of userid Object (not string)
-                    // doNext();
-                    // function doNext() {
-                    //     cursor.next(function (err, doc) {
-                    //         // console.log("doc");
-                    //         // console.log(doc);
-                    //         // the last docs
-                    //         if (null === doc) {
-                    //             return updateUser(function () {
-                    //                 // unlock
-                    //                 delete locksegment[segment._id.toString()];
-                    //                 if (callback) callback();
-                    //             });
-                    //         }
-                    //         //check if is in segment
-                    //         // console.log("outcollection");
-                    //         // console.log(outcollection);
-                    //         db.collection(outcollection).find({_id: doc._id}).toArray(function (err, docs) {
-                    //             if (err) throw err;
-                    //             // console.log("docs");
-                    //             // console.log(docs);
-                    //             arr.push({pp: docs[0] && docs[0].value === 1.0 ? 1 : -1, id: doc._id});
-                    //             // console.log(arr);
-                    //             if (arr.length === 100) {
-                    //                 // clean the stack by calling setTimeout
-                    //                 setTimeout(function () {
-                    //                     updateUser(doNext);
-                    //                 }, 1);
-                    //             }
-                    //             else {
-                    //                 return doNext();
-                    //             }
-                    //         });
-                    //     });
-                    // }
-                    db.collection(outcollection).find({value:1}).toArray(function (err, docs) {
-                                    if (err) throw err;
-                                    for(var i in docs){
-                                        arr.push({pp: 1, id: docs[i]._id});
-                                        if(i == docs.length-1){
-                                            updateUser(function(){
-                                                delete locksegment[segment._id.toString()];
-                                                if (callback) callback();
-                                            })
-                                        }
-                                    }
+                    var matchquery = {};
+                    matchquery[ids._isUser] = true;
+
+                    var cursor = col.find(matchquery);
+                    var arr = []; //array of userid Object (not string)
+                    doNext();
+                    function doNext() {
+                        cursor.next(function (err, doc) {
+                            // console.log("doc");
+                            // console.log(doc);
+                            // the last docs
+                            if (null === doc) {
+                                return updateUser(function () {
+                                    // unlock
+                                    delete locksegment[segment._id.toString()];
+                                    if (callback) callback();
                                 });
+                            }
+                            //check if is in segment
+                            // console.log("outcollection");
+                            // console.log(outcollection);
+                            db.collection(outcollection).find({_id: doc._id}).toArray(function (err, docs) {
+                                if (err) throw err;
+                                // console.log("docs");
+                                // console.log(docs);
+                                arr.push({pp: docs[0] && docs[0].value === 1.0 ? 1 : -1, id: doc._id});
+                                // console.log(arr);
+                                if (arr.length === 100) {
+                                    // clean the stack by calling setTimeout
+                                    setTimeout(function () {
+                                        updateUser(doNext);
+                                    }, 1);
+                                }
+                                else {
+                                    return doNext();
+                                }
+                            });
+                        });
+                    }
+
+                    function updateUser(next) {
+                        if (arr.length === 0) return next();
+                        var bulk = col.initializeUnorderedBulkOp();
+                        for (var i in arr) if (arr.hasOwnProperty(i))
+                            if (arr[i].pp === 1)
+                                bulk.find({
+                                    _mtid: arr[i].id,
+                                    _isUser: true
+                                }).update({$addToSet: {_segments: segment._id}});
+                            else
+                                bulk.find({_mtid: arr[i].id, _isUser: true}).update({$pull: {_segments: segment._id}});
+                        // clean the array first
+                        arr = [];
+
+                        bulk.execute(function (err, res) {
+                            if (err) throw err;
+                            next();
+                        });
+                    }
                 });
             });
         });
-        function updateUser(next) {
-            if (arr.length === 0) return next();
-            var bulk = col.initializeUnorderedBulkOp();
-            for (var i in arr) if (arr.hasOwnProperty(i))
-                if (arr[i].pp === 1)
-                    bulk.find({
-                        _mtid: arr[i].id,
-                        _isUser: true
-                    }).update({$addToSet: {_segments: segment._id}});
-                else
-                    bulk.find({_mtid: arr[i].id, _isUser: true}).update({$pull: {_segments: segment._id}});
-            // clean the array first
-            arr = [];
-
-            bulk.execute(function (err, res) {
-                if (err) throw err;
-                next();
-            });
-        }
     };
 
     // purpose: convert query in json to mongodb based query

@@ -355,15 +355,17 @@
         function addcode(){
             setTimeout(function(){
                 // var button = document.getElementById("kol_bounce_form_button_135764");
-                var button = $('input[data-dojo-attach-point = "submitButton"]');
-                if(button === null){
+                var submitbtn = $('input[data-dojo-attach-point = "submitButton"]');
+                if(submitbtn === null){
                     console.log("acaca");
                     addcode();
                 }else{
                     console.log("fycker");
-                    button.click(function() {
-                        signup();
-                    });
+                    submitbtn.addEventListener("click",signup);
+                    //        submitbtn.click(function() {
+                    //         console.log("fuck");
+                    //         signup();
+                    // });
                     function signup(){
                         var obj = new Object();
                         // obj.name = document.getElementById("name").value;
