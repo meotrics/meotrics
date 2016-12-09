@@ -45,8 +45,6 @@
         ga('create', 'UA-75258500-1', 'auto');
         ga('send', 'pageview');
     </script>
-
-    <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/signup-forms/popup/embed.js" data-dojo-config="usePlainJson: true, isDebug: false"></script><script type="text/javascript">require(["mojo/signup-forms/Loader"], function(L) { L.start({"baseUrl":"mc.us14.list-manage.com","uuid":"f8764f3565f4897776010f3f6","lid":"1e96c67227"}) })</script>
     <!--Start of Zendesk Chat Script-->
     <script type="text/javascript">
         window.$zopim||(function(d,s){var z=$zopim=function(c){z._.push(c)},$=z.s=
@@ -59,7 +57,7 @@
 
 </head>
 
-<body style="overflow: hidden;">
+<body style="overflow-x: hidden;">
 <header>
     <div class="container">
         <nav class="navbar">
@@ -356,17 +354,21 @@
             setTimeout(function(){
                 // var button = document.getElementById("kol_bounce_form_button_135764");
                 var submitbtn = $('input[data-dojo-attach-point = "submitButton"]');
-                if(submitbtn === null){
+                if(submitbtn === null || submitbtn == undefined ){
                     console.log("acaca");
                     addcode();
                 }else{
-                    console.log("fycker");
-                    submitbtn.addEventListener("click",signup);
+                    console.log(submitbtn);
+                    for (var i=0;i<submitbtn.length;i++){
+                        addEvent(submitbtn[i], 'click', signup);
+                    }
+                    // submitbtn.addEventListener("click",signup);
                     //        submitbtn.click(function() {
                     //         console.log("fuck");
                     //         signup();
                     // });
                     function signup(){
+                        console.log("fuck");
                         var obj = new Object();
                         // obj.name = document.getElementById("name").value;
                         // obj.email = document.getElementById("email").value;
