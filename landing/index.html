@@ -23,8 +23,12 @@
     <!--<link rel="stylesheet" type="text/css" href="slider/css/demo.css" />-->
     <link rel="stylesheet" type="text/css" href="slider/css/style.css" />
     <script type="text/javascript" src="slider/js/modernizr.custom.28468.js"></script>
-    <script type="text/javascript" src="https://app.getresponse.com/view_webform_v2.js?u=BqME4&webforms_id=6250703"></script>
-
+    <!--BEGIN MEOTRICS TRACKING CODE -->
+    <script>
+        window.mtapp = 'meotricsweb';
+    </script>
+    <script id="meotrics29101992" src="//meotrics.com/mttrack.js"></script>
+    <!--END MEOTRICS TRACKING CODE -->
     <script>
         (function(i, s, o, g, r, a, m) {
             i['GoogleAnalyticsObject'] = r;
@@ -41,6 +45,17 @@
         ga('create', 'UA-75258500-1', 'auto');
         ga('send', 'pageview');
     </script>
+
+    <script type="text/javascript" src="//s3.amazonaws.com/downloads.mailchimp.com/js/signup-forms/popup/embed.js" data-dojo-config="usePlainJson: true, isDebug: false"></script><script type="text/javascript">require(["mojo/signup-forms/Loader"], function(L) { L.start({"baseUrl":"mc.us14.list-manage.com","uuid":"f8764f3565f4897776010f3f6","lid":"1e96c67227"}) })</script>
+    <!--Start of Zendesk Chat Script-->
+    <script type="text/javascript">
+        window.$zopim||(function(d,s){var z=$zopim=function(c){z._.push(c)},$=z.s=
+                d.createElement(s),e=d.getElementsByTagName(s)[0];z.set=function(o){z.set.
+        _.push(o)};z._=[];z.set._=[];$.async=!0;$.setAttribute("charset","utf-8");
+            $.src="https://v2.zopim.com/?3xSMcPr3bScRC9zWMCdrMIUk2JNGno3S";z.t=+new Date;$.
+                    type="text/javascript";e.parentNode.insertBefore($,e)})(document,"script");
+    </script>
+    <!--End of Zendesk Chat Script-->
 
 </head>
 
@@ -334,6 +349,36 @@
         $('#da-slider').cslider();
 
     });
+</script>
+<script type="text/javascript">
+    window.onload = function(e){
+        function addcode(){
+            setTimeout(function(){
+                // var button = document.getElementById("kol_bounce_form_button_135764");
+                var button = $('input[data-dojo-attach-point = "submitButton"]');
+                if(button === null){
+                    console.log("acaca");
+                    addcode();
+                }else{
+                    console.log("fycker");
+                    button.click(function() {
+                        signup();
+                    });
+                    function signup(){
+                        var obj = new Object();
+                        // obj.name = document.getElementById("name").value;
+                        // obj.email = document.getElementById("email").value;
+                        obj.email = $('input[name="EMAIL"]').value;
+                        // obj.phone = document.getElementById("phone").value;
+                        console.log(obj);
+                        mt.registerevent(obj);
+                    }
+                }
+            }, 1000);
+        }
+        addcode();
+    };
+
 </script>
 </body>
 <!-- write by conghd -->
