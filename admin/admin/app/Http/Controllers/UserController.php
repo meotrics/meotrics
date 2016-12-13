@@ -13,7 +13,7 @@ class UserController extends Controller
     }
 
     public function getListuser(){
-        $data = DB::select('select email,phone,verified from users order by id desc');
+        $data = DB::select('select email,name,phone,verified,created_at from users order by id desc');
         return $data;
     }
 

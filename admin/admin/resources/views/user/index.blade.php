@@ -19,16 +19,20 @@
                     <tbody>
                     <tr>
                         <th style="width: 10px">#</th>
+                        <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Verified</th>
+                        <th>Created time</th>
                         <td>ListApp</td>
                     </tr>
                     <tr v-for="(value,index) in listUser">
                         <td>@{{index}}</td>
+                        <td>@{{ value.name }}</td>
                         <td>@{{value.email}}</td>
                         <td>@{{value.phone}}</td>
                         <td>@{{value.verified}}</td>
+                        <td>@{{ (new Date(value.created_at * 1000)).toLocaleString()}}</td>
                         <td>
                             <a v-on:click="showApp(value.email,index)">Show</a>
                             <div  v-if="value.render">
