@@ -14,6 +14,7 @@
                         <th>Name</th>
                         <th>Core</th>
                         <th>URL</th>
+                        <th>Time</th>
                         <td>Count user</td>
                     </tr>
                     <tr v-for="(value,index) in listApp">
@@ -21,8 +22,8 @@
                         <td>@{{value.name}}</td>
                         <td>@{{value.core}}</td>
                         <td>@{{value.url}}</td>
-                        <td>
-                        </td>
+                        <td>@{{ (new Date(value.created_at * 1000)).toLocaleString() }}</td>
+                        <td></td>
                     </tr>
                     </tbody>
                 </table>
