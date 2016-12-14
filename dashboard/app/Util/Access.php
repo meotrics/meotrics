@@ -96,11 +96,20 @@ class Access
 		return -1;
 	}
 
+	public static function isBanned($id){
+		$user = DB::table('users')->where('id',$id)->first();
+		if($user == null) return true;
+		if(!$user->banned)
+			return false;
+		return true;
+	}
+
 	public static function can_editPerm($userid, $appcode)
 	{
 		// full access for app owner
 		$app = DB::table('apps')->where('code', $appcode)->first();
 		if ($app == null) return -3;
+		if(self::isBanned($app->ownerid)) return false;
 		if ($app->ownerid == $userid) return true;
 
 		$perm = DB::table('user_app')->where('appid', $app->id)->where('userid', $userid)->first();
@@ -114,6 +123,7 @@ class Access
 		// full access for app owner
 		$app = DB::table('apps')->where('code', $appcode)->first();
 		if ($app == null) return -3;
+		if(self::isBanned($app->ownerid)) return false;
 		if ($app->ownerid == $userid) return true;
 
 		$perm = DB::table('user_app')->where('appid', $app->id)->where('userid', $userid)->first();
@@ -127,6 +137,8 @@ class Access
 		// full access for app owner
 		$app = DB::table('apps')->where('code', $appcode)->first();
 		if ($app == null) return -3;
+
+		if(self::isBanned($app->ownerid)) return false;
 		if ($app->ownerid == $userid) return true;
 
 		$perm = DB::table('user_app')->where('appid', $app->id)->where('userid', $userid)->first();
@@ -139,6 +151,8 @@ class Access
 		// full access for app owner
 		$app = DB::table('apps')->where('code', $appcode)->first();
 		if ($app == null) return -3;
+
+		if(self::isBanned($app->ownerid)) return false;
 		if ($app->ownerid == $userid) return true;
 
 		$perm = DB::table('user_app')->where('appid', $app->id)->where('userid', $userid)->first();

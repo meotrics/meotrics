@@ -26,7 +26,7 @@ class HomeController extends Controller
 
 	public function postCurrenttime(Request $request, $appid)
 	{
- if(Access::can_view($request->user()->id, $appid) == false) abort(500,'Permission Denied');
+ 		if(Access::can_view($request->user()->id, $appid) == false) abort(500,'Permission Denied');
 		$response = new Response();
 		$st = $request->input('startTime', null);
 		$et = $request->input('endTime', null);
