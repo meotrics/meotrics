@@ -16,14 +16,26 @@ Route::get('/', function () {
 });
 
 Auth::routes();
-
 Route::get('/home', 'HomeController@index');
+// user
+
 Route::get('/user', 'UserController@index');
+
+// app
 Route::get('/app',  'AppController@index');
 
 
 //api
+//user
 Route::get('api/listuser','UserController@getListuser');
+Route::get('api/banuser/{email}/{status}','UserController@banUser');
+Route::get('api/countuser/{appid}/{starttime}/{endtime}','AppController@getCountuserapp');
+
+
+//ban user
+Route::get('api/banreason/{email}/{status}/{message}','UserController@banReason');
+
+
+// app
 Route::get('api/listappbyemail/{email}','AppController@getListappbyemail');
 Route::get('api/listapp','AppController@getListapp');
-Route::get('api/countuser/{appid}/{starttime}/{endtime}','AppController@getCountuserapp');
