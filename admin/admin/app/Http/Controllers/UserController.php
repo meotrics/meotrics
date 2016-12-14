@@ -18,7 +18,7 @@ class UserController extends Controller
     }
 
     public function banUser($email,$status){
-        $data = DB::select('update `users` set `banned` ='.$status.' where `email`="'.$email.'"');
+        $data = DB::update('update `users` set `banned` ='.$status.' where `email`="'.$email.'"');
         return $data;
     }
 
