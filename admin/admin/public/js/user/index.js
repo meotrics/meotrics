@@ -56,7 +56,7 @@ var test = new Vue({
         saveban: function(){
             _self = this;
             if(this.ban.email != undefined){
-                if(this.ban["status"])
+                if(this.ban["status"] == 1)
                     this.ban["status"]= 0;
                 else
                     this.ban["status"] =1;
