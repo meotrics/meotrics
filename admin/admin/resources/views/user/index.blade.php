@@ -33,7 +33,7 @@
                         <td>@{{value.email}}</td>
                         <td>@{{value.phone}}</td>
                         <td v-on:click="changeban(value.email,index,value.banned)">
-                            <div v-if="!value.banned"><i class="fa fa-fw fa-check alert-success"></i></div>
+                            <div v-if="value.banned ==0"><i class="fa fa-fw fa-check alert-success"></i></div>
                             <div v-else><i class="fa fa-fw fa-ban alert-danger"></i></div>
                         </td>
                         <td>@{{ (new Date(value.created_at * 1000)).toLocaleString()}}</td>
