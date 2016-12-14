@@ -8,9 +8,6 @@ var meotrics = new Vue({
         created: function(){
             this.getListApp();
         },
-        updated: function(){
-            this.addCountUsertoList(0);
-        },
         methods:{
             getListApp: function(){
                 _self = this;
@@ -20,21 +17,21 @@ var meotrics = new Vue({
                             response.body[i]["countuser"] = 0;
                         }
                         _self.listApp = response.body;
+                        this.addCountUsertoList(0);
             }, (response) => {
         // error callback
             })
             },
             addCountUsertoList : function(i){
-                _self = this;
-                var appid = _self.listApp[i].code;
-                _self.getCountUserinMonth(appid,function(countuser){
-                    _self.listApp[i]["countuser"] = countuser;
-                    i++;
-                    if(i < _self.listApp.length){
-                        _self.addCountUsertoList(i);
-                    }
-                })
-
+                    _self = this;
+                    var appid = _self.listApp[i].code;
+                    _self.getCountUserinMonth(appid,function(countuser){
+                        _self.listApp[i]["countuser"] = countuser;
+                        i++;
+                        if(i < _self.listApp.length){
+                            _self.addCountUsertoList(i);
+                        }
+                    })
             },
             getCountUserinMonth: function(appid,callback){
                 var now = new Date();
@@ -42,7 +39,6 @@ var meotrics = new Vue({
                 var month = now.getMonth();
                 var year = now.getFullYear();
                 var firstMonth = parseInt(new Date(year.toString(),month.toString(),1)/1000);
-                console.log(firstMonth);
                 var url = urllistcount+appid+"/"+firstMonth+"/"+today;
                 this.$http.get(url).then((response) => {
                     // success callback
