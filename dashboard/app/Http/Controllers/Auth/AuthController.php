@@ -88,8 +88,8 @@ class AuthController extends Controller
 		$userid = DB::table('users')->insertGetId(['password' => '',
 			'email' => $email,
 			'status' => 10,
-			'created_at' => date("Y"),
-			'updated_at' => date("Y"),
+			'created_at' => time(),
+			'updated_at' => time(),
 			'verified' => 0,
 			'resetpwhash' => $hash]);
 
@@ -345,8 +345,8 @@ class AuthController extends Controller
 					'email' => $data->email,
 					'name' => $data->name,
 					'status' => 10,
-					'created_at' => date("Y"),
-					'updated_at' => date("Y"),
+					'created_at' => time(),
+					'updated_at' => time(),
 					'verified' => 1]);
 			} else {
 				// update verified token

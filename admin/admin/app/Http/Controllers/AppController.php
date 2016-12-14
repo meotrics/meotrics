@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use App\Util\MtHttp;
 class AppController extends Controller
 {
     //
@@ -28,5 +29,10 @@ class AppController extends Controller
 //        die;
         $data = DB::select('select * from apps where ownerid="'.$id.'"');
         return $data;
-}
+    }
+
+    public function getCountuserapp($appid,$starttime,$endtime){
+        $tmp_charts = MtHttp::get('app/countuser/' . $appid . '/' . $starttime . '/' . $endtime);
+        return $tmp_charts;
+    }
 }

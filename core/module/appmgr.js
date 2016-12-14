@@ -140,6 +140,25 @@
 			});
 		};
 
+		this.countUser = function(appid,starttime,endtime,callback){
+			converter.toIDs(["_ctime","_mtid"],function(ids){
+				var todayvismatch = {};
+				todayvismatch[ids._ctime] = { $gte: parseInt(starttime), $lte : parseInt(endtime)};
+
+				var pipelines = [{ $match: todayvismatch }, { $group: { _id: "$" + ids._mtid } }, {
+					$group: {
+						_id: null, count: { $sum: 1 }
+					}
+				}];
+				db.collection(prefix + "app" + appid).aggregate(pipelines, function (err, res) {
+					if (err) throw err;
+					if (res.length === 0)
+						callback(0);
+					else callback(res[0].count);
+				});
+			})
+		};
+
 		this.initApp = function (appid, callback) {
 
 			var purchase = {

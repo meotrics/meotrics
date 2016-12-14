@@ -23,7 +23,7 @@
                         <td>@{{value.core}}</td>
                         <td>@{{value.url}}</td>
                         <td>@{{ (new Date(value.created_at * 1000)).toLocaleString() }}</td>
-                        <td></td>
+                        <td>@{{ value.countuser }}</td>
                     </tr>
                     </tbody>
                 </table>

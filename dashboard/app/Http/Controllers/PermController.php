@@ -134,7 +134,8 @@ class PermController extends Controller
 				'name' => $name,
 				'code' => $code,
 				'ownerid' => $uid,
-				'url'=>$url
+				'url'=>$url,
+				'created_at'=>time()
 			)
 		);
 

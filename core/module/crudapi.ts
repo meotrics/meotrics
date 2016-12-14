@@ -132,7 +132,7 @@ export class CrudApi {
 				res.json(result);
 			});
 		});
-
+		
 		app.getEx('/app/getsignup/:appid/:starttime/:endtime', function (req, res) {
 			me.dashboard.getSignup(req.params.appid, req.params.starttime, req.params.endtime,function (result) {
 				res.json(result);
@@ -144,6 +144,12 @@ export class CrudApi {
 				res.json(ret);
 			});
 		});
+		// count user in time
+		app.getEx('/app/countuser/:appid/:starttime/:endtime',function(req,res){
+			me.appmgr.countUser(req.params.appid, req.params.starttime, req.params.endtime, function(result){
+				res.json(result);
+			})
+		})
 
 		// count number of action in app
 		app.getEx('/app/count_traffic/:appid', function (req, res) {

@@ -26,3 +26,4 @@ Route::get('/app',  'AppController@index');
 Route::get('api/listuser','UserController@getListuser');
 Route::get('api/listappbyemail/{email}','AppController@getListappbyemail');
 Route::get('api/listapp','AppController@getListapp');
+Route::get('api/countuser/{appid}/{starttime}/{endtime}','AppController@getCountuserapp');
