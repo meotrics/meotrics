@@ -40,8 +40,9 @@ var meotrics = new Vue({
                 var now = new Date();
                 var today = parseInt(now.getTime()/1000);
                 var month = now.getMonth();
-                var year = now.getYear();
+                var year = now.getFullYear();
                 var firstMonth = parseInt(new Date(year.toString(),month.toString(),1)/1000);
+                console.log(firstMonth);
                 var url = urllistcount+appid+"/"+firstMonth+"/"+today;
                 this.$http.get(url).then((response) => {
                     // success callback
