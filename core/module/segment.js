@@ -160,7 +160,6 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
                     // console.log("r");
                     // console.log(r);
                     // console.log("ret");
-                    console.log(ret);
                     callback(ret);
                 });
             });
@@ -225,8 +224,6 @@ exports.SegmentExr = function (db, mongodb, async, converter, prefix) {
             var query = {};
             query.$or = [];
             var c = Math.ceil(length / 2);
-            console.log("object");
-            console.log(object);
             for (var i = 0; i < length; i += 2) {
                 var queryuser = {};
                 var queryaction = {};
