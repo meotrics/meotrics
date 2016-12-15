@@ -563,6 +563,7 @@ export class Dashboard {
 
 		me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid", "_stime", "_utm_campaign"], function (ids) {
 			me.getGrowthRate(me.db, me.prefix, appid, ids, startime, endtime, function (growrate: number) {
+				growrate = Math.round(growrate*100)/100;
 				callback(growrate);
 			});
 		});
