@@ -226,6 +226,8 @@ export class Dashboard {
 		});
 	}
 
+
+
 	private getRevenues(db: mongo.Db, prefix: string, appid: string, ids, starttime: number, endtime: number, callback: (revenues: number[], purchases: number[]) => void) {
 		let me = this;
 		var revenues = [];
@@ -418,14 +420,27 @@ export class Dashboard {
 		});
 	}
 
-	public generateLabel(startime: number, endtime: number) {
+	public generateLabel(startime: number, endtime: number,callback) {
+		let me = this;
+		if (startime === undefined) {
+			endtime = Math.floor(new Date().getTime() / 1000);
+			startime = endtime - 30 * 86400;
+		}
+
+		var now = new Date(startime * 1000);
+		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		now = new Date(endtime * 1000);
+		var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		let startsec = Math.round(startday.getTime() / 1000);
+		let endsec = Math.round(endday.getTime() / 1000) + 86400;
+
 		var labels = [];
 		var ranges = this.getTimeRange(startime, endtime);
 		for (var i of ranges) {
 			var date = new Date(i * 1000);
 			labels.push(date.toUTCString().split(' ')[2] + " " + date.getDate());
 		}
-		return labels;
+		callback(labels);
 	 }
 
 	public getPageview(appid: string, callback:(ret)=>void) {
@@ -496,7 +511,43 @@ export class Dashboard {
 		});
 	}
 
-	public getDashboard(appid: string, startime: number, endtime: number, callback: (d: DashboardEntity) => void) {
+	public getRevenuesTime(appid: string, startime: number, endtime: number,callback){
+		let me = this;
+		if (startime === undefined) {
+			endtime = Math.floor(new Date().getTime() / 1000);
+			startime = endtime - 30 * 86400;
+		}
+
+		var now = new Date(startime * 1000);
+		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		now = new Date(endtime * 1000);
+		var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		let startsec = Math.round(startday.getTime() / 1000);
+		let endsec = Math.round(endday.getTime() / 1000) + 86400;
+		me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid", "_stime", "_utm_campaign"], function (ids) {
+			me.getRevenues(me.db, me.prefix, appid, ids, startime, endtime, function (revenues, n_purchases) {
+				var revenue = {};
+				revenue.revenues = revenues;
+				revenue.n_purchases = n_purchases;
+				callback(revenue);
+			});
+		});
+
+	}
+
+	public getTraffic24Time(appid: string,callback){
+		let me = this;
+		me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid", "_stime", "_utm_campaign"], function (ids) {
+			me.getTraffic24(me.db, me.prefix, appid, ids, function (data, labels) {
+				var traffic = {};
+				traffic.traffic24 = data;
+				traffic.traffic24labels = labels;
+				callback(traffic);
+			});
+		});
+	}
+
+	public getGrowthRateTime(appid: string, startime: number, endtime: number,callback){
 		let me = this;
 		if (startime === undefined) {
 			endtime = Math.floor(new Date().getTime() / 1000);
@@ -510,140 +561,220 @@ export class Dashboard {
 		let startsec = Math.round(startday.getTime() / 1000);
 		let endsec = Math.round(endday.getTime() / 1000) + 86400;
 
-		function generateDashboard(gcallback: (d: DashboardEntity) => void) {
-			var dashboard: DashboardEntity = new DashboardEntity();
+		me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid", "_stime", "_utm_campaign"], function (ids) {
+			me.getGrowthRate(me.db, me.prefix, appid, ids, startime, endtime, function (growrate: number) {
+				callback(growrate);
+			});
+		});
+	}
 
-			dashboard.labels = me.generateLabel(startime, endtime);
+	public getRetensionRateTime(appid: string,callback){
+			let me = this;
 			me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid", "_stime", "_utm_campaign"], function (ids) {
-				me.getTodayVisitor(me.db, me.prefix, appid, ids, function (n_new_visitor, n_returning_visitor) {
-					dashboard.n_new_visitor = n_new_visitor;
-					dashboard.n_returning_visitor = n_returning_visitor;
-					me.getNewSignup(me.db, me.prefix, appid, ids, startime, endtime, function (ret) {
-						dashboard.n_new_signup = ret;
+				me.getRetensionRate(me.db, me.prefix, appid, ids, function (rate:number) {
+					callback(rate);
+				});
+			});
+	}
 
-						me.getRevenues(me.db, me.prefix, appid, ids, startime, endtime, function (revenues, n_purchases) {
-							dashboard.revenues = revenues;
-							dashboard.n_purchases = n_purchases;
+	public getTotalRevenueTime(appid: string, startime: number, endtime: number,callback){
+			let me = this;
+			if (startime === undefined) {
+				endtime = Math.floor(new Date().getTime() / 1000);
+				startime = endtime - 30 * 86400;
+			}
 
-							me.getTotalRevenue(me.db, me.prefix, appid, ids, startime, endtime, function (revenue, npurchase, nuser) {
-								dashboard.total_revenue = revenue;
-								dashboard.n_avgcartsize = npurchase === 0 ? 0 : revenue / npurchase;
-								dashboard.revenue_per_customer = nuser === 0 ? 0 : revenue / nuser;
+			var now = new Date(startime * 1000);
+			var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+			now = new Date(endtime * 1000);
+			var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+			let startsec = Math.round(startday.getTime() / 1000);
+			let endsec = Math.round(endday.getTime() / 1000) + 86400;
 
-								me.getGrowthRate(me.db, me.prefix, appid, ids, startime, endtime, function (growrate: number) {
-									dashboard.usergrowth_rate = growrate;
-
-									me.getConversionRate(me.db, me.prefix, appid, ids, startime, endtime, function (cs: number) {
-										dashboard.conversion_rate = cs;
-
-										me.getRetensionRate(me.db, me.prefix, appid, ids, function (rate: number) {
-											dashboard.retention_rate = rate;
-											me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, startime, endtime, function (campaign: string) {
-												dashboard.highest_revenue_campaign = campaign;
-												me.getMostPopulerCategory(me.db, me.prefix, appid, ids, startime, endtime, function (cat: string) {
-													dashboard.most_popular_category = cat;
-													me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, startime, endtime, function (ref: string) {
-														dashboard.most_effective_ref = ref;
-														me.getTraffic24(me.db, me.prefix, appid, ids, function (data, labels) {
-
-															dashboard.traffic24 = data;
-															dashboard.traffic24labels = labels;
-
-															gcallback(dashboard);
-														});
-													});
-												});
-											});
-										});
-									});
-								});
-							});
-						});
-					});
+			me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid", "_stime", "_utm_campaign"], function (ids) {
+				me.getTotalRevenue(me.db, me.prefix, appid, ids, startime, endtime, function (revenue, npurchase, nuser) {
+					var data = {};
+					data.total_revenue = revenue;
+					data.n_avgcartsize = npurchase === 0 ? 0 : revenue / npurchase;
+					data.revenue_per_customer = nuser === 0 ? 0 : revenue / nuser;
+					callback(data);
 				});
 			});
 		}
 
-		me.db.collection(me.prefix + "dashboard").find({ appid: appid, endtime: endsec, starttime: startsec }).limit(1).toArray(function (err, res) {
-			if (err) throw err;
-			// cache not existed
-			if (res.length === 0) {
-				me.lock("c_" + appid + "-" + startsec + "-" + endsec, function (release) {
-					// recheck because cache could be create after the lock
-					me.db.collection(me.prefix + "dashboard").find({ appid: appid, endtime: endsec, starttime: startsec }).limit(1).toArray(function (err, res) {
-						if (err) throw err;
-						if (res.length === 0) {
-							generateDashboard(function (dash: DashboardEntity) {
-								callback(dash);
-								dash.appid = appid + "";
-								dash.ctime = Math.round(new Date().getTime() / 1000);
-								dash.starttime = startsec;
-								dash.endtime = endsec;
-								me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "", endtime: endsec, starttime: startsec }, dash, { upsert: true }, function (err) {
-									release()();
-									if (err) throw err;
-								});
-							});
-						} else {
-							return release(function () {
-								// why not just do callback(res[0]) ?
-								// this may look wasted, but give us 100% guarranty that,
-								// the result dashboard alway up to date
-								// the problem with res[0] is that, is very likely up to date
-								// (deltatime < delay) but there is no warranty
-								me.getDashboard(appid, startime, endtime, callback);
-							})();
-						}
-					});
-				});
-				return;
-			}
+	// me.getConversionRate(me.db, me.prefix, appid, ids, startime, endtime, function (cs: number) {
+	// // 									dashboard.conversion_rate = cs;
 
-			var dash: DashboardEntity = res[0];
-			var deltaT = Math.round(new Date().getTime() / 1000) - dash.ctime;
+	public getConversionRateTime(appid: string, startime: number, endtime: number,callback){
+		let me = this;
+		if (startime === undefined) {
+			endtime = Math.floor(new Date().getTime() / 1000);
+			startime = endtime - 30 * 86400;
+		}
 
-			if (deltaT > me.delaysec) {
-				me.lock("c_" + appid + "-" + startsec + "-" + endsec, function (release) {
-					me.db.collection(me.prefix + "dashboard").find({ appid: appid, endtime: endsec, starttime: startsec }).limit(1).toArray(function (err, res) {
-						if (err) throw err;
-						// this is a must found
-						var dash = res[0];
-						var deltaT = Math.round(new Date().getTime() / 1000) - dash.ctime;
-						if (deltaT > me.delaysec) {
-							// refresh the cache
-							generateDashboard(function (dash: DashboardEntity) {
-								callback(dash);
-								dash.appid = appid + "";
-								dash.ctime = Math.round(new Date().getTime() / 1000);
-								dash.starttime = startsec;
-								dash.endtime = endsec;
-								me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "", endtime: endsec, starttime: startsec }, dash, { upsert: true }, function (err) {
-									release(function () {
-									})();
-									if (err) throw err;
-								});
-							});
-						} else
-							return release(function () {
-								// callback(dash);
-								// again, why not use callback(dash) ? because i want 100% guarranty that the dash
-								// is up to date (deltatime < delay)
-								me.getDashboard(appid, startime, endtime, callback);
-							})();
-					});
-				});
-			} else {
-				me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid", "_stime", "_utm_campaign"], function (ids) {
-					me.getNewSignup(me.db, me.prefix, appid, ids, startime, endtime, function (newsignup) {
-						me.getTodayVisitor(me.db, me.prefix, appid, ids, function (newvistor, returning) {
-							dash.n_new_signup = newsignup;
-							dash.n_returning_visitor = returning;
-							dash.n_new_visitor = newvistor;
-							callback(dash);
-						});
-					});
-				});
-			}
+		var now = new Date(startime * 1000);
+		var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		now = new Date(endtime * 1000);
+		var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		let startsec = Math.round(startday.getTime() / 1000);
+		let endsec = Math.round(endday.getTime() / 1000) + 86400;
+
+		me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid", "_stime", "_utm_campaign"], function (ids) {
+			me.getConversionRate(me.db, me.prefix, appid, ids, startime, endtime, function (cs: number) {
+				// dashboard.conversion_rate = cs;
+				callback(cs);
+			});
 		});
 	}
+				
+	// public getDashboard(appid: string, startime: number, endtime: number, callback: (d: DashboardEntity) => void) {
+	// 	let me = this;
+	// 	if (startime === undefined) {
+	// 		endtime = Math.floor(new Date().getTime() / 1000);
+	// 		startime = endtime - 30 * 86400;
+	// 	}
+    //
+	// 	var now = new Date(startime * 1000);
+	// 	var startday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+	// 	now = new Date(endtime * 1000);
+	// 	var endday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+	// 	let startsec = Math.round(startday.getTime() / 1000);
+	// 	let endsec = Math.round(endday.getTime() / 1000) + 86400;
+    //
+	// 	function generateDashboard(gcallback: (d: DashboardEntity) => void) {
+	// 		var dashboard: DashboardEntity = new DashboardEntity();
+    //
+	// 		dashboard.labels = me.generateLabel(startime, endtime);
+	// 		me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid", "_stime", "_utm_campaign"], function (ids) {
+	// 			me.getTodayVisitor(me.db, me.prefix, appid, ids, function (n_new_visitor, n_returning_visitor) {
+	// 				dashboard.n_new_visitor = n_new_visitor;
+	// 				dashboard.n_returning_visitor = n_returning_visitor;
+	// 				me.getNewSignup(me.db, me.prefix, appid, ids, startime, endtime, function (ret) {
+	// 					dashboard.n_new_signup = ret;
+    //
+	// 					me.getRevenues(me.db, me.prefix, appid, ids, startime, endtime, function (revenues, n_purchases) {
+	// 						dashboard.revenues = revenues;
+	// 						dashboard.n_purchases = n_purchases;
+    //
+	// 						me.getTotalRevenue(me.db, me.prefix, appid, ids, startime, endtime, function (revenue, npurchase, nuser) {
+	// 							dashboard.total_revenue = revenue;
+	// 							dashboard.n_avgcartsize = npurchase === 0 ? 0 : revenue / npurchase;
+	// 							dashboard.revenue_per_customer = nuser === 0 ? 0 : revenue / nuser;
+    //
+	// 							me.getGrowthRate(me.db, me.prefix, appid, ids, startime, endtime, function (growrate: number) {
+	// 								dashboard.usergrowth_rate = growrate;
+    //
+	// 								me.getConversionRate(me.db, me.prefix, appid, ids, startime, endtime, function (cs: number) {
+	// 									dashboard.conversion_rate = cs;
+    //
+	// 									me.getRetensionRate(me.db, me.prefix, appid, ids, function (rate: number) {
+	// 										dashboard.retention_rate = rate;
+	// 										me.getHighestRevenueCampaign(me.db, me.prefix, appid, ids, startime, endtime, function (campaign: string) {
+	// 											dashboard.highest_revenue_campaign = campaign;
+	// 											me.getMostPopulerCategory(me.db, me.prefix, appid, ids, startime, endtime, function (cat: string) {
+	// 												dashboard.most_popular_category = cat;
+	// 												me.getMostEffectiveReferal(me.db, me.prefix, appid, ids, startime, endtime, function (ref: string) {
+	// 													dashboard.most_effective_ref = ref;
+	// 													me.getTraffic24(me.db, me.prefix, appid, ids, function (data, labels) {
+    //
+	// 														dashboard.traffic24 = data;
+	// 														dashboard.traffic24labels = labels;
+    //
+	// 														gcallback(dashboard);
+	// 													});
+	// 												});
+	// 											});
+	// 										});
+	// 									});
+	// 								});
+	// 							});
+	// 						});
+	// 					});
+	// 				});
+	// 			});
+	// 		});
+	// 	}
+    //
+	// 	me.db.collection(me.prefix + "dashboard").find({ appid: appid, endtime: endsec, starttime: startsec }).limit(1).toArray(function (err, res) {
+	// 		if (err) throw err;
+	// 		// cache not existed
+	// 		if (res.length === 0) {
+	// 			me.lock("c_" + appid + "-" + startsec + "-" + endsec, function (release) {
+	// 				// recheck because cache could be create after the lock
+	// 				me.db.collection(me.prefix + "dashboard").find({ appid: appid, endtime: endsec, starttime: startsec }).limit(1).toArray(function (err, res) {
+	// 					if (err) throw err;
+	// 					if (res.length === 0) {
+	// 						generateDashboard(function (dash: DashboardEntity) {
+	// 							callback(dash);
+	// 							dash.appid = appid + "";
+	// 							dash.ctime = Math.round(new Date().getTime() / 1000);
+	// 							dash.starttime = startsec;
+	// 							dash.endtime = endsec;
+	// 							me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "", endtime: endsec, starttime: startsec }, dash, { upsert: true }, function (err) {
+	// 								release()();
+	// 								if (err) throw err;
+	// 							});
+	// 						});
+	// 					} else {
+	// 						return release(function () {
+	// 							// why not just do callback(res[0]) ?
+	// 							// this may look wasted, but give us 100% guarranty that,
+	// 							// the result dashboard alway up to date
+	// 							// the problem with res[0] is that, is very likely up to date
+	// 							// (deltatime < delay) but there is no warranty
+	// 							me.getDashboard(appid, startime, endtime, callback);
+	// 						})();
+	// 					}
+	// 				});
+	// 			});
+	// 			return;
+	// 		}
+    //
+	// 		var dash: DashboardEntity = res[0];
+	// 		var deltaT = Math.round(new Date().getTime() / 1000) - dash.ctime;
+    //
+	// 		if (deltaT > me.delaysec) {
+	// 			me.lock("c_" + appid + "-" + startsec + "-" + endsec, function (release) {
+	// 				me.db.collection(me.prefix + "dashboard").find({ appid: appid, endtime: endsec, starttime: startsec }).limit(1).toArray(function (err, res) {
+	// 					if (err) throw err;
+	// 					// this is a must found
+	// 					var dash = res[0];
+	// 					var deltaT = Math.round(new Date().getTime() / 1000) - dash.ctime;
+	// 					if (deltaT > me.delaysec) {
+	// 						// refresh the cache
+	// 						generateDashboard(function (dash: DashboardEntity) {
+	// 							callback(dash);
+	// 							dash.appid = appid + "";
+	// 							dash.ctime = Math.round(new Date().getTime() / 1000);
+	// 							dash.starttime = startsec;
+	// 							dash.endtime = endsec;
+	// 							me.db.collection(me.prefix + "dashboard").updateOne({ appid: appid + "", endtime: endsec, starttime: startsec }, dash, { upsert: true }, function (err) {
+	// 								release(function () {
+	// 								})();
+	// 								if (err) throw err;
+	// 							});
+	// 						});
+	// 					} else
+	// 						return release(function () {
+	// 							// callback(dash);
+	// 							// again, why not use callback(dash) ? because i want 100% guarranty that the dash
+	// 							// is up to date (deltatime < delay)
+	// 							me.getDashboard(appid, startime, endtime, callback);
+	// 						})();
+	// 				});
+	// 			});
+	// 		} else {
+	// 			me.converter.toIDs(["_isUser", "_mtid", "_ctime", "_typeid", "_reftype", "userid", "cname", "amount", "cid", "_stime", "_utm_campaign"], function (ids) {
+	// 				me.getNewSignup(me.db, me.prefix, appid, ids, startime, endtime, function (newsignup) {
+	// 					me.getTodayVisitor(me.db, me.prefix, appid, ids, function (newvistor, returning) {
+	// 						dash.n_new_signup = newsignup;
+	// 						dash.n_returning_visitor = returning;
+	// 						dash.n_new_visitor = newvistor;
+	// 						callback(dash);
+	// 					});
+	// 				});
+	// 			});
+	// 		}
+	// 	});
+	// }
 }

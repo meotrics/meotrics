@@ -121,11 +121,54 @@ export class CrudApi {
 			});
 		});
 
-		app.getEx('/dashboard/:appid/:starttime?/:endtime?', function (req, res) {
-			me.dashboard.getDashboard(req.params.appid, req.params.starttime, req.params.endtime, function (result) {
+		// app.getEx('/dashboard/:appid/:starttime?/:endtime?', function (req, res) {
+		// 	me.dashboard.getDashboard(req.params.appid, req.params.starttime, req.params.endtime, function (result) {
+		// 		res.json(result);
+		// 	});
+		// });
+
+		app.getEx('/dashboard/labels/:starttime?/:endtime?', function (req, res) {
+			me.dashboard.generateLabel(req.params.starttime, req.params.endtime, function (result) {
 				res.json(result);
 			});
 		});
+
+		app.getEx('/dashboard/revenues/:appid/:starttime?/:endtime?', function (req, res) {
+			me.dashboard.getRevenuesTime(req.params.appid, req.params.starttime, req.params.endtime, function (result) {
+				res.json(result);
+			});
+		});
+
+		app.getEx('/dashboard/gettraffic24/:appid', function (req, res) {
+			me.dashboard.getTraffic24Time(req.params.appid, function (result) {
+				res.json(result);
+			});
+		});
+
+		app.getEx('/dashboard/retentionrate/:appid', function (req, res) {
+			me.dashboard.getRetensionRateTime(req.params.appid, function (result) {
+				res.json(result);
+			});
+		});
+
+		app.getEx('/dashboard/getgrowthrate/:appid/:starttime?/:endtime?', function (req, res) {
+			me.dashboard.getGrowthRateTime(req.params.appid, req.params.starttime, req.params.endtime, function (result) {
+				res.json(result);
+			});
+		});
+
+		app.getEx('/dashboard/gettotalrevenue/:appid/:starttime?/:endtime?', function (req, res) {
+			me.dashboard.getTotalRevenueTime(req.params.appid,req.params.starttime, req.params.endtime, function (result) {
+				res.json(result);
+			});
+		});
+
+		app.getEx('/dashboard/conversionratetime/:appid/:starttime?/:endtime?', function (req, res) {
+			me.dashboard.getConversionRateTime(req.params.appid,req.params.starttime, req.params.endtime, function (result) {
+				res.json(result);
+			});
+		});
+
 
 		app.getEx('/app/getpageview/:appid', function (req, res) {
 			me.dashboard.getPageview(req.params.appid, function (result) {

@@ -20,7 +20,7 @@
                     <tr v-for="(value,index) in listApp">
                         <td>@{{index}}</td>
                         <td>@{{value.name}}</td>
-                        <td>@{{value.core}}</td>
+                        <td>@{{value.code}}</td>
                         <td>@{{value.url}}</td>
                         <td>@{{ (new Date(value.created_at * 1000)).toLocaleString() }}</td>
                         <td>@{{ value.countuser }}</td>
