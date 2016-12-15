@@ -96,7 +96,7 @@ export class Dashboard {
 			'13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
 
 		// xac dinh gio
-		var curhour = now.getHours() ;
+		var curhour = now.getHours() +7;
 		var queryCont = [];
 		var labelarr = [];
 		// get Rangue query
@@ -139,6 +139,15 @@ export class Dashboard {
 				}
 				data.push(value);
 			}
+			// var a = [];
+			// var b = [];
+			// for(var item in data){
+			// 	a.push(data[data.length- item -1]);
+			// 	b.push(labelarr[labelarr.length - item -1]);
+			// }
+			// console.log(a.reverse(), b.reverse());
+			// console.log(data.reverse(), data);
+			// console.log(labelarr.reverse(), labelarr);
 			callback(data.reverse(), labelarr.reverse());
 		});
 	}
