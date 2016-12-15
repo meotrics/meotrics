@@ -80,6 +80,19 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
         res._utm_term = query.utm_term;
         res._utm_content = query.utm_content;
         res._utm_medium = query.utm_medium;
+        delete res.k;
+        return res;
+    }
+
+    function getKey(request) {
+        var useragent = request.headers['user-agent'];
+        var r = ua.parse(useragent);
+        var uri = request.params._url || '';
+        var res = {};
+        for (var i in request.params)
+            if (i.startsWith('_') === false) {
+                res[i] = isNaN(request.params[i]) ? request.params[i] : parseFloat(request.params[i]);
+            }
         return res;
     }
 
@@ -257,7 +270,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
             }
 
             function handle(req, res, path) {
-                var data = trackBasic(req);
+                var data = getKey(req);
                 if(data.k =="4ec0f81c5a3ddb192ab9ee9641758c52"){
                     var parts = path.split('/');
                     res.statusCode = 200;
