@@ -96,7 +96,7 @@ export class Dashboard {
 			'13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'];
 
 		// xac dinh gio
-		var curhour = now.getHours() +7;
+		var curhour = now.getHours();
 		var queryCont = [];
 		var labelarr = [];
 		// get Rangue query
