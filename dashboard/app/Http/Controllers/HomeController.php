@@ -53,6 +53,10 @@ class HomeController extends Controller
 			$ets = strtotime($pieces[1] . '/' . $pieces[2] . '/' . $pieces[0]);
 			$queryurl .= '/' . $sts . '/' . $ets;
 			$url_time = '/'. $sts . '/' . $ets;
+		}else{
+			$sts = time() - 86400*7;
+			$ets = time();
+			$url_time = '/'. $sts . '/' . $ets;
 		}
 		$dashboard =  new \stdClass;
 //		$dashboard = MtHttp::get($queryurl);
