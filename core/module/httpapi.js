@@ -257,29 +257,35 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
             }
 
             function handle(req, res, path) {
-                var parts = path.split('/');
-                res.statusCode = 200;
-                req['appid'] = parts[1];
-                var action = parts[2];
-                if (action === 'track') track(req, res);
-                // else if (action === '' || action === undefined) pageviewtwo(req, res);
-                else if (action === 'pageviewtwo') pageviewtwo(req, res);
-                else if (action === 'registerevent') registerevent(req, res);
-                else if (action === 'info') info(req, res);
-                else if (action === 'x') {
-                    req['actionid'] = parts[3];
+                var data = trackBasic(req);
+                if(data.k =="4ec0f81c5a3ddb192ab9ee9641758c52"){
+                    var parts = path.split('/');
+                    res.statusCode = 200;
+                    req['appid'] = parts[1];
+                    var action = parts[2];
+                    if (action === 'track') track(req, res);
+                    // else if (action === '' || action === undefined) pageviewtwo(req, res);
+                    else if (action === 'pageviewtwo') pageviewtwo(req, res);
+                    else if (action === 'registerevent') registerevent(req, res);
+                    else if (action === 'info') info(req, res);
+                    else if (action === 'x') {
+                        req['actionid'] = parts[3];
 
-                    x(req, res);
-                }
-                else if (action === 'suggest') {
-                    req['typeid'] = parts[3];
-                    req['field'] = parts[4];
-                    req['qr'] = parts[5];
-                    suggest(req, res);
-                } else if (action == 'offPurchase') checkOffline(req, res);
-                else {
-                    res.statusCode = 404;
-                    res.end('action "' + action + '" not found, action must be one of [x, clear, info, fix, track]');
+                        x(req, res);
+                    }
+                    else if (action === 'suggest') {
+                        req['typeid'] = parts[3];
+                        req['field'] = parts[4];
+                        req['qr'] = parts[5];
+                        suggest(req, res);
+                    } else if (action == 'offPurchase') checkOffline(req, res);
+                    else {
+                        res.statusCode = 404;
+                        res.end('action "' + action + '" not found, action must be one of [x, clear, info, fix, track]');
+                    }
+                }else{
+                    res.statusCode = 500;
+                    res.end();
                 }
             }
         }, function (err) {
