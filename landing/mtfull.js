@@ -156,6 +156,12 @@
 	function ajax(url, data, callback) {
 		data._mtid  = getMtid();
 		data.k = '4ec0f81c5a3ddb192ab9ee9641758c52';
+		if(typeof ga == 'function'){
+			ga(function(tracker) {
+				var clientId = tracker.get('clientId');
+				data.ga = clientId;
+			});
+		}
 		console.log(data._mtid);
 		var address = 'http://45.32.113.71:1711/';
 		if(location.protocol == 'https:')

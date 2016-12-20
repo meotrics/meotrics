@@ -16,7 +16,7 @@ const router = express.Router();
 const Excel = require('exceljs');
 
 const defaultUserFields = ['name', 'email','phone',"_ctime",'_utm_campaign','_utm_source','_utm_medium','_utm_term','_utm_content','_reftype','_ref','_country','_city','_location','_os','_osver',
-'_browser','_browserver','_deviceid','_devicetype','_scr','_lang'];
+'_browser','_browserver','_deviceid','_devicetype','_scr','_lang','ga'];
 const purchase = ['pid','pname','cid','cname','price','amount','quantity','paymentype'];
 const pageview = ['_url'];
 const click  = ['oid','type'];

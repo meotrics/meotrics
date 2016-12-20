@@ -259,7 +259,7 @@ $props = isset($props) ? $props : [];
 						data: data_get,
 						success: function (data) {
 							if(data.success){
-								var linkexport = '//'+ data.result + '.xls' ;
+								var linkexport = '//'+ data.result + '.xlsx' ;
 								var texturl = '<a href='+linkexport+'> https:'+linkexport+'</a>';
 								$('#messageexport').html('Click this URL link to download!');
 								$('#resultexport').html(texturl);
