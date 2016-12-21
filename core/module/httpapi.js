@@ -114,24 +114,121 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
     // identify an user
     // if mtid not exists in the parameter ->create one
+    // function info(req, res) {
+    //     // console.log("=====info");
+    //     var appid = req.appid;
+    //     var data = trackBasic(req);
+    //     handlerMtid(data._mtid, appid, res, function (mtid) {
+    //         var value = {};
+    //         // console.log(req.params);
+    //         for (var i in req.params)
+    //             if (i.startsWith('_') === false) value[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
+    //
+    //         actionmgr.identifyRaw(appid, {mtid: mtid, user: value}, function (mtid) {
+    //             //set new mtid if need
+    //             data._typeid = "login";
+    //             actionmgr.saveRaw(appid, data, function (actionid) {
+    //             });
+    //         });
+    //     });
+    // }
+
     function info(req, res) {
         // console.log("=====info");
         var appid = req.appid;
         var data = trackBasic(req);
-        handlerMtid(data._mtid, appid, res, function (mtid) {
-            var value = {};
-            // console.log(req.params);
-            for (var i in req.params)
-                if (i.startsWith('_') === false) value[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
+        // find user have mtid
+        var queryuserhavemtid = {_id: new ObjectID(data._mtid)};
+        var queryuserhaveemail = {email : data.email};
+        // console.log(data.email);
+        actionmgr.findUserByKey(appid,queryuserhavemtid,function(userold){
+            if(userold != undefined){
+                if(userold.email == undefined){
+                    actionmgr.findUserByKey(appid, queryuserhaveemail,function(userhaveemail){
+                        if(userhaveemail == "undefined"){
+                            // console.log(1);
+                            login();
+                            // sendMtid(mtid, res);
+                            // updateUser(data._mtid);
+                        }else{
+                            // console.log(2);
+                            var idUser = userhaveemail._mtid;
+                             sendMtid(idUser, res);
+                            actionmgr.moveUser(userold, userhaveemail,appid);
+                        }
+                    })
+                }else{
+                      if(userold.email == data.email){
+                          // console.log(3);
+                          sendMtid(data._mtid, res);
+                          updateUser(data._mtid);
+                      }else{
+                          actionmgr.findUserByKey(appid, queryuserhaveemail,function(userhaveemail){
+                              // console.log("userhaveemail: ");
+                              // console.log(userhaveemail);
+                              if(userhaveemail == "undefined"){
+                                  // console.log(4);
+                                  data._mtid = undefined;
+                                  handlerMtid(data._mtid, appid, res, function (mtid) {
+                                      var value = {};
+                                      data._mtid = mtid;
+                                      // console.log(req.params);
+                                      for (var i in req.params)
+                                          if (i.startsWith('_') === false) value[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
 
-            actionmgr.identifyRaw(appid, {mtid: mtid, user: value}, function (mtid) {
-                //set new mtid if need
-                data._typeid = "login";
-                actionmgr.saveRaw(appid, data, function (actionid) {
+                                      actionmgr.identifyRaw(appid, {mtid: mtid, user: value}, function (mtid) {
+                                          //set new mtid if need
+                                          data._typeid = "login";
+                                          actionmgr.saveRaw(appid, data, function (actionid) {
+                                          });
+                                      });
+                                  });
+                              }else{
+                                  // console.log(5);
+                                  // exists user
+                                  data._mtid = userhaveemail._mtid;
+                                  sendMtid(userhaveemail._mtid,res);
+                                  updateUser(userhaveemail._mtid);
+
+                              }
+                          })
+                      }
+                }
+            }
+        })
+
+        function updateUser(mtid){
+                var value = {};
+                // console.log(req.params);
+                for (var i in req.params)
+                    if (i.startsWith('_') === false) value[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
+
+                actionmgr.identifyRaw(appid, {mtid: mtid, user: value}, function (mtid) {
+                    //set new mtid if need
+                    data._typeid = "login";
+                    actionmgr.saveRaw(appid, data, function (actionid) {
+                    });
+                });
+        };
+
+        function login(){
+            handlerMtid(data._mtid, appid, res, function (mtid) {
+                var value = {};
+                // console.log(req.params);
+                for (var i in req.params)
+                    if (i.startsWith('_') === false) value[i] = isNaN(req.params[i]) ? req.params[i] : parseFloat(req.params[i]);
+
+                actionmgr.identifyRaw(appid, {mtid: mtid, user: value}, function (mtid) {
+                    //set new mtid if need
+                    data._typeid = "login";
+                    actionmgr.saveRaw(appid, data, function (actionid) {
+                    });
                 });
             });
-        });
+        }
     }
+
+
 
     function registerevent(req, res) {
         // console.log("=====info");
@@ -141,8 +238,8 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
         if(data.email != undefined){
             var query = {};
             query['email'] = data.email;
-            actionmgr.findUserByKey(appid, query, function (mtid) {
-                data._mtid = mtid.toString();
+            actionmgr.findUserByKey(appid, query, function (user) {
+                data._mtid = user._mtid.toString();
                 registerUser();
             });
         }else{
@@ -271,7 +368,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
             function handle(req, res, path) {
                 var data = getKey(req);
-                if(data.k =="4ec0f81c5a3ddb192ab9ee9641758c52"){
+                if(data.k =="4ec0f81c5a3ddb192ab9ee9641758c52" && data.brower != "Googlebot"){
                     var parts = path.split('/');
                     res.statusCode = 200;
                     req['appid'] = parts[1];

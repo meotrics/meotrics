@@ -58,19 +58,21 @@ export class trackOffline {
         for (let key in this.keyUser) {
             (function(key){
                 var value = _self.keyUser[key];
-                // console.log(value);
-                // console.log(req[value]);
-                // console.log(req);
                 if(req[value] != undefined){
                     var data = {};
                     data[value] = req[value];
                     // console.log(data);
-                    _self.actionmgr.findUserByKey(_self.appid,data,function(mtid){
-                        if(mtid != 0 && mtid != undefined){
-                            callback(mtid);
+                    _self.actionmgr.findUserByKey(_self.appid,data,function(user){
+                        if(user == "undefined"){
+                            callback(0);
                         }else{
-                            if(key == _self.keyUser.length -1){
-                                callback(0);
+                            var mtid = user._mtid;
+                            if(mtid != 0 && mtid != undefined){
+                                callback(mtid);
+                            }else{
+                                if(key == _self.keyUser.length -1){
+                                    callback(0);
+                                }
                             }
                         }
                     });

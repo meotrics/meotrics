@@ -60,22 +60,21 @@ export class ActionMgr {
             var query = data;
             query[isUser] = true;
             me.db.collection(collection).find(query).limit(1).toArray(function (err, ret){
-                if(ret.length === 0){
+                if(ret.length > 0){
+                    callback(ret[0]);
+                }else{
                     callback('undefined');
-                }
-                else{
-                    callback(ret[0]._mtid);
                 }
             })
         })
     }
 
     // purpose insert offline data
-    public insertOfflinePurchase(appid: string){
-        var me = this;
-        var collection = me.db.collection(me.prefix + "app" + appid);
-        collection
-    }
+    // public insertOfflinePurchase(appid: string){
+    //     var me = this;
+    //     var collection = me.db.collection(me.prefix + "app" + appid);
+    //     collection
+    // }
 
     // purpose: record an action rawly
     // param:
@@ -172,9 +171,11 @@ export class ActionMgr {
                         me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
                             '_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype', 'lastactionid', '_ref',
                             '_lang', '_os', '_browser', '_country', '_city', '_devicetype', '_deviceid',
-                            '_callback', '_numberPurchase', '_listProduct', '_deltat', 'actionid', '_lastSeen', '_utm_campaign'], function (ids) {
+                            '_callback', '_numberPurchase', '_listProduct', '_deltat', 'actionid', '_lastSeen', '_utm_campaign','ga'], function (ids) {
                             // increase revenue
                             var simpleprop = {};
+                            // add ga to user
+                            datax[ids.ga] = data.ga;
                             if (typeid.toLowerCase() === 'purchase') {
                                 if (user[ids._revenue] === undefined) user[ids._revenue] = 0;
                                 //get purchase amount
@@ -237,6 +238,32 @@ export class ActionMgr {
         callback();
     }
 
+    // move user old to user new
+    // add data old user to new user
+    // change mtid old user to id new user
+    // remove old user
+    public moveUser(oldUser,newUser,appid){
+        var me = this;
+        var newid = newUser._mtid;
+        var oldid = oldUser._mtid;
+        var collection = me.db.collection(this.prefix + "app" + appid);
+        me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
+            '_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype', 'lastactionid', '_ref',
+            '_lang', '_os', '_browser', '_country', '_city', '_devicetype', '_deviceid',
+            '_callback', '_numberPurchase', '_listProduct', '_deltat', 'actionid', '_lastSeen', '_utm_campaign'], function (ids) {
+            me.updateArrayBasedUserInfo(collection,newid,ids,newUser, oldUser, function(){});
+            var query = {_mtid: ObjectID(oldid)}
+            var update = { $set:{_mtid: ObjectID(newid)}};
+            var multi = { multi: true }
+            collection.update(query,update,multi,function(err,res){
+                if(err) throw err;
+            });
+            var querydeleteolduser = {_id: ObjectID(oldid)};
+            collection.remove(querydeleteolduser,function(err,res){
+                if(err) throw err;
+            });
+        });
+    }
 
     // purpose: add new data to arrays in user
     // param:
@@ -275,7 +302,6 @@ export class ActionMgr {
 
         //sync data from datax to user
         for (var p in datax) if (datax.hasOwnProperty(p)) {
-
             if (p === ids._revenue || p === ids._numberPurchase || p === ids._listProduct || p === ids._lastSeen) {
                 user[p] = datax[p];
                 continue;
@@ -651,7 +677,6 @@ export class ActionMgr {
                         db.collection(collection).find({_id: mtid}).limit(1).toArray(function (err, r) {
                             if (err) throw err;
                             var userx = {};
-                            console.log(mtid);
                             if (r[0][ids._stime] === undefined || r[0][ids._stime] === null) {
                                 userx[ids._stime] = Math.round(new Date().getTime() / 1000);
                                 db.collection(collection).update({_id: mtid}, {$set: userx}, function (err, result) {
@@ -686,6 +711,7 @@ export class ActionMgr {
 
     // purpose: set up new record for anonymous user
     // param: appid: id of the app
+    // creat new user
     public setupRaw(appid:string, id,callback) {
         var me = this;
         var collection = me.prefix + "app" + appid;
