@@ -368,7 +368,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
 
             function handle(req, res, path) {
                 var data = getKey(req);
-                if(data.k =="4ec0f81c5a3ddb192ab9ee9641758c52" && data.brower != "Googlebot"){
+                if(data.k =="4ec0f81c5a3ddb192ab9ee9641758c52" && data.browser != "Googlebot"){
                     var parts = path.split('/');
                     res.statusCode = 200;
                     req['appid'] = parts[1];
