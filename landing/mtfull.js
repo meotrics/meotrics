@@ -167,7 +167,7 @@
 		if(location.protocol == 'https:')
 			address = "https://api.meotrics.com/";
 		getGa(function(gaId){
-			data.ga = gaId;
+			data._ga = gaId;
 			var theurl = address + window.mtapp + '/' + url + (data ? '?' + serialize(data) : '');
 			callback(httpGetAsync(theurl,function(value){
 				callback(value);

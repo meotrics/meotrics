@@ -65,7 +65,8 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
             _scr: request.params._scr,
             _lang: request.headers["accept-language"],
             _devicetype: devicetype,
-            _mtid: request.params._mtid
+            _mtid: request.params._mtid,
+            _ga : request.params._ga
         };
 
         for (var i in request.params)
