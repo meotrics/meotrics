@@ -171,11 +171,11 @@ export class ActionMgr {
                         me.converter.toIDs(['_revenue', '_firstcampaign', '_lastcampaign', '_campaign', '_ctime', '_mtid', '_reftype',
                             '_segments', '_url', '_typeid', '_referer', '_totalsec', 'registed', '_reftype', 'lastactionid', '_ref',
                             '_lang', '_os', '_browser', '_country', '_city', '_devicetype', '_deviceid',
-                            '_callback', '_numberPurchase', '_listProduct', '_deltat', 'actionid', '_lastSeen', '_utm_campaign','ga'], function (ids) {
+                            '_callback', '_numberPurchase', '_listProduct', '_deltat', 'actionid', '_lastSeen', '_utm_campaign','_ga'], function (ids) {
                             // increase revenue
                             var simpleprop = {};
                             // add ga to user
-                            datax[ids.ga] = data.ga;
+                            datax[ids._ga] = data._ga;
                             if (typeid.toLowerCase() === 'purchase') {
                                 if (user[ids._revenue] === undefined) user[ids._revenue] = 0;
                                 //get purchase amount

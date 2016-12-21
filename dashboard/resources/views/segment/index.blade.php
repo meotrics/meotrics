@@ -248,7 +248,8 @@ $props = isset($props) ? $props : [];
 //			if(data.length > 0){
 				url = '{{ URL::to('segment/'.$appcode.'/exportexcel') }}';
 				data_get = {
-					'data': JSON.stringify(data),
+//					'data': JSON.stringify(data),
+					'data': data,
 					'segment_id': segment_id
 				}
 				if (url) {
