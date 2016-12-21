@@ -245,7 +245,7 @@ $props = isset($props) ? $props : [];
 			var segment_id = $('#segment').val();
 			console.log(data);
 			var $btn = $('#exportdata').button('loading');
-			if(data.length > 0){
+//			if(data.length > 0){
 				url = '{{ URL::to('segment/'.$appcode.'/exportexcel') }}';
 				data_get = {
 					'data': JSON.stringify(data),
@@ -270,7 +270,7 @@ $props = isset($props) ? $props : [];
 						}
 					})
 				}
-			}
+//			}
 
 		}
 		$('select').select2();

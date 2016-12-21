@@ -166,14 +166,26 @@
 		var address = 'http://45.32.113.71:1711/';
 		if(location.protocol == 'https:')
 			address = "https://api.meotrics.com/";
+		getGa(function(gaId){
+			data.ga = gaId;
+			var theurl = address + window.mtapp + '/' + url + (data ? '?' + serialize(data) : '');
+			callback(httpGetAsync(theurl,function(value){
+				callback(value);
+			}));
+		})
+	}
 
-		var theurl = address + window.mtapp + '/' + url + (data ? '?' + serialize(data) : '');
-
-
-		callback(httpGetAsync(theurl,function(value){
-			callback(value);
-		}));
-
+	function getGa(callback){
+		var clientId = '';
+		if(typeof ga == 'function'){
+			ga(function(tracker) {
+				clientId = tracker.get('clientId');
+				console.log(clientId);
+				callback(clientId);
+			});
+		}else{
+			callback(clientId);
+		}
 	}
 
 	function httpGetAsync(theUrl, callback)
