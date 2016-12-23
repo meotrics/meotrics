@@ -94,6 +94,7 @@ exports.HttpApi = function (db, converter, prefix, codepath, ref, valuemgr) {
             if (i.startsWith('_') === false) {
                 res[i] = isNaN(request.params[i]) ? request.params[i] : parseFloat(request.params[i]);
             }
+        res["_browser"] = r.ua.family;
         return res;
     }
 
