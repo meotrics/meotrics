@@ -29,6 +29,7 @@ var funnelApp = new Vue({
         removeSegment: function(item){
             var index = this.list_choice.indexOf(item);
             this.list_choice.splice(index,1);
+            this.getChartSegment();
         },
         getChartSegment: function(){
             var _self = this;
