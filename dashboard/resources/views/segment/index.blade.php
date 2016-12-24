@@ -243,7 +243,6 @@ $props = isset($props) ? $props : [];
 				data.push(item);
 			}
 			var segment_id = $('#segment').val();
-			console.log(data);
 			var $btn = $('#exportdata').button('loading');
 //			if(data.length > 0){
 				url = '{{ URL::to('segment/'.$appcode.'/exportexcel') }}';
@@ -279,7 +278,6 @@ $props = isset($props) ? $props : [];
 			var that = $('#segment');
 			var $btn = $(this).button('loading');
 			$.get('/segment/{{$appcode}}/refresh/' + that.val(),function(data){
-				console.log(data);
 				$btn.button('reset');
 				data = JSON.parse(data);
 				$('#count').html(data.count);
@@ -302,7 +300,6 @@ $props = isset($props) ? $props : [];
 			$('#desc').html(segments[that.val()].description);
 			$('#count').html(segments[that.val()].count);
 			$('#startTime').html(segments[that.val()].startTime + ' to ' + segments[that.val()].endTime)
-			console.log(segments);
 			$('div[data-name="canvas-chart"]').html('');
 			$("#user_table").empty();
 			return false;
@@ -326,15 +323,12 @@ $props = isset($props) ? $props : [];
 
 		var listDataActionType = {!! json_encode($actiontypes) !!};
 		var listPropUser = {!! json_encode($props) !!};
-		console.log(listDataActionType);
-		console.log(listPropUser);
 		function actiontypechange(e){
 			var actionValue = $('select[name="actiontype"]').val();
 //			var str = '<select name="Prop[one]" id="slprop" class="form-control" >' +
 //					'<option value="">Select property</option>';
 			var str = '<option value="">Select property</option>';
 			if(actionValue == 'user'){
-				console.log(listPropUser);
 				for(var i in listPropUser){
 					var item = listPropUser[i];
 					var option = "<option value='"+item.code+"'>"+item.name+"</option>";
@@ -427,7 +421,6 @@ $props = isset($props) ? $props : [];
 					data: data_get,
 					success: function (data) {
 						if (data.success && data.labels && data.datasets) {
-							console.log(data);
 							$.each(data.labels,function(index,value){
 								if(value == "" || value == null){
 									data.labels[index] = "N/A";
@@ -476,13 +469,11 @@ $props = isset($props) ? $props : [];
 									'backgroundColor': chart_colors[di] ? chart_colors[di] : '',
 									'hoverBackgroundColor': chart_colors[di] ? chart_colors[di] : '',
 								});
-//                            data_chart.datasets[di]['data'] = dv['data'];
 							});
                                                         var tmp_labels = [];
                                                         if(data_chart.labels.length < 7){
                                                             var add = 0;
                                                             add = Math.floor((7 - data_chart.labels.length)/2);
-                                                            console.log(add);
                                                             $.each(data_chart.datasets, function(ddi, ddv){
                                                                 tmp_labels = [];
                                                                 var tmp_data = [];
@@ -541,7 +532,6 @@ $props = isset($props) ? $props : [];
                                 setTable(data.users,field1, field2,segment_id,page);
                             }
                             window.listuser = data;
-                            console.log(data);
                         }
                     });
 		}
@@ -607,7 +597,6 @@ $props = isset($props) ? $props : [];
 						{{--console.log($("#count").text());--}}
 						{{--console.log(document.getElementById("count").textContent);--}}
 					@endif
-					console.log("count: "+ count);
 					var page = parseInt(count/15)+1;
 					// end take page
 					var max_index = page;

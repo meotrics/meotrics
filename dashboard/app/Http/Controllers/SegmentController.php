@@ -478,134 +478,6 @@ class SegmentController extends Controller
         return $result;
     }
 
-//    public function convertData($charts, $f)
-//    {
-//        $result = ['datasets' => [], 'labels' => []];
-//        $labels = [];
-//        $datasets = [];
-//        $tmp_data = [];
-//        if (is_array($charts) && $charts) {
-//            $tmp_charts_first = $charts[0];
-//            if (!isset($tmp_charts_first->key))
-//                $tmp_charts_first->key = "N/A";
-//            if (property_exists($tmp_charts_first, 'key') && is_string($tmp_charts_first->key)) {
-//                foreach ($charts as $tmp_chart) {
-//                    if ($f === '_reftype')
-//                        $labels[] = $this->reftypemap[$tmp_chart->key];
-//                    else
-//                        $labels[] = $tmp_chart->key;
-//
-//                    $tmp_data[] = $tmp_chart->count;
-//                }
-//                if($f === "_ref"){
-//                    // conver url
-//                    foreach($charts as $tmp_chart){
-//                        //remove https
-//                        $tmp = str_replace("https://","",$tmp_chart->key);
-//                        $tmp = str_replace("http://","",$tmp);
-//                        $arr_url_have_uri = explode("/",$tmp);
-//                        $server_name = $arr_url_have_uri[0];
-//                        $tmp_chart->key = $server_name;
-//                    }
-//                    //return data and label
-//                    $labels = [];
-//                    $tmp_data = [];
-//                    foreach($charts as $tmp_chart){
-//                        if(!in_array($tmp_chart->key,$labels)){
-//                            $labels[] = $tmp_chart->key;
-//                            $tmp_data[$tmp_chart->key] = 0;
-//                        }
-//                        $tmp_data[$tmp_chart->key] += (int)$tmp_chart->count;
-//                    }
-//
-//                }
-//                $tmp = [];
-//                foreach($labels as $label){
-//                    $tmp[] = $tmp_data[$label];
-//                }
-//                $tmp_data = $tmp;
-//                $datasets[] = (object)[
-//                    'data' => $tmp_data,
-//                ];
-//            } elseif (property_exists($tmp_charts_first, 'key') && is_array($tmp_charts_first->key)) {
-//                $tmp_data = [];
-//                $tmp_name = []; // name ref
-//                foreach ($charts as $tmp_chart) { // 1 object
-//                    $tmp_chart_keys = isset($tmp_chart->key) && is_array($tmp_chart->key) ? $tmp_chart->key : []; // arr key in object
-//                    foreach ($tmp_chart_keys as $tmp_label) {  // field in arr key
-//                        if (!in_array($tmp_label, $labels)) {
-//
-//                            $labels[] = $tmp_label;
-//                            if ($f === '_reftype')
-//                                $tmp_name[] = $this->reftypemap[$tmp_label];
-//                            $tmp_data[$tmp_label] = 0;
-//                        }
-//                        $tmp_data[$tmp_label] += (int)$tmp_chart->count;
-//                    }
-//                }
-//                $chart_data = [];
-//                // sap xep tu cao xuong thap
-//                for($i=0; $i< count($labels); $i++){
-//                    for($j = $i+1; $j<count($labels);$j++){
-//                        $label = $labels[$i];
-//                        $next_label = $labels[$j];
-//                        if($tmp_data[$label] < $tmp_data[$next_label]){
-//                            $tmp = $labels[$i];
-//                            $labels[$i] = $labels[$j];
-//                            $labels[$j] = $tmp;
-//                        }
-//                    }
-//                }
-//                $count = 0;
-//                $labels_10 = [];
-//                // only take 10 field
-//                foreach ($labels as $label) {
-//                    $count++;
-//                    $chart_data[] = $tmp_data[$label];
-//                    if($label == null){
-//                        $label = "N/A";
-//                    }
-//                    $labels_10[] = $label;
-//                    if($count == 10)
-//                        break;
-//                }
-//                $labels = $labels_10;
-//                $datasets[] = (object)[
-//                    'data' => $chart_data,
-//                ];
-//
-//                if ($f === '_reftype') {
-//                    $labels = $tmp_name;
-//                }
-//            } else {
-//                foreach ($charts as $tmp_chart) {
-//                    if (!isset($tmp_chart->key))
-//                        $tmp_chart->key = "N/A";
-//
-//                    $tmp_label = property_exists($tmp_chart, 'key') && property_exists($tmp_chart->key, 'from') ? ('from ' . $tmp_chart->key->from) : '';
-//                    $tmp_label .= property_exists($tmp_chart, 'key') && property_exists($tmp_chart->key, 'to') ? (' to ' . $tmp_chart->key->to) : '';
-//                    if($tmp_chart->key == null)
-//                        $tmp_label = "N/A";
-//                    $labels[] = trim($tmp_label);
-//                    $tmp_data[] = $tmp_chart->count;
-//                }
-//                $datasets[] = (object)[
-//                    'data' => $tmp_data,
-//                ];
-//
-//                if ($f === '_reftype') {
-//                    $labels = [];
-//                    foreach ($tmp_chart->key as $tmp_label)
-//                        if (!in_array($tmp_label, $labels))
-//                            $labels[] = $this->reftypemap[trim($tmp_label)];
-//                }
-//
-//            }
-//        }
-//        $result['datasets'] = $datasets;
-//        $result['labels'] = $labels;
-//        return $result;
-//    }
 
     public function convertData($charts, $f)
     {
@@ -796,5 +668,10 @@ class SegmentController extends Controller
             }
         }
         return $result;
+    }
+
+    // api
+    public function getListSegment($appid){
+
     }
 }

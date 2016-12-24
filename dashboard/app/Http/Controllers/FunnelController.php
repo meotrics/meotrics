@@ -20,17 +20,9 @@ class FunnelController extends Controller{
     {
         $this->middleware('auth');
     }
-    public function index(){
-//        $this->layout = View::make('layouts.master');
-        return view('funnel/index');
+    public function index(Request $request, $appcode, $segid = null){
+//        if (Access::can_view($request->user()->id, $appcode) == false) abort(500, "Permission Denied");
+        $segments = MtHttp::get('segment/' . $appcode);
+        return view('funnel/index',['segments'=>$segments]);
     }
-//    public function index(Request $request, $appid)
-//    {
-//        var_dump("fuck");die;
-//        $result = MtHttp::get('actiontype/' . $appid);
-//        return view('funnel/index', [
-//            'appcode' => $appid,
-//            'actiontypes' => $result
-//        ]);
-//    }
 }
