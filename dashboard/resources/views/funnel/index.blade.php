@@ -19,19 +19,19 @@
                     </div>
                     <div class="content row">
                         <div class="col-md-12" id="listsegment">
-                            <div class="col-md-2" v-for="segment_item in list_choice">
+                            {{--<div class="col-md-2" v-for="segment_item in list_choice">--}}
                                 {{--<label>@{{ segment_item.name }}</label>--}}
                                 {{--<button type="button" rel="tooltip" title="" class="btn btn-danger btn-simple btn-xs" v-on:click="removeSegment(segment_item)">--}}
                                     {{--<i class="fa fa-times"></i>--}}
                                 {{--</button>--}}
                                 {{--<button type="button" aria-hidden="true" class="close" v-on:click="removeSegment(segment_item)">×</button>--}}
-                                <span class="tag tag-pill tag-success" style="border: 1px solid #968d8d;padding: 6px;border-radius: 14px;">
+                                <span class="tag tag-pill tag-success" style="border: 1px solid #968d8d;padding: 6px;border-radius: 14px;margin-right:1px" v-for="segment_item in list_choice">
                                 <label>@{{ segment_item.name }}</label>
                                 <button type="button" rel="tooltip" title="" class="btn btn-danger btn-simple btn-xs" v-on:click="removeSegment(segment_item)">
                                     <i class="fa fa-times"></i>
                                 </button>
                             </span>
-                            </div>
+                            {{--</div>--}}
                         </div>
                         <div class="col-md-12" id="canvas-chart" style="margin-top:20px">
                         </div>
