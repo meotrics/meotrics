@@ -75,6 +75,7 @@ Route::post('auth/confirm/{email}/{time}/{salt}/{hash}', 'Auth\AuthController@co
 Route::get('auth/reset/{email}/{time}/{salt}/{hash}', 'Auth\AuthController@newpw');
 Route::post('auth/reset/{email}/{time}/{salt}/{hash}', 'Auth\AuthController@reset');
 Route::post('auth/register', 'Auth\AuthController@register');
+Route::get('auth/register', 'Auth\AuthController@getRegister');
 Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',

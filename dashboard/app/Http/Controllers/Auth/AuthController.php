@@ -62,6 +62,10 @@ class AuthController extends Controller
 		return 'sent';
 	}
 
+	public function getRegister(){
+		return view('/auth/register');
+	}
+
 	public function register(Request $request)
 	{
 		$isAdmin = $request->input('radio') == 1;
