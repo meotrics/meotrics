@@ -66,7 +66,9 @@ class AuthController extends Controller
 	{
 		$isAdmin = $request->input('radio') == 1;
 		$email = $request->input('email');
-
+		$phone = $request->input('codephone').$request->input('phone');
+		$job =  $request->input('job');
+		$expired = time() + 60*60*24*11;
 		// create a new user
 		// generate new hash
 		$characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -87,9 +89,13 @@ class AuthController extends Controller
 
 		$userid = DB::table('users')->insertGetId(['password' => '',
 			'email' => $email,
+			'phone' => $phone,
+			'job' =>  $job,
+			'name' => $email,
 			'status' => 10,
 			'created_at' => time(),
 			'updated_at' => time(),
+			'expired' =>  $expired,
 			'verified' => 0,
 			'resetpwhash' => $hash]);
 
