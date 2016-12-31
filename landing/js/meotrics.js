@@ -1,13 +1,17 @@
 //write by conghd
 
-$( document ).ready(function() {
-	$("#tologin").click(function() {
-		$("[href$='#login']").trigger('click');
-	});
+$(function(){
+	if(window.location.pathname.length < 3){
+      	$("#includedContent").load("menu.html"); 
+		$("#footer").load("footer.html"); 
+  		$('#checking').load("tracking.html");
 
-	$("#toregister").click(function() {
-		$("[href$='#register']").trigger('click');
-	});
+	}
+  	else{
+  		$("#includedContent").load("../menu.html"); 
+  		$("#footer").load("../footer.html"); 
+  		$('#checking').load("../tracking.html");
 
-	
-});
+  	}
+
+    });
